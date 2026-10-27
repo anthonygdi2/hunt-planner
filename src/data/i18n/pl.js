@@ -530,4 +530,9 @@ export default {
   "Every kill counts": "Liczy się każde zabicie",
   "Any Creature kills left": "Pozostałe zabicia Any Creature",
   "Any Creature done": "Any Creature zrobione",
+  // Preferred / Unwanted lists on the Plan
+  "★ Preferred {preferred} of {max} · ⊘ Unwanted {unwanted} of {max}": "★ Preferred {preferred} z {max} · ⊘ Unwanted {unwanted} z {max}",
+  "Preferred and Unwanted lists: not set": "Listy Preferred i Unwanted: nieustawione",
+  "Edit lists": "Edytuj listy",
+  "Counts your lists: {preferred} Preferred, {unwanted} Unwanted in this pool.": "Uwzględnia twoje listy: {preferred} Preferred i {unwanted} Unwanted w tej puli.",
 };

@@ -1,5 +1,5 @@
 // Creatures (was the Classic view): tiers S–D and Avoid, or a table, for one task difficulty and the goal mix; search;
-// each creature opens its page. Below, the Preferred and Unwanted lists open inline with board odds and suggestions.
+// each creature opens its page. At the top, the Preferred and Unwanted lists open inline with board odds and suggestions.
 import { h } from "../dom.js";
 import { segmented, badges } from "../components.js";
 import { t } from "../../app/lang.js";
@@ -45,6 +45,11 @@ export function render(view, on) {
   return h("div", { class: "hp-section" },
     h("div", { class: "hp-spot-title" }, h("h1", { class: "hp-title" }, t("Creatures")), h("span", { class: "hp-caption" }, view.sub)),
     segmented({ label: t("Task difficulty"), options: view.difficulties, value: view.difficulty, onPick: on.difficulty }),
+    h("div", { class: "hp-card" }, h("b", null, t("Preferred and unwanted")),
+      h("span", { class: "hp-small hp-muted" }, t("Your in-game lists.")),
+      h("button", { id: "cr-lists", type: "button", class: "hp-btn", "aria-expanded": view.lists ? "true" : "false", "aria-controls": "lists-editor", onClick: () => on.lists(!view.lists) },
+        view.lists ? t("Close the lists") : t("Edit the lists"))),
+    view.lists ? listsEditor(view.lists, on) : null,
     segmented({ label: t("View"), options: [{ value: "tiers", label: t("Tiers") }, { value: "table", label: t("Table") }], value: view.mode, onPick: on.mode }),
     h("input", { id: "cr-q", type: "search", class: "hp-input", "aria-label": t("Search creatures"), placeholder: t("Search creatures"), value: view.query, autocomplete: "off", onInput: (e) => on.query(e.target.value) }),
     view.empty ? h("p", { class: "hp-p hp-muted" }, view.empty) : null,
@@ -58,10 +63,5 @@ export function render(view, on) {
         h("tbody", null, view.table.map((c) => h("tr", null,
           h("th", { scope: "row" }, h("a", { href: "#/creature/" + c.slug, onClick: (e) => { e.preventDefault(); on.open(c.slug); } }, c.name)),
           h("td", null, c.avoid ? t("Avoid") : c.tier ? c.tier + " " + c.score : "–"), h("td", null, c.spot),
-          h("td", { class: "num" }, c.exp), h("td", { class: "num" }, c.profit), h("td", null, c.badge ? badges([c.badge]) : "–")))))),
-    h("div", { class: "hp-card" }, h("b", null, t("Preferred and unwanted")),
-      h("span", { class: "hp-small hp-muted" }, t("Your in-game lists.")),
-      h("button", { id: "cr-lists", type: "button", class: "hp-btn", "aria-expanded": view.lists ? "true" : "false", "aria-controls": "lists-editor", onClick: () => on.lists(!view.lists) },
-        view.lists ? t("Close the lists") : t("Edit the lists"))),
-    view.lists ? listsEditor(view.lists, on) : null);
+          h("td", { class: "num" }, c.exp), h("td", { class: "num" }, c.profit), h("td", null, c.badge ? badges([c.badge]) : "–")))))));
 }

@@ -95,7 +95,8 @@ export function mount(root, app, host) {
         setTokens: () => { P.open = "bounty"; draw(); }, confirmNoTokens: a.confirmNoTokens,
         preset: a.applyPreset,
         weight: (key, n) => { const w = {}; v.goal.rows.forEach((row) => { w[row.key] = row.value; }); w[key] = n; a.setWeights(w); },
-        bounty: { difficulty: a.setDifficulty, tokens: a.setTokens, offer: a.setOffer, pick: a.pickOffer, active: a.setActive, finished: a.finishedBounty, rerolled: a.rerolled },
+        bounty: { difficulty: a.setDifficulty, tokens: a.setTokens, offer: a.setOffer, pick: a.pickOffer, active: a.setActive, finished: a.finishedBounty, rerolled: a.rerolled,
+          lists: () => { ui.creatures.lists = true; go("creatures"); } },
       });
     }
     if (r === "log") {

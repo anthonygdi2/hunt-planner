@@ -121,11 +121,22 @@ test("plan: the Bounty editor while choosing offers and once one is picked", asy
   const choosing = { difficulty: "master", tokens: 4, mode: "offers", active: null,
     offers: [{ slug: "cobra-assassin", kills: 450, kind: "normal", exp: null }, { slug: "gorerilla", kills: 400, kind: "silver", exp: 1627800 }, blank] };
   const s = spy(), bounty = {};
-  ["difficulty", "tokens", "offer", "pick", "active", "finished", "rerolled"].forEach((k) => { bounty[k] = s.fn(k); });
+  ["difficulty", "tokens", "offer", "pick", "active", "finished", "rerolled", "lists"].forEach((k) => { bounty[k] = s.fn(k); });
   const goal = { chip: { label: "Goal", value: "Exp", set: true } };
-  let v = bountyView(choosing, catalog);
+  // The Preferred / Unwanted lists: a line with Edit lists, and the offers' marks.
+  let v = bountyView(choosing, catalog, { preferred: ["cobra-assassin"], unwanted: ["gorerilla", "rat"] });
+  assert.equal(v.lists, "★ Preferred 1 of 5 · ⊘ Unwanted 2 of 5");
+  assert.deepEqual(v.offers.map((o) => o.mark && o.mark.text), ["★ Preferred", "⊘ Unwanted", null]);
+  let $ = mount(plan.render({ goal, bounty: v }, { open: "bounty" }, { toggle() {}, bounty }));
+  assert.equal($("#offer-0-mark").textContent, "★ Preferred");
+  assert.equal($("#offer-1-mark").textContent, "⊘ Unwanted");
+  assert.equal($("#offer-2-mark"), null);
+  $("#bounty-lists").click();
+  assert.deepEqual(s.calls.splice(0), [["lists"]]);
+  assert.equal(bountyView(choosing, catalog).lists, "Preferred and Unwanted lists: not set");
+  v = bountyView(choosing, catalog);
   assert.equal(v.chip.value, "2 offers · 4 tokens");
-  let $ = mount(plan.render({ goal, bounty: v }, { open: "bounty" }, { toggle: s.fn("toggle"), bounty }));
+  $ = mount(plan.render({ goal, bounty: v }, { open: "bounty" }, { toggle: s.fn("toggle"), bounty }));
   assert.equal($("#chip-bounty").getAttribute("aria-expanded"), "true");
   assert.equal($("#offer-0-name").value, "Cobra Assassin");
   assert.ok($("#offer-1-exp"), "Challenging on Master: reward exp field");
@@ -338,6 +349,7 @@ test("creatures: difficulty, tiers and table, search, chips, and the lists edito
   assert.match(document.body.textContent, /Rat · 700\+/);
   assert.equal(document.querySelectorAll(".hp-slot-empty").length, 9);
   assert.equal($("#cr-lists").getAttribute("aria-expanded"), "true");
+  assert.ok($("#cr-lists").compareDocumentPosition($(".hp-tiers")) & 4, "the lists come before the tiers");
   [...document.querySelectorAll('[aria-label="Task difficulty"] button')][4].click();
   [...document.querySelectorAll('[aria-label="View"] button')][1].click();
   $("#cr-q").value = "cob"; $("#cr-q").dispatchEvent(new dom.window.Event("input"));

@@ -37,6 +37,10 @@ test("picking, rerolling and the end of the chain", () => {
   const ctx = { chosen: [{ held: true, offer: active, name: "Sewers" }], worth: {}, options: [{}], offers: [active], tokens: 2, pct, active };
   assert.equal(rerollWhy({ name: "Cave", v: 0.4, thr: 0.5 }, [], ctx), "The next spot, Cave (40), is worth less than a reroll (50). Rerolling drops Rat.");
   assert.equal(rerollWhy(null, [], Object.assign({}, ctx, { options: [], offers: [], active: null })), "None of your spots has numbers for this character yet.");
+  // The Preferred and Unwanted lists, when any of their creatures is in the pool.
+  const listed = Object.assign({}, ctx, { active: null, sc: { model: { lists: { preferred: 2, unwanted: 1 } } } });
+  assert.equal(rerollWhy({ name: "Cave", v: 0.4, thr: 0.5 }, [], listed), "The next spot, Cave (40), is worth less than a reroll (50). Counts your lists: 2 Preferred, 1 Unwanted in this pool.");
+  assert.doesNotMatch(rerollWhy({ name: "Cave", v: 0.4, thr: 0.5 }, [], Object.assign({}, listed, { sc: { model: { lists: { preferred: 0, unwanted: 0 } } } })), /lists/);
   assert.match(seeSpotsWhy({ unknown: true }), /Set your reroll tokens/);
   assert.match(seeSpotsWhy({ tokens: 0 }), /No reroll tokens left/);
   assert.equal(seeSpotsWhy({ tokens: 3, model: true }), "");

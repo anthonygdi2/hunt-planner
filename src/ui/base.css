@@ -142,6 +142,8 @@
   .hp-inline { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); flex-wrap: wrap; }
   .hp-offer { border: 1px solid var(--line); border-radius: var(--r-card); padding: var(--s3); display: grid; gap: var(--s2); }
   .hp-offer.active { border: 2px solid var(--gold); }
+  .hp-lists-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--s2); }
+  .hp-lists-line .hp-linkbtn { min-height: 44px; }
   .hp-offer-top { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: var(--s2); align-items: end; }
   .hp-letter { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--r-tile); background: var(--surface2); font-family: var(--font-title); font-size: 20px; }
   .hp-offer-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--s2); align-items: end; }

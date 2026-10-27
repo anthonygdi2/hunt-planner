@@ -321,10 +321,15 @@ test("Creatures over the golden fixture: tiers, a creature page's writes, and th
   assert.match(p.d.body.textContent, /Needs level 700 for Elite Knights/);
   await p.click("#cr-avoid");
   await until(() => !("rating" in store["profiles/ek/entries/cobra-assassin"]), "Avoid off");
+  // The lists from the Plan's Bounty editor: the line, the offers' marks, and Edit lists opens them on Creatures.
+  await p.go("plan");
+  await p.click("#chip-bounty");
+  assert.match(p.$("#plan-editor").textContent, /★ Preferred 2 of 5 · ⊘ Unwanted 1 of 5/);
+  await p.click("#bounty-lists");
+  assert.equal(p.w.location.hash, "#/creatures");
+  assert.equal(p.$("#cr-lists").getAttribute("aria-expanded"), "true");
   // The lists editor: a suggestion goes into Preferred.
-  await p.go("creatures");
   await p.type("#cr-q", "", "input");
-  await p.click("#cr-lists");
   const sug = p.d.querySelector('[id^="list-preferred-sug-"]');
   const slug = sug.id.replace("list-preferred-sug-", "");
   sug.click();
