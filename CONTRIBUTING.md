@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping. Bug reports and ideas go in [issues](https://github.com/anthonygdi2/hunt-planner/issues); please don’t attach a backup file there, since it holds your characters and hunts.
+Thanks for helping. Bug reports and ideas go in [issues](https://github.com/anthonygdi2/hunt-planner/issues); please don’t attach a backup file there, since it holds your characters and hunts. Security problems go privately through [SECURITY.md](SECURITY.md) instead. Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## Setup
 
