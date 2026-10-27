@@ -175,6 +175,7 @@
     display: inline-flex; align-items: center; gap: 6px; }
   .hp-chip .label { color: var(--muted); }
   .hp-chip.unset { background: transparent; border-style: dashed; }
+  .hp-chip.warn { border: 2px solid var(--gold); }
   .hp-chip[aria-expanded="true"] { border: 2px solid var(--accent); }
   .hp-editor { background: var(--surface); border: 2px solid var(--accent); border-radius: var(--r-editor); padding: var(--s4); display: flex; flex-direction: column; gap: var(--s3); }
   .hp-editor-head { display: flex; flex-direction: column; gap: var(--s1); }
@@ -200,6 +201,12 @@
   .hp-inline { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); flex-wrap: wrap; }
   .hp-offer { border: 1px solid var(--line); border-radius: var(--r-card); padding: var(--s3); display: grid; gap: var(--s2); }
   .hp-offer.active { border: 2px solid var(--gold); }
+  .hp-compare summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+  .hp-compare .hp-table th, .hp-compare .hp-table td { white-space: normal; padding: 8px; }
+  .hp-advice { display: flex; flex-direction: column; gap: var(--s2); }
+  .hp-advice.suggest > p { border-left: 3px solid var(--gold); padding-left: var(--s2); }
+  .hp-lists-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--s2); }
+  .hp-lists-line .hp-linkbtn { min-height: 44px; }
   .hp-offer-top { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: var(--s2); align-items: end; }
   .hp-letter { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--r-tile); background: var(--surface2); font-family: var(--font-title); font-size: 20px; }
   .hp-offer-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--s2); align-items: end; }
@@ -240,6 +247,7 @@
   .hp-wk-head, .hp-wk-row { display: grid; grid-template-columns: minmax(0, 1fr) 6.5em 6.5em; gap: var(--s2); align-items: center; }
   .hp-wk-head { font-size: 13px; color: var(--muted); }
   .hp-wk-rows { display: grid; gap: var(--s2); }
+  .hp-wk-any { display: flex; flex-direction: column; min-width: 0; }
   .hp-btn.hp-done { min-height: 44px; padding: 0 var(--s2); }
   .hp-btn.hp-done[aria-pressed="true"] { border-color: var(--yours); background: var(--yours); color: var(--bg); font-weight: 700; }
 
@@ -1087,6 +1095,8 @@
     return L <= 82 ? 25 * L * L - 75 * L + 100 : L < 1e3 ? Math.round(1994.008 * L) : 2 * L * L - 6 * L + 8;
   }
   var WEEKLY_CAP = deepFreeze({ beginner: 2e5, adept: 8e5, expert: 3e6, master: Infinity });
+  var WEEKLY_MIN_LEVEL = deepFreeze({ beginner: 0, adept: 30, expert: 150, master: 400 });
+  var WEEKLY_KILL_POINTS = deepFreeze({ beginner: 25, adept: 50, expert: 100, master: 110 });
   var WEEKLY_MAX_TASKS = 9;
   var SERVER_SAVE_UTC_HOUR = 8;
   var TOKEN_CAP = 10;
@@ -1220,6 +1230,20 @@
     const f = weeklyExpFormula(Number(level));
     return f != null ? Math.min(f, WEEKLY_CAP[diff]) : null;
   }
+  function weeklyDifficulties(level) {
+    const L = Number(level), f = weeklyExpFormula(L);
+    if (f == null) return null;
+    const rows = DIFFICULTIES.map((diff) => ({
+      diff,
+      exp: Math.min(f, WEEKLY_CAP[diff]),
+      capped: f > WEEKLY_CAP[diff],
+      locked: L < WEEKLY_MIN_LEVEL[diff],
+      minLevel: WEEKLY_MIN_LEVEL[diff],
+      points: WEEKLY_KILL_POINTS[diff]
+    }));
+    const open = rows.filter((r) => !r.locked), top = Math.max(...open.map((r) => r.exp));
+    return { rows, best: open.filter((r) => r.exp === top)[0].diff, exp: f };
+  }
   function readWeekly(w2, level, now) {
     w2 = w2 || {};
     const tasks = Array.isArray(w2.tasks) ? w2.tasks.slice(0, WEEKLY_MAX_TASKS) : [];
@@ -1246,10 +1270,17 @@
       return { i, t: t2, creature: c, key, name: c ? c.name : name, K, logged, extra, done, rem: K ? Math.max(0, K - done) : null };
     });
   }
+  var ANY_CREATURE = "any";
+  var allKph = (kph) => Object.keys(kph || {}).reduce((a, k) => a + (kph[k] > 0 ? kph[k] : 0), 0);
   function weeklyBonus(open, spotKph, hours, selfSlug, selfKills) {
     if (!open.length || !(hours > 0)) return 0;
     let v = 0;
     open.forEach((w2) => {
+      if (w2.key === ANY_CREATURE) {
+        const all = Math.max(allKph(spotKph) * hours, selfKills || 0);
+        if (all > 0) v += w2.exp * Math.min(1, all / w2.rem);
+        return;
+      }
       if (selfSlug && w2.key === selfSlug) {
         v += w2.exp * Math.min(1, (selfKills || 0) / w2.rem);
         return;
@@ -1679,9 +1710,10 @@
     s.today = {
       boosted: known(t2.boosted) ? t2.boosted : null,
       boostedDay: typeof t2.boostedDay === "string" ? t2.boostedDay : null,
-      prey: (Array.isArray(t2.prey) ? t2.prey : []).slice(0, PREY_SLOTS).filter((q) => q && known(q.slug) && has(PREY, q.kind)).map((q) => {
+      // A slot with no creature yet (slug null) is kept: "Add a prey" saves one before the name is typed.
+      prey: (Array.isArray(t2.prey) ? t2.prey : []).slice(0, PREY_SLOTS).filter((q) => q && (q.slug == null || known(q.slug)) && has(PREY, q.kind)).map((q) => {
         const r = PREY[q.kind];
-        return { slug: q.slug, kind: q.kind, pct: plNum(q.pct, r.lo, r.hi) || r.lo };
+        return { slug: q.slug == null ? null : q.slug, kind: q.kind, pct: plNum(q.pct, r.lo, r.hi) || r.lo };
       }),
       event: plNum(t2.event, 0, 100) || 0
     };
@@ -1706,12 +1738,23 @@
       const slug = t2.slug && known(t2.slug) ? t2.slug : null;
       return { slug, name: slug ? null : (typeof t2.name === "string" ? t2.name.trim().slice(0, 60) : "") || null, killsLeft: plNum(t2.killsLeft, 0, 1e5), done: t2.done === true };
     });
-    return { weekStart: typeof w2.weekStart === "string" ? w2.weekStart : null, difficulty: TASK[w2.difficulty] ? w2.difficulty : "master", slots, exp: plNum(w2.exp, 1, 1e12), tasks };
+    return {
+      weekStart: typeof w2.weekStart === "string" ? w2.weekStart : null,
+      difficulty: TASK[w2.difficulty] ? w2.difficulty : "master",
+      slots,
+      exp: plNum(w2.exp, 1, 1e12),
+      tasks,
+      any: readAnyTask(w2.any)
+    };
+  }
+  function readAnyTask(v) {
+    v = v && typeof v === "object" ? v : {};
+    return { killsLeft: plNum(v.killsLeft, 0, 1e5), done: v.done === true };
   }
   function weeklyTasksFromOld(old, rows) {
     const w2 = old && typeof old === "object" ? old : {}, n = Array.isArray(w2.tasks) ? w2.tasks.filter((t2) => t2 && (t2.name || t2.kills)).length : 0;
     const tasks = rows.filter((r) => r.name).map((r) => ({ slug: r.creature ? r.creature.slug : null, name: r.creature ? null : r.name, killsLeft: r.K ? r.rem : null, done: !!(r.K && r.rem === 0) }));
-    return { weekStart: typeof w2.week === "string" ? w2.week : null, difficulty: TASK[w2.diff] ? w2.diff : "master", slots: n > 6 ? 9 : 6, exp: plNum(w2.exp, 1, 1e12), tasks };
+    return { weekStart: typeof w2.week === "string" ? w2.week : null, difficulty: TASK[w2.diff] ? w2.diff : "master", slots: n > 6 ? 9 : 6, exp: plNum(w2.exp, 1, 1e12), tasks, any: readAnyTask(null) };
   }
   function readHunting(st) {
     const h2 = st && st.hunting;
@@ -1749,7 +1792,8 @@
         tokens: b.tokens == null ? null : Math.max(0, Math.min(10, Math.floor(Number(b.tokens)) || 0)),
         mode: b.mode === "active" && active2 ? "active" : "offers",
         offers: offers(Array.isArray(b.offers) ? b.offers : []),
-        active: active2
+        active: active2,
+        zeroChecked: typeof b.zeroChecked === "string" ? b.zeroChecked : null
       };
     }
     const p = profile || {}, reroll = p.reroll || {}, board = p.board || {}, h2 = st.held;
@@ -1766,7 +1810,14 @@
         since: typeof h2.since === "string" ? h2.since : null
       };
     }
-    return { difficulty: TASK[st.diff] ? st.diff : "master", tokens: left, mode: active ? "active" : "offers", offers: offers(Array.isArray(board.offers) ? board.offers : []), active };
+    return {
+      difficulty: TASK[st.diff] ? st.diff : "master",
+      tokens: left,
+      mode: active ? "active" : "offers",
+      offers: offers(Array.isArray(board.offers) ? board.offers : []),
+      active,
+      zeroChecked: null
+    };
   }
   function readMark(v) {
     return v && (v.state === "taken" || v.state === "free") && typeof v.at === "string" ? { state: v.state, at: v.at, world: typeof v.world === "string" ? v.world : null } : null;
@@ -2624,7 +2675,48 @@
     "Loading…": "Cargando…",
     "Couldn’t create the backup. Try again in a moment.": "No se pudo crear la copia. Inténtalo de nuevo en un momento.",
     "That isn’t a number. Type it like 450, 3.2kk or 800k.": "Eso no es un número. Escríbelo como 450, 3.2kk u 800k.",
-    "Dismiss": "Cerrar"
+    "Dismiss": "Cerrar",
+    // Reroll tokens assumed or at 0; the Any Creature weekly task
+    "{n} token (assumed)": { one: "{n} token (supuesto)", many: "{n} tokens (supuestos)", other: "{n} tokens (supuestos)" },
+    "Assumed. Set what you have in game.": "Supuesto. Pon los que tienes en el juego.",
+    "None left: the plan won’t suggest a reroll.": "No te queda ninguno: el plan no sugerirá un reroll.",
+    "Out of reroll tokens?": "¿Sin tokens de reroll?",
+    "At 0 the plan can’t suggest a reroll. Claim today’s free token on the Task Board if you haven’t, then set how many you have.": "Con 0 el plan no puede sugerir un reroll. Reclama el token gratis de hoy en el Task Board si aún no lo hiciste y luego pon cuántos tienes.",
+    "Set tokens": "Poner tokens",
+    "I have none": "No tengo ninguno",
+    "Every kill counts": "Cuenta cada kill",
+    "Any Creature kills left": "Kills restantes de Any Creature",
+    "Any Creature done": "Any Creature hecha",
+    // Preferred / Unwanted lists on the Plan
+    "★ Preferred {preferred} of {max} · ⊘ Unwanted {unwanted} of {max}": "★ Preferred {preferred} de {max} · ⊘ Unwanted {unwanted} de {max}",
+    "Preferred and Unwanted lists: not set": "Listas Preferred y Unwanted: sin poner",
+    "Edit lists": "Editar listas",
+    "Counts your lists: {preferred} Preferred, {unwanted} Unwanted in this pool.": "Cuenta tus listas: {preferred} Preferred y {unwanted} Unwanted en este pool.",
+    // Difficulty hints (Bounty editor, Weekly)
+    "{difficulty} looks about {pct}% better for your goal.": "{difficulty} parece un {pct}% mejor para tu objetivo.",
+    "Switch in game now: it’s free while your bounty is active, and your next board uses it.": "Cámbialo ahora en el juego: es gratis mientras tu bounty está activo, y tu próximo tablero lo usará.",
+    "That counts the reroll token a switch costs while you choose; it’s free while a bounty is active.": "Eso cuenta el token de reroll que cuesta cambiar mientras eliges; es gratis con un bounty activo.",
+    "{difficulty} looks best for your goal; {current} has too few numbers to compare.": "{difficulty} parece la mejor para tu objetivo; {current} tiene muy pocos números para comparar.",
+    "Not enough numbers yet to compare difficulties.": "Aún no hay números suficientes para comparar dificultades.",
+    "{difficulty} is close to the best for your goal.": "{difficulty} está cerca de la mejor para tu objetivo.",
+    "{difficulty} suits your goal best right now.": "{difficulty} es la que mejor encaja con tu objetivo ahora.",
+    "Too few numbers": "Muy pocos números",
+    "Needs a reroll token": "Necesita un token de reroll",
+    "Current": "Actual",
+    "Best": "Mejor",
+    "{known} of {size}": "{known} de {size}",
+    "Long-run value per hour for your goal, rerolling as the plan does. Only Master’s task reward is verified in game.": "Valor por hora a largo plazo para tu objetivo, haciendo reroll como el plan. Solo la recompensa de Master está verificada en el juego.",
+    "Best for exp at level {level}: {difficulty}": "Mejor para exp en nivel {level}: {difficulty}",
+    "It’s the easiest that pays your full {exp} exp per kill task.": "Es la más fácil que paga tus {exp} de exp completos por kill task.",
+    "Level {n}+": "Nivel {n}+",
+    "(capped)": "(con tope)",
+    "You pick it in game when you collect last week’s rewards, and it stays until the next Monday. Creatures and kill counts per difficulty aren’t published, so only exp and points are compared.": "Se elige en el juego al recoger las recompensas de la semana pasada y se mantiene hasta el lunes siguiente. Las criaturas y kills por dificultad no están publicadas, así que solo se comparan exp y puntos.",
+    "Compare difficulties": "Comparar dificultades",
+    "Value": "Valor",
+    "With numbers": "Con números",
+    "Exp per kill task": "Exp por kill task",
+    "Points": "Puntos",
+    "(current)": "(actual)"
   };
 
   // src/data/i18n/pt.js
@@ -3144,7 +3236,48 @@
     "Loading…": "Carregando…",
     "Couldn’t create the backup. Try again in a moment.": "Não foi possível criar o backup. Tente de novo em instantes.",
     "That isn’t a number. Type it like 450, 3.2kk or 800k.": "Isso não é um número. Digite como 450, 3.2kk ou 800k.",
-    "Dismiss": "Fechar"
+    "Dismiss": "Fechar",
+    // Reroll tokens assumed or at 0; the Any Creature weekly task
+    "{n} token (assumed)": { one: "{n} token (estimado)", many: "{n} tokens (estimados)", other: "{n} tokens (estimados)" },
+    "Assumed. Set what you have in game.": "Estimado. Coloque quantos você tem no jogo.",
+    "None left: the plan won’t suggest a reroll.": "Nenhum restante: o plano não vai sugerir reroll.",
+    "Out of reroll tokens?": "Sem tokens de reroll?",
+    "At 0 the plan can’t suggest a reroll. Claim today’s free token on the Task Board if you haven’t, then set how many you have.": "Com 0 o plano não pode sugerir reroll. Pegue o token grátis de hoje no Task Board se ainda não pegou e depois coloque quantos você tem.",
+    "Set tokens": "Definir tokens",
+    "I have none": "Não tenho nenhum",
+    "Every kill counts": "Toda kill conta",
+    "Any Creature kills left": "Kills restantes de Any Creature",
+    "Any Creature done": "Any Creature feita",
+    // Preferred / Unwanted lists on the Plan
+    "★ Preferred {preferred} of {max} · ⊘ Unwanted {unwanted} of {max}": "★ Preferred {preferred} de {max} · ⊘ Unwanted {unwanted} de {max}",
+    "Preferred and Unwanted lists: not set": "Listas Preferred e Unwanted: não definidas",
+    "Edit lists": "Editar listas",
+    "Counts your lists: {preferred} Preferred, {unwanted} Unwanted in this pool.": "Conta suas listas: {preferred} Preferred e {unwanted} Unwanted neste pool.",
+    // Difficulty hints (Bounty editor, Weekly)
+    "{difficulty} looks about {pct}% better for your goal.": "{difficulty} parece uns {pct}% melhor para o seu objetivo.",
+    "Switch in game now: it’s free while your bounty is active, and your next board uses it.": "Troque agora no jogo: é grátis enquanto sua bounty está ativa, e o próximo quadro já usa a nova.",
+    "That counts the reroll token a switch costs while you choose; it’s free while a bounty is active.": "Isso conta o token de reroll que a troca custa enquanto você escolhe; é grátis com uma bounty ativa.",
+    "{difficulty} looks best for your goal; {current} has too few numbers to compare.": "{difficulty} parece a melhor para o seu objetivo; {current} tem poucos números para comparar.",
+    "Not enough numbers yet to compare difficulties.": "Ainda não há números suficientes para comparar dificuldades.",
+    "{difficulty} is close to the best for your goal.": "{difficulty} está perto da melhor para o seu objetivo.",
+    "{difficulty} suits your goal best right now.": "{difficulty} é a que mais combina com o seu objetivo agora.",
+    "Too few numbers": "Poucos números",
+    "Needs a reroll token": "Precisa de um token de reroll",
+    "Current": "Atual",
+    "Best": "Melhor",
+    "{known} of {size}": "{known} de {size}",
+    "Long-run value per hour for your goal, rerolling as the plan does. Only Master’s task reward is verified in game.": "Valor por hora a longo prazo para o seu objetivo, fazendo reroll como o plano. Só a recompensa de Master foi verificada no jogo.",
+    "Best for exp at level {level}: {difficulty}": "Melhor para exp no level {level}: {difficulty}",
+    "It’s the easiest that pays your full {exp} exp per kill task.": "É a mais fácil que paga seus {exp} de exp completos por kill task.",
+    "Level {n}+": "Level {n}+",
+    "(capped)": "(com teto)",
+    "You pick it in game when you collect last week’s rewards, and it stays until the next Monday. Creatures and kill counts per difficulty aren’t published, so only exp and points are compared.": "Você escolhe no jogo ao pegar as recompensas da semana passada, e ela vale até a próxima segunda. As criaturas e kills por dificuldade não são publicadas, então só exp e pontos são comparados.",
+    "Compare difficulties": "Comparar dificuldades",
+    "Value": "Valor",
+    "With numbers": "Com números",
+    "Exp per kill task": "Exp por kill task",
+    "Points": "Pontos",
+    "(current)": "(atual)"
   };
 
   // src/data/i18n/pl.js
@@ -3664,7 +3797,48 @@
     "Loading…": "Ładowanie…",
     "Couldn’t create the backup. Try again in a moment.": "Nie udało się utworzyć kopii. Spróbuj ponownie za chwilę.",
     "That isn’t a number. Type it like 450, 3.2kk or 800k.": "To nie jest liczba. Wpisz np. 450, 3.2kk albo 800k.",
-    "Dismiss": "Zamknij"
+    "Dismiss": "Zamknij",
+    // Reroll tokens assumed or at 0; the Any Creature weekly task
+    "{n} token (assumed)": { one: "{n} token (zakładany)", few: "{n} tokeny (zakładane)", many: "{n} tokenów (zakładanych)", other: "{n} tokena (zakładane)" },
+    "Assumed. Set what you have in game.": "Zakładane. Ustaw tyle, ile masz w grze.",
+    "None left: the plan won’t suggest a reroll.": "Brak tokenów: plan nie zaproponuje rerolla.",
+    "Out of reroll tokens?": "Brak tokenów reroll?",
+    "At 0 the plan can’t suggest a reroll. Claim today’s free token on the Task Board if you haven’t, then set how many you have.": "Przy 0 plan nie może zaproponować rerolla. Odbierz dzisiejszy darmowy token na Task Board, jeśli jeszcze tego nie zrobiłeś, a potem ustaw, ile masz.",
+    "Set tokens": "Ustaw tokeny",
+    "I have none": "Nie mam żadnych",
+    "Every kill counts": "Liczy się każde zabicie",
+    "Any Creature kills left": "Pozostałe zabicia Any Creature",
+    "Any Creature done": "Any Creature zrobione",
+    // Preferred / Unwanted lists on the Plan
+    "★ Preferred {preferred} of {max} · ⊘ Unwanted {unwanted} of {max}": "★ Preferred {preferred} z {max} · ⊘ Unwanted {unwanted} z {max}",
+    "Preferred and Unwanted lists: not set": "Listy Preferred i Unwanted: nieustawione",
+    "Edit lists": "Edytuj listy",
+    "Counts your lists: {preferred} Preferred, {unwanted} Unwanted in this pool.": "Uwzględnia twoje listy: {preferred} Preferred i {unwanted} Unwanted w tej puli.",
+    // Difficulty hints (Bounty editor, Weekly)
+    "{difficulty} looks about {pct}% better for your goal.": "{difficulty} wygląda na około {pct}% lepszy dla twojego celu.",
+    "Switch in game now: it’s free while your bounty is active, and your next board uses it.": "Zmień teraz w grze: to darmowe, gdy masz aktywne bounty, a następna tablica już go użyje.",
+    "That counts the reroll token a switch costs while you choose; it’s free while a bounty is active.": "To uwzględnia token reroll, który kosztuje zmiana podczas wybierania; przy aktywnym bounty jest darmowa.",
+    "{difficulty} looks best for your goal; {current} has too few numbers to compare.": "{difficulty} wygląda najlepiej dla twojego celu; {current} ma za mało liczb do porównania.",
+    "Not enough numbers yet to compare difficulties.": "Za mało liczb, by porównać poziomy trudności.",
+    "{difficulty} is close to the best for your goal.": "{difficulty} jest blisko najlepszego dla twojego celu.",
+    "{difficulty} suits your goal best right now.": "{difficulty} najlepiej pasuje teraz do twojego celu.",
+    "Too few numbers": "Za mało liczb",
+    "Needs a reroll token": "Wymaga tokenu reroll",
+    "Current": "Obecny",
+    "Best": "Najlepszy",
+    "{known} of {size}": "{known} z {size}",
+    "Long-run value per hour for your goal, rerolling as the plan does. Only Master’s task reward is verified in game.": "Długoterminowa wartość na godzinę dla twojego celu, z rerollami jak w planie. Tylko nagroda Master jest sprawdzona w grze.",
+    "Best for exp at level {level}: {difficulty}": "Najlepszy dla exp na poziomie {level}: {difficulty}",
+    "It’s the easiest that pays your full {exp} exp per kill task.": "To najłatwiejszy, który płaci pełne {exp} exp za kill task.",
+    "Level {n}+": "Poziom {n}+",
+    "(capped)": "(limit)",
+    "You pick it in game when you collect last week’s rewards, and it stays until the next Monday. Creatures and kill counts per difficulty aren’t published, so only exp and points are compared.": "Wybierasz go w grze przy odbieraniu nagród z zeszłego tygodnia i obowiązuje do następnego poniedziałku. Stwory i liczby zabić dla poziomów nie są opublikowane, więc porównujemy tylko exp i punkty.",
+    "Compare difficulties": "Porównaj poziomy trudności",
+    "Value": "Wartość",
+    "With numbers": "Z liczbami",
+    "Exp per kill task": "Exp za kill task",
+    "Points": "Punkty",
+    "(current)": "(obecny)"
   };
 
   // src/data/i18n/index.js
@@ -3926,7 +4100,10 @@
   }
   function openWeeklyTasks(w2, catalog) {
     if (!w2.current || !(w2.exp > 0)) return [];
-    return weeklyTaskRows(w2, catalog).filter((r) => r.open && r.key).map((r) => ({ key: r.key, name: r.name, rem: r.killsLeft, exp: w2.exp }));
+    const open = weeklyTaskRows(w2, catalog).filter((r) => r.open && r.key).map((r) => ({ key: r.key, name: r.name, rem: r.killsLeft, exp: w2.exp }));
+    const any = w2.any || {};
+    if (!any.done && any.killsLeft > 0) open.push({ key: ANY_CREATURE, name: "Any Creature", rem: any.killsLeft, exp: w2.exp });
+    return open;
   }
 
   // src/core/metrics.js
@@ -4056,7 +4233,7 @@
     const t2 = TASK[diff], d = t2.maxKills - t2.minKills;
     return [t2.minKills + d / 6, t2.minKills + d / 2, t2.minKills + 5 * d / 6];
   }
-  function poolModel(diff, { weights: w2, pool, preferred, unwanted, metricsFor, unknown, rewardObs }) {
+  function poolModel(diff, { weights: w2, pool, preferred, unwanted, metricsFor, unknown, rewardObs, scale }) {
     const keys = GOAL_KEYS.filter((g) => w2[g] > 0);
     if (!keys.length) return null;
     const unw = {}, pref = {}, blocked = [];
@@ -4079,6 +4256,10 @@
       rows.push({ it: p.it, e, m, w: pref[p.it.slug] ? SLOTS.preferredWeight : 1 });
       blocked.push(!!p.blocked);
     });
+    const own = Object.assign({}, max);
+    if (scale) keys.forEach((k) => {
+      if (scale[k] > 0) max[k] = scale[k];
+    });
     const known = [], kphs = [];
     rows.forEach((r, i) => {
       if (r.e.kph > 0) kphs.push(r.e.kph);
@@ -4089,7 +4270,8 @@
       r.v1 = weightedValue(r.m, w2, keys, max);
       if (r.v1 != null) known.push(r.v1);
     });
-    const model = { keys, w: w2, max, rows, known: known.length, diff };
+    const lists = { preferred: rows.filter((r) => r.w > 1).length, unwanted: pool.filter((p) => unw[p.it.slug]).length };
+    const model = { keys, w: w2, max, own, rows, known: known.length, diff, lists };
     if (!known.length) return model;
     known.sort((a, b) => a - b);
     kphs.sort((a, b) => a - b);
@@ -4180,8 +4362,35 @@
     }
     return { h: h2, pts, hpd };
   }
+  function commonMax(models) {
+    const out = {};
+    models.forEach((m) => {
+      if (m) Object.keys(m.own).forEach((k) => {
+        if (!(out[k] >= m.own[k])) out[k] = m.own[k];
+      });
+    });
+    return out;
+  }
   function rateThreshold(plan, s, q) {
     return (plan.h[s - 1] - q.dT * contValue(plan.h, s, q)) / q.A;
+  }
+
+  // src/core/difficulty.js
+  var MIN_COVERAGE = 0.25;
+  var SUGGEST_GAIN = 0.1;
+  function compareDifficulties(models, solve, { tokens, current, active }) {
+    const rows = DIFFICULTIES.map((diff) => {
+      const m = models[diff], size = m ? m.rows.length : 0, known = m ? m.known : 0, coverage = size ? known / size : 0;
+      const enough = !!(m && m.pts && m.best > 0 && coverage >= MIN_COVERAGE);
+      const cost = diff === current || active ? 0 : 1, s = tokens - cost;
+      return { diff, size, known, coverage, enough, cost, needsToken: enough && s < 0, rate: enough && s >= 0 ? RHO * solve(m).h[s] : null };
+    });
+    const cur2 = rows.filter((r) => r.diff === current)[0], base = cur2 && cur2.rate > 0 ? cur2.rate : null;
+    rows.forEach((r) => {
+      r.gain = base && r.rate != null ? r.rate / base - 1 : null;
+    });
+    const others = rows.filter((r) => r.diff !== current && r.rate > 0 && (base ? r.gain >= SUGGEST_GAIN : true)).sort((a, b) => b.rate - a.rate);
+    return { current, rows, best: others.length ? others[0].diff : null, free: !!active };
   }
 
   // src/core/spots.js
@@ -4370,6 +4579,8 @@
     else if (!ctx.options.length) s = t2("None of your spots has numbers for this character yet.");
     else s = skipped.length && !ctx.chosen.length ? t2("Every spot worth checking is marked taken.") : t2("Every spot worth checking is on this list.");
     if (ctx.active) s += " " + t2("Rerolling drops {creature}.", { creature: ctx.active.name });
+    const l = ctx.sc && ctx.sc.model && ctx.sc.model.lists;
+    if (l && (l.preferred || l.unwanted)) s += " " + t2("Counts your lists: {preferred} Preferred, {unwanted} Unwanted in this pool.", l);
     return s;
   }
   function seeSpotsWhy({ unknown, tokens, model, t: t2 }) {
@@ -4450,7 +4661,7 @@
       v.held = { slug: held.slug, kph: hk, kills: rate ? null : Math.min(held.left, hk * Hh), left: held.left, finishes: !rate && hf >= 1, hoursLeft: held.left / hk };
     }
     (opts.weekly || []).forEach((w2) => {
-      const k = nums.kph[w2.key];
+      const k = w2.key === ANY_CREATURE ? allKph(nums.kph) : nums.kph[w2.key];
       if (!(k > 0)) return;
       const f = rate ? k / w2.rem : Math.min(1, k * Hh / w2.rem);
       v.parts.weekly += w2.exp * f / H;
@@ -4628,8 +4839,9 @@
   }
 
   // src/app/model.js
+  var ASSUMED_TOKENS = 5;
   function makePlanCache() {
-    return { key: "", plan: null };
+    return { key: "", plan: null, diffs: {} };
   }
   function makeModel(state, derived, now, opts) {
     const d = derived || compute(state, now), p = state.profile || {}, catalog = state.catalog, entries = state.entries, t2 = state.t || EN;
@@ -4661,29 +4873,49 @@
     const eff = (c) => effective(entries[c.slug], d.derived[c.slug]);
     const metricsFor = (c, rec, diff, kills, mult, rewardExp) => metrics(c, rec, Object.assign(d.ctx(diff), { kills, mult, rewardExp }));
     const boardDiff = () => state.difficulty === "all" ? "master" : state.difficulty;
-    const bounty = () => readBounty(plState, p, { known: (s) => !!catalog.bySlug[s], slugOf: (name) => {
-      const c = catalog.byName[norm(name || "")];
-      return c ? c.slug : null;
-    } });
+    const bounty = () => {
+      const b = readBounty(plState, p, { known: (s) => !!catalog.bySlug[s], slugOf: (name) => {
+        const c = catalog.byName[norm(name || "")];
+        return c ? c.slug : null;
+      } });
+      return Object.assign(b, b.tokens == null ? { tokens: ASSUMED_TOKENS, assumed: true } : { assumed: false });
+    };
     const rerollSettings = () => {
       const b = bounty();
       return readReroll(Object.assign({}, p.reroll, { left: b.tokens }));
     };
     const poolModels = {};
+    const poolArgs = (diff) => {
+      const sl = slots();
+      return {
+        weights: weights(),
+        preferred: sl.preferred,
+        unwanted: sl.unwanted,
+        unknown: rerollSettings().unknown,
+        rewardObs: (p.rewardObs || {})[diff] || [],
+        pool: catalog.poolOf(diff).map((c) => ({ it: c, e: eff(c), blocked: ratingOf(c) === "X" || lockedFor(c) })),
+        metricsFor: (it, e, kills, mult) => metricsFor(it, e, diff, kills, mult)
+      };
+    };
     const poolModel2 = (diff) => {
-      if (!(diff in poolModels)) {
-        const sl = slots();
-        poolModels[diff] = poolModel(diff, {
-          weights: weights(),
-          preferred: sl.preferred,
-          unwanted: sl.unwanted,
-          unknown: rerollSettings().unknown,
-          rewardObs: (p.rewardObs || {})[diff] || [],
-          pool: catalog.poolOf(diff).map((c) => ({ it: c, e: eff(c), blocked: ratingOf(c) === "X" || lockedFor(c) })),
-          metricsFor: (it, e, kills, mult) => metricsFor(it, e, diff, kills, mult)
-        });
-      }
+      if (!(diff in poolModels)) poolModels[diff] = poolModel(diff, poolArgs(diff));
       return poolModels[diff];
+    };
+    let compared;
+    const difficultyCompare = () => {
+      if (compared !== void 0) return compared;
+      const own = DIFFICULTIES.map((x) => poolModel2(x));
+      if (!own.some(Boolean)) return compared = null;
+      const scale = commonMax(own), models = {}, set = rerollSettings(), b = bounty(), diffs = cache.diffs || (cache.diffs = {});
+      DIFFICULTIES.forEach((x, i) => {
+        models[x] = own[i] && poolModel(x, Object.assign(poolArgs(x), { scale }));
+      });
+      const solve = (m) => {
+        const key = planKey(m, set.hpd), c = diffs[m.diff];
+        if (!c || c.key !== key) diffs[m.diff] = { key, plan: solvePlan(m, set.hpd) };
+        return diffs[m.diff].plan;
+      };
+      return compared = compareDifficulties(models, solve, { tokens: set.left, current: b.difficulty, active: b.mode === "active" && !!b.active });
     };
     const rerollPlan = (model, hpd) => {
       const key = planKey(model, hpd);
@@ -4796,6 +5028,7 @@
       rerollSettings,
       poolModel: poolModel2,
       rerollPlan,
+      difficultyCompare,
       boardOffers,
       weekly,
       weeklyRows: weeklyRows2,
@@ -4947,7 +5180,14 @@
     }
     function saveBounty(patch) {
       const b = model().bounty();
-      actions.savePlanner({ bounty: Object.assign({ difficulty: b.difficulty, tokens: b.tokens, mode: b.mode, offers: b.offers, active: b.active }, patch) });
+      actions.savePlanner({ bounty: Object.assign({
+        difficulty: b.difficulty,
+        tokens: b.assumed ? null : b.tokens,
+        mode: b.mode,
+        offers: b.offers,
+        active: b.active,
+        zeroChecked: b.zeroChecked
+      }, patch) });
     }
     function endBounty(tokens) {
       saveBounty({ tokens, mode: "offers", active: null, offers: [blankOffer(), blankOffer(), blankOffer()] });
@@ -4962,7 +5202,7 @@
     const weeklyNow = () => model().weekly();
     function saveWeekly(patch) {
       const w2 = weeklyNow();
-      const next = Object.assign({ weekStart: w2.weekStart || weekKey(new Date(now())), difficulty: w2.difficulty, slots: w2.slots, exp: w2.override, tasks: w2.tasks }, patch);
+      const next = Object.assign({ weekStart: w2.weekStart || weekKey(new Date(now())), difficulty: w2.difficulty, slots: w2.slots, exp: w2.override, tasks: w2.tasks, any: w2.any }, patch);
       next.tasks = next.tasks.slice(0, next.slots);
       updateCharacter({ weeklyTasks: next });
     }
@@ -5256,13 +5496,18 @@
       },
       // Finished it: +1 token (at most 10), the bounty clears, back to choosing offers.
       finishedBounty() {
-        const t2 = model().bounty().tokens;
-        endBounty(Math.min(TOKEN_CAP, (t2 || 0) + 1));
+        const b = model().bounty();
+        endBounty(b.assumed ? null : Math.min(TOKEN_CAP, b.tokens + 1));
       },
       // Rerolled: −1 token, offers and any active bounty clear.
       rerolled() {
-        const t2 = model().bounty().tokens;
-        endBounty(Math.max(0, (t2 || 0) - 1));
+        const b = model().bounty();
+        endBounty(b.assumed ? null : Math.max(0, b.tokens - 1));
+      },
+      // At 0 tokens the player says they really have none (the daily one claimed too): the Plan's check stays away until
+      // the next server save.
+      confirmNoTokens() {
+        saveBounty({ zeroChecked: serverDay(now()) });
       },
       // Plan: Free and Taken marks (each counted once per 15 minutes toward how often the spot is free), Hunting now.
       markTaken(spotId) {
@@ -5299,7 +5544,7 @@
         }
         if ("pct" in patch) q.pct = Math.min(PREY[q.kind].hi, Math.max(PREY[q.kind].lo, Number(patch.pct) || PREY[q.kind].lo));
         prey[i] = q;
-        saveToday({ prey: prey.filter((x) => x.slug || x === q).slice(0, PREY_SLOTS) });
+        saveToday({ prey: prey.slice(0, PREY_SLOTS) });
       },
       addPrey() {
         const prey = todayPrey();
@@ -5338,9 +5583,16 @@
         tasks[i].done = !!on;
         saveWeekly({ tasks });
       },
+      // The Any Creature task: {killsLeft} as typed ("" clears it) and/or {done}.
+      setWeeklyAny(patch) {
+        const any = Object.assign({}, weeklyNow().any);
+        if ("killsLeft" in patch) any.killsLeft = patch.killsLeft === "" || patch.killsLeft == null ? null : Math.max(0, Math.min(1e5, Math.floor(Number(patch.killsLeft)) || 0));
+        if ("done" in patch) any.done = !!patch.done;
+        saveWeekly({ any });
+      },
       // A new week: the rows clear (difficulty and slots stay).
       startNewWeek() {
-        saveWeekly({ weekStart: weekKey(new Date(now())), exp: null, tasks: [] });
+        saveWeekly({ weekStart: weekKey(new Date(now())), exp: null, tasks: [], any: { killsLeft: null, done: false } });
       },
       // Logging a clean hunt. preview: parseSession's result. spot: {id} (a known spot) or {name, parentId, note} (a new
       // spot, or a variation of parentId). raidsBy: Echo Raids per creature (advanced). Saves the session at that spot (and
@@ -5739,18 +5991,50 @@
   }
   var DIFF_LABELS = [["master", _("Master")], ["expert", _("Expert")], ["adept", _("Adept")], ["beginner", _("Beginner")]];
   var diffOptions = () => DIFF_LABELS.map(([value, label]) => ({ value, label: t(label) }));
-  function bountyView(b, catalog) {
+  var signedPct = (g) => (g >= 0 ? "+" : "−") + Math.abs(Math.round(g * 100)) + "%";
+  function difficultyAdvice(cmp) {
+    if (!cmp) return null;
+    const name = (d) => t(DIFF_NAME[d]), cur2 = cmp.rows.filter((r) => r.diff === cmp.current)[0];
+    const rated = cmp.rows.filter((r) => r.rate > 0), top = rated.slice().sort((a, b) => b.rate - a.rate)[0];
+    const ref = cur2 && cur2.rate > 0 ? cur2 : top, best = cmp.best ? cmp.rows.filter((r) => r.diff === cmp.best)[0] : null;
+    let line;
+    if (best && best.gain != null) {
+      line = t("{difficulty} looks about {pct}% better for your goal.", { difficulty: name(best.diff), pct: Math.round(best.gain * 100) }) + " " + (cmp.free ? t("Switch in game now: it’s free while your bounty is active, and your next board uses it.") : t("That counts the reroll token a switch costs while you choose; it’s free while a bounty is active."));
+    } else if (best) line = t("{difficulty} looks best for your goal; {current} has too few numbers to compare.", { difficulty: name(best.diff), current: name(cmp.current) });
+    else if (!ref) line = t("Not enough numbers yet to compare difficulties.");
+    else line = rated.some((r) => r.diff !== cmp.current && r.rate > ref.rate) ? t("{difficulty} is close to the best for your goal.", { difficulty: name(cmp.current) }) : t("{difficulty} suits your goal best right now.", { difficulty: name(cmp.current) });
+    return {
+      line,
+      suggest: !!best,
+      rows: cmp.rows.slice().reverse().map((r) => ({
+        diff: r.diff,
+        name: name(r.diff),
+        current: r.diff === cmp.current,
+        best: r.diff === cmp.best,
+        value: !r.enough ? t("Too few numbers") : r.needsToken ? t("Needs a reroll token") : r === ref ? r.diff === cmp.current ? t("Current") : t("Best") : ref ? signedPct(r.rate / ref.rate - 1) : "–",
+        coverage: t("{known} of {size}", { known: r.known, size: r.size })
+      })),
+      note: t("Long-run value per hour for your goal, rerolling as the plan does. Only Master’s task reward is verified in game.")
+    };
+  }
+  function bountyView(b, catalog, slots, cmp) {
+    const sl = slots || { preferred: [], unwanted: [] };
+    const mark = (slug) => !slug ? null : sl.preferred.indexOf(slug) !== -1 ? { kind: "pref", text: "★ " + t("Preferred") } : sl.unwanted.indexOf(slug) !== -1 ? { kind: "unw", text: "⊘ " + t("Unwanted") } : null;
     const c = (slug) => slug && catalog.bySlug[slug] || null, name = (slug) => c(slug) ? c(slug).name : "";
-    const tokens = b.tokens == null ? t("tokens not set") : t.n(b.tokens, "{n} token", "{n} tokens"), n = b.offers.filter((o) => o.slug).length;
+    const tokens = b.tokens == null ? t("tokens not set") : b.assumed ? t.n(b.tokens, "{n} token (assumed)", "{n} tokens (assumed)") : t.n(b.tokens, "{n} token", "{n} tokens");
+    const n = b.offers.filter((o) => o.slug).length;
     const active = b.mode === "active" && b.active;
     const chip3 = active ? { set: true, value: name(b.active.slug) + " · " + tokens } : n ? { set: true, value: t.n(n, "{n} offer", "{n} offers") + " · " + tokens } : b.tokens != null ? { set: true, value: t("No offers") + " · " + tokens } : { set: false, value: "" };
     return {
-      chip: Object.assign({ label: t("Bounty") }, chip3),
+      chip: Object.assign({ label: t("Bounty"), warn: b.tokens === 0 }, chip3),
       mode: active ? "active" : "offers",
       difficulty: b.difficulty,
       tokens: b.tokens,
+      tokensNote: b.assumed ? t("Assumed. Set what you have in game.") : b.tokens === 0 ? t("None left: the plan won’t suggest a reroll.") : "",
       difficulties: diffOptions(),
       intro: active ? t("Your active bounty, as the game shows it.") : t("The three offers on your board."),
+      advice: difficultyAdvice(cmp),
+      lists: sl.preferred.length || sl.unwanted.length ? t("★ Preferred {preferred} of {max} · ⊘ Unwanted {unwanted} of {max}", { preferred: sl.preferred.length, unwanted: sl.unwanted.length, max: SLOTS.max }) : t("Preferred and Unwanted lists: not set"),
       offers: b.offers.map((o, i) => ({
         i,
         letter: "ABC"[i],
@@ -5758,6 +6042,7 @@
         kills: o.kills,
         kind: o.kind,
         exp: o.exp,
+        mark: mark(o.slug),
         showExp: isChallengingMaster(b.difficulty, c(o.slug)),
         canPick: !!o.slug
       })),
@@ -5773,9 +6058,9 @@
       suggestions: catalog.poolOf(b.difficulty).map((x) => x.name)
     };
   }
-  function planView(state, model, catalog) {
+  function planView(state, model, catalog, compare) {
     const p = state.profiles[state.pid] || {};
-    return { goal: goalMixView(readGoal(p)), bounty: model && catalog ? bountyView(model.bounty(), catalog) : null };
+    return { goal: goalMixView(readGoal(p)), bounty: model && catalog ? bountyView(model.bounty(), catalog, model.slots(), compare ? model.difficultyCompare() : null) : null };
   }
   var MINUTES_LABEL = { 30: _("30 minutes"), 45: _("45 minutes"), 60: _("1 hour"), 120: _("2 hours") };
   function calibrationText({ sources, calib, calibOther }) {
@@ -5825,9 +6110,9 @@
     if (o.src === "own" && (o.huntHours != null ? o.huntHours : 0) < 1 && sessions < 2) out.push({ kind: "low", text: t("Low sample") });
     return out;
   }
-  function planScreenView(state, model, catalog, now) {
+  function planScreenView(state, model, catalog, now, compare) {
     const p = state.profiles[state.pid] || {}, pl = state.planner || {}, st = pl.state || {};
-    const base = planView(state, model, catalog), settings = readSettings(p, st), sources = readSources(p), hunting = readHunting(st);
+    const base = planView(state, model, catalog, compare), settings = readSettings(p, st), sources = readSources(p), hunting = readHunting(st);
     const name = (slug) => slug && catalog.bySlug[slug] ? catalog.bySlug[slug].name : "";
     const idx = model.spotIndex(), spotName = (id) => idx.spots[id] ? idx.spots[id].name : id, sessionsAt = (id) => idx.spots[id] ? idx.spots[id].sessions.length : 0;
     const ch = model.planChain(model.plannerCtx({ marks: pl.marks }));
@@ -5853,7 +6138,11 @@
       line: (last.dropsBounty ? t("Drops your bounty.") + " " : "") + t.n(last.tokens, "{n} token left.", "{n} tokens left."),
       why: last.why
     } : { kind: "seeSpots", title: last.label, line: b.tokens === 0 ? t("No reroll tokens left.") : t("Every spot, best first."), why: last.why };
-    const notices = ch.steps.filter((s) => s.kind === "finish" || s.kind === "claim").map((s) => ({ kind: s.kind, text: s.text, why: s.why }));
+    const tokenCheck = b.tokens === 0 && !b.assumed && b.zeroChecked !== serverDay(now) ? {
+      title: t("Out of reroll tokens?"),
+      text: t("At 0 the plan can’t suggest a reroll. Claim today’s free token on the Task Board if you haven’t, then set how many you have.")
+    } : null;
+    const notices = ch.steps.filter((s) => s.kind === "finish").map((s) => ({ kind: s.kind, text: s.text, why: s.why }));
     const first = go[0] || null;
     const refNote = first && (first.badges[0] || {}).kind !== "yours" && (first.badges[0] || {}).kind !== "refAdj" ? t("Top players’ numbers: expect less until you log a hunt.") : null;
     const taken = Object.keys(pl.marks || {}).filter((id) => pl.marks[id].state === "taken" && markActive(pl.marks[id], now, settings.takenMinutes)).map((id) => {
@@ -5866,9 +6155,11 @@
       huntingView = { spotId: hunting.spotId, name: spotName(hunting.spotId), pick: off ? { i: off.i, letter: "ABC"[off.i], name: off.name } : null };
     }
     const wk = model.weekly(), rows = model.weeklyRows().filter((r) => r.name), done = rows.filter((r) => r.done);
+    const anyTask = wk.current && wk.any && (wk.any.killsLeft != null || wk.any.done) ? { left: wk.any.killsLeft, done: wk.any.done } : null;
     const weekly = {
-      chip: rows.length && wk.current ? { set: true, value: t("{done} of {slots} done", { done: done.length, slots: wk.slots }) } : { set: false, value: "" },
-      rows: wk.current ? rows.map((r) => ({ i: r.i, name: r.name, left: r.killsLeft, done: r.done })) : []
+      chip: (rows.length || anyTask) && wk.current ? { set: true, value: t("{done} of {slots} done", { done: done.length, slots: wk.slots }) } : { set: false, value: "" },
+      rows: wk.current ? rows.map((r) => ({ i: r.i, name: r.name, left: r.killsLeft, done: r.done })) : [],
+      any: anyTask
     };
     const td = model.today(), prey = (td.prey || []).filter((q) => q.slug);
     const todayParts = [
@@ -5907,7 +6198,7 @@
       preset,
       presets: ["mine", "reference", "everything"].map((value) => ({ value, label: t(SOURCE_LABELS[value]), switches: SOURCE_PRESETS[value] }))
     };
-    return Object.assign(base, { weekly, today, time, data, steps: { first, fallbacks: go.slice(1), end, notices, refNote, notes: ch.notes }, taken, hunting: huntingView });
+    return Object.assign(base, { weekly, today, time, data, steps: { first, fallbacks: go.slice(1), end, notices, tokenCheck, refNote, notes: ch.notes }, taken, hunting: huntingView });
   }
   function preySizes(kind) {
     const r = PREY[kind] || PREY.xp, out = [];
@@ -5916,7 +6207,8 @@
   }
   var DAY = 864e5;
   var fmtDay = (iso) => (/* @__PURE__ */ new Date(iso + "T12:00:00Z")).toLocaleDateString(locale(), { month: "short", day: "numeric", timeZone: "UTC" });
-  function weeklyView(w2, rows, catalog, now) {
+  function weeklyView(w2, rows, catalog, now, level) {
+    const wd = weeklyDifficulties(level);
     const thisWeek = weekKey(new Date(now)), start = w2.current && w2.weekStart ? w2.weekStart : thisWeek;
     const next = new Date(Date.parse(start + "T08:00:00Z") + 7 * DAY).toISOString().slice(0, 10);
     const slots = [];
@@ -5932,10 +6224,24 @@
       difficulties: diffOptions(),
       slots: w2.slots,
       slotOptions: [{ value: 6, label: "6" }, { value: 9, label: t("9 (with expansion)") }],
+      any: { killsLeft: w2.any && w2.any.killsLeft != null ? w2.any.killsLeft : "", done: !!(w2.any && w2.any.done) },
       rows: slots,
       doneCount: slots.filter((r) => r.done).length,
       reward: w2.exp ? t("{exp} exp each", { exp: fmtBig(w2.exp) }) : t("Set your level to see the reward."),
-      names: catalog.list.map((c) => c.name)
+      names: catalog.list.map((c) => c.name),
+      diffHint: wd ? {
+        summary: t("Best for exp at level {level}: {difficulty}", { level: Number(level), difficulty: t(DIFF_NAME[wd.best]) }),
+        why: t("It’s the easiest that pays your full {exp} exp per kill task.", { exp: fmtBig(wd.exp) }),
+        rows: wd.rows.map((r) => ({
+          diff: r.diff,
+          name: t(DIFF_NAME[r.diff]),
+          best: r.diff === wd.best,
+          current: r.diff === w2.difficulty,
+          exp: r.locked ? t("Level {n}+", { n: r.minLevel }) : fmtBig(r.exp) + (r.capped ? " " + t("(capped)") : ""),
+          points: String(r.points)
+        })),
+        note: t("You pick it in game when you collect last week’s rewards, and it stays until the next Monday. Creatures and kill counts per difficulty aren’t published, so only exp and points are compared.")
+      } : null
     };
   }
   function logView(draft, model, catalog, advanced) {
@@ -6626,10 +6932,10 @@
   }
 
   // src/ui/screens/plan.js
-  function chip({ id, label, value, set, open, onToggle }) {
+  function chip({ id, label, value, set, warn, open, onToggle }) {
     return h(
       "button",
-      { id, type: "button", class: "hp-chip" + (set ? "" : " unset"), "aria-expanded": open ? "true" : "false", "aria-controls": "plan-editor", onClick: onToggle },
+      { id, type: "button", class: "hp-chip" + (set ? "" : " unset") + (warn ? " warn" : ""), "aria-expanded": open ? "true" : "false", "aria-controls": "plan-editor", onClick: onToggle },
       set ? [h("span", { class: "label" }, label), " ", h("b", null, value)] : "+ " + label
     );
   }
@@ -6673,6 +6979,31 @@
     h("input", Object.assign({ id, class: "hp-input", value: value == null ? "" : String(value), onChange: (e) => onCommit(e.target.value), onKeydown: nextOnEnter }, opts || {}))
   );
   var kinds = () => [{ value: "normal", label: t("Normal") }, { value: "silver", label: "Silver" }, { value: "gold", label: "Gold" }];
+  function difficultyAdvice2(a) {
+    return h(
+      "div",
+      { id: "bounty-advice", class: "hp-advice" + (a.suggest ? " suggest" : "") },
+      h("p", { class: "hp-p hp-small" }, a.line),
+      h(
+        "details",
+        { class: "hp-compare" },
+        h("summary", null, t("Compare difficulties")),
+        h("div", { class: "hp-table-wrap" }, h(
+          "table",
+          { class: "hp-table" },
+          h("thead", null, h("tr", null, h("th", { scope: "col" }, t("Difficulty")), h("th", { scope: "col", class: "num" }, t("Value")), h("th", { scope: "col", class: "num" }, t("With numbers")))),
+          h("tbody", null, a.rows.map((r) => h(
+            "tr",
+            { id: "advice-" + r.diff },
+            h("th", { scope: "row" }, r.best ? "★ " + r.name : r.name),
+            h("td", { class: "num" }, r.value),
+            h("td", { class: "num" }, r.coverage)
+          )))
+        )),
+        h("p", { class: "hp-p hp-caption" }, a.note)
+      )
+    );
+  }
   function bountyEditor(view, on) {
     const KINDS = kinds();
     const offerCard = (o) => h(
@@ -6684,6 +7015,7 @@
         h("span", { class: "hp-letter", "aria-hidden": "true" }, o.letter),
         textInput("offer-" + o.i + "-name", t("Offer {letter}: creature", { letter: o.letter }), o.name, (v) => on.offer(o.i, { name: v }), { list: "bounty-names", autocomplete: "off" })
       ),
+      o.mark ? h("span", { id: "offer-" + o.i + "-mark", class: "hp-caption hp-mark " + o.mark.kind }, o.mark.text) : null,
       h(
         "div",
         { class: "hp-offer-row" },
@@ -6726,7 +7058,20 @@
           { id: "bounty-diff", class: "hp-select", onChange: (e) => on.difficulty(e.target.value) },
           view.difficulties.map((d) => h("option", { value: d.value, selected: d.value === view.difficulty }, d.label))
         )),
-        h("div", { class: "hp-field" }, t("Reroll tokens"), stepper({ id: "bounty-tokens", label: t("Reroll tokens"), value: view.tokens, min: 0, max: 10, onSet: on.tokens }))
+        h(
+          "div",
+          { class: "hp-field" },
+          t("Reroll tokens"),
+          stepper({ id: "bounty-tokens", label: t("Reroll tokens"), value: view.tokens, min: 0, max: 10, onSet: on.tokens }),
+          view.tokensNote ? h("span", { id: "bounty-tokens-note", class: "hp-caption warn" }, view.tokensNote) : null
+        )
+      ),
+      view.advice ? difficultyAdvice2(view.advice) : null,
+      h(
+        "div",
+        { class: "hp-lists-line" },
+        h("span", { class: "hp-small" }, view.lists),
+        h("button", { id: "bounty-lists", type: "button", class: "hp-linkbtn", onClick: on.lists }, t("Edit lists"))
       ),
       h("datalist", { id: "bounty-names" }, view.suggestions.map((n) => h("option", { value: n }))),
       view.mode === "active" ? activeCard : [
@@ -6754,26 +7099,28 @@
     )
   );
   function weeklyEditor(v, planLine, on) {
-    return editorFrame("weekly", t("Weekly"), null, planLine, [
-      v.rows.length ? h("ul", { class: "hp-list" }, v.rows.map((r) => h(
-        "li",
+    const item = (id, name, left, done, toggle) => h(
+      "li",
+      null,
+      h(
+        "span",
         null,
-        h(
-          "span",
-          null,
-          h("b", null, r.name),
-          " ",
-          h("span", { class: "hp-muted" }, r.left == null ? "" : t("{n} left", { n: r.left }))
-        ),
-        h("button", {
-          id: "wkchip-" + r.i + "-done",
-          type: "button",
-          class: "hp-btn hp-done",
-          "aria-pressed": r.done ? "true" : "false",
-          "aria-label": t("{creature} done", { creature: r.name }),
-          onClick: () => on.weeklyDone(r.i, !r.done)
-        }, r.done ? "✓ " + t("Done") : t("Done"))
-      ))) : h("p", { class: "hp-p hp-muted" }, t("No open weekly tasks.")),
+        h("b", null, name),
+        " ",
+        h("span", { class: "hp-muted" }, left == null ? "" : t("{n} left", { n: left }))
+      ),
+      h("button", {
+        id: "wkchip-" + id + "-done",
+        type: "button",
+        class: "hp-btn hp-done",
+        "aria-pressed": done ? "true" : "false",
+        "aria-label": t("{creature} done", { creature: name }),
+        onClick: toggle
+      }, done ? "✓ " + t("Done") : t("Done"))
+    );
+    const items = (v.any ? [item("any", "Any Creature", v.any.left, v.any.done, () => on.weeklyAnyDone(!v.any.done))] : []).concat(v.rows.map((r) => item(r.i, r.name, r.left, r.done, () => on.weeklyDone(r.i, !r.done))));
+    return editorFrame("weekly", t("Weekly"), null, planLine, [
+      items.length ? h("ul", { class: "hp-list" }, items) : h("p", { class: "hp-p hp-muted" }, t("No open weekly tasks.")),
       h("a", { href: "#/weekly", id: "weekly-open" }, t("Edit them on the Weekly tab"))
     ], on.done);
   }
@@ -6819,6 +7166,18 @@
   ];
   function steps(v, ui, on) {
     const st = v.steps, f = st.first, kids = [], takenLead = () => h("span", { class: "hp-muted" }, t("Taken? →") + " ");
+    if (st.tokenCheck) kids.push(h(
+      "article",
+      { id: "token-check", class: "hp-step note", role: "status", "aria-labelledby": "token-check-title" },
+      h("h3", { id: "token-check-title", class: "hp-step-title" }, st.tokenCheck.title),
+      h("p", { class: "hp-p hp-small" }, st.tokenCheck.text),
+      h(
+        "div",
+        { class: "hp-grid2" },
+        h("button", { id: "token-check-set", type: "button", class: "hp-btn solid", onClick: on.setTokens }, t("Set tokens")),
+        h("button", { id: "token-check-none", type: "button", class: "hp-btn", onClick: on.confirmNoTokens }, t("I have none"))
+      )
+    ));
     st.notices.forEach((n, i) => kids.push(h("article", { class: "hp-step note" }, h("b", null, n.text), whyToggle("n" + i, n.why, ui.why["n" + i], () => on.why("n" + i)))));
     if (v.hunting) {
       const hu = v.hunting;
@@ -6912,7 +7271,7 @@
     const editors = {
       goal: () => goalEditor(view.goal, { preset: on.preset, weight: on.weight, done: close }),
       bounty: () => bountyEditor(view.bounty, Object.assign({}, on.bounty, { done: close })),
-      weekly: () => weeklyEditor(view.weekly, planLine, { weeklyDone: on.weeklyDone, done: close }),
+      weekly: () => weeklyEditor(view.weekly, planLine, { weeklyDone: on.weeklyDone, weeklyAnyDone: on.weeklyAnyDone, done: close }),
       today: () => todayEditor(view.today, planLine, Object.assign({}, on.today, { done: close })),
       time: () => timeEditor(view.time, planLine, { hours: on.hours, done: close }),
       data: () => dataEditor(view.data, planLine, { sources: on.sources, done: close })
@@ -6933,7 +7292,7 @@
         "section",
         { class: "hp-section", "aria-labelledby": "using-h" },
         h("h2", { id: "using-h", class: "hp-eyebrow" }, t("Plan is using")),
-        h("div", { class: "hp-chips" }, chips.map(([id, label, c]) => chip({ id: "chip-" + id, label, value: c.value, set: c.set, open: ui.open === id, onToggle: toggle(id) })))
+        h("div", { class: "hp-chips" }, chips.map(([id, label, c]) => chip({ id: "chip-" + id, label, value: c.value, set: c.set, warn: c.warn, open: ui.open === id, onToggle: toggle(id) })))
       ),
       ui.open && editors[ui.open] ? editors[ui.open]() : null
     );
@@ -7010,9 +7369,53 @@
         selectField({ id: "wk-slots", label: t("Kill tasks per week"), value: view.slots, options: view.slotOptions, onPick: (x) => on.slots(Number(x)) })
       ),
       h("p", { class: "hp-p hp-caption" }, t("{done} of {slots} done", { done: view.doneCount, slots: view.slots }) + " · " + view.reward),
+      view.diffHint ? h(
+        "details",
+        { id: "wk-diff-hint", class: "hp-card hp-compare" },
+        h("summary", null, h("b", null, view.diffHint.summary)),
+        h("p", { class: "hp-p hp-small" }, view.diffHint.why),
+        h("div", { class: "hp-table-wrap" }, h(
+          "table",
+          { class: "hp-table" },
+          h("thead", null, h("tr", null, h("th", { scope: "col" }, t("Difficulty")), h("th", { scope: "col", class: "num" }, t("Exp per kill task")), h("th", { scope: "col", class: "num" }, t("Points")))),
+          h("tbody", null, view.diffHint.rows.map((r) => h(
+            "tr",
+            { id: "wk-hint-" + r.diff },
+            h("th", { scope: "row" }, (r.best ? "★ " : "") + r.name + (r.current ? " " + t("(current)") : "")),
+            h("td", { class: "num" }, r.exp),
+            h("td", { class: "num" }, r.points)
+          )))
+        )),
+        h("p", { class: "hp-p hp-caption" }, view.diffHint.note)
+      ) : null,
       h("datalist", { id: "wk-names" }, view.names.map((n) => h("option", { value: n }))),
       h("div", { class: "hp-wk-head", "aria-hidden": "true" }, h("span", null, t("Creature")), h("span", null, t("Kills left")), h("span")),
-      h("div", { class: "hp-wk-rows" }, view.rows.map(row)),
+      h(
+        "div",
+        { class: "hp-wk-rows" },
+        h(
+          "div",
+          { class: "hp-wk-row any", role: "group", "aria-label": "Any Creature" },
+          h("span", { class: "hp-wk-any" }, h("b", null, "Any Creature"), h("span", { class: "hp-caption" }, t("Every kill counts"))),
+          h("input", {
+            id: "wk-any-left",
+            class: "hp-input",
+            "aria-label": t("Any Creature kills left"),
+            value: String(view.any.killsLeft),
+            inputmode: "numeric",
+            onChange: (e) => on.any({ killsLeft: e.target.value })
+          }),
+          h("button", {
+            id: "wk-any-done",
+            type: "button",
+            class: "hp-btn hp-done",
+            "aria-pressed": view.any.done ? "true" : "false",
+            "aria-label": t("Any Creature done"),
+            onClick: () => on.any({ done: !view.any.done })
+          }, view.any.done ? "✓ " + t("Done") : t("Done"))
+        ),
+        view.rows.map(row)
+      ),
       view.stale ? null : confirmButton({
         id: "wk-new",
         label: t("Start a new week"),
@@ -7367,6 +7770,18 @@
       { class: "hp-section" },
       h("div", { class: "hp-spot-title" }, h("h1", { class: "hp-title" }, t("Creatures")), h("span", { class: "hp-caption" }, view.sub)),
       segmented({ label: t("Task difficulty"), options: view.difficulties, value: view.difficulty, onPick: on.difficulty }),
+      h(
+        "div",
+        { class: "hp-card" },
+        h("b", null, t("Preferred and unwanted")),
+        h("span", { class: "hp-small hp-muted" }, t("Your in-game lists.")),
+        h(
+          "button",
+          { id: "cr-lists", type: "button", class: "hp-btn", "aria-expanded": view.lists ? "true" : "false", "aria-controls": "lists-editor", onClick: () => on.lists(!view.lists) },
+          view.lists ? t("Close the lists") : t("Edit the lists")
+        )
+      ),
+      view.lists ? listsEditor(view.lists, on) : null,
       segmented({ label: t("View"), options: [{ value: "tiers", label: t("Tiers") }, { value: "table", label: t("Table") }], value: view.mode, onPick: on.mode }),
       h("input", { id: "cr-q", type: "search", class: "hp-input", "aria-label": t("Search creatures"), placeholder: t("Search creatures"), value: view.query, autocomplete: "off", onInput: (e) => on.query(e.target.value) }),
       view.empty ? h("p", { class: "hp-p hp-muted" }, view.empty) : null,
@@ -7397,19 +7812,7 @@
           h("td", { class: "num" }, c.profit),
           h("td", null, c.badge ? badges([c.badge]) : "–")
         )))
-      )),
-      h(
-        "div",
-        { class: "hp-card" },
-        h("b", null, t("Preferred and unwanted")),
-        h("span", { class: "hp-small hp-muted" }, t("Your in-game lists.")),
-        h(
-          "button",
-          { id: "cr-lists", type: "button", class: "hp-btn", "aria-expanded": view.lists ? "true" : "false", "aria-controls": "lists-editor", onClick: () => on.lists(!view.lists) },
-          view.lists ? t("Close the lists") : t("Edit the lists")
-        )
-      ),
-      view.lists ? listsEditor(view.lists, on) : null
+      ))
     );
   }
 
@@ -7661,7 +8064,7 @@
         });
       }
       if (r === "plan") {
-        const v = planScreenView(s, app2.model(), app2.catalog, Date.now()), a = app2.actions, P = ui.plan;
+        const v = planScreenView(s, app2.model(), app2.catalog, Date.now(), ui.plan.open === "bounty"), a = app2.actions, P = ui.plan;
         return render3(v, P, {
           toggle: (id) => {
             P.open = id;
@@ -7686,6 +8089,7 @@
           pick: a.pickOffer,
           stopHunting: a.stopHunting,
           weeklyDone: a.setWeeklyDone,
+          weeklyAnyDone: (on) => a.setWeeklyAny({ done: on }),
           logHunt: (spotId) => openLog({ spotId, where: "known" }, "plan"),
           reroll: () => {
             P.open = "bounty";
@@ -7693,6 +8097,11 @@
           },
           spots: () => go("spots"),
           openSpot,
+          setTokens: () => {
+            P.open = "bounty";
+            draw();
+          },
+          confirmNoTokens: a.confirmNoTokens,
           preset: a.applyPreset,
           weight: (key, n) => {
             const w2 = {};
@@ -7702,7 +8111,19 @@
             w2[key] = n;
             a.setWeights(w2);
           },
-          bounty: { difficulty: a.setDifficulty, tokens: a.setTokens, offer: a.setOffer, pick: a.pickOffer, active: a.setActive, finished: a.finishedBounty, rerolled: a.rerolled }
+          bounty: {
+            difficulty: a.setDifficulty,
+            tokens: a.setTokens,
+            offer: a.setOffer,
+            pick: a.pickOffer,
+            active: a.setActive,
+            finished: a.finishedBounty,
+            rerolled: a.rerolled,
+            lists: () => {
+              ui.creatures.lists = true;
+              go("creatures");
+            }
+          }
         });
       }
       if (r === "log") {
@@ -7872,11 +8293,12 @@
       }
       if (r === "weekly") {
         const M = app2.model(), a = app2.actions, W = ui.weekly;
-        return render4(weeklyView(M.weekly(), M.weeklyRows(), app2.catalog, Date.now()), W, {
+        return render4(weeklyView(M.weekly(), M.weeklyRows(), app2.catalog, Date.now(), (app2.profile() || {}).level), W, {
           difficulty: a.setWeeklyDifficulty,
           slots: a.setWeeklySlots,
           task: a.setWeeklyTask,
           done: a.setWeeklyDone,
+          any: a.setWeeklyAny,
           newWeek: () => {
             W.armed = false;
             a.startNewWeek();
