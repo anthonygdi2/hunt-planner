@@ -27,7 +27,7 @@ Everything you enter stays in your own browser: there’s no account and no serv
 - Creature data, creature exp and today’s bonus rules: [TibiaWiki](https://tibia.fandom.com/wiki/Task_Board), under CC BY-SA.
 - Reference hunts: read from [Kusnier’s hunt videos](https://www.youtube.com/@Kusnierr/videos) (also listed on [TibiaPal](https://tibiapal.com)), each with a link to its video.
 - Game rules (task rewards, bounty points, bestiary, weekly rewards) are in [`src/data/rules.js`](src/data/rules.js), each with its source; how sure each one is, is in [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md).
-- Fonts: Pixelify Sans and Atkinson Hyperlegible, under the SIL Open Font License (`fonts-OFL.txt`).
+- Font: Atkinson Hyperlegible, under the SIL Open Font License (`fonts-OFL.txt`).
 
 Licenses for each data file are in [`src/data/README.md`](src/data/README.md).
 
@@ -39,4 +39,4 @@ Tibia is a trademark of CipSoft GmbH. Hunt Planner is a fan project and isn’t 
 
 ## License
 
-The code is under the [MIT License](LICENSE): anyone may use, change and share it. The data files keep their own licenses: the TibiaWiki-derived creature data is CC BY-SA, and the reference hunts come from Kusnier’s videos (see [`src/data/README.md`](src/data/README.md)). The fonts are under the SIL Open Font License.
+The code is under the [MIT License](LICENSE): anyone may use, change and share it. The data files keep their own licenses: the TibiaWiki-derived creature data is CC BY-SA, and the reference hunts come from Kusnier’s videos (see [`src/data/README.md`](src/data/README.md)). The font is under the SIL Open Font License.

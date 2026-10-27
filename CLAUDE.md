@@ -29,7 +29,7 @@ Hunt Planner (formerly the Bounty Task tier list), a Tibia hunt planner. Read `d
 - Build: fetch the fonts once, then `npm run build` (assemble, then `python3 tools/build.py dist/index.html . fonts-cache`):
   ```
   mkdir -p fonts-cache && cd fonts-cache
-  npm pack @fontsource/pixelify-sans @fontsource/atkinson-hyperlegible
+  npm pack @fontsource/atkinson-hyperlegible
   for f in *.tgz; do tar xzf "$f" && mv package "${f%.tgz}"; done
   cd .. && npm run build
   ```

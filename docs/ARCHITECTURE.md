@@ -203,6 +203,7 @@ Dated so later sessions know what's settled.
 - **2026-10-26 Text on green** (F9). The pressed Done button and a switch's knob use `--bg` on `--yours`, not `--on-gold` as `TOKENS.md` says: `--on-gold` on the light theme's green is 2.7:1; `--bg` is 8.5:1 dark and about 6:1 light.
 - **2026-10-26 No typed numbers for a spot** (maintainer, after F10). A spot's own numbers come only from the character's logged hunts ("Yours"); there's no field to type them, so `setSpotNumbers` isn't built. Logged hunts stay in the character's own storage and aren't shared with other players.
 - **2026-10-26 Name.** The app is Hunt Planner (maintainer). The repository, the backup's `app` id (`bounty-task-tier-list`) and the GitHub Pages address keep the old name, so existing backups and links still work.
+- **2026-10-26 One font.** Atkinson Hyperlegible for titles and numbers as well as text; Pixelify Sans is gone (hard to read, and it looked gimmicky). `--font-title` stays as a token so headings can change in one place.
 - **2026-10-26 Module type.** `src/package.json` and `tests/unit/package.json` set `"type": "module"`; the repo root stays CommonJS for the tools and the jsdom tests.
 
 ## Conventions

@@ -26,6 +26,6 @@
   :root {
     --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
     --r-tile: 8px; --r-input: 10px; --r-button: 12px; --r-card: 14px; --r-editor: 16px; --r-step: 18px;
-    --font-title: "Pixelify Sans", system-ui, sans-serif;
+    --font-title: "Atkinson Hyperlegible", system-ui, sans-serif;
     --font-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
   }

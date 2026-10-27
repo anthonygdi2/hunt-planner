@@ -163,7 +163,7 @@
   .hp-bountyline { color: var(--gold-text); font-weight: 700; }
   .hp-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
   .hp-stats > div { background: var(--surface2); border-radius: var(--r-tile); padding: var(--s2) var(--s3); }
-  .hp-stat { font-family: var(--font-title); font-size: 28px; line-height: 32px; font-weight: 500; }
+  .hp-stat { font-family: var(--font-title); font-size: 28px; line-height: 32px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
   @media (min-width: 900px) { .hp-stat { font-size: 34px; line-height: 38px; } }
   .hp-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
   .hp-badge { font-size: 12px; line-height: 17px; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--line2); }
@@ -198,7 +198,7 @@
   .hp-spot-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s2); }
   .hp-spot-name { display: flex; flex-direction: column; }
   .hp-spot-name b { font-size: 16px; }
-  .hp-spot-score { font-family: var(--font-title); font-size: 18px; }
+  .hp-spot-score { font-family: var(--font-title); font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .hp-spot.taken .hp-spot-score { color: var(--muted); }
   .hp-none { font-style: italic; }
   .hp-badge.taken { background: var(--surface2); font-weight: 700; color: var(--text); }

@@ -35,14 +35,14 @@ Every color is a CSS variable set on a theme class (`.hp-dark`, `.hp-light`) at 
 
 ## Type
 
-Pixelify Sans for titles and big numbers only, never below 18px. Atkinson Hyperlegible for everything people read. Form inputs are 16px so phones don't zoom.
+Atkinson Hyperlegible for everything, with bold titles and bold numbers in equal-width digits (`tabular-nums`). Form inputs are 16px so phones don't zoom. (The design used Pixelify Sans for titles and big numbers; it was dropped in October 2026 because it was hard to read and looked gimmicky.)
 
 | Style | Font · size/line · weight |
 |---|---|
-| Display | Pixelify · 30/36 phone, 34/40 desktop · 700 |
-| Title | Pixelify · 24/30 · 700 |
-| Panel title | Pixelify · 20/26 · 700 |
-| Stat number | Pixelify · 28/32 phone, 34/38 desktop · 500 |
+| Display | Atkinson · 30/36 phone, 34/40 desktop · 700 |
+| Title | Atkinson · 24/30 · 700 |
+| Panel title | Atkinson · 20/26 · 700 |
+| Stat number | Atkinson · 28/32 phone, 34/38 desktop · 700, tabular digits |
 | Step title | Atkinson · 22/28 phone, 28/34 desktop · 700 |
 | Body | Atkinson · 15/21 · 400 (700 for emphasis) |
 | Small | Atkinson · 14/20 · 400 (Why? text, editor intros) |

@@ -35,7 +35,7 @@ Only a claude.ai chat can republish the Claude artifact (it uses the Artifact to
 - Reference hunts are `src/data/reference.json` (shape and rules in `REFERENCE_DB_PLAN.md`), one entry per line, generated from `tools/reference/readings.json` by `tools/reference/generate.js`; edit the readings, not the file. Tests swap in a fixture with `assemble({ reference })`.
 - All storage goes through one API. Inside Claude, `window.claude.use("db")` returns a Firestore-like store (`doc`, `collection`, `limit`, `onSnapshot`, `get`, `set`, `update`, `delete`). Outside Claude, `localDb()` provides the same API over `localStorage` key `btl.data.v1`. The artifact declares `db` (rules: read "view", write "admin") and `downloads`.
 - Per-device preferences in localStorage: `btl.profile` (active character), `btl.adv` (Advanced mode), `btl.theme` (system, light or dark). `btl.ui` is retired.
-- Fonts: Pixelify Sans (headings) and Atkinson Hyperlegible (body). The dev file loads them from Google Fonts; the build inlines them.
+- Font: Atkinson Hyperlegible for everything (Pixelify Sans was dropped for readability, October 2026). The dev file loads them from Google Fonts; the build inlines them.
 
 ### Data model
 
@@ -98,7 +98,7 @@ Advanced mode (per device) adds: Echo Raid counts per hunt, renaming or deleting
 ## Release workflow
 
 1. Edit `src/` (code; see `ARCHITECTURE.md` for where things go) or `src/data/` (data; `reference.json` through the readings and `generate.js`). Run `npm test`: it assembles `dist/index.html`, then runs the layer, data, unit and UI tests and the golden-output test. The golden test fails if anything the app computes changed; when that's intended, `npm run golden:update` rewrites `tests/golden/expected/` (with the maintainer's OK). Its real-data run uses a frozen copy of the data in `tests/golden/data/`, so data updates don't affect it.
-2. Build: `npm pack @fontsource/pixelify-sans @fontsource/atkinson-hyperlegible`, untar both into `fonts-cache` (`tar xzf <file>.tgz && mv package <name>`), then `npm run build` (assembles, then `python3 tools/build.py dist/index.html . fonts-cache`). This writes the built `index.html`, `manifest.webmanifest`, `sw.js` (its cache name changes with the content), icons and `fonts-OFL.txt` to the repo root.
+2. Build: `npm pack @fontsource/atkinson-hyperlegible`, untar it into `fonts-cache` (`tar xzf <file>.tgz && mv package <name>`), then `npm run build` (assembles, then `python3 tools/build.py dist/index.html . fonts-cache`). This writes the built `index.html`, `manifest.webmanifest`, `sw.js` (its cache name changes with the content), icons and `fonts-OFL.txt` to the repo root.
 3. Commit source and built files; push to `main`. GitHub Pages updates in about a minute.
 4. To update the maintainer's Claude artifact, ask a claude.ai chat in the Project to republish the assembled page to the development artifact, keeping its existing capabilities: `dist/index.html` as `node tools/assemble.js` builds it at the pushed commit. `dist/` isn't committed, so the chat clones the repo, runs `npm ci` (esbuild bundles the script) and the assembler, or gets the file attached. `src/index.html` alone doesn't work, and the root `index.html` is the offline build. Download a backup first when the release changes stored shapes.
 5. Keep the TibiaWiki CC BY-SA credit in Characters and settings and the README.

@@ -6,7 +6,7 @@ src/data inlined).
 Output: a folder ready for GitHub Pages: index.html, manifest.webmanifest, sw.js, icons, font licence.
 
 Usage:
-  npm pack @fontsource/pixelify-sans @fontsource/atkinson-hyperlegible   (then untar both into FONTS_DIR)
+  npm pack @fontsource/atkinson-hyperlegible   (then untar it into FONTS_DIR)
   node tools/assemble.js && python3 tools/build.py dist/index.html OUT_DIR FONTS_DIR   (npm run build: OUT_DIR . and
   FONTS_DIR fonts-cache)
 """
@@ -22,7 +22,7 @@ def woff2(pattern):
     path = glob.glob(os.path.join(fonts, "**", pattern), recursive=True)[0]
     return base64.b64encode(open(path, "rb").read()).decode()
 faces = []
-for fam, file_fam, weights in [("Pixelify Sans", "pixelify-sans", (500, 700)), ("Atkinson Hyperlegible", "atkinson-hyperlegible", (400, 700))]:
+for fam, file_fam, weights in [("Atkinson Hyperlegible", "atkinson-hyperlegible", (400, 700))]:
     for w in weights:
         faces.append("@font-face{font-family:'%s';font-style:normal;font-weight:%d;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');}"
                      % (fam, w, woff2("%s-latin-%d-normal.woff2" % (file_fam, w))))
@@ -135,7 +135,7 @@ icon(512, 112).save(os.path.join(out, "icon-maskable-512.png"))
 
 # 5. Font licence (SIL Open Font License requires it to travel with the fonts).
 lic = []
-for fam in ("pixelify-sans", "atkinson-hyperlegible"):
+for fam in ("atkinson-hyperlegible",):
     path = glob.glob(os.path.join(fonts, "*" + fam + "*", "LICENSE"))[0]
     lic.append("==== " + fam + " ====\n" + open(path).read())
 open(os.path.join(out, "fonts-OFL.txt"), "w").write("\n\n".join(lic))
