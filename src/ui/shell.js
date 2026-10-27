@@ -5,6 +5,7 @@
 import { h, rerender, icon } from "./dom.js";
 import { headerView, firstRunView, charactersPageView, planScreenView, weeklyView, logView, spotsView, spotView, creaturesView, creatureView } from "../app/views.js";
 import * as firstRun from "./screens/firstRun.js";
+import { t, _ } from "../app/lang.js";
 import * as characters from "./screens/characters.js";
 import * as plan from "./screens/plan.js";
 import * as weeklyScreen from "./screens/weekly.js";
@@ -14,7 +15,7 @@ import * as spotScreen from "./screens/spot.js";
 import * as creaturesScreen from "./screens/creatures.js";
 import * as creatureScreen from "./screens/creature.js";
 
-export const TABS = [["plan", "Plan"], ["spots", "Spots"], ["creatures", "Creatures"], ["weekly", "Weekly"]];
+export const TABS = [["plan", _("Plan")], ["spots", _("Spots")], ["creatures", _("Creatures")], ["weekly", _("Weekly")]];
 const ROUTES = TABS.map((t) => t[0]).concat(["characters", "log", "spot", "creature"]);
 // Full pages without the tab bar.
 const PAGES = ["characters", "log"];
@@ -36,48 +37,48 @@ export function mount(root, app, host) {
     const v = headerView({ profile: inApp ? app.profile() : null });
     return h("header", { class: "hp-header" },
       h("span", { class: "hp-appname" }, v.appName),
-      v.character ? h("nav", { class: "hp-nav-desktop", "aria-label": "Main" }, TABS.map(([id, label]) =>
-        h("a", { href: "#/" + id, "aria-current": current(r, id) }, label))) : null,
+      v.character ? h("nav", { class: "hp-nav-desktop", "aria-label": t("Main") }, TABS.map(([id, label]) =>
+        h("a", { href: "#/" + id, "aria-current": current(r, id) }, t(label)))) : null,
       v.character ? h("div", { class: "hp-header-end" },
         h("button", { id: "hdr-char", type: "button", class: "hp-switcher", "aria-label": v.character.label, onClick: () => go("characters") },
           h("span", { class: "name" }, v.character.name + " ▾"), h("span", { class: "sub" }, v.character.sub)),
-        h("button", { id: "hdr-settings", type: "button", class: "hp-iconbtn", "aria-label": "Characters and settings", onClick: () => go("characters") }, icon("settings"))) : null);
+        h("button", { id: "hdr-settings", type: "button", class: "hp-iconbtn", "aria-label": t("Characters and settings"), onClick: () => go("characters") }, icon("settings"))) : null);
   }
   function tabbar(r) {
-    return h("nav", { class: "hp-tabbar", "aria-label": "Main" }, TABS.map(([id, label]) =>
-      h("a", { href: "#/" + id, "aria-current": current(r, id) }, icon(id), label)));
+    return h("nav", { class: "hp-tabbar", "aria-label": t("Main") }, TABS.map(([id, label]) =>
+      h("a", { href: "#/" + id, "aria-current": current(r, id) }, icon(id), t(label))));
   }
 
   function restore(done) {
     host.pickFile().then((text) => {
       if (text == null) return;
-      ui.characters.status = "Restoring…"; draw();
-      return app.actions.restoreBackup(text).then((n) => { ui.characters.status = "Restored " + n + " character" + (n === 1 ? "" : "s") + " from the backup."; if (done) done(); },
-        (e) => { ui.characters.status = e && e.message === "bad" ? "That file isn’t a backup from this tool." : e && e.message === "empty" ? "That backup has no characters in it." : "Couldn’t restore everything. Try again."; });
+      ui.characters.status = t("Restoring…"); draw();
+      return app.actions.restoreBackup(text).then((n) => { ui.characters.status = t.n(n, "Restored {n} character from the backup.", "Restored {n} characters from the backup."); if (done) done(); },
+        (e) => { ui.characters.status = e && e.message === "bad" ? t("That file isn’t a backup from this tool.") : e && e.message === "empty" ? t("That backup has no characters in it.") : t("Couldn’t restore everything. Try again."); });
     }).then(draw);
   }
 
   function screen(r) {
     const s = app.state;
-    if (s.status === "loading") return h("p", { class: "hp-p hp-muted", role: "status" }, "Loading…");
+    if (s.status === "loading") return h("p", { class: "hp-p hp-muted", role: "status" }, t("Loading…"));
     if (!app.profile() || ui.adding) {
-      const f = ui.firstRun, view = firstRunView(f);
+      const f = ui.firstRun, view = firstRunView(Object.assign({ lang: s.lang }, f));
       return firstRun.render(view, {
         cancel: ui.adding && app.profile() ? () => { ui.adding = false; draw(); } : null,
         pickVocation: (v) => { f.vocation = v; draw(); },
-        setLevel: (t) => { f.level = t; draw(); },
+        setLevel: (x) => { f.level = x; draw(); },
         start: () => { if (!view.ready) return; ui.adding = false; app.actions.addCharacter({ vocation: view.vocations.filter((v) => v.pressed)[0].name, level: Number(view.level) }); f.level = ""; go("plan"); },
-        restore: () => restore(() => go("plan")),
+        restore: () => restore(() => go("plan")), setLang: app.actions.setLang,
       });
     }
     if (r === "characters") {
       const a = app.actions, c = ui.characters;
       return characters.render(charactersPageView(s, app.model()), c, {
         back: () => go("plan"), switchCharacter: (id) => { c.armed = false; a.switchCharacter(id); }, add: () => { c.armed = false; ui.firstRun = { vocation: null, level: "" }; ui.adding = true; draw(); },
-        update: a.updateCharacter, setSources: a.setSources, setWorld: a.setWorld, setTakenMinutes: a.setTakenMinutes, setAdvanced: a.setAdvanced, setTheme: a.setTheme,
+        update: a.updateCharacter, setSources: a.setSources, setWorld: a.setWorld, setTakenMinutes: a.setTakenMinutes, setAdvanced: a.setAdvanced, setTheme: a.setTheme, setLang: a.setLang,
         arm: (b) => { c.armed = b; draw(); }, deleteCharacter: () => { c.armed = false; a.deleteCharacter(); },
         download: () => a.exportBackup().then((bk) => host.download("hunt-planner-backup-" + bk.exportedAt.slice(0, 10) + ".json", JSON.stringify(bk, null, 2)))
-          .then((msg) => { c.status = msg || "Backup saved."; draw(); }, () => { c.status = "Couldn’t create the backup. Try again in a moment."; draw(); }),
+          .then((msg) => { c.status = msg || t("Backup saved."); draw(); }, () => { c.status = t("Couldn’t create the backup. Try again in a moment."); draw(); }),
         restore: () => restore(),
       });
     }
@@ -139,7 +140,7 @@ export function mount(root, app, host) {
         preferred: (on) => a.setPreferred(slug, on), unwanted: (on) => a.setUnwanted(slug, on), avoid: (on) => a.setAvoid(slug, on),
         bestiary: (on) => a.setBestiaryDone(slug, on), warden: (on) => a.setWardenDone(slug, on),
         notesDraft: (t) => { U.notes = t; }, notes: (t) => { U.notes = null; a.setNotes(slug, t); },
-        nums: (k, t) => { if (!a.setCreatureNumbers(slug, { [k]: t })) { s.notice = "That isn’t a number. Type it like 450, 3.2kk or 800k."; draw(); } },
+        nums: (k, x) => { if (!a.setCreatureNumbers(slug, { [k]: x })) { s.notice = t("That isn’t a number. Type it like 450, 3.2kk or 800k."); draw(); } },
         pin: (spot) => a.pinSpot(slug, spot), minLevel: (t) => a.setMinLevel(slug, t),
       });
     }
@@ -166,11 +167,12 @@ export function mount(root, app, host) {
     root.className = "app hp-" + s.theme;
     // The page behind the app takes the theme too.
     root.ownerDocument.documentElement.className = "hp-" + s.theme;
+    root.ownerDocument.documentElement.lang = s.lang;
     rerender(root, () => {
       const frag = root.ownerDocument.createDocumentFragment();
       frag.appendChild(header(r, inApp));
       if (s.notice && r !== "characters") frag.appendChild(h("div", { class: "hp-notice", role: "status", style: "margin:12px 16px 0" }, s.notice,
-        h("button", { type: "button", class: "hp-linkbtn", onClick: app.actions.clearNotice }, "Dismiss")));
+        h("button", { type: "button", class: "hp-linkbtn", onClick: app.actions.clearNotice }, t("Dismiss"))));
       frag.appendChild(h("main", { class: "hp-main", id: "main" }, screen(r)));
       if (inApp && PAGES.indexOf(r) === -1) frag.appendChild(tabbar(r));
       return frag;

@@ -1,6 +1,7 @@
 // Preferred and Unwanted lists: board odds and suggestions. Odds follow the community model in rules.js (Preferred
 // creatures weighted, Unwanted ones removed, three offers per board). Unofficial.
 import { SLOTS } from "../data/rules.js";
+import { EN } from "./i18n.js";
 
 // pool: the difficulty's pool [{slug}]; slots {preferred, unwanted} (slugs); isGood(slug): a creature worth getting
 // (S or A for the goal, not avoided, not above the character's level). Returns {poolSize, unwanted, preferred (slots
@@ -32,17 +33,18 @@ export function slotOdds(pool, slots, isGood) {
 // slugs already in either list; info(it) → {avoided, locked, minLevel, score: {tier, rel} or undefined}. Preferred: S, A
 // or B creatures that aren't avoided or above level, by score. Unwanted: avoided, then above level, then D creatures
 // (lowest score first).
-export function slotSuggestions(which, pool, taken, info, n) {
+export function slotSuggestions(which, pool, taken, info, n, t) {
+  t = t || EN;
   const scored = pool.filter((it) => taken.indexOf(it.slug) === -1).map((it) => {
     const x = info(it), sc = x.score;
     let key, why;
     if (which === "preferred") {
       if (x.avoided || x.locked || !sc || sc.tier === "C" || sc.tier === "D") return null;
-      key = sc.rel; why = "Score " + sc.tier;
+      key = sc.rel; why = t("Score {tier}", { tier: sc.tier });
     } else {
-      if (x.avoided) { key = 3; why = "Avoided"; }
-      else if (x.locked) { key = 2; why = "Needs level " + x.minLevel; }
-      else if (sc && sc.tier === "D") { key = 1 + (1 - sc.rel) / 2; why = "Score D"; }
+      if (x.avoided) { key = 3; why = t("Avoided"); }
+      else if (x.locked) { key = 2; why = t("Needs level {level}", { level: x.minLevel }); }
+      else if (sc && sc.tier === "D") { key = 1 + (1 - sc.rel) / 2; why = t("Score {tier}", { tier: "D" }); }
       else return null;
     }
     return { it, key, why };

@@ -16,7 +16,13 @@ export function h(tag, props, ...children) {
   return el;
 }
 
+// A translated sentence with elements in it: "Read {videos} on {pal}." with nodes {videos, pal} → its parts in order.
+export function withNodes(text, nodes) {
+  return String(text).split(/(\{\w+\})/).filter((x) => x !== "").map((x) => { const m = x.match(/^\{(\w+)\}$/); return m && nodes[m[1]] ? nodes[m[1]] : x; });
+}
+
 // Re-renders root's contents with render(), keeping the focused control (by id) and its caret.
+
 export function rerender(root, render) {
   const a = root.ownerDocument.activeElement, id = a && root.contains(a) ? a.id : null;
   const sel = id && typeof a.selectionStart === "number" ? [a.selectionStart, a.selectionEnd] : null;

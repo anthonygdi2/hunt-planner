@@ -16,6 +16,7 @@ import { noNumsWhy as coreNoNumsWhy } from "../core/explain.js";
 import { heldTask as coreHeldTask, spotValue as coreSpotValue, scaleSpots, spotScores as coreSpotScores, planOffers as corePlanOffers,
   planOptions as corePlanOptions, planChain as corePlanChain, todayFactor as coreTodayFactor } from "../core/plan.js";
 import { GOAL_KEYS } from "../core/score.js";
+import { EN } from "../core/i18n.js";
 
 // A reroll plan cache shared across models (solvePlan is the slow part); keyed by planKey.
 export function makePlanCache() { return { key: "", plan: null }; }
@@ -23,7 +24,7 @@ export function makePlanCache() { return { key: "", plan: null }; }
 // state: compute()'s state plus {creatures (shared creature settings), planner {state, marks, occupancy}, spotMeta,
 // expTable (PL_EXP)}. derived: compute(state, now), or null to compute it here. opts.planCache: makePlanCache().
 export function makeModel(state, derived, now, opts) {
-  const d = derived || compute(state, now), p = state.profile || {}, catalog = state.catalog, entries = state.entries;
+  const d = derived || compute(state, now), p = state.profile || {}, catalog = state.catalog, entries = state.entries, t = state.t || EN;
   const cache = (opts && opts.planCache) || makePlanCache(), at = new Date(now);
   const pl = state.planner || {}, plState = pl.state || {};
   const vocation = p.vocation || VOCATIONS[0], sources = readSources(p), refOn = sources.reference && state.reference.length > 0, otherOn = refOn && sources.otherVocation;
@@ -88,7 +89,7 @@ export function makeModel(state, derived, now, opts) {
     const t = plState.today || {};
     return { boosted: t.boostedDay === serverDay(now) ? t.boosted : null, prey: t.prey || [], event: t.event || 0 };
   };
-  const todayFactor = (kph, t) => coreTodayFactor(kph, t, { catalog, expTable: state.expTable });
+  const todayFactor = (kph, td) => coreTodayFactor(kph, td, { catalog, expTable: state.expTable, t });
   const spotIndex = () => coreSpotIndex({ reference: state.reference, sessions: state.sessions, catalog, spotMeta: state.spotMeta, userSpots: state.userSpots });
   const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost });
   const heldTask = (h, diff) => coreHeldTask(h, diff, { catalog, chalRates: chalRates() });
@@ -97,14 +98,14 @@ export function makeModel(state, derived, now, opts) {
     const nums = spotNums(sp);
     if (!nums) return null;
     return coreSpotValue(sp, nums, { hours: o.hours, held: o.held, diff: o.diff || boardDiff(), today: o.today, travel: o.travel, weekly: o.weekly || openWeeklies() },
-      { catalog, chalRates: chalRates(), entries, bestiaryBonus: p.bestiaryBonus, raidP: d.raidP, expTable: state.expTable });
+      { catalog, chalRates: chalRates(), entries, bestiaryBonus: p.bestiaryBonus, raidP: d.raidP, expTable: state.expTable, t });
   };
   const scaleArgs = (diff) => { const w = weights(); return { weights: w, model: GOAL_KEYS.some((k) => w[k] > 0) ? poolModel(diff) : null }; };
   const plScale = (values, diff) => scaleSpots(values, scaleArgs(diff));
   const spotScores = (values, diff) => coreSpotScores(values, scaleArgs(diff || boardDiff()));
   const planOffers = (board, h, diff) => corePlanOffers(board, h, diff, catalog);
   const lensCheck = (sp, lens) => coreLensCheck(sp, lens, { level: p.level, vocation, otherOn });
-  const noNumsWhy = (sp) => coreNoNumsWhy(sp, { level: p.level, vocation, refOn, otherOn });
+  const noNumsWhy = (sp) => coreNoNumsWhy(sp, { level: p.level, vocation, refOn, otherOn, t });
   const planOptions = (o) => {
     o = o || {};
     const diff = o.diff || boardDiff(), H = o.hours > 0 ? o.hours : null, wk = o.weekly || openWeeklies();
@@ -119,7 +120,7 @@ export function makeModel(state, derived, now, opts) {
   const planChain = (o) => {
     o = o || {};
     const set = rerollSettings(), po = planOptions(o);
-    return corePlanChain(po, { diff: po.diff, now: o.now != null ? o.now : now, marks: o.marks, tokens: o.tokens != null ? o.tokens : set.left,
+    return corePlanChain(po, { t, diff: po.diff, now: o.now != null ? o.now : now, marks: o.marks, tokens: o.tokens != null ? o.tokens : set.left,
       tokensUnknown: o.tokensUnknown, hpd: set.hpd, solve: rerollPlan, occupancy: o.occupancy, world: o.world, markMinutes: settings.takenMinutes });
   };
   // The planner's own context for planChain and planOptions: its saved session length, difficulty, held offer, today's

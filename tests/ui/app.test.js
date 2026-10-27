@@ -30,7 +30,7 @@ function mockDb(store) {
     limit: () => ({ get: async () => ({ docs: kids(col) }), onSnapshot: (fn) => { const s = { col, fn, alive: true }; subs.push(s); setTimeout(() => fn({ docs: kids(col) }), 0); return () => { s.alive = false; }; } }) }) };
 }
 
-function load({ store, prefs, now } = {}) {
+function load({ store, prefs, now, browserLang } = {}) {
   const errors = [], vc = new VirtualConsole();
   // jsdom can't follow the backup's download link; anything else it reports is a page error.
   vc.on("jsdomError", (e) => { if (!/Not implemented: navigation/.test(e.message)) errors.push(e.message); });
@@ -42,6 +42,7 @@ function load({ store, prefs, now } = {}) {
         w.Date = class extends RealDate { constructor(...a) { if (a.length) super(...a); else super(now); } static now() { return now; } };
       }
       Object.entries(prefs || {}).forEach(([k, v]) => w.localStorage.setItem(k, v));
+      if (browserLang) Object.defineProperty(w.navigator, "language", { value: browserLang });
       if (store) w.claude = { use: (name) => Promise.resolve(name === "db" ? mockDb(store) : name === "user" ? { canEdit: () => Promise.resolve(true) } : null) };
       w.URL.createObjectURL = () => "blob:x"; w.URL.revokeObjectURL = () => {};
       w.addEventListener("error", (e) => errors.push(e.message));
@@ -310,6 +311,36 @@ test("Creatures over the golden fixture: tiers, a creature page's writes, and th
   sug.click();
   await until(() => store["profiles/ek"].slots.preferred.indexOf(slug) !== -1, "a suggested Preferred creature");
   assert.match(p.d.body.textContent, /A Preferred creature on [\d.]+% of boards/);
+  assert.deepEqual(p.errors, []);
+  p.w.close();
+});
+
+test("languages: the browser's language at first, the saved choice after, and the plan's Why? text in it", async () => {
+  const first = load({ browserLang: "pt-BR" });
+  await until(() => first.$("#fr-go"), "first run");
+  assert.match(first.d.body.textContent, /Onde você deve caçar\?/);
+  assert.equal(first.d.documentElement.lang, "pt");
+  assert.equal(first.$("#fr-lang").value, "pt");
+  first.w.close();
+
+  const store = fixtureStore();
+  const p = load({ store, prefs: { "btl.profile": "ek", "btl.lang": "pl" }, browserLang: "es-ES", now: Date.parse("2026-10-24T18:00:00Z") });
+  await until(() => p.$("#step1-title"), "the plan");
+  assert.match(p.d.body.textContent, /Gdzie polować teraz/);
+  assert.match(p.$("#step1-title").textContent, /^Idź na /);
+  await p.click("#why-first");
+  assert.match(p.d.body.textContent, /Wynik \d+: /, "the Why? text comes from core in Polish");
+  assert.equal(p.$('.hp-tabbar a[aria-current="page"]').textContent, "Plan");
+  await p.go("characters");
+  await p.type("#set-lang", "es");
+  assert.equal(p.w.localStorage.getItem("btl.lang"), "es");
+  assert.equal(p.d.documentElement.lang, "es");
+  assert.match(p.d.body.textContent, /Personajes y ajustes/);
+  assert.match(p.d.body.textContent, /Las traducciones son nuevas/);
+  await p.go("spots");
+  assert.match(p.$("#spots-count").textContent, /^\d+ spots?$/);
+  await p.type("#spots-q", "zzzz", "input");
+  assert.match(p.d.body.textContent, /Ningún spot ni criatura coincide con «zzzz»/);
   assert.deepEqual(p.errors, []);
   p.w.close();
 });

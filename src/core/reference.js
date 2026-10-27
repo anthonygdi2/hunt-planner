@@ -7,6 +7,7 @@
 import { norm } from "./text.js";
 import { sessHours } from "./rates.js";
 import { manualNums } from "./numbers.js";
+import { EN } from "./i18n.js";
 
 // Calibration ratios are clamped to this range; a spot's profit offset to ± max(its reference profit, this).
 export const REF_CLAMP_LO = 0.2, REF_CLAMP_HI = 1.5, REF_PROFIT_CAP = 500000;
@@ -31,7 +32,11 @@ export function refIndex(best) {
 export const refTooHigh = (e, level) => { const lvl = Number(level) || 0; return !!(lvl && e.levelMin && lvl < e.levelMin); };
 // The entry's profit is dated: recorded before the rebalance or flagged.
 export const profitStale = (e) => !!(e.profitStale || (e.source && e.source.postRebalance === false));
-export function staleProfitText(e) { const d = e.source && e.source.date; return (d ? "Profit from " + String(d).slice(0, 4) : "Profit") + ", may be out of date"; }
+export function staleProfitText(e, t) {
+  t = t || EN;
+  const d = e.source && e.source.date;
+  return d ? t("Profit from {year}, may be out of date", { year: String(d).slice(0, 4) }) : t("Profit, may be out of date");
+}
 
 // The entries a character uses: {by (spot key → entry), list, other: {vocation: {by, list}}} for its vocation (and
 // "any") and for every other vocation. Entries above its level, or without spot, raw exp/h, creatures or vocation, are

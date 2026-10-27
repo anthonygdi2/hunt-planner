@@ -34,7 +34,8 @@ Only a claude.ai chat can republish the Claude artifact (it uses the Artifact to
 - Creature data is `src/data/creatures.json` (730 creatures): `n` name, `c` bestiary class (`E` Easy, `M` Medium, `H` Hard, `C` Challenging), `m` task-pool bitmask (Beginner 1, Adept 2, Expert 4, Master 8), `w` TibiaWiki title when it differs from the name, `r` 1 for rare creatures.
 - Reference hunts are `src/data/reference.json` (shape and rules in `REFERENCE_DB_PLAN.md`), one entry per line, generated from `tools/reference/readings.json` by `tools/reference/generate.js`; edit the readings, not the file. Tests swap in a fixture with `assemble({ reference })`.
 - All storage goes through one API. Inside Claude, `window.claude.use("db")` returns a Firestore-like store (`doc`, `collection`, `limit`, `onSnapshot`, `get`, `set`, `update`, `delete`). Outside Claude, `localDb()` provides the same API over `localStorage` key `btl.data.v1`. The artifact declares `db` (rules: read "view", write "admin") and `downloads`.
-- Per-device preferences in localStorage: `btl.profile` (active character), `btl.adv` (Advanced mode), `btl.theme` (system, light or dark). `btl.ui` is retired.
+- Per-device preferences in localStorage: `btl.profile` (active character), `btl.adv` (Advanced mode), `btl.theme` (system, light or dark), `btl.lang` (en, es, pt or pl; the browser's language until chosen). `btl.ui` is retired.
+- Languages: English, Spanish, Brazilian Portuguese and Polish. Code writes English wrapped in `t()`; the translations are in `src/data/i18n/`, keyed by the English text (`core/i18n.js`, `app/lang.js`, `tools/i18n.js`; how-to in `CONTRIBUTING.md`).
 - Font: Atkinson Hyperlegible for everything (Pixelify Sans was dropped for readability, October 2026). The dev file loads them from Google Fonts; the build inlines them.
 
 ### Data model

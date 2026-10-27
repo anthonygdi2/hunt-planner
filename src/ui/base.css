@@ -254,7 +254,7 @@
 
   /* The narrowest phones (320–359 px) */
   @media (max-width: 359px) {
-    .hp-seg button { padding: 0 2px; font-size: 13px; }
+    .hp-seg button { padding: 0 1px; font-size: 12px; letter-spacing: -0.01em; }
     .hp-offer-row { grid-template-columns: minmax(0, 1fr); }
     .hp-wk-head, .hp-wk-row { grid-template-columns: minmax(0, 1fr) 4.5em 5em; }
   }

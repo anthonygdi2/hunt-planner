@@ -7,6 +7,7 @@ import { GOAL_KEYS, weightedValue } from "./score.js";
 import { RHO, taskShape, rateThreshold } from "./reroll.js";
 import { markAge, markActive, occOdds, orderByOdds } from "./occupancy.js";
 import { offerLetter, goWhy, rerollWhy, seeSpotsWhy } from "./explain.js";
+import { EN } from "./i18n.js";
 import { BOOSTED_EXP_MULT, RAID, TASK, TOKEN_CAP } from "../data/rules.js";
 
 // The chain shows at most this many spots.
@@ -19,7 +20,7 @@ export const CHECK_HOURS = 2;
 // ctx.expTable, or kill shares when a creature's exp is unknown) times its own bonus (Boosted Creature, exp Prey), then
 // any exp event. today: {boosted (slug), prey [{slug, kind, pct}], event (percent)} or null. Returns {mult, notes}.
 export function todayFactor(kph, today, ctx) {
-  const out = { mult: 1, notes: [] };
+  const out = { mult: 1, notes: [] }, t = ctx.t || EN;
   if (!today) return out;
   const keys = Object.keys(kph), exp = ctx.expTable, byExp = keys.every((k) => exp[k] > 0), w = {};
   let tot = 0, per = 0;
@@ -27,12 +28,12 @@ export function todayFactor(kph, today, ctx) {
   keys.forEach((k) => {
     let m = 1;
     const name = ctx.catalog.bySlug[k] ? ctx.catalog.bySlug[k].name : k;
-    if (today.boosted === k) { m *= BOOSTED_EXP_MULT; out.notes.push(name + " is boosted (double exp)"); }
-    (today.prey || []).forEach((p) => { if (p.slug === k && p.kind === "xp" && p.pct > 0) { m *= 1 + p.pct / 100; out.notes.push(name + " prey +" + p.pct + "% exp"); } });
+    if (today.boosted === k) { m *= BOOSTED_EXP_MULT; out.notes.push(t("{creature} is boosted (double exp)", { creature: name })); }
+    (today.prey || []).forEach((p) => { if (p.slug === k && p.kind === "xp" && p.pct > 0) { m *= 1 + p.pct / 100; out.notes.push(t("{creature} prey +{pct}% exp", { creature: name, pct: p.pct })); } });
     per += tot ? w[k] / tot * m : 0;
   });
   if (tot) out.mult = per;
-  if (today.event > 0) { out.mult *= 1 + today.event / 100; out.notes.push("+" + today.event + "% exp event"); }
+  if (today.event > 0) { out.mult *= 1 + today.event / 100; out.notes.push(t("+{pct}% exp event", { pct: today.event })); }
   return out;
 }
 
@@ -216,22 +217,22 @@ export function planChain(po, ctx) {
 
   // The active bounty, when one is picked (planOffers marks it held); otherwise the offers being chosen from.
   const active = offers.filter((o) => o.held)[0] || null;
-  const steps = [], why = { sc, pct, tokens, options, chosen, order: keep, offers, worth, now, active };
-  if (active && Number(active.kills) > 0 && active.done >= Number(active.kills)) steps.push({ kind: "finish", offer: active, text: "Claim " + active.name + "’s task reward",
-    why: "No kills left. Claiming it pays the reward, " + TASK[ctx.diff].points * kindMult(active.kind) +
-      " bounty points and a reroll token; then choose from new offers." });
-  if (tokens === 0 && !unknown) steps.push({ kind: "claim", text: "Claim your daily reroll token if you haven’t today, then re-plan",
-    why: "You have no reroll tokens left. Each day gives one to claim, and each finished bounty gives another." });
+  const t = ctx.t || EN, steps = [], why = { sc, pct, tokens, options, chosen, order: keep, offers, worth, now, active, t };
+  if (active && Number(active.kills) > 0 && active.done >= Number(active.kills)) steps.push({ kind: "finish", offer: active, text: t("Claim {creature}’s task reward", { creature: active.name }),
+    why: t("No kills left. Claiming it pays the reward, {points} bounty points and a reroll token; then choose from new offers.", { points: TASK[ctx.diff].points * kindMult(active.kind) }) });
+  if (tokens === 0 && !unknown) steps.push({ kind: "claim", text: t("Claim your daily reroll token if you haven’t today, then re-plan"),
+    why: t("You have no reroll tokens left. Each day gives one to claim, and each finished bounty gives another.") });
   chosen.forEach((o, n) => {
-    const bounty = !o.offer ? null : o.offer.held ? "counts for your active bounty" : "for offer " + offerLetter(o.offer) + ", pick once the spot is free";
-    steps.push({ kind: "go", option: o, offer: o.offer || null, bounty, taken: n > 0, text: (n ? "Taken? → " : "Go to ") + o.name, why: goWhy(o, n, why) });
+    const bounty = !o.offer ? null : o.offer.held ? t("counts for your active bounty") : t("for offer {letter}, pick once the spot is free", { letter: offerLetter(o.offer) });
+    steps.push({ kind: "go", option: o, offer: o.offer || null, bounty, taken: n > 0, text: n ? t("Taken? → {spot}", { spot: o.name }) : t("Go to {spot}", { spot: o.name }), why: goWhy(o, n, why) });
   });
-  const pre = chosen.length ? "Taken? → " : "";
-  if (more) steps.push({ kind: "seeSpots", taken: true, text: pre + "See Spots for more", why: "More spots still beat a reroll than fit here." });
-  else if (plan) steps.push({ kind: "reroll", taken: chosen.length > 0, text: pre + "Reroll and re-plan", tokens, dropsBounty: !!active, why: rerollWhy(cutoff, skipped, why) });
-  else steps.push({ kind: "seeSpots", taken: chosen.length > 0, text: pre + (skipped.length && !chosen.length ? "See Spots for more, or free a spot below" : "See Spots for more"),
-    why: seeSpotsWhy({ unknown, tokens, model: !!sc.model }) });
-  const notes = skipped.map((x) => "Skipped " + x.name + ": marked taken " + x.mins + " min ago.");
+  // The end of the chain: label is its text without the "Taken? →" lead.
+  const end = (label) => ({ label, text: chosen.length ? t("Taken? → {spot}", { spot: label }) : label });
+  if (more) steps.push(Object.assign({ kind: "seeSpots", taken: true, why: t("More spots still beat a reroll than fit here.") }, end(t("See Spots for more"))));
+  else if (plan) steps.push(Object.assign({ kind: "reroll", taken: chosen.length > 0, tokens, dropsBounty: !!active, why: rerollWhy(cutoff, skipped, why) }, end(t("Reroll and re-plan"))));
+  else steps.push(Object.assign({ kind: "seeSpots", taken: chosen.length > 0, why: seeSpotsWhy({ unknown, tokens, model: !!sc.model, t }) },
+    end(skipped.length && !chosen.length ? t("See Spots for more, or free a spot below") : t("See Spots for more"))));
+  const notes = skipped.map((x) => t("Skipped {spot}: marked taken {min} min ago.", { spot: x.name, min: x.mins }));
   return { steps, notes, options, chosen, skipped, cutoff, tokens, hours: H, pct,
     pool: sc.model ? { known: sc.model.known, size: sc.model.rows.length } : null };
 }

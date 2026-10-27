@@ -1,5 +1,6 @@
 // Reading Tibia's Hunting Session Analyser text.
 import { norm, toInt } from "./text.js";
+import { EN } from "./i18n.js";
 
 // text: what the player pasted. catalog: makeCatalog(...), to match kill names to creatures.
 // Returns {kills [{count, name, slug?}], start?, end?, minutes?, hours, rawXp?, xp?, loot?, supplies?, balance?}.
@@ -41,10 +42,11 @@ export function parseSession(text, catalog) {
 }
 
 // What keeps a parsed session from being saved, as one sentence for the player; "" when it's fine.
-export function sessionProblems(p) {
-  if (!p) return "Paste the text from the Hunting Session Analyser.";
-  if (!p.hours) return "Couldn’t find the session length. Make sure the Session data or Session line is included.";
-  if (!p.kills.length) return "Couldn’t find any killed monsters. Make sure the Killed Monsters section is included.";
-  if (p.rawXp == null && p.xp == null) return "Couldn’t find the XP lines.";
+export function sessionProblems(p, t) {
+  t = t || EN;
+  if (!p) return t("Paste the text from the Hunting Session Analyser.");
+  if (!p.hours) return t("Couldn’t find the session length. Make sure the Session data or Session line is included.");
+  if (!p.kills.length) return t("Couldn’t find any killed monsters. Make sure the Killed Monsters section is included.");
+  if (p.rawXp == null && p.xp == null) return t("Couldn’t find the XP lines.");
   return "";
 }

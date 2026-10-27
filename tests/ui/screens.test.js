@@ -237,7 +237,7 @@ test("log: paste, where, and save call their actions", async () => {
 
 test("spots: search, sort, toggles, rows, more, and the badges legend", async () => {
   const spots = await import("../../src/ui/screens/spots.js");
-  const { BADGE_LEGEND } = await import("../../src/app/views.js");
+  const { badgeLegend } = await import("../../src/app/views.js"); const BADGE_LEGEND = badgeLegend();
   const view = { query: "co", sort: "score", sorts: [{ value: "score", label: "Score" }, { value: "exp", label: "Exp/h" }, { value: "profit", label: "Profit/h" }],
     toggles: [{ key: "allVocations", label: "All vocations", on: false }, { key: "anyLevel", label: "Any level", on: true }, { key: "hideTaken", label: "Hide taken", on: false }],
     count: "2 spots", more: 3, empty: "", legend: BADGE_LEGEND,

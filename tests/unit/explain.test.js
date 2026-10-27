@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { aVoc, offerLabel, offerLetter, noNumsWhy, pickWhy, oddsText, srcWhy, partsWhy, rerollWhy, seeSpotsWhy } from "../../src/core/explain.js";
+import { aVoc, offerLabel, offerLetter, noNumsWhy, pickWhy, oddsText, partsWhy, rerollWhy, seeSpotsWhy } from "../../src/core/explain.js";
 
 const pct = (v) => Math.round(v * 100);
 
@@ -22,13 +22,6 @@ test("why a spot has no numbers", () => {
   assert.equal(noNumsWhy({ sessions: [], entries: [{ levelMin: 500 }, { levelMin: 400 }] }, ctx), "Needs level 400.");
   assert.match(noNumsWhy({ sessions: [], entries: [{ vocation: "Royal Paladin" }] }, ctx), /^Only other vocations/);
   assert.equal(noNumsWhy({ sessions: [], entries: [{ vocation: "any" }] }, ctx), "No usable numbers for this character yet.");
-});
-
-test("where numbers come from", () => {
-  assert.equal(srcWhy({ src: "own" }), "From your own sessions here.");
-  assert.equal(srcWhy({ src: "refAdj", entry: {} }), "From a reference hunt, adjusted to you.");
-  assert.equal(srcWhy({ src: "other", entry: { vocation: "Elite Knight", source: { date: "2024-05-01" } }, profitStale: true }),
-    "From an Elite Knight’s reference hunt not adjusted to you yet, so likely optimistic. Profit from 2024, may be out of date.");
 });
 
 test("the parts of a spot's score", () => {

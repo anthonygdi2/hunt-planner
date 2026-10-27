@@ -5,19 +5,21 @@ import { createApp } from "./app/app.js";
 import { mount } from "./ui/shell.js";
 import { claudeDb, localDb, LOCAL_KEY } from "./store/db.js";
 import { makePrefs } from "./store/prefs.js";
+import { t } from "./app/lang.js";
 
 const w = window, host = w.claude, hasHost = !!(host && typeof host.use === "function");
-const app = createApp({ data: { creatures: DATA, reference: REFERENCE, expTable: PL_EXP }, prefs: makePrefs(w.localStorage), now: () => Date.now() });
+const app = createApp({ data: { creatures: DATA, reference: REFERENCE, expTable: PL_EXP }, prefs: makePrefs(w.localStorage), now: () => Date.now(),
+  browserLang: w.navigator && w.navigator.language });
 
 function download(name, text) {
   if (hasHost) {
-    return host.use("downloads").then((dl) => (dl ? dl.save({ filename: name, data: text }).then(() => "Backup saved.") : "Downloads aren’t available in this view."))
-      .catch((e) => { if (e && e.code === "declined") return ""; if (e && e.code === "rate_limited") return "A save prompt is already open."; throw e; });
+    return host.use("downloads").then((dl) => (dl ? dl.save({ filename: name, data: text }).then(() => t("Backup saved.")) : t("Downloads aren’t available in this view.")))
+      .catch((e) => { if (e && e.code === "declined") return ""; if (e && e.code === "rate_limited") return t("A save prompt is already open."); throw e; });
   }
   const url = URL.createObjectURL(new Blob([text], { type: "application/json" })), a = document.createElement("a");
   a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 2000);
-  return Promise.resolve("Backup saved to your downloads.");
+  return Promise.resolve(t("Backup saved to your downloads."));
 }
 function pickFile() {
   return new Promise((resolve) => {

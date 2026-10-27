@@ -21,11 +21,19 @@ html = open(src, encoding="utf-8").read()
 def woff2(pattern):
     path = glob.glob(os.path.join(fonts, "**", pattern), recursive=True)[0]
     return base64.b64encode(open(path, "rb").read()).decode()
+def unicode_range(file_fam, subset, w):
+    # The subset's characters, from the font package's own CSS (latin-ext has Polish and other accented letters).
+    path = glob.glob(os.path.join(fonts, "*" + file_fam + "*", "%d.css" % w))[0]
+    for block in re.findall(r"@font-face\s*\{[^}]*\}", open(path, encoding="utf-8").read()):
+        if "-%s-%d-normal.woff2" % (subset, w) in block:
+            return re.search(r"unicode-range:\s*([^;}]+)", block).group(1).strip()
+    raise SystemExit("no unicode-range for %s %s %d" % (file_fam, subset, w))
 faces = []
 for fam, file_fam, weights in [("Atkinson Hyperlegible", "atkinson-hyperlegible", (400, 700))]:
     for w in weights:
-        faces.append("@font-face{font-family:'%s';font-style:normal;font-weight:%d;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');}"
-                     % (fam, w, woff2("%s-latin-%d-normal.woff2" % (file_fam, w))))
+        for subset in ("latin", "latin-ext"):
+            faces.append("@font-face{font-family:'%s';font-style:normal;font-weight:%d;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');unicode-range:%s;}"
+                         % (fam, w, woff2("%s-%s-%d-normal.woff2" % (file_fam, subset, w)), unicode_range(file_fam, subset, w)))
 html, n = re.subn(r'\s*<link rel="preconnect" href="https://fonts\.googleapis\.com">\s*<link rel="preconnect" href="https://fonts\.gstatic\.com" crossorigin>\s*<link href="https://fonts\.googleapis\.com/css2[^"]*" rel="stylesheet">',
                   "\n<style>" + "".join(faces) + "</style>", html)
 assert n == 1, "Google Fonts links not found"

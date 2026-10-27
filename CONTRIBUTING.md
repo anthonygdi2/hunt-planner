@@ -37,6 +37,12 @@ ES modules under `src/`, bundled by esbuild into one self-contained page with no
 
 `npm test` must pass before a pull request. Keep commits focused, and say in the description what you checked by hand.
 
+## Text and translations
+
+Visible text is written in English and wrapped for translation: `t("…")` from `src/app/lang.js` in view models and screens (with `{placeholders}` for anything that changes), `t.n(count, "{n} hunt", "{n} hunts")` for counts, and `_("…")` for a string kept in a table and translated where it’s shown. Core functions that produce text take a translator as a parameter (`ctx.t`), so they stay pure.
+
+The translations are in `src/data/i18n/` (`es.js`, `pt.js`, `pl.js`), keyed by the English text. `node tools/i18n.js` shows what’s missing, and `node tools/i18n.js --missing` prints it ready to fill in. `npm test` fails while a string has no translation, has different placeholders, or misses one of its language’s plural forms (Polish has four). Creature, spot and in-game feature names stay in English, as Tibia’s client shows them. If you add a string and can’t translate it, say so in the pull request; corrections from native speakers are very welcome.
+
 ## Reference hunt data
 
 `src/data/reference.json` is generated: don’t edit it. Readings go in `tools/reference/readings.json` (one per Hunt Analyser shown in a video, with the video’s link and time), then `node tools/reference/generate.js` writes the data file (`--check` confirms the file matches the readings; `npm test` checks that too). The queue of videos still to read is `docs/REFERENCE_VIDEOS.md`, and the rules for readings are in `docs/REFERENCE_DB_PLAN.md`.

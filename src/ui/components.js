@@ -1,6 +1,7 @@
 // Shared controls: segmented, switch, field, select, inline confirm. Each returns an element; state lives in the
 // view model and the caller's actions.
 import { h } from "./dom.js";
+import { t } from "../app/lang.js";
 
 // Segmented control: options [{value, label}], the pressed one, onPick(value). Arrow keys move between options.
 export function segmented({ label, options, value, onPick, disabled }) {
@@ -49,9 +50,9 @@ export function confirmButton({ id, label, confirmLabel, armed, onArm, onConfirm
 export function stepper({ id, label, value, min, max, onSet, disabled }) {
   const v = value == null ? null : value;
   return h("div", { class: "hp-stepper", role: "group", "aria-label": label },
-    h("button", { id: id + "-dec", type: "button", class: "hp-btn", "aria-label": "One fewer", disabled: disabled || (v != null && v <= min), onClick: () => onSet(v == null ? min : v - 1) }, "−"),
+    h("button", { id: id + "-dec", type: "button", class: "hp-btn", "aria-label": t("One fewer"), disabled: disabled || (v != null && v <= min), onClick: () => onSet(v == null ? min : v - 1) }, "−"),
     h("output", { id, "aria-live": "polite" }, v == null ? "–" : String(v)),
-    h("button", { id: id + "-inc", type: "button", class: "hp-btn", "aria-label": "One more", disabled: disabled || (v != null && v >= max), onClick: () => onSet(v == null ? Math.min(max, 1) : v + 1) }, "+"));
+    h("button", { id: id + "-inc", type: "button", class: "hp-btn", "aria-label": t("One more"), disabled: disabled || (v != null && v >= max), onClick: () => onSet(v == null ? Math.min(max, 1) : v + 1) }, "+"));
 }
 
 // Source badges: [{kind, text}] (app/views.js sourceBadges); big on a step or spot page. Nothing for an empty list.

@@ -15,17 +15,21 @@ import { plDefaults, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKE
 import { makeActions } from "./actions.js";
 import { makeWatchers, mergeProfiles } from "./state.js";
 import { makeModel, makePlanCache } from "./model.js";
+import { pickLang } from "../core/i18n.js";
+import { setLang, translator, t } from "./lang.js";
 
 // data: {creatures, reference, expTable}; prefs: store/prefs.js; now() → ms.
-export function createApp({ data, prefs, now }) {
+// browserLang: the browser's language (navigator.language), for the first choice of language.
+export function createApp({ data, prefs, now, browserLang }) {
   const catalog = makeCatalog(data.creatures), known = (slug) => !!catalog.bySlug[slug];
   const state = {
     status: "loading", // "loading" until the profiles arrive, then "ready"
     local: false, canWrite: true, notice: "",
     profiles: {}, order: [], pid: prefs.get(PREF.profile) || null,
     creatures: {}, entries: {}, sessions: [], userSpots: {}, planner: { state: plDefaults(), marks: {}, occupancy: {} },
-    advanced: prefs.get(PREF.advanced) === "1", theme: readTheme(prefs.get(PREF.theme)),
+    advanced: prefs.get(PREF.advanced) === "1", theme: readTheme(prefs.get(PREF.theme)), lang: pickLang(prefs.get(PREF.lang), browserLang),
   };
+  setLang(state.lang);
   const listeners = new Set(), pending = {}, pendingNew = {}, planCache = makePlanCache();
   let repo = null, act = null, watch = null, charUnsub = [], plPending = 0, cachedModel = null, diffModels = {};
   const changed = () => { cachedModel = null; diffModels = {}; listeners.forEach((fn) => fn()); };
@@ -61,7 +65,7 @@ export function createApp({ data, prefs, now }) {
       if (!state.profiles[state.pid]) state.pid = m.order[0] || null;
       if (watching !== state.pid) { watching = state.pid; watchCharacter(state.pid); }
       changed();
-    }, () => { state.notice = "Saved data stopped updating. Reload the page to reconnect."; changed(); });
+    }, () => { state.notice = t("Saved data stopped updating. Reload the page to reconnect."); changed(); });
   }
 
   // A patch to the active character's profile: shown at once, written in the background; on failure the unsaved
@@ -76,7 +80,7 @@ export function createApp({ data, prefs, now }) {
       if (p) Object.keys(patch).forEach((k) => { if (p[k] === patch[k]) delete p[k]; });
     }, () => {
       if (pending[pid]) Object.keys(patch).forEach((k) => { delete pending[pid][k]; });
-      state.notice = "Couldn’t save that change. Try again in a moment.";
+      state.notice = t("Couldn’t save that change. Try again in a moment.");
       changed();
     });
     changed();
@@ -147,7 +151,7 @@ export function createApp({ data, prefs, now }) {
       const back = Object.assign({}, state.entries);
       if (prev) back[slug] = prev; else delete back[slug];
       state.entries = back;
-      state.notice = "Couldn’t save that change. Try again in a moment.";
+      state.notice = t("Couldn’t save that change. Try again in a moment.");
       changed();
     });
     changed();
@@ -159,7 +163,7 @@ export function createApp({ data, prefs, now }) {
     if (!on) next[which] = next[which].filter((x) => x !== slug);
     else {
       if (next[which].indexOf(slug) !== -1) return;
-      if (next[which].length >= SLOTS.max) { state.notice = "Your " + (which === "preferred" ? "Preferred" : "Unwanted") + " list is full. Remove one first."; changed(); return; }
+      if (next[which].length >= SLOTS.max) { state.notice = which === "preferred" ? t("Your Preferred list is full. Remove one first.") : t("Your Unwanted list is full. Remove one first."); changed(); return; }
       next[other] = next[other].filter((x) => x !== slug);
       next[which].push(slug);
     }
@@ -189,7 +193,7 @@ export function createApp({ data, prefs, now }) {
       Object.assign(body, goalPatch(PRESETS.exp), sourcesPatch(SOURCE_PRESETS.everything));
       if (name && String(name).trim()) body.name = String(name).trim().slice(0, 40);
       let id = null;
-      id = act.createProfile(body, () => { delete pendingNew[id]; }, () => { delete pendingNew[id]; state.notice = "Couldn’t add the character. Try again in a moment."; changed(); });
+      id = act.createProfile(body, () => { delete pendingNew[id]; }, () => { delete pendingNew[id]; state.notice = t("Couldn’t add the character. Try again in a moment."); changed(); });
       pendingNew[id] = true;
       state.profiles = Object.assign({}, state.profiles, { [id]: body });
       state.order = state.order.concat([id]);
@@ -229,6 +233,7 @@ export function createApp({ data, prefs, now }) {
     // Per-device preferences.
     setAdvanced(on) { state.advanced = !!on; prefs.set(PREF.advanced, on ? "1" : "0"); changed(); },
     setTheme(t) { state.theme = readTheme(t); prefs.set(PREF.theme, state.theme); changed(); },
+    setLang(l) { state.lang = pickLang(l, "en"); prefs.set(PREF.lang, state.lang); setLang(state.lang); changed(); },
     clearNotice() { state.notice = ""; changed(); },
     // Backup: the file's contents, and restoring one from its text (resolves with the number of characters; rejects
     // with Error("bad") or Error("empty") for a file it can't use).
@@ -267,7 +272,7 @@ export function createApp({ data, prefs, now }) {
       const empty = !Object.keys(ml).length, creatures = Object.assign({}, state.creatures);
       if (empty) delete creatures[slug]; else creatures[slug] = { name: c.name, minLevel: ml };
       state.creatures = creatures;
-      act.setCreatureSettings(slug, empty ? null : { name: c.name, minLevel: ml }, () => { state.notice = "Couldn’t save the level. Try again in a moment."; changed(); });
+      act.setCreatureSettings(slug, empty ? null : { name: c.name, minLevel: ml }, () => { state.notice = t("Couldn’t save the level. Try again in a moment."); changed(); });
       changed();
     },
     // The bounty (planner state `bounty`; reroll tokens also kept in step in the profile's reroll.left for older builds).
@@ -383,7 +388,7 @@ export function createApp({ data, prefs, now }) {
       if (Object.keys(raids).length) body.raidsBy = raids;
       const id = act.newSessionId(pid);
       state.sessions = state.sessions.concat([Object.assign({ id }, body)]);
-      act.saveSession(pid, id, body, () => { state.sessions = state.sessions.filter((x) => x.id !== id); state.notice = "Couldn’t save the hunt. Try again in a moment."; changed(); });
+      act.saveSession(pid, id, body, () => { state.sessions = state.sessions.filter((x) => x.id !== id); state.notice = t("Couldn’t save the hunt. Try again in a moment."); changed(); });
       if (readHunting(state.planner.state)) actions.savePlanner({ hunting: null }); else changed();
       return id;
     },
@@ -391,7 +396,7 @@ export function createApp({ data, prefs, now }) {
       const pid = state.pid;
       if (!act || !pid) return;
       state.sessions = state.sessions.filter((x) => x.id !== id);
-      act.deleteSession(pid, id, () => { state.notice = "Couldn’t delete that hunt."; changed(); });
+      act.deleteSession(pid, id, () => { state.notice = t("Couldn’t delete that hunt."); changed(); });
       changed();
     },
     // Echo Raid counts per creature on a logged hunt (advanced).
@@ -436,7 +441,7 @@ export function createApp({ data, prefs, now }) {
       if (!act || !pid) return;
       state.planner = Object.assign({}, state.planner, { state: Object.assign({}, state.planner.state, patch) });
       plPending++;
-      act.savePlannerState(pid, JSON.parse(JSON.stringify(state.planner.state)), () => { state.notice = "Couldn’t save that change. Try again in a moment."; changed(); })
+      act.savePlannerState(pid, JSON.parse(JSON.stringify(state.planner.state)), () => { state.notice = t("Couldn’t save that change. Try again in a moment."); changed(); })
         .then(() => { plPending--; });
       changed();
     },
@@ -444,7 +449,7 @@ export function createApp({ data, prefs, now }) {
 
   // The active character's model (app/model.js), rebuilt after each change; its tiers are for Master tasks. modelFor
   // gives one whose tiers are for another difficulty (or "all"), for the Creatures screen.
-  const modelState = (difficulty) => ({ catalog, reference: data.reference, profile: profile() || {}, sessions: state.sessions, entries: state.entries, advanced: state.advanced,
+  const modelState = (difficulty) => ({ t: translator(), catalog, reference: data.reference, profile: profile() || {}, sessions: state.sessions, entries: state.entries, advanced: state.advanced,
     difficulty, creatures: state.creatures, planner: state.planner, spotMeta: {}, expTable: data.expTable, userSpots: state.userSpots });
   function model() {
     if (!cachedModel) cachedModel = makeModel(modelState("master"), null, now(), { planCache });

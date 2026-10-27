@@ -18,6 +18,10 @@ Where should you hunt right now? Hunt Planner answers that for Tibia players, ar
 - **Weekly**: your weekly kill tasks, so spots with open tasks score higher.
 - **Log a clean hunt**: paste Tibia’s Hunting Session Analyser text, and that spot’s numbers become your own. Published reference hunts fill in until then, and they’re adjusted to you once you’ve logged a few.
 
+## Languages
+
+English, Español, Português (Brasil) and Polski: the app picks your browser’s language the first time, and you can change it on the first screen or in Characters and settings. The translations are new, so if something reads wrong, [open an issue](https://github.com/anthonygdi2/hunt-planner/issues). Creature and spot names stay as Tibia shows them.
+
 ## Your data
 
 Everything you enter stays in your own browser: there’s no account and no server. Use **Characters and settings → Download backup** to keep a copy or move it to another device. A backup holds your characters and hunts, so don’t post it publicly (for example in an issue).
