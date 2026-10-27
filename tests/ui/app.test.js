@@ -218,6 +218,10 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   assert.equal(store[logged[0]].task, "cobra-assassin", "the active bounty's creature was killed: the session's task");
   assert.equal(p.w.location.hash, "#/plan");
   await until(() => store["profiles/ek/planner/state"].hunting === null, "Hunting now cleared by the log");
+  // The Bounty editor compares the four difficulties on the real data.
+  await p.click("#chip-bounty");
+  assert.ok(p.$("#bounty-advice"), "the difficulty comparison");
+  assert.deepEqual([...p.d.querySelectorAll("#bounty-advice tbody th")].map((x) => x.textContent.replace("★ ", "")), ["Master", "Expert", "Adept", "Beginner"]);
   await p.click("#chip-today");
   await p.type("#today-boosted", "Silencer");
   await until(() => (store["profiles/ek/planner/state"].today || {}).boosted === "silencer", "the boosted creature");
@@ -225,6 +229,7 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   assert.equal(store["profiles/ek/planner/state"].held.slug, "cobra-assassin", "the old held field is left in place");
   // Weekly: the old list read with the old rule; Done writes the new field and leaves the old one.
   await p.go("weekly");
+  assert.equal(p.$("#wk-diff-hint summary").textContent, "Best for exp at level 615: Expert");
   assert.deepEqual([...p.d.querySelectorAll(".hp-wk-row:not(.any)")].slice(0, 4).map((r) => [r.querySelector("input").value, r.querySelectorAll("input")[1].value, r.querySelector("button").getAttribute("aria-pressed")]),
     [["Silencer", "10", "false"], ["Choking Fear", "180", "false"], ["Retching Horror", "0", "true"], ["Dragon Lord", "200", "false"]]);
   await p.click("#wk-3-done");

@@ -40,6 +40,18 @@ const textInput = (id, label, value, onCommit, opts) => h("label", { class: "hp-
 // Silver and Gold are the game's names for the board's bonus offers.
 const kinds = () => [{ value: "normal", label: t("Normal") }, { value: "silver", label: "Silver" }, { value: "gold", label: "Gold" }];
 
+// The bounty difficulties compared: what to do, then a table per difficulty under Compare difficulties.
+function difficultyAdvice(a) {
+  return h("div", { id: "bounty-advice", class: "hp-advice" + (a.suggest ? " suggest" : "") },
+    h("p", { class: "hp-p hp-small" }, a.line),
+    h("details", { class: "hp-compare" }, h("summary", null, t("Compare difficulties")),
+      h("div", { class: "hp-table-wrap" }, h("table", { class: "hp-table" },
+        h("thead", null, h("tr", null, h("th", { scope: "col" }, t("Difficulty")), h("th", { scope: "col", class: "num" }, t("Value")), h("th", { scope: "col", class: "num" }, t("With numbers")))),
+        h("tbody", null, a.rows.map((r) => h("tr", { id: "advice-" + r.diff },
+          h("th", { scope: "row" }, r.best ? "★ " + r.name : r.name), h("td", { class: "num" }, r.value), h("td", { class: "num" }, r.coverage)))))),
+      h("p", { class: "hp-p hp-caption" }, a.note)));
+}
+
 // The Bounty editor: difficulty and tokens, then the three offers while choosing, or the active bounty.
 // view: app/views.js bountyView. on: {difficulty(d), tokens(n), offer(i, patch), pick(i), active(patch), finished(), rerolled(), lists(),
 // done()}.
@@ -73,6 +85,7 @@ export function bountyEditor(view, on) {
         view.difficulties.map((d) => h("option", { value: d.value, selected: d.value === view.difficulty }, d.label)))),
       h("div", { class: "hp-field" }, t("Reroll tokens"), stepper({ id: "bounty-tokens", label: t("Reroll tokens"), value: view.tokens, min: 0, max: 10, onSet: on.tokens }),
         view.tokensNote ? h("span", { id: "bounty-tokens-note", class: "hp-caption warn" }, view.tokensNote) : null)),
+    view.advice ? difficultyAdvice(view.advice) : null,
     h("div", { class: "hp-lists-line" }, h("span", { class: "hp-small" }, view.lists),
       h("button", { id: "bounty-lists", type: "button", class: "hp-linkbtn", onClick: on.lists }, t("Edit lists"))),
     h("datalist", { id: "bounty-names" }, view.suggestions.map((n) => h("option", { value: n }))),

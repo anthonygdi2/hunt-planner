@@ -142,6 +142,10 @@
   .hp-inline { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); flex-wrap: wrap; }
   .hp-offer { border: 1px solid var(--line); border-radius: var(--r-card); padding: var(--s3); display: grid; gap: var(--s2); }
   .hp-offer.active { border: 2px solid var(--gold); }
+  .hp-compare summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+  .hp-compare .hp-table th, .hp-compare .hp-table td { white-space: normal; padding: 8px; }
+  .hp-advice { display: flex; flex-direction: column; gap: var(--s2); }
+  .hp-advice.suggest > p { border-left: 3px solid var(--gold); padding-left: var(--s2); }
   .hp-lists-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--s2); }
   .hp-lists-line .hp-linkbtn { min-height: 44px; }
   .hp-offer-top { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: var(--s2); align-items: end; }

@@ -55,12 +55,19 @@ export const RAID = deepFreeze({ wardenShare: 0.1, wardenShareDone: 0.2, priorPe
 export function weeklyExpFormula(L) { if (!(L > 0)) return null; return L <= 82 ? 25 * L * L - 75 * L + 100 : L < 1000 ? Math.round(1994.008 * L) : 2 * L * L - 6 * L + 8; }
 // Weekly reward caps by difficulty (Master has none), and the most kill tasks a week can have.
 export const WEEKLY_CAP = deepFreeze({ beginner: 200000, adept: 800000, expert: 3000000, master: Infinity });
+// The level each weekly difficulty needs, and the Hunting Task Points a finished kill task gives before the weekly
+// multiplier (TibiaWiki BR Weekly Tasks, August 2026; TibiaWiki Task Board). The difficulty is picked for the next week
+// when last week's rewards are collected and can't change until the next Monday.
+export const WEEKLY_MIN_LEVEL = deepFreeze({ beginner: 0, adept: 30, expert: 150, master: 400 });
+export const WEEKLY_KILL_POINTS = deepFreeze({ beginner: 25, adept: 50, expert: 100, master: 110 });
 export const WEEKLY_MAX_TASKS = 9;
 
 // Server save, when daily things (Boosted Creature) and the weekly tasks (Mondays) reset, treated as 08:00 UTC.
 export const SERVER_SAVE_UTC_HOUR = 8;
 
-// Reroll tokens: +1 per finished bounty task, +1 claimable per day, at most 10.
+// Reroll tokens: +1 per finished bounty task, +1 claimable per day, at most 10. Changing the bounty difficulty while a
+// task is active is free (the next board uses it); while choosing offers, seeing another difficulty's board takes a
+// reroll (TibiaWiki BR Bounty Tasks, June 2026).
 export const TOKEN_CAP = 10;
 
 // Preferred and Unwanted lists: up to 5 creatures each. Odds use the community model: a Preferred creature is drawn

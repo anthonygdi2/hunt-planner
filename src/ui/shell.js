@@ -83,7 +83,7 @@ export function mount(root, app, host) {
       });
     }
     if (r === "plan") {
-      const v = planScreenView(s, app.model(), app.catalog, Date.now()), a = app.actions, P = ui.plan;
+      const v = planScreenView(s, app.model(), app.catalog, Date.now(), ui.plan.open === "bounty"), a = app.actions, P = ui.plan;
       return plan.render(v, P, {
         toggle: (id) => { P.open = id; draw(); },
         why: (id) => { P.why[id] = !P.why[id]; draw(); },
@@ -148,7 +148,7 @@ export function mount(root, app, host) {
     }
     if (r === "weekly") {
       const M = app.model(), a = app.actions, W = ui.weekly;
-      return weeklyScreen.render(weeklyView(M.weekly(), M.weeklyRows(), app.catalog, Date.now()), W, {
+      return weeklyScreen.render(weeklyView(M.weekly(), M.weeklyRows(), app.catalog, Date.now(), (app.profile() || {}).level), W, {
         difficulty: a.setWeeklyDifficulty, slots: a.setWeeklySlots, task: a.setWeeklyTask, done: a.setWeeklyDone, any: a.setWeeklyAny,
         newWeek: () => { W.armed = false; a.startNewWeek(); }, arm: (b) => { W.armed = b; draw(); },
       });

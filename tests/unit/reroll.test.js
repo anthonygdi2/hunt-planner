@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { RHO, readReroll, killLevels, poolModel, taskShape, takeValue, planKey, solvePlan, beatChance, rateThreshold } from "../../src/core/reroll.js";
+import { RHO, readReroll, killLevels, poolModel, taskShape, takeValue, planKey, solvePlan, beatChance, rateThreshold, commonMax } from "../../src/core/reroll.js";
 import { readWeights } from "../../src/core/score.js";
 
 test("reading reroll settings", () => {
@@ -24,6 +24,16 @@ test("task shape", () => {
 const pool = [1, 2, 3, 4, 5].map((n) => ({ it: { slug: "c" + n }, e: { kph: 450, xph: n * 1e6 }, blocked: n === 1 }));
 const ctx = (over) => Object.assign({ weights: readWeights({ xp: 10 }), pool, preferred: [], unwanted: [], unknown: "poor", rewardObs: [],
   metricsFor: (it, e, kills, mult) => ({ xp: e.xph * (mult || 1) }) }, over);
+
+test("pool models on one scale", () => {
+  const own = poolModel("master", ctx()), other = poolModel("expert", ctx({ pool: pool.map((p) => Object.assign({}, p, { e: { kph: 450, xph: p.e.xph * 2 } })) }));
+  const scale = commonMax([own, null, other]);
+  assert.deepEqual(scale, { xp: 10e6 });
+  const scaled = poolModel("master", ctx({ scale }));
+  assert.equal(scaled.best, 0.5, "scored against the other pool's best");
+  assert.deepEqual(scaled.own, { xp: 5e6 }, "its own best is kept");
+  assert.equal(own.best, 1, "without a scale: its own best");
+});
 
 test("pool model", () => {
   assert.equal(poolModel("master", ctx({ weights: readWeights({}) })), null, "no goal");
