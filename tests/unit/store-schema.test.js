@@ -36,14 +36,14 @@ test("planner state: defaults and every field checked", () => {
   const s = S.readPlState({
     fixedHours: 30, sessionHours: 2, diff: "expert",
     held: { slug: "cobra-assassin", kills: "400", done: -5, kind: "platinum", exp: 0, i: 1.7, since: 5 },
-    today: { boosted: "unknown", boostedDay: "2026-10-21", prey: [{ slug: "rat", kind: "xp", pct: 99 }, { slug: "rat", kind: "loot", pct: 16 }, { slug: "bear", kind: "xp", pct: 20 }, { slug: "rat", kind: "constructor" }], event: 150 },
+    today: { boosted: "unknown", boostedDay: "2026-10-21", prey: [{ slug: "rat", kind: "xp", pct: 99 }, { slug: null, kind: "loot", pct: 16 }, { slug: "bear", kind: "xp", pct: 20 }, { slug: "rat", kind: "constructor" }], event: 150 },
     world: "  Antica  ", travel: { "cobra-bastion": "12", "Bad Key": 5, "far": 900 }, lens: { anyLevel: true },
     active: { spot: "cobra-bastion", at: "2026-10-21T17:00:00Z", slug: "bear" },
   }, known);
   assert.equal(s.fixedHours, null, "outside 0.25-12 h");
   assert.equal(s.diff, "expert");
   assert.deepEqual(s.held, { slug: "cobra-assassin", kills: 400, done: 0, kind: "normal", exp: null, i: 1, since: null });
-  assert.deepEqual(s.today, { boosted: null, boostedDay: "2026-10-21", prey: [{ slug: "rat", kind: "xp", pct: 13 }, { slug: "rat", kind: "loot", pct: 16 }], event: 0 });
+  assert.deepEqual(s.today, { boosted: null, boostedDay: "2026-10-21", prey: [{ slug: "rat", kind: "xp", pct: 13 }, { slug: null, kind: "loot", pct: 16 }], event: 0 }, "an empty slot is kept, an unknown creature isn't");
   assert.equal(s.world, "Antica");
   assert.deepEqual(s.travel, { "cobra-bastion": 12 });
   assert.deepEqual(s.lens, { anyLevel: true });

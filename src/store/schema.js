@@ -154,9 +154,10 @@ export function readPlState(v, known) {
   }
   const t = v.today && typeof v.today === "object" ? v.today : {};
   s.today = { boosted: known(t.boosted) ? t.boosted : null, boostedDay: typeof t.boostedDay === "string" ? t.boostedDay : null,
-    prey: (Array.isArray(t.prey) ? t.prey : []).slice(0, PREY_SLOTS).filter((q) => q && known(q.slug) && has(PREY, q.kind)).map((q) => {
+    // A slot with no creature yet (slug null) is kept: "Add a prey" saves one before the name is typed.
+    prey: (Array.isArray(t.prey) ? t.prey : []).slice(0, PREY_SLOTS).filter((q) => q && (q.slug == null || known(q.slug)) && has(PREY, q.kind)).map((q) => {
       const r = PREY[q.kind];
-      return { slug: q.slug, kind: q.kind, pct: plNum(q.pct, r.lo, r.hi) || r.lo };
+      return { slug: q.slug == null ? null : q.slug, kind: q.kind, pct: plNum(q.pct, r.lo, r.hi) || r.lo };
     }), event: plNum(t.event, 0, 100) || 0 };
   if (typeof v.world === "string" && v.world.trim()) s.world = v.world.trim().slice(0, 30);
   if (v.travel && typeof v.travel === "object") Object.keys(v.travel).forEach((k) => { const m = plNum(v.travel[k], 1, 600); if (validSpotId(k) && m) s.travel[k] = m; });

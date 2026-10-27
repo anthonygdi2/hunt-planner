@@ -112,6 +112,16 @@ test("browser storage: first run, characters and settings, no page errors", asyn
   await p.click('[aria-label="Charm points weight"] button:nth-child(2)');
   assert.equal(p.$("#chip-goal").textContent, "Goal Custom mix");
   assert.equal(p.$("#goal-share").textContent, "Exp 43% · Profit 43% · Charm points 14%");
+  // Today's boosts: the slot Add a prey makes stays open once saved and read back, then a name fills it.
+  await p.click("#chip-today");
+  await p.click("#prey-add");
+  await until(() => JSON.stringify(p.local()).includes('"prey":[{"slug":null'), "the empty prey slot saved");
+  await wait(50);
+  assert.ok(p.$("#prey-0-name"), "the new prey row stays");
+  await p.type("#prey-0-name", "Rotworm");
+  await until(() => JSON.stringify(p.local()).includes('"prey":[{"slug":"rotworm"'), "the prey saved");
+  assert.equal(p.$("#prey-0-name").value, "Rotworm");
+  await p.click("#prey-0-remove");
   // The Bounty: offers, pick, kills left, finished.
   // Tokens never set: 5 assumed, said on the chip and in the editor; stepping from there makes them real.
   assert.match(p.$("#chip-bounty").textContent, /5 tokens \(assumed\)/);

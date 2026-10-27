@@ -341,7 +341,7 @@ export function createApp({ data, prefs, now, browserLang }) {
       if ("kind" in patch && PREY[patch.kind]) { q.kind = patch.kind; q.pct = Math.min(PREY[q.kind].hi, Math.max(PREY[q.kind].lo, q.pct)); }
       if ("pct" in patch) q.pct = Math.min(PREY[q.kind].hi, Math.max(PREY[q.kind].lo, Number(patch.pct) || PREY[q.kind].lo));
       prey[i] = q;
-      saveToday({ prey: prey.filter((x) => x.slug || x === q).slice(0, PREY_SLOTS) });
+      saveToday({ prey: prey.slice(0, PREY_SLOTS) });
     },
     addPrey() { const prey = todayPrey(); if (prey.length < PREY_SLOTS) saveToday({ prey: prey.concat([{ slug: null, kind: "xp", pct: PREY.xp.lo }]) }); },
     removePrey(i) { const prey = todayPrey(); prey.splice(i, 1); saveToday({ prey }); },
