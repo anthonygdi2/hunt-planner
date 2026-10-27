@@ -57,4 +57,4 @@ body:
     id: more
     attributes:
       label: Anything else?
-      description: Vocation and level, the goal mix, the bounty difficulty: whatever seems related.
+      description: "Vocation and level, the goal mix, the bounty difficulty: whatever seems related."
