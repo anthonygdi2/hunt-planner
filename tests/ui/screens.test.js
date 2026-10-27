@@ -172,6 +172,31 @@ test("plan: the Bounty editor while choosing offers and once one is picked", asy
   assert.match($("#chip-bounty").className, /\bwarn\b/);
 });
 
+test("plan: the bounty difficulties compared in the Bounty editor", async () => {
+  const { bountyView, difficultyAdvice } = await import("../../src/app/views.js");
+  const { makeCatalog } = await import("../../src/core/catalog.js");
+  const plan = await import("../../src/ui/screens/plan.js");
+  const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }]);
+  const row = (diff, rate, extra) => Object.assign({ diff, size: 300, known: 150, coverage: 0.5, enough: rate != null, cost: 0, needsToken: false, rate, gain: null }, extra);
+  const cmp = { current: "master", free: true, best: "expert", rows: [row("beginner", null, { known: 20, size: 153 }), row("adept", 0.3, { gain: -0.4 }), row("expert", 0.6, { gain: 0.2 }), row("master", 0.5, { gain: 0 })] };
+  const a = difficultyAdvice(cmp);
+  assert.equal(a.line, "Expert looks about 20% better for your goal. Switch in game now: it’s free while your bounty is active, and your next board uses it.");
+  assert.deepEqual(a.rows.map((r) => [r.name, r.value, r.coverage]), [["Master", "Current", "150 of 300"], ["Expert", "+20%", "150 of 300"], ["Adept", "−40%", "150 of 300"], ["Beginner", "Too few numbers", "20 of 153"]]);
+  assert.match(difficultyAdvice(Object.assign({}, cmp, { free: false })).line, /counts the reroll token/);
+  assert.equal(difficultyAdvice(Object.assign({}, cmp, { best: null, rows: cmp.rows.map((r) => (r.diff === "expert" ? row("expert", 0.52) : r)) })).line, "Master is close to the best for your goal.");
+  assert.equal(difficultyAdvice({ current: "master", free: true, best: null, rows: cmp.rows.map((r) => row(r.diff, null)) }).line, "Not enough numbers yet to compare difficulties.");
+  assert.equal(difficultyAdvice(null), null);
+  const blank = { slug: null, kills: null, kind: "normal", exp: null };
+  const v = bountyView({ difficulty: "master", tokens: 3, mode: "offers", offers: [blank, blank, blank], active: null }, catalog, null, cmp);
+  const goal = { chip: { label: "Goal", value: "Exp", set: true } };
+  const $ = (sel) => document.querySelector(sel);
+  document.body.replaceChildren(plan.render({ goal, bounty: v }, { open: "bounty" }, { toggle() {}, bounty: {} }));
+  assert.match($("#bounty-advice").className, /suggest/);
+  assert.match($("#bounty-advice").textContent, /Expert looks about 20% better/);
+  assert.equal($("#advice-expert").textContent, "★ Expert+20%150 of 300");
+  assert.equal(bountyView({ difficulty: "master", tokens: 3, mode: "offers", offers: [blank, blank, blank], active: null }, catalog).advice, null, "not asked for: none");
+});
+
 test("plan: steps, Hunting now and Taken spots call their actions", async () => {
   const plan = await import("../../src/ui/screens/plan.js");
   const goal = { chip: { label: "Goal", value: "Exp", set: true } };
@@ -222,7 +247,12 @@ test("weekly: rows, Done, slots and a new week call their actions", async () => 
   const catalog = makeCatalog([{ n: "Silencer", c: "H", m: 12 }]);
   const NOW = Date.parse("2026-10-21T18:00:00Z");
   const w = { weekStart: "2026-10-19", difficulty: "master", slots: 6, exp: 1226315, override: null, formula: 1226315, current: true, tasks: [], any: { killsLeft: 2500, done: false } };
-  const v = weeklyView(w, [{ i: 0, name: "Silencer", killsLeft: 390, done: false }, { i: 1, name: "Choking Fear", killsLeft: 0, done: true }], catalog, NOW);
+  const v = weeklyView(w, [{ i: 0, name: "Silencer", killsLeft: 390, done: false }, { i: 1, name: "Choking Fear", killsLeft: 0, done: true }], catalog, NOW, 615);
+  assert.equal(v.diffHint.summary, "Best for exp at level 615: Expert");
+  assert.deepEqual(v.diffHint.rows.map((r) => [r.name, r.exp, r.points, r.best, r.current]),
+    [["Beginner", "200k (capped)", "25", false, false], ["Adept", "800k (capped)", "50", false, false], ["Expert", "1.23kk", "100", true, false], ["Master", "1.23kk", "110", false, true]]);
+  assert.equal(weeklyView(w, [], catalog, NOW, 300).diffHint.rows[3].exp, "Level 400+");
+  assert.equal(weeklyView(w, [], catalog, NOW).diffHint, null, "no level: no table");
   assert.match(v.intro, /^Week of Oct 19 · new tasks Oct 26$/);
   assert.equal(v.rows.length, 6);
   assert.equal(v.doneCount, 1);
@@ -230,6 +260,9 @@ test("weekly: rows, Done, slots and a new week call their actions", async () => 
   ["difficulty", "slots", "task", "done", "any", "newWeek", "arm"].forEach((k) => { on[k] = s.fn(k); });
   let $ = mount(weekly.render(v, { armed: false }, on));
   assert.equal($("#wk-any-left").value, "2500");
+  assert.equal($("#wk-diff-hint summary").textContent, "Best for exp at level 615: Expert");
+  assert.equal($("#wk-hint-master th").textContent, "Master (current)");
+  assert.equal($("#wk-hint-expert th").textContent, "★ Expert");
   $("#wk-any-left").value = "2400"; $("#wk-any-left").dispatchEvent(new dom.window.Event("change"));
   $("#wk-any-done").click();
   assert.deepEqual(s.calls.splice(0), [["any", { killsLeft: "2400" }], ["any", { done: true }]]);

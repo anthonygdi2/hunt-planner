@@ -1,6 +1,6 @@
 // Weekly kill tasks: the week, the reward, each task's progress, and what an hour at a spot adds toward them.
 import { norm } from "./text.js";
-import { SERVER_SAVE_UTC_HOUR, TASK, WEEKLY_CAP, WEEKLY_MAX_TASKS, weeklyExpFormula } from "../data/rules.js";
+import { SERVER_SAVE_UTC_HOUR, TASK, WEEKLY_CAP, WEEKLY_MAX_TASKS, WEEKLY_MIN_LEVEL, WEEKLY_KILL_POINTS, DIFFICULTIES, weeklyExpFormula } from "../data/rules.js";
 
 // The start of the week containing `now` (a Date): Monday at server save, UTC.
 export function weekStart(now) {
@@ -18,6 +18,18 @@ export const serverDay = (t) => new Date(t - SERVER_SAVE_UTC_HOUR * 36e5).toISOS
 export function weeklyReward(level, diff) {
   const f = weeklyExpFormula(Number(level));
   return f != null ? Math.min(f, WEEKLY_CAP[diff]) : null;
+}
+
+// The weekly difficulties at a level, easiest first: [{diff, exp (per kill task), capped, locked (below its level),
+// points (Hunting Task Points per kill task)}], and best: the easiest open one paying the full exp. Only exp and points
+// are compared: the creatures and kill counts per difficulty aren't published. Null without a level.
+export function weeklyDifficulties(level) {
+  const L = Number(level), f = weeklyExpFormula(L);
+  if (f == null) return null;
+  const rows = DIFFICULTIES.map((diff) => ({ diff, exp: Math.min(f, WEEKLY_CAP[diff]), capped: f > WEEKLY_CAP[diff], locked: L < WEEKLY_MIN_LEVEL[diff],
+    minLevel: WEEKLY_MIN_LEVEL[diff], points: WEEKLY_KILL_POINTS[diff] }));
+  const open = rows.filter((r) => !r.locked), top = Math.max(...open.map((r) => r.exp));
+  return { rows, best: open.filter((r) => r.exp === top)[0].diff, exp: f };
 }
 
 // The stored weekly ({week, diff, exp, tasks [{name, kills, extra}]}) read for this level at `now`:

@@ -29,7 +29,8 @@ export function killLevels(diff) { const t = TASK[diff], d = t.maxKills - t.minK
 // rewardObs [{kind}] (logged boards). Returns null with no goal; else {keys, w, max, rows [{it, e, m, w, blocked?,
 // v1?}], known (creatures with a value), diff} and, when any is known, best, medKph, fallback, nObs, kinds
 // [normal, silver, gold odds], levels and pts [{p, v, T}] (probability, value, task hours).
-export function poolModel(diff, { weights: w, pool, preferred, unwanted, metricsFor, unknown, rewardObs }) {
+// scale: each goal key's best metric to score against instead of this pool's own (commonMax), so pools compare.
+export function poolModel(diff, { weights: w, pool, preferred, unwanted, metricsFor, unknown, rewardObs, scale }) {
   const keys = GOAL_KEYS.filter((g) => w[g] > 0);
   if (!keys.length) return null;
   const unw = {}, pref = {}, blocked = [];
@@ -43,6 +44,8 @@ export function poolModel(diff, { weights: w, pool, preferred, unwanted, metrics
     rows.push({ it: p.it, e, m, w: pref[p.it.slug] ? SLOTS.preferredWeight : 1 });
     blocked.push(!!p.blocked);
   });
+  const own = Object.assign({}, max);
+  if (scale) keys.forEach((k) => { if (scale[k] > 0) max[k] = scale[k]; });
   const known = [], kphs = [];
   rows.forEach((r, i) => {
     if (r.e.kph > 0) kphs.push(r.e.kph);
@@ -52,7 +55,7 @@ export function poolModel(diff, { weights: w, pool, preferred, unwanted, metrics
   });
   // How many of the player's Preferred and Unwanted creatures are in this pool (they're what the odds above use).
   const lists = { preferred: rows.filter((r) => r.w > 1).length, unwanted: pool.filter((p) => unw[p.it.slug]).length };
-  const model = { keys, w, max, rows, known: known.length, diff, lists };
+  const model = { keys, w, max, own, rows, known: known.length, diff, lists };
   if (!known.length) return model;
   known.sort((a, b) => a - b);
   kphs.sort((a, b) => a - b);
@@ -122,6 +125,13 @@ export function solvePlan(model, hpd) {
     if (dm < 1e-5 * scale) break;
   }
   return { h, pts, hpd };
+}
+
+// One scale for several pool models: each goal key's largest metric over their pools.
+export function commonMax(models) {
+  const out = {};
+  models.forEach((m) => { if (m) Object.keys(m.own).forEach((k) => { if (!(out[k] >= m.own[k])) out[k] = m.own[k]; }); });
+  return out;
 }
 
 // The chance a fresh board with s tokens has an offer worth more than q0 to take.

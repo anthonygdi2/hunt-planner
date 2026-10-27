@@ -1,13 +1,14 @@
 // The app's model of one character at one moment: compute()'s result plus the functions screens and view models need
 // on top of it (numbers per creature, the reroll model, weekly tasks, the planner). Everything is a function of the
 // state, the derived values and `now`, so the same model backs the screens, the view models and the golden capture.
-import { VOCATIONS, SLOTS } from "../data/rules.js";
+import { VOCATIONS, SLOTS, DIFFICULTIES } from "../data/rules.js";
 import { compute } from "./compute.js";
 import { readSources, readSettings, readGoal, readBounty } from "../store/schema.js";
 import { norm } from "../core/text.js";
 import { effective } from "../core/numbers.js";
 import { metrics } from "../core/metrics.js";
-import { poolModel as corePoolModel, readReroll, solvePlan, planKey } from "../core/reroll.js";
+import { poolModel as corePoolModel, readReroll, solvePlan, planKey, commonMax } from "../core/reroll.js";
+import { compareDifficulties } from "../core/difficulty.js";
 import { scoringWeights } from "../core/score.js";
 import { weeklyBonus as coreWeeklyBonus, serverDay } from "../core/weekly.js";
 import { weeklyState, weeklyTaskRows, openWeeklyTasks } from "./weekly.js";
@@ -22,7 +23,7 @@ import { EN } from "../core/i18n.js";
 export const ASSUMED_TOKENS = 5;
 
 // A reroll plan cache shared across models (solvePlan is the slow part); keyed by planKey.
-export function makePlanCache() { return { key: "", plan: null }; }
+export function makePlanCache() { return { key: "", plan: null, diffs: {} }; }
 
 // state: compute()'s state plus {creatures (shared creature settings), planner {state, marks, occupancy}, spotMeta,
 // expTable (PL_EXP)}. derived: compute(state, now), or null to compute it here. opts.planCache: makePlanCache().
@@ -55,15 +56,31 @@ export function makeModel(state, derived, now, opts) {
   // Reroll settings: tokens from the bounty; hours per day and the unknown-creature assumption from the profile.
   const rerollSettings = () => { const b = bounty(); return readReroll(Object.assign({}, p.reroll, { left: b.tokens })); };
   const poolModels = {};
+  const poolArgs = (diff) => {
+    const sl = slots();
+    return { weights: weights(), preferred: sl.preferred, unwanted: sl.unwanted, unknown: rerollSettings().unknown,
+      rewardObs: (p.rewardObs || {})[diff] || [],
+      pool: catalog.poolOf(diff).map((c) => ({ it: c, e: eff(c), blocked: ratingOf(c) === "X" || lockedFor(c) })),
+      metricsFor: (it, e, kills, mult) => metricsFor(it, e, diff, kills, mult) };
+  };
   const poolModel = (diff) => {
-    if (!(diff in poolModels)) {
-      const sl = slots();
-      poolModels[diff] = corePoolModel(diff, { weights: weights(), preferred: sl.preferred, unwanted: sl.unwanted, unknown: rerollSettings().unknown,
-        rewardObs: (p.rewardObs || {})[diff] || [],
-        pool: catalog.poolOf(diff).map((c) => ({ it: c, e: eff(c), blocked: ratingOf(c) === "X" || lockedFor(c) })),
-        metricsFor: (it, e, kills, mult) => metricsFor(it, e, diff, kills, mult) });
-    }
+    if (!(diff in poolModels)) poolModels[diff] = corePoolModel(diff, poolArgs(diff));
     return poolModels[diff];
+  };
+  // The bounty difficulties compared on one scale (core/difficulty.js), once per model; null without a goal.
+  let compared;
+  const difficultyCompare = () => {
+    if (compared !== undefined) return compared;
+    const own = DIFFICULTIES.map((x) => poolModel(x));
+    if (!own.some(Boolean)) return (compared = null);
+    const scale = commonMax(own), models = {}, set = rerollSettings(), b = bounty(), diffs = cache.diffs || (cache.diffs = {});
+    DIFFICULTIES.forEach((x, i) => { models[x] = own[i] && corePoolModel(x, Object.assign(poolArgs(x), { scale })); });
+    const solve = (m) => {
+      const key = planKey(m, set.hpd), c = diffs[m.diff];
+      if (!c || c.key !== key) diffs[m.diff] = { key, plan: solvePlan(m, set.hpd) };
+      return diffs[m.diff].plan;
+    };
+    return (compared = compareDifficulties(models, solve, { tokens: set.left, current: b.difficulty, active: b.mode === "active" && !!b.active }));
   };
   const rerollPlan = (model, hpd) => {
     const key = planKey(model, hpd);
@@ -135,7 +152,7 @@ export function makeModel(state, derived, now, opts) {
   const plannerCtx = (extra) => Object.assign({ hours: plState.fixedHours, tokensUnknown: !rerollSettings().hasLeft, diff: bounty().difficulty, held: held(), today: today(),
     travel: plState.travel, occupancy: pl.occupancy, world: settings.world }, extra || {});
 
-  return { derived: d, now, sources, settings, bounty, weights, chalRates, slots, minLevelFor, lockedFor, ratingOf, eff, metricsFor, boardDiff, rerollSettings, poolModel, rerollPlan,
+  return { derived: d, now, sources, settings, bounty, weights, chalRates, slots, minLevelFor, lockedFor, ratingOf, eff, metricsFor, boardDiff, rerollSettings, poolModel, rerollPlan, difficultyCompare,
     boardOffers, weekly, weeklyRows, openWeeklies, weeklyBonus, held, today, todayFactor, spotIndex, spotNums, heldTask, spotValue, plScale, spotScores,
     planOffers, lensCheck, noNumsWhy, planOptions, planChain, plannerCtx };
 }

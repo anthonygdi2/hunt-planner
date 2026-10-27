@@ -53,6 +53,7 @@ Each opens below the chips, has a one-line intro saying what it changes, and end
 
 **Bounty: choosing offers**
 - Difficulty (Master, Expert, Adept, Beginner). Reroll tokens stepper 0–10.
+- **[Decision]** Under the difficulty, one line saying whether another difficulty suits the goal better (and that switching is free while a bounty is active, a token while choosing), with Compare difficulties opening a table: value against the current one and how many creatures have numbers.
 - **[Decision]** The Preferred / Unwanted lists in one line ("★ Preferred 2 of 5 · ⊘ Unwanted 1 of 5", or "not set") with **Edit lists**, which opens the lists on Creatures. They change the odds of the next board, so they belong where the reroll is decided.
 - Offers A, B, C: creature (suggestions after 2 letters), kills needed (number pad), kind Normal / Silver / Gold, **Picked**. Enter moves to the next field. An offer whose creature is on a list says so (★ Preferred / ⊘ Unwanted).
 - **[Decision]** For a Challenging creature on Master, an optional "Reward exp" field (the reward the game shows), used to learn that creature's reward rate.

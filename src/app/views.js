@@ -13,7 +13,7 @@ import { staleProfitText } from "../core/reference.js";
 import { slotOdds, slotSuggestions } from "../core/slots.js";
 import { aVoc } from "../core/explain.js";
 import { parseSession, sessionProblems } from "../core/session.js";
-import { weekKey, serverDay } from "../core/weekly.js";
+import { weekKey, serverDay, weeklyDifficulties } from "../core/weekly.js";
 import { markAge, markActive } from "../core/occupancy.js";
 import { isChallengingMaster } from "../core/rewards.js";
 import { t, _, translator, locale } from "./lang.js";
@@ -68,8 +68,35 @@ export function goalMixView(goal) {
 // The Bounty chip and its editor. b: the model's bounty(); catalog: makeCatalog(...).
 const DIFF_LABELS = [["master", _("Master")], ["expert", _("Expert")], ["adept", _("Adept")], ["beginner", _("Beginner")]];
 const diffOptions = () => DIFF_LABELS.map(([value, label]) => ({ value, label: t(label) }));
-// slots: the model's {preferred, unwanted} lists (slugs), or none.
-export function bountyView(b, catalog, slots) {
+// A signed percentage: "+12%", "−40%".
+const signedPct = (g) => (g >= 0 ? "+" : "−") + Math.abs(Math.round(g * 100)) + "%";
+// The bounty difficulties compared (model.difficultyCompare()): a line saying what to do, and a row per difficulty with
+// its value against the current one (or the best, when the current one has too few numbers) and its coverage.
+export function difficultyAdvice(cmp) {
+  if (!cmp) return null;
+  const name = (d) => t(DIFF_NAME[d]), cur = cmp.rows.filter((r) => r.diff === cmp.current)[0];
+  const rated = cmp.rows.filter((r) => r.rate > 0), top = rated.slice().sort((a, b) => b.rate - a.rate)[0];
+  const ref = cur && cur.rate > 0 ? cur : top, best = cmp.best ? cmp.rows.filter((r) => r.diff === cmp.best)[0] : null;
+  let line;
+  if (best && best.gain != null) {
+    line = t("{difficulty} looks about {pct}% better for your goal.", { difficulty: name(best.diff), pct: Math.round(best.gain * 100) }) + " "
+      + (cmp.free ? t("Switch in game now: it’s free while your bounty is active, and your next board uses it.") : t("That counts the reroll token a switch costs while you choose; it’s free while a bounty is active."));
+  } else if (best) line = t("{difficulty} looks best for your goal; {current} has too few numbers to compare.", { difficulty: name(best.diff), current: name(cmp.current) });
+  else if (!ref) line = t("Not enough numbers yet to compare difficulties.");
+  else line = rated.some((r) => r.diff !== cmp.current && r.rate > ref.rate) ? t("{difficulty} is close to the best for your goal.", { difficulty: name(cmp.current) })
+    : t("{difficulty} suits your goal best right now.", { difficulty: name(cmp.current) });
+  return {
+    line, suggest: !!best,
+    rows: cmp.rows.slice().reverse().map((r) => ({ diff: r.diff, name: name(r.diff), current: r.diff === cmp.current, best: r.diff === cmp.best,
+      value: !r.enough ? t("Too few numbers") : r.needsToken ? t("Needs a reroll token") : r === ref ? (r.diff === cmp.current ? t("Current") : t("Best"))
+        : ref ? signedPct(r.rate / ref.rate - 1) : "–",
+      coverage: t("{known} of {size}", { known: r.known, size: r.size }) })),
+    note: t("Long-run value per hour for your goal, rerolling as the plan does. Only Master’s task reward is verified in game."),
+  };
+}
+
+// slots: the model's {preferred, unwanted} lists (slugs), or none. cmp: model.difficultyCompare(), when wanted.
+export function bountyView(b, catalog, slots, cmp) {
   const sl = slots || { preferred: [], unwanted: [] };
   const mark = (slug) => (!slug ? null : sl.preferred.indexOf(slug) !== -1 ? { kind: "pref", text: "★ " + t("Preferred") }
     : sl.unwanted.indexOf(slug) !== -1 ? { kind: "unw", text: "⊘ " + t("Unwanted") } : null);
@@ -84,6 +111,7 @@ export function bountyView(b, catalog, slots) {
     tokensNote: b.assumed ? t("Assumed. Set what you have in game.") : b.tokens === 0 ? t("None left: the plan won’t suggest a reroll.") : "",
     difficulties: diffOptions(),
     intro: active ? t("Your active bounty, as the game shows it.") : t("The three offers on your board."),
+    advice: difficultyAdvice(cmp),
     lists: sl.preferred.length || sl.unwanted.length ? t("★ Preferred {preferred} of {max} · ⊘ Unwanted {unwanted} of {max}", { preferred: sl.preferred.length, unwanted: sl.unwanted.length, max: SLOTS.max })
       : t("Preferred and Unwanted lists: not set"),
     offers: b.offers.map((o, i) => ({ i, letter: "ABC"[i], name: name(o.slug), kills: o.kills, kind: o.kind, exp: o.exp, mark: mark(o.slug),
@@ -96,9 +124,10 @@ export function bountyView(b, catalog, slots) {
 }
 
 // The Plan screen (F2: Goal; F3: Bounty; F4 adds the rest). model: the active character's model; catalog for names.
-export function planView(state, model, catalog) {
+// compare: work out the difficulty comparison (it's slow, so only while the Bounty editor is open).
+export function planView(state, model, catalog, compare) {
   const p = state.profiles[state.pid] || {};
-  return { goal: goalMixView(readGoal(p)), bounty: model && catalog ? bountyView(model.bounty(), catalog, model.slots()) : null };
+  return { goal: goalMixView(readGoal(p)), bounty: model && catalog ? bountyView(model.bounty(), catalog, model.slots(), compare ? model.difficultyCompare() : null) : null };
 }
 
 const MINUTES_LABEL = { 30: _("30 minutes"), 45: _("45 minutes"), 60: _("1 hour"), 120: _("2 hours") };
@@ -152,9 +181,9 @@ export function sourceBadges(o, sessions) {
 }
 
 // state: the app state; model: the active character's model; catalog; now (ms).
-export function planScreenView(state, model, catalog, now) {
+export function planScreenView(state, model, catalog, now, compare) {
   const p = state.profiles[state.pid] || {}, pl = state.planner || {}, st = pl.state || {};
-  const base = planView(state, model, catalog), settings = readSettings(p, st), sources = readSources(p), hunting = readHunting(st);
+  const base = planView(state, model, catalog, compare), settings = readSettings(p, st), sources = readSources(p), hunting = readHunting(st);
   const name = (slug) => (slug && catalog.bySlug[slug] ? catalog.bySlug[slug].name : "");
   const idx = model.spotIndex(), spotName = (id) => (idx.spots[id] ? idx.spots[id].name : id), sessionsAt = (id) => (idx.spots[id] ? idx.spots[id].sessions.length : 0);
 
@@ -218,7 +247,9 @@ function preySizes(kind) { const r = PREY[kind] || PREY.xp, out = []; for (let v
 const DAY = 864e5;
 const fmtDay = (iso) => new Date(iso + "T12:00:00Z").toLocaleDateString(locale(), { month: "short", day: "numeric", timeZone: "UTC" });
 // w: the model's weekly(); rows: weeklyRows(); now (ms). The week's dates, difficulty and slots, one row per slot.
-export function weeklyView(w, rows, catalog, now) {
+// level: the character's, for the difficulty table (exp and Hunting Task Points per kill task).
+export function weeklyView(w, rows, catalog, now, level) {
+  const wd = weeklyDifficulties(level);
   const thisWeek = weekKey(new Date(now)), start = w.current && w.weekStart ? w.weekStart : thisWeek;
   const next = new Date(Date.parse(start + "T08:00:00Z") + 7 * DAY).toISOString().slice(0, 10);
   const slots = [];
@@ -231,6 +262,13 @@ export function weeklyView(w, rows, catalog, now) {
     any: { killsLeft: w.any && w.any.killsLeft != null ? w.any.killsLeft : "", done: !!(w.any && w.any.done) },
     rows: slots, doneCount: slots.filter((r) => r.done).length, reward: w.exp ? t("{exp} exp each", { exp: fmtBig(w.exp) }) : t("Set your level to see the reward."),
     names: catalog.list.map((c) => c.name),
+    diffHint: wd ? {
+      summary: t("Best for exp at level {level}: {difficulty}", { level: Number(level), difficulty: t(DIFF_NAME[wd.best]) }),
+      why: t("It’s the easiest that pays your full {exp} exp per kill task.", { exp: fmtBig(wd.exp) }),
+      rows: wd.rows.map((r) => ({ diff: r.diff, name: t(DIFF_NAME[r.diff]), best: r.diff === wd.best, current: r.diff === w.difficulty,
+        exp: r.locked ? t("Level {n}+", { n: r.minLevel }) : fmtBig(r.exp) + (r.capped ? " " + t("(capped)") : ""), points: String(r.points) })),
+      note: t("You pick it in game when you collect last week’s rewards, and it stays until the next Monday. Creatures and kill counts per difficulty aren’t published, so only exp and points are compared."),
+    } : null,
   };
 }
 

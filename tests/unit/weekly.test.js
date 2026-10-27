@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { weekStart, weekKey, weeklyReward, readWeekly, loggedSince, weeklyRows, openWeeklies, weeklyBonus, ANY_CREATURE, allKph } from "../../src/core/weekly.js";
+import { weekStart, weekKey, weeklyReward, readWeekly, loggedSince, weeklyRows, openWeeklies, weeklyBonus, ANY_CREATURE, allKph, weeklyDifficulties } from "../../src/core/weekly.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 
 const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }, { n: "Cobra Scout", c: "M", m: 6 }]);
@@ -73,6 +73,17 @@ test("weekly bonus per hour", () => {
   assert.equal(weeklyBonus(open, null, 2, "cobra-assassin", 200), 1e6 * 0.5 / 2);
   assert.equal(weeklyBonus([], { "cobra-scout": 100 }, 1), 0);
   assert.equal(weeklyBonus(open, { "cobra-scout": 100 }, 0), 0);
+});
+
+test("weekly difficulties by level: exp per kill task, points, and the easiest paying the full exp", () => {
+  assert.equal(weeklyDifficulties(null), null);
+  const at = (L) => { const d = weeklyDifficulties(L); return [d.best, d.rows.map((r) => (r.locked ? "locked" : r.exp))]; };
+  assert.deepEqual(at(20), ["beginner", [8600, "locked", "locked", "locked"]], "Adept needs level 30");
+  assert.deepEqual(at(300), ["adept", [200000, 598202, 598202, "locked"]], "Beginner capped; Master needs level 400");
+  assert.deepEqual(at(615), ["expert", [200000, 800000, 1226315, 1226315]], "Expert pays as much as Master below the 3kk cap");
+  assert.deepEqual(at(1300), ["master", [200000, 800000, 3000000, 3372208]], "Expert capped from about level 1227");
+  assert.deepEqual(weeklyDifficulties(615).rows.map((r) => r.points), [25, 50, 100, 110]);
+  assert.deepEqual(weeklyDifficulties(615).rows.map((r) => r.capped), [true, true, false, false]);
 });
 
 test("the Any Creature weekly takes every kill at the spot", () => {
