@@ -1,0 +1,221 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Flow-1-FirstRun.dc.html": {
+      "h": 680,
+      "title": "Flow 1 · First run",
+      "w": 1576,
+      "x": 0,
+      "y": 1192
+    },
+    "Flow-2-Daily.dc.html": {
+      "h": 880,
+      "title": "Flow 2 · Daily plan",
+      "w": 1576,
+      "x": 1656,
+      "y": 1192
+    },
+    "Flow-3-HuntLog.dc.html": {
+      "h": 680,
+      "title": "Flow 3 · Hunt, log only if clean",
+      "w": 1576,
+      "x": 0,
+      "y": 2192
+    },
+    "Flow-4-Reroll.dc.html": {
+      "h": 952,
+      "title": "Flow 4 · New bounty offers",
+      "w": 1576,
+      "x": 1656,
+      "y": 2192
+    },
+    "Home.dc.html": {
+      "h": 1072,
+      "title": "Home (Plan) structure, phone",
+      "w": 1120,
+      "x": 1656,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 1072,
+      "title": "Map of screens",
+      "w": 1576,
+      "x": 0,
+      "y": 0
+    },
+    "PlanPhone.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 1600,
+      "title": "Plan · phone · dark",
+      "page": "screens",
+      "is_interactive": true
+    },
+    "PlanPhoneLight.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 1600,
+      "title": "Plan · phone · light, bounty offers open",
+      "page": "screens",
+      "is_interactive": true
+    },
+    "GoalMix.dc.html": {
+      "x": 0,
+      "y": 1720,
+      "w": 390,
+      "h": 1100,
+      "title": "Goal mix editor · phone",
+      "page": "screens",
+      "is_interactive": true
+    },
+    "FirstRun.dc.html": {
+      "x": 470,
+      "y": 1720,
+      "w": 390,
+      "h": 900,
+      "title": "First run · phone",
+      "page": "screens",
+      "is_interactive": true
+    },
+    "LogHunt.dc.html": {
+      "x": 940,
+      "y": 1720,
+      "w": 390,
+      "h": 1750,
+      "title": "Log a clean hunt · phone",
+      "page": "screens",
+      "is_interactive": true
+    },
+    "Spots.dc.html": {
+      "x": 1410,
+      "y": 1720,
+      "w": 390,
+      "h": 1750,
+      "title": "Spots · phone",
+      "page": "screens"
+    },
+    "SpotPage.dc.html": {
+      "x": 1880,
+      "y": 1720,
+      "w": 390,
+      "h": 1650,
+      "title": "Spot page · phone",
+      "page": "screens"
+    },
+    "Creatures.dc.html": {
+      "x": 2350,
+      "y": 1720,
+      "w": 390,
+      "h": 1400,
+      "title": "Creatures (tier list) · phone",
+      "page": "screens"
+    },
+    "Weekly.dc.html": {
+      "x": 2820,
+      "y": 1720,
+      "w": 390,
+      "h": 1200,
+      "title": "Weekly · phone",
+      "page": "screens"
+    },
+    "Characters.dc.html": {
+      "x": 3290,
+      "y": 1720,
+      "w": 390,
+      "h": 1700,
+      "title": "Characters and settings · phone",
+      "page": "screens"
+    },
+    "Tokens.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 2100,
+      "title": "Token sheet",
+      "page": "handoff"
+    },
+    "Components.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 2200,
+      "title": "Components",
+      "page": "handoff"
+    },
+    "Inventory.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1280,
+      "h": 6400,
+      "title": "Screen inventory",
+      "page": "handoff",
+      "expand": "fill"
+    },
+    "PlanDesktop.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 1440,
+      "h": 1180,
+      "title": "Plan · desktop · dark",
+      "page": "screens",
+      "expand": "fill"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-26T19:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "decide": {
+      "fill": "blue",
+      "size": 24,
+      "text": "Decisions to check:\n\n1. Home = Plan. Answer first, inputs right above it as one chip row.\n\n2. Board, goal mix, weekly, today’s boosts, session length and data sources are all chips in that row. Same pattern, all optional.\n\n3. Editors open inline under the chips, never as pop-ups.\n\n4. Classic view becomes a Creatures tab.\n\n5. No hunt timer: Free just shows where you’re hunting.",
+      "w": 460,
+      "x": 3269,
+      "y": 550
+    },
+    "flags": {
+      "fill": "orange",
+      "size": 24,
+      "text": "Rules from your answers:\n\n• Kill counts are typed. Each falls in a range that may depend on difficulty (to research later).\n\n• The app never counts kills left on an offer or weekly task. Kills needed is only used for scoring.\n\n• Logging is optional and rare: only focused, break-free hunts.\n\n• Taken lasts about 45 min, then clears itself. A Taken spots list lets you free one early.\n\n• Tokens are a number you can set any time. “Rerolled” (−1) and “Finished” (+1) are shortcuts, never required.\n\n• Bounty: picking is free but the other two offers disappear, so pick only once the spot is confirmed free. A reroll (1 token) gives three new offers, with or without picking, and also drops an active bounty.\n\n• Finished bounty: the game shows three new offers. Weekly: a claimed task is marked Done; new board each Monday.",
+      "w": 460,
+      "x": 2856,
+      "y": 0
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Home.dc.html",
+    "Flow-1-FirstRun.dc.html",
+    "Flow-2-Daily.dc.html",
+    "Flow-3-HuntLog.dc.html",
+    "Flow-4-Reroll.dc.html",
+    "PlanPhone.dc.html",
+    "PlanPhoneLight.dc.html",
+    "PlanDesktop.dc.html",
+    "GoalMix.dc.html",
+    "FirstRun.dc.html",
+    "LogHunt.dc.html",
+    "Spots.dc.html",
+    "SpotPage.dc.html",
+    "Creatures.dc.html",
+    "Weekly.dc.html",
+    "Characters.dc.html",
+    "Tokens.dc.html",
+    "Components.dc.html",
+    "Inventory.dc.html"
+  ],
+  "pages": [
+    {"id": "flows", "name": "Flows"},
+    {"id": "screens", "name": "Screens"},
+    {"id": "handoff", "name": "Handoff"}
+  ],
+  "title": "Hunt planner redesign"
+}

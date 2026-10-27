@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spot page, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9c4ff}a:hover{color:#d3e0ff}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{cls}}" style="width: 390px; min-height: 1650px; box-sizing: border-box; background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--surface)">
+<a href="#" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; color: var(--text); text-decoration: none"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>Spots</a>
+</header>
+<main style="padding: 16px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">Cobra Bastion</h1>
+<span style="color: var(--muted)">Score 96 for Main EK · mostly exp, some profit</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="padding: 12px; border-radius: 12px; background: var(--surface)"><div style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 32px">7.8kk</div><div style="font-size: 13px; line-height: 18px; color: var(--muted)">exp/h</div></div>
+<div style="padding: 12px; border-radius: 12px; background: var(--surface)"><div style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 32px">300k</div><div style="font-size: 13px; line-height: 18px; color: var(--muted)">profit/h</div></div>
+</div>
+<span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent-text); font-size: 13px; line-height: 18px"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5h11l5 5v9z"></path><path d="M8 13h8M8 9h5"></path></svg>Reference, adjusted to you</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button style="min-height: 52px; border-radius: 12px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Mark taken</button>
+<button style="min-height: 52px; border-radius: 12px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Log a clean hunt</button>
+</div>
+<section aria-labelledby="cr-h" style="display: flex; flex-direction: column; gap: 8px">
+<h2 id="cr-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">Creatures here</h2>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line)"><span><b>Cobra Assassin</b><br><span style="font-size: 13px; line-height: 18px; color: var(--gold-text)">Your bounty</span></span><span style="color: var(--muted)">≈ 400/h</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line)"><span><b>Cobra Scout</b><br><span style="font-size: 13px; line-height: 18px; color: var(--muted)">Weekly task</span></span><span style="color: var(--muted)">≈ 90/h</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 14px"><span><b>Cobra Vizier</b></span><span style="color: var(--muted)">≈ 40/h</span></div>
+</div>
+</section>
+<section aria-labelledby="src-h" style="display: flex; flex-direction: column; gap: 8px">
+<h2 id="src-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">Where the numbers come from</h2>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<b>Your hunts here</b>
+<span style="color: var(--muted); font-size: 14px; line-height: 20px">None yet. Log one clean hunt and these become your own numbers.</span>
+</div>
+<div style="height: 1px; background: var(--line)"></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<b>Reference hunt</b>
+<span style="font-size: 14px; line-height: 20px">Elite Knight lap, from a published video</span>
+<span style="font-size: 14px; line-height: 20px; color: var(--muted)">As recorded: 9.1kk exp/h · 350k profit/h</span>
+<span style="font-size: 14px; line-height: 20px; color: var(--muted)">Adjusted to you: 7.8kk · 300k, from how your 3 logged spots compare to their references.</span>
+</div>
+<div style="height: 1px; background: var(--line)"></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<b>Other sources not used here</b>
+<span style="font-size: 14px; line-height: 20px; color: var(--muted)">Royal Paladin reference (skipped: an Elite Knight hunt exists).</span>
+</div>
+</div>
+</section>
+<section aria-labelledby="var-h" style="display: flex; flex-direction: column; gap: 8px">
+<h2 id="var-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">Your variations</h2>
+<a href="#" style="display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none">
+<span style="display: flex; justify-content: space-between; gap: 8px"><b>2-box lure</b><span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 18px">93</span></span>
+<span style="font-size: 14px; line-height: 19px">8.1kk exp/h · 240k profit/h</span>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">Lure two boxes, skip the Viziers · Yours · 1 hunt · low sample</span>
+</a>
+<button style="min-height: 48px; border-radius: 12px; border: 1px dashed var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Log a hunt as a new variation</button>
+</section>
+<section aria-labelledby="ses-h" style="display: flex; flex-direction: column; gap: 8px">
+<h2 id="ses-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">Your sessions</h2>
+<div style="border: 1px dashed var(--line2); border-radius: 14px; padding: 14px; color: var(--muted); font-size: 14px; line-height: 20px">No sessions logged at this spot. Only clean, break-free hunts belong here.</div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1650}}'>
+class Component extends DCLogic {
+renderVals() {
+return { cls: 'hp-' + (this.props.theme ?? 'dark') };
+}
+}
+</script>
+</body>
+</html>

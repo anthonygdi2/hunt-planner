@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hunt planner screen inventory</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9c4ff}a:hover{color:#d3e0ff}
+</style>
+</helmet>
+<div style="background: #17191c; color: #ecebe8; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 16px; line-height: 24px; min-height: 6400px">
+<div style="max-width: 1040px; margin: 0 auto; padding: 56px 24px 96px; display: flex; flex-direction: column; gap: 40px">
+<header style="display: flex; flex-direction: column; gap: 10px">
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 44px; line-height: 52px">Screen inventory</h1>
+<p style="margin: 0; color: #b4b8bf; font-size: 18px; line-height: 27px">For each screen: what it shows, what you can do, its states and the rules behind it. Build against this list. Designs live on the Screens page; tokens and parts on this page.</p>
+<nav aria-label="Contents" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px">
+<a href="#g" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Global rules</a>
+<a href="#s1" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Plan</a>
+<a href="#s2" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Plan editors</a>
+<a href="#s3" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">First run</a>
+<a href="#s4" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Log a clean hunt</a>
+<a href="#s5" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Spots</a>
+<a href="#s6" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Spot page</a>
+<a href="#s7" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Creatures</a>
+<a href="#s8" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Weekly</a>
+<a href="#s9" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Characters and settings</a>
+<a href="#d" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Data changes</a>
+<a href="#q" style="padding: 6px 12px; border-radius: 999px; border: 1px solid #78808b; color: #ecebe8; text-decoration: none; font-size: 14px">Open questions</a>
+</nav>
+</header>
+
+<section id="g" style="display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: 16px; background: #212429; border: 1px solid #3a3f47">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">Global rules</h2>
+<ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px">
+<li><b>Never assume the app saw something.</b> Rerolls, picks, claims and hunts can happen in game without the app. Every value (tokens, offers, active bounty, weekly Done) can be typed over at any time. Shortcut buttons only save typing.</li>
+<li><b>No kill tracking.</b> The app never counts kills toward a bounty or weekly task. “Kills needed” only feeds scoring.</li>
+<li><b>Logging is optional and rare.</b> Only clean, focused, break-free hunts. Nothing else in the app depends on a log.</li>
+<li><b>Everything on Plan is optional.</b> With only vocation and level the plan still works, from reference hunts.</li>
+<li><b>No modal pop-ups.</b> Editors expand inline; Log a clean hunt and Characters are full pages with Back.</li>
+<li><b>Header</b> (every screen): app name, character switcher (name, vocation, level), settings button → Characters and settings. <b>Navigation</b>: Plan, Spots, Creatures, Weekly as a bottom tab bar on phone, header links on desktop.</li>
+<li><b>Words:</b> “Bounty” (never board), “bounty offers” (the three choices), “active bounty” (the one picked), “pick” (not hold), “reroll token”, “Taken / Free”, “clean hunt”.</li>
+<li><b>Data saved</b> in this browser per character; backup and restore in Characters.</li>
+</ul>
+</section>
+
+<section id="s1" style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">1 · Plan (home)</h2>
+<p style="margin: 0; color: #b4b8bf">Answers “where should I hunt right now?” as a short chain of steps. Opens as you left it.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Shows</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>“Plan is using” chips: Goal, Bounty, Weekly, Today’s boosts, Time, Data. Set chips show their value; unset ones are dashed.</li>
+<li>Step 1: title (“Go to Cobra Bastion”), a bounty line (counts for your active bounty, or “for offer A, pick once the spot is free”), exp/h, profit/h, source badge(s), low-sample warning if any.</li>
+<li>Fallback steps (“Taken? → …”): name, exp/h · profit/h, badge.</li>
+<li>End of chain: “Reroll and re-plan” with tokens left (and “drops your bounty” when one is active), or “See Spots for more” when tokens are 0.</li>
+<li>Taken spots list: name, marked how long ago, minutes until it clears. Hidden when empty.</li>
+<li>Desktop: the same inputs as an always-open left column; steps on the right.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">You can</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Tap a chip to open its editor below the chips; tap again or Done to close.</li>
+<li><b>Free</b> on step 1: the card becomes “Hunting now” at that spot. If you’re still choosing offers and this spot is for one of them, a gold prompt says “pick offer A now” with <b>Picked A</b> (makes it the active bounty).</li>
+<li><b>Taken</b> on any step: marks the spot taken (default 45 min), moves the next step up, adds it to Taken spots.</li>
+<li><b>Why?</b>: expands the reason for that step in place.</li>
+<li>In Hunting now: <b>Log a clean hunt</b> (optional) or <b>Back to plan</b>.</li>
+<li><b>Free again</b> on a Taken spot: clears the mark early.</li>
+<li>Tap the end of chain: Reroll opens the Bounty editor; See Spots goes to Spots.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">States</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Normal, Hunting now, every planned spot taken (“See Spots for more, or free a spot below”), no bounty set (plan ignores bounty), choosing offers vs active bounty.</li>
+<li>Reference-only numbers carry the note “top players’ numbers, likely more than you’ll get” until a log adjusts them.</li>
+<li>After server save the Today chip resets to unset.</li></ul></div>
+</div>
+</section>
+
+<section id="s2" style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">2 · Plan editors (inline)</h2>
+<p style="margin: 0; color: #b4b8bf">Each opens below the chips, has a one-line intro saying what it changes, ends with a live “Plan: …” line and Done.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Goal mix</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Presets: Exp, Profit, Mostly exp some profit, Balanced, Charm points, Bounty points. Picking one sets all weights.</li>
+<li>Weights 0–5 for Exp, Profit, Charm points, Bounty points.</li>
+<li>Split bar and text (“Exp 67% · Profit 33%”). All zero: “Nothing weighted yet, so the plan uses Exp.”</li>
+<li>Chip shows the preset name, or “Custom mix”.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Bounty: choosing offers</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Difficulty (Master, Expert, Adept, Beginner). Reroll tokens stepper 0–10.</li>
+<li>Offers A, B, C: creature (suggestions after 2 letters), kills needed (number pad), kind Normal / Silver / Gold, <b>Picked</b>.</li>
+<li><b>Rerolled</b>: tokens −1, clears the three offers, cursor to offer A.</li>
+<li>Note: picking makes the other two disappear in game, so pick after checking the spot is free.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Bounty: active</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Difficulty, tokens stepper, active bounty: creature, kills needed, kind (all editable).</li>
+<li><b>Finished it</b>: tokens +1 (max 10), clears the bounty, switches to choosing offers.</li>
+<li><b>Rerolled</b>: tokens −1, drops the bounty, switches to choosing offers.</li>
+<li>Chip value: “Cobra Assassin · 4 tokens”, or “3 offers · 4 tokens” while choosing.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Today’s boosts</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Boosted creature; Prey 1 (creature, bonus type, size); Add a prey; Exp event.</li>
+<li>Counts the boosted creature’s double exp, prey exp bonus and exp events only. Clears at server save.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Weekly, Time, Data</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Weekly: compact list of open kill tasks with Done; link to the Weekly tab.</li>
+<li>Time: No limit, 30 min, 1 h, 1.5 h, 2 h, 3 h, 4 h (counts travel time and only kills you can finish).</li>
+<li>Data: Mine only / + Reference / Everything; link to the detailed switches in Characters.</li></ul></div>
+</div>
+</section>
+
+<section id="s3" style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">3 · First run</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Shows</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Heading and one line: two answers get a plan; everything else optional.</li>
+<li>Five vocation buttons; level field; what you’ll see first (reference numbers caveat); restore-backup link.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">You can</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Pick a vocation, type a level, <b>Show my plan</b> (disabled until level is set) → Plan with dashed hint chips.</li>
+<li>Restore a backup instead.</li>
+<li>Name is optional; the character is called by vocation and level until named.</li></ul></div>
+</div>
+</section>
+
+<section id="s4" style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">4 · Log a clean hunt (full page)</h2>
+<p style="margin: 0; color: #b4b8bf">Reached from Hunting now, a spot page, a variation button, or Spots → “Log a clean hunt at a new spot”.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Shows</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Reminder: only focused, break-free hunts; skipping is fine.</li>
+<li>Paste box (focused on open); once read: the pasted text and “Read it: 1 h 2 min, 4 creature types”.</li>
+<li>Preview: where (Known spot / New spot), exp/h, profit/h, kills per hour per creature, what saving does.</li>
+<li>Parse error message with how to fix it.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">You can</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li><b>Known spot</b>: choose the spot (preset to where you tapped Free, or the spot page you came from). Variations appear in the list.</li>
+<li><b>New spot</b>: name (required), Variation of (optional, an existing spot), route or tactic note (optional). Creatures come from the paste.</li>
+<li><b>Save hunt</b> or <b>Don’t save</b>. Paste again.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Rules</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Saving updates only spot numbers (“Yours · n hunts”) and the reference adjustment. Bounty, tokens and weekly are never touched.</li>
+<li>A new spot joins Spots and the plan with Yours · 1 hunt and low sample. A variation is listed under its parent too.</li>
+<li>Leaving the page after a paste asks inline: discard this hunt?</li></ul></div>
+</div>
+</section>
+
+<section id="s5" style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">5 · Spots</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Shows</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Count and what Score means.</li>
+<li>Rows: name (variations show “Your variation of …”), score, exp/h · profit/h, creatures (your bounty marked), source badge, low sample, Taken with minutes left, or “Not enough data for your vocation” in place of numbers.</li>
+<li>“What the badges mean” (collapsed).</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">You can</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Search by spot or creature. Sort by Score, Exp/h, Profit/h.</li>
+<li>Toggle All vocations, Any level, Hide taken.</li>
+<li>Open a spot. <b>Log a clean hunt at a new spot</b>.</li></ul></div>
+</div>
+</section>
+
+<section id="s6" style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">6 · Spot page</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Shows</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Name, score for this character and goal, exp/h, profit/h, source badge.</li>
+<li>Creatures here with kills/h, marked “Your bounty”, “Bounty offer B” or “Weekly task”.</li>
+<li>Where the numbers come from: your hunts, the reference as recorded and as adjusted, sources skipped and why.</li>
+<li>Your variations (name, score, numbers, note, hunts). Your sessions (date, length, exp/h, profit/h).</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">You can</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li><b>Mark taken</b> / Free again. <b>Log a clean hunt</b> here. <b>Log a hunt as a new variation</b> (opens Log with New spot and this spot as parent).</li>
+<li>Open a variation; open a creature; delete one of your sessions (inline confirm).</li>
+<li>Advanced mode: type your own numbers for this spot.</li></ul></div>
+</div>
+</section>
+
+<section id="s7" style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">7 · Creatures (was Classic view)</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Shows</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Tiers S–D and Avoid for the chosen difficulty and goal mix; each creature as a chip, with bounty, Preferred, Unwanted and low-data markers.</li>
+<li>Table view: creature, tier, best spot, exp/h, profit/h, source.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">You can</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Switch Tiers / Table, search.</li>
+<li>Open a creature panel: its spots, numbers and sources; mark Preferred or Unwanted (mirrors the in-game lists).</li>
+<li>Edit the Preferred / Unwanted lists (the old slots planner).</li></ul></div>
+</div>
+</section>
+
+<section id="s8" style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">8 · Weekly</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Shows</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Week start and next reset (Monday, server save). Done count.</li>
+<li>6 kill-task rows, or 9 with the expansion: creature, kills needed, Done.</li>
+<li>How the plan uses these. Delivery tasks are not listed.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">You can</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Set difficulty and 6 / 9 tasks. Type creature and kills. Toggle Done when claimed in game.</li>
+<li><b>Start a new week</b> (clears rows; also offered automatically after the Monday reset).</li></ul></div>
+</div>
+</section>
+
+<section id="s9" style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">9 · Characters and settings (full page)</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">Shows</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Character pills; this character’s name, vocation, level, talisman bestiary bonus.</li>
+<li>Numbers from: preset plus switches for reference hunts, other vocations, older hunts; calibration status in plain words.</li>
+<li>World; how long a Taken mark lasts. Advanced mode. Theme. Backup. Credits.</li></ul></div>
+<div style="padding: 18px; border-radius: 14px; background: #212429; border: 1px solid #3a3f47"><h3 style="margin: 0 0 8px; font-size: 17px">You can</h3><ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Switch, add or delete a character (inline confirm).</li>
+<li>Choose Mine only / + Reference / Everything, or flip each switch (the preset shows “Custom” when switches don’t match one).</li>
+<li>Set world and Taken length (30 min, 45 min default, 1 h, 2 h).</li>
+<li>Turn on Advanced mode: own numbers for a creature or spot, raid counts, full score breakdown in Why?</li>
+<li>Theme System / Dark / Light. Download backup, Restore.</li></ul></div>
+</div>
+</section>
+
+<section id="d" style="display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: 16px; background: #212429; border: 2px solid #e8b84a">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">Data changes for engineers</h2>
+<h3 style="margin: 4px 0 0; font-size: 17px">New or changed</h3>
+<ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li><b>Bounty</b>: mode (offers | active); offers[3] {creature, kills, kind}; active {creature, kills, kind}; tokens 0–10; difficulty.</li>
+<li><b>Goal weights</b> {exp, profit, charms, bounty}, each 0–5; preset name is derived, not stored.</li>
+<li><b>Taken marks</b> {spot, markedAt}; expire after the Taken length setting (default 45 min).</li>
+<li><b>Hunting now</b>: the spot tapped Free (cleared by Back to plan, Taken or a log).</li>
+<li><b>User spots</b> {id, name, parentSpot?, note?, creatures from paste, sessions}. Treated as spots everywhere, with no reference.</li>
+<li><b>Weekly</b>: up to 9 kill tasks {creature, kills, done}; slots 6 | 9; week start; difficulty.</li>
+<li><b>Source switches</b> {reference, otherVocation, older}; preset derived.</li>
+<li><b>Settings</b>: Taken length, theme (system | dark | light).</li></ul>
+<h3 style="margin: 8px 0 0; font-size: 17px">Removed</h3>
+<ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Kill progress on offers and weekly tasks (“120/450”, “Other kills”).</li>
+<li>The active-hunt timer and End and log.</li>
+<li>“Hold” as a separate state from the active bounty.</li>
+<li>Classic view as a separate mode (its parts live in Creatures).</li></ul>
+</section>
+
+<section id="q" style="display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: 16px; background: #212429; border: 1px dashed #78808b">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">Open questions</h2>
+<ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+<li>Does scoring combine goal weights as plain shares? If not, the goal mix bar should show the real effect.</li>
+<li>Kill-count ranges per creature and difficulty: if known later, prefill offers and weekly rows.</li>
+<li>Variations compete in the plan as their own spots (assumed). Confirm.</li>
+<li>Picking early has no cost in scoring; the plan only tells you to wait. Should scoring prefer offers whose spots have a free fallback?</li></ul>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":6400}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

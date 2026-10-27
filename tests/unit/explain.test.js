@@ -1,0 +1,50 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { aVoc, offerLabel, offerLetter, noNumsWhy, pickWhy, oddsText, srcWhy, partsWhy, rerollWhy, seeSpotsWhy } from "../../src/core/explain.js";
+
+const pct = (v) => Math.round(v * 100);
+
+test("small pieces", () => {
+  assert.equal(aVoc("Elite Knight"), "an Elite Knight");
+  assert.equal(aVoc("Royal Paladin"), "a Royal Paladin");
+  assert.equal(offerLabel({ name: "Rat", i: 1 }), "Rat (offer B)");
+  assert.equal(offerLabel({ name: "Rat", i: -1 }), "Rat");
+  assert.equal(offerLabel({ name: "Rat", i: 0, held: true }), "Rat", "the active bounty by its name");
+  assert.equal(offerLetter({ i: 2 }), "C");
+  assert.equal(oddsText({ n: 4, free: 1 }), "Free 1 of 4 times you checked around this hour");
+  assert.equal(oddsText({ n: 0, freeAll: 0, nAll: 1 }), "Free 0 of 1 time you checked it");
+});
+
+test("why a spot has no numbers", () => {
+  const ctx = { level: 300, vocation: "Elite Knight", refOn: true, otherOn: false };
+  assert.match(noNumsWhy({ sessions: [{}], entries: [] }, ctx), /breaks/);
+  assert.match(noNumsWhy({ sessions: [], entries: [{ vocation: "Elite Knight" }] }, Object.assign({}, ctx, { refOn: false })), /off for this character/);
+  assert.equal(noNumsWhy({ sessions: [], entries: [{ levelMin: 500 }, { levelMin: 400 }] }, ctx), "Needs level 400.");
+  assert.match(noNumsWhy({ sessions: [], entries: [{ vocation: "Royal Paladin" }] }, ctx), /^Only other vocations/);
+  assert.equal(noNumsWhy({ sessions: [], entries: [{ vocation: "any" }] }, ctx), "No usable numbers for this character yet.");
+});
+
+test("where numbers come from", () => {
+  assert.equal(srcWhy({ src: "own" }), "From your own sessions here.");
+  assert.equal(srcWhy({ src: "refAdj", entry: {} }), "From a reference hunt, adjusted to you.");
+  assert.equal(srcWhy({ src: "other", entry: { vocation: "Elite Knight", source: { date: "2024-05-01" } }, profitStale: true }),
+    "From an Elite Knight’s reference hunt not adjusted to you yet, so likely optimistic. Profit from 2024, may be out of date.");
+});
+
+test("the parts of a spot's score", () => {
+  const o = { v: 0.92, m: { xp: 4.84e6, profit: 2e5 }, parts: { hunt: 4.1e6, today: 0, held: 5.4e5, weekly: 2e5 }, offer: { name: "Cobra Assassin" },
+    weekly: [{ name: "Silencer" }], today: [], held: { hoursLeft: 1.5 }, hours: null };
+  assert.equal(partsWhy(o, { sc: { keys: ["xp", "profit"] }, pct }),
+    "Scores 92: 4.84kk exp/h (4.1kk hunting, 540k from Cobra Assassin’s task, 200k from your Silencer weekly task), 200k profit/h. Finishes the task in about 1 h 30 min here.");
+});
+
+test("picking, rerolling and the end of the chain", () => {
+  assert.equal(pickWhy({ name: "Rat", i: 0 }), "Pick Rat (offer A) once you see the spot is free: picking makes the other two offers disappear in game.");
+  const active = { key: "held", name: "Rat", kills: 100, done: 40, held: true, i: -1 };
+  const ctx = { chosen: [{ held: true, offer: active, name: "Sewers" }], worth: {}, options: [{}], offers: [active], tokens: 2, pct, active };
+  assert.equal(rerollWhy({ name: "Cave", v: 0.4, thr: 0.5 }, [], ctx), "The next spot, Cave, scores 40, below the 50 a reroll is worth with 2 tokens left. Rerolling drops your active bounty, Rat.");
+  assert.equal(rerollWhy(null, [], Object.assign({}, ctx, { options: [], offers: [], active: null })), "None of your spots has numbers for this character yet.");
+  assert.match(seeSpotsWhy({ unknown: true }), /Set your reroll tokens/);
+  assert.match(seeSpotsWhy({ tokens: 0 }), /No reroll tokens left/);
+  assert.equal(seeSpotsWhy({ tokens: 3, model: true }), "");
+});

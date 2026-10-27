@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Creatures tier list, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9c4ff}a:hover{color:#d3e0ff}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff;--tS:#ff8a80;--tA:#ffb74d;--tB:#ffe082;--tC:#a5d6a7;--tD:#90caf9;--on-tier:#1a1408}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4;--tS:#f28b82;--tA:#f6b26b;--tB:#ffd966;--tC:#93c47d;--tD:#8ab4f8;--on-tier:#1a1408}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.hp-dark ::placeholder,.hp-light ::placeholder{color:var(--muted);opacity:1}
+</style>
+</helmet>
+<div class="{{cls}}" style="width: 390px; min-height: 1400px; box-sizing: border-box; background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--surface)">
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Creatures</h1>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">Master bounties · EK 615</span>
+</header>
+<main style="padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">How good each creature is as a bounty for your goal mix. This is the old Classic view’s tier list.</p>
+<div role="group" aria-label="View" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden">
+<button aria-pressed="true" style="min-height: 44px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer">Tiers</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; border-left: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Table</button>
+</div>
+<input type="search" aria-label="Search creatures" placeholder="Search creatures" style="min-height: 48px; box-sizing: border-box; width: 100%; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; gap: 8px; align-items: stretch">
+<span style="flex: none; width: 48px; border-radius: 10px; background: var(--tS); color: var(--on-tier); display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; font-weight: 700" aria-label="Tier S">S</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: 10px; background: var(--surface)">
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--gold); color: var(--text); text-decoration: none; font-size: 14px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3 7h7l-5.5 4.5 2 7.5-6.5-4.5L5.5 21l2-7.5L2 9h7z"></path></svg>Cobra Assassin<span style="font-size: 12px; color: var(--gold-text)">bounty</span></a>
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Choking Fear</a>
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Flimsy Lost Soul</a>
+</div>
+</div>
+<div style="display: flex; gap: 8px; align-items: stretch">
+<span style="flex: none; width: 48px; border-radius: 10px; background: var(--tA); color: var(--on-tier); display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; font-weight: 700" aria-label="Tier A">A</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: 10px; background: var(--surface)">
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Gorerilla</a>
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Norcferatu Heartless</a>
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Hellspawn<span style="font-size: 12px; color: var(--muted)">· 2 hunts</span></a>
+</div>
+</div>
+<div style="display: flex; gap: 8px; align-items: stretch">
+<span style="flex: none; width: 48px; border-radius: 10px; background: var(--tB); color: var(--on-tier); display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; font-weight: 700" aria-label="Tier B">B</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: 10px; background: var(--surface)">
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Dragolisk</a>
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Wardragon</a>
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Varg</a>
+</div>
+</div>
+<div style="display: flex; gap: 8px; align-items: stretch">
+<span style="flex: none; width: 48px; border-radius: 10px; background: var(--tC); color: var(--on-tier); display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; font-weight: 700" aria-label="Tier C">C</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: 10px; background: var(--surface)">
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Gloom Maw</a>
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--muted); text-decoration: none; font-size: 14px; font-style: italic">Silencer · not enough data</a>
+</div>
+</div>
+<div style="display: flex; gap: 8px; align-items: stretch">
+<span style="flex: none; width: 48px; border-radius: 10px; background: var(--tD); color: var(--on-tier); display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; font-weight: 700" aria-label="Tier D">D</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: 10px; background: var(--surface)">
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Orclops Bloodbreaker</a>
+</div>
+</div>
+<div style="display: flex; gap: 8px; align-items: stretch">
+<span style="flex: none; width: 48px; border-radius: 10px; background: repeating-linear-gradient(135deg, var(--gold) 0 6px, #1a1408 6px 12px); display: grid; place-items: center" aria-label="Avoid"><span style="padding: 2px 4px; border-radius: 4px; background: #1a1408; color: var(--gold); font-size: 11px; font-weight: 700; letter-spacing: 0.04em">AVOID</span></span>
+<div style="flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: 10px; background: var(--surface); border: 1px dashed var(--gold)">
+<a href="#" style="min-height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M6 6l12 12"></path></svg>Dworc Shadowstalker<span style="font-size: 12px; color: var(--muted)">unwanted</span></a>
+</div>
+</div>
+</div>
+<div style="border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; background: var(--surface); display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 20px">
+<b>Preferred and unwanted</b>
+<span style="color: var(--muted)">Mark creatures the way you set them on the in-game list. Tap a creature, then Preferred (star) or Unwanted (crossed circle). <a href="#">Edit the lists</a></span>
+</div>
+</main>
+<nav aria-label="Main" style="margin-top: auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; border-top: 1px solid var(--line); background: var(--surface); padding: 6px 8px 12px">
+<a href="#" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; color: var(--muted); font-size: 12px; line-height: 16px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="M4 6h1M4 12h1M4 18h1"></path></svg>Plan</a>
+<a href="#" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; color: var(--muted); font-size: 12px; line-height: 16px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>Spots</a>
+<a href="#" aria-current="page" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; background: var(--surface2); color: var(--text); font-size: 12px; line-height: 16px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 10h12M4 15h8M4 20h4"></path></svg>Creatures</a>
+<a href="#" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; color: var(--muted); font-size: 12px; line-height: 16px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Weekly</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1400}}'>
+class Component extends DCLogic {
+renderVals() {
+return { cls: 'hp-' + (this.props.theme ?? 'dark') };
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home (Plan) structure on a phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9c4ff}a:hover{color:#d3e0ff}
+</style>
+</helmet>
+<div style="width: 1120px; height: 1072px; box-sizing: border-box; padding: 56px 64px; background: #1f2226; color: #ecebe8; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 36px; line-height: 44px">Home = Plan</h1>
+<p style="margin: 0; font-size: 17px; line-height: 24px; color: #c4c8ce">Structure only, not the visual design. Phone, 390 px wide, top to bottom.</p>
+</div>
+<div style="display: flex; gap: 48px; align-items: flex-start">
+<div style="width: 390px; flex: none; box-sizing: border-box; border: 2px solid #5a606a; border-radius: 28px; padding: 16px; background: #24282d; display: flex; flex-direction: column; gap: 12px; font-size: 14px; line-height: 19px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<button style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #6a707a; background: #2f343b; color: #ecebe8; font: inherit; font-weight: 700">Main EK · EK 615 ▾</button>
+<button style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #6a707a; background: #2f343b; color: #ecebe8; font: inherit">Menu</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; letter-spacing: 0.06em; color: #c4c8ce"><b>1</b> · PLAN IS USING</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button style="min-height: 44px; padding: 0 12px; border-radius: 22px; border: 1px solid #8a909a; background: #2f343b; color: #ecebe8; font: inherit">Goal: mostly exp</button>
+<button style="min-height: 44px; padding: 0 12px; border-radius: 22px; border: 1px solid #8a909a; background: #2f343b; color: #ecebe8; font: inherit">Bounty: Cobra Assassin · 4 tokens</button>
+<button style="min-height: 44px; padding: 0 12px; border-radius: 22px; border: 1px solid #8a909a; background: #2f343b; color: #ecebe8; font: inherit">Weekly 2/6 done</button>
+<button style="min-height: 44px; padding: 0 12px; border-radius: 22px; border: 1px dashed #8a909a; background: transparent; color: #ecebe8; font: inherit">+ Today’s boosts</button>
+<button style="min-height: 44px; padding: 0 12px; border-radius: 22px; border: 1px solid #8a909a; background: #2f343b; color: #ecebe8; font: inherit">No time limit</button>
+<button style="min-height: 44px; padding: 0 12px; border-radius: 22px; border: 1px solid #8a909a; background: #2f343b; color: #ecebe8; font: inherit">Data: all sources</button>
+</div>
+</div>
+<div style="border: 2px dashed #5a606a; border-radius: 12px; padding: 12px; color: #c4c8ce"><b style="color: #ecebe8">2</b> · Inline editor opens here<br>Last line: “Plan: Go to Cobra Bastion”</div>
+<div style="border: 2px solid #7fa8ff; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #2a2e34">
+<span style="font-size: 12px; letter-spacing: 0.06em; color: #a9c4ff"><b>3</b> · STEP 1</span>
+<span style="font-size: 18px; line-height: 24px"><b>Go to Cobra Bastion</b></span>
+<span>7.8kk exp/h · 300k profit/h<br><span style="color: #c4c8ce">Reference, adjusted to you · Why?</span></span>
+<div style="display: flex; gap: 8px">
+<button style="flex: 1; min-height: 48px; border-radius: 10px; border: 1px solid #ecebe8; background: #ecebe8; color: #1f2226; font: inherit; font-weight: 700">Free</button>
+<button style="flex: 1; min-height: 48px; border-radius: 10px; border: 1px solid #8a909a; background: transparent; color: #ecebe8; font: inherit">Taken</button>
+</div>
+</div>
+<div style="border: 1px solid #5a606a; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<span><b>4</b> · Taken? → <b>Ruins of Nuur</b><br><span style="color: #c4c8ce">6.9kk · 450k · Yours, 9 hunts</span></span>
+<button style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #8a909a; background: transparent; color: #ecebe8; font: inherit">Taken</button>
+</div>
+<div style="border: 1px solid #5a606a; border-radius: 12px; padding: 12px; min-height: 44px; box-sizing: border-box"><b>5</b> · Taken? → Reroll and re-plan</div>
+<div style="border: 1px dashed #7a808a; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<span><b>6</b> · Taken spots (1)<br><span style="color: #c4c8ce">Asura Palace · 25 min left</span></span>
+<button style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #8a909a; background: transparent; color: #ecebe8; font: inherit">Free again</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; border-top: 1px solid #5a606a; padding-top: 8px">
+<button style="min-height: 44px; border: 0; border-radius: 8px; background: #3a404a; color: #ecebe8; font: inherit; font-weight: 700">Plan</button>
+<button style="min-height: 44px; border: 0; border-radius: 8px; background: transparent; color: #ecebe8; font: inherit">Spots</button>
+<button style="min-height: 44px; border: 0; border-radius: 8px; background: transparent; color: #ecebe8; font: inherit">Creatures</button>
+<button style="min-height: 44px; border: 0; border-radius: 8px; background: transparent; color: #ecebe8; font: inherit">Weekly</button>
+</div>
+<span style="font-size: 12px; color: #c4c8ce; text-align: center"><b style="color: #ecebe8">7</b> · tab bar</span>
+</div>
+<ol style="margin: 0; padding-left: 24px; display: flex; flex-direction: column; gap: 18px; font-size: 16px; line-height: 23px; max-width: 540px">
+<li><b>“Plan is using” chips.</b> Every optional input in one row: goal mix, bounty (the three offers or your active one, plus tokens), weekly, today’s boosts (boosted creature, prey, exp event), session length, data sources. A set chip shows its value. An empty one is dashed and its editor opens with one line on what adding it changes. Replaces both “Options” and the separate “Your board”.</li>
+<li><b>Inline editor.</b> One chip open at a time, expanding in the page, so nothing covers the keyboard. A live “Plan:” line at its foot shows the effect while you type. Done collapses it.</li>
+<li><b>Step 1.</b> The answer, with the two biggest buttons. Free turns the card into “Hunting at Cobra Bastion” with an optional “Log a clean hunt”. No timer, no kill counting. Source badge and Why? live on the card.</li>
+<li><b>Fallbacks.</b> “Taken? →” steps, compact, each with its own Taken. Tapping Taken on step 1 moves the next one up.</li>
+<li><b>End of chain.</b> “Reroll and re-plan” while you have tokens (with an active bounty, a reroll drops it), else “See Spots for more”.</li>
+<li><b>Taken spots.</b> Every spot marked Taken in the last ~45 minutes, with time left. Free again clears it early. Hidden when empty.</li>
+<li><b>Tabs.</b> Plan, Spots, Creatures (the old Classic view), Weekly. On desktop the chips and editors become a left column, the steps a right column.</li>
+</ol>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":1072}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+node_modules/
+fonts-cache/
+tools/reference/.staging/
+dist/
+
+# Backups downloaded from the app hold your own characters and hunts: never commit one.
+*backup*.json
+backups/

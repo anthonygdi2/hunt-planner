@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Log a clean hunt, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9c4ff}a:hover{color:#d3e0ff}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{cls}}" style="width: 390px; min-height: 1750px; box-sizing: border-box; background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--surface)">
+<a href="#" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; padding: 0 8px 0 0; color: var(--text); text-decoration: none"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>Back</a>
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 24px">Log a clean hunt</h1>
+</header>
+<main style="padding: 16px; display: flex; flex-direction: column; gap: 18px">
+<div style="border: 2px solid var(--gold); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 6px">
+<b>Only log hunts that show what the spawn gives</b>
+<span style="font-size: 14px; line-height: 20px; color: var(--muted)">Focused, no breaks, no waiting around. A messy session makes this spot’s numbers worse, so skipping it is fine. Nothing else in the app needs a log.</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><b>Hunting Session Analyser text</b><button style="min-height: 44px; padding: 0; border: 0; background: none; color: var(--accent-text); font: inherit; text-decoration: underline; cursor: pointer">Paste again</button></div>
+<div style="border: 1px solid var(--line2); border-radius: 12px; background: var(--surface); padding: 12px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 19px; color: var(--muted); white-space: pre-line">Session data: From 2026-10-26, 18:02:11 to 2026-10-26, 19:04:15
+Session: 01:02h
+XP Gain: 7,744,100
+Loot: 1,241,880
+Supplies: 932,410
+Balance: 309,470
+Killed Monsters: 412x cobra assassin, 96x cobra scout …</div>
+<span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; color: var(--yours)"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"></path></svg>Read it: 1 h 2 min, 4 creature types</span>
+</div>
+<section aria-labelledby="prev-h" style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<h2 id="prev-h" style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 26px">Preview</h2>
+<div role="group" aria-label="Where did you hunt" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden">
+<button aria-pressed="{{existingPressed}}" onClick="{{pickExisting}}" style="{{existingStyle}}">Known spot</button>
+<button aria-pressed="{{newPressed}}" onClick="{{pickNew}}" style="{{newStyle}}">New spot</button>
+</div>
+<sc-if value="{{isExisting}}" hint-placeholder-val="{{true}}">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Spot<select style="min-height: 44px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 16px"><option>Cobra Bastion</option><option>Cobra Bastion · 2-box lure (yours)</option><option>Ruins of Nuur</option></select></label>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted); margin-top: -8px">Set from the spot you tapped Free on. Hunted a different route? Switch to New spot.</span>
+</sc-if>
+<sc-if value="{{isNew}}" hint-placeholder-val="{{false}}">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Name<input placeholder="e.g. Cobra Bastion, 2-box lure" autocomplete="off" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Variation of (optional)<select style="min-height: 44px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 16px"><option>None, it’s a new spot</option><option>Cobra Bastion</option><option>Ruins of Nuur</option></select></label>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted); margin-top: -8px">Pick one to list it under that spot as a different route or tactic. Leave it on None for a spot the app doesn’t know yet.</span>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Route or tactic (optional)<input placeholder="e.g. lure two boxes, skip the Viziers" autocomplete="off" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">Creatures come from your paste: Cobra Assassin, Cobra Scout, Cobra Vizier, Gorgon.</span>
+</sc-if>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="padding: 10px 12px; border-radius: 12px; background: var(--surface2)"><div style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; line-height: 28px">7.5kk</div><div style="font-size: 13px; line-height: 18px; color: var(--muted)">exp/h</div></div>
+<div style="padding: 10px 12px; border-radius: 12px; background: var(--surface2)"><div style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; line-height: 28px">300k</div><div style="font-size: 13px; line-height: 18px; color: var(--muted)">profit/h</div></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<b>Kills per hour</b>
+<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line)"><span>Cobra Assassin</span><span>399/h</span></div>
+<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line)"><span>Cobra Scout</span><span>93/h</span></div>
+<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line)"><span>Cobra Vizier</span><span>41/h</span></div>
+<div style="display: flex; justify-content: space-between; padding: 6px 0"><span>Gorgon</span><span>12/h</span></div>
+</div>
+<div style="padding: 12px; border-radius: 12px; background: var(--surface2); font-size: 14px; line-height: 20px">
+<b>What saving does</b><br>
+<span style="color: var(--muted)">{{saveText}} Your bounty, tokens and weekly tasks stay as they are.</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button style="min-height: 52px; border-radius: 12px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Don’t save</button>
+<button style="min-height: 52px; border-radius: 12px; border: 0; background: var(--gold); color: var(--on-gold); font: inherit; font-size: 17px; font-weight: 700; cursor: pointer">Save hunt</button>
+</div>
+</section>
+<section aria-labelledby="err-h" style="border: 1px dashed var(--line2); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 6px">
+<h2 id="err-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">If the paste can’t be read</h2>
+<span style="display: inline-flex; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 20px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold-text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18h.01"></path></svg><span><b>No “Killed Monsters” list found.</b> Copy the whole Hunting Session Analyser, not just the summary line, and paste again.</span></span>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1750}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { mode: 'existing' };
+}
+renderVals() {
+const isNew = this.state.mode === 'new';
+const seg = (on) => 'min-height: 44px; border: 0; font: inherit; cursor: pointer; background: ' + (on ? 'var(--text)' : 'transparent') + '; color: ' + (on ? 'var(--bg)' : 'var(--text)') + '; font-weight: ' + (on ? '700' : '400');
+return {
+cls: 'hp-' + (this.props.theme ?? 'dark'),
+isNew: isNew,
+isExisting: !isNew,
+existingPressed: isNew ? 'false' : 'true',
+newPressed: isNew ? 'true' : 'false',
+existingStyle: seg(!isNew),
+newStyle: seg(isNew),
+pickExisting: () => this.setState({ mode: 'existing' }),
+pickNew: () => this.setState({ mode: 'new' }),
+saveText: isNew
+? 'A new spot appears in Spots with a “Yours · 1 hunt” number and joins the plan like any other spot. It has no reference, so it’s marked low sample until you log more.'
+: 'Cobra Bastion gets a “Yours · 1 hunt” number, and reference numbers rescale to you.'
+};
+}
+}
+</script>
+</body>
+</html>

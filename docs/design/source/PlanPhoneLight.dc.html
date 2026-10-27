@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan, phone, light theme with bounty offers open</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2a55b0}a:hover{color:#1d3f86}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.hp-dark ::placeholder,.hp-light ::placeholder{color:var(--muted);opacity:1}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1600px; background: #f4f2ee">
+<dc-import name="PlanPhone" theme="light" start-open="bounty" start-mode="offers" hint-size="390px,1600px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1600}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

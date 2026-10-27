@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Goal mix editor, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#8fb3ff}a:hover{color:#c3d5ff}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{cls}}" style="width: 390px; min-height: 1100px; box-sizing: border-box; background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--surface)">
+<span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 24px; font-weight: 700">Hunt planner</span>
+<button aria-label="Character: Main EK, Elite Knight level 615. Change character" style="min-height: 48px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 4px 12px; border-radius: 12px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; text-align: left; cursor: pointer"><span style="font-weight: 700; font-size: 15px; line-height: 19px">Main EK ▾</span><span style="font-size: 13px; line-height: 17px; color: var(--muted)">Elite Knight · 615</span></button>
+</header>
+<main style="padding: 16px; display: flex; flex-direction: column; gap: 18px">
+<section aria-labelledby="using-h" style="display: flex; flex-direction: column; gap: 10px">
+<h2 id="using-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 700">Plan is using</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button aria-expanded="true" style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 2px solid var(--accent); background: var(--surface2); color: var(--text); font: inherit; font-size: 14px; cursor: pointer"><span style="color: var(--muted)">Goal</span> <b>{{goalLabel}}</b></button>
+<button aria-expanded="false" style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 14px; cursor: pointer"><span style="color: var(--muted)">Bounty</span> <b>Cobra Assassin · 4 tokens</b></button>
+<button aria-expanded="false" style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 14px; cursor: pointer"><span style="color: var(--muted)">Weekly</span> <b>2 of 6 done</b></button>
+<button aria-expanded="false" style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px dashed var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 14px; cursor: pointer">+ Today’s boosts</button>
+</div>
+</section>
+<section aria-label="Goal mix" style="background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h3 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 26px">Goal mix</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">What should a good hunt give you? Start from a preset, then nudge the weights.</p>
+</div>
+<div role="group" aria-label="Presets" style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{presets}}" as="p" hint-placeholder-count="6"><button aria-pressed="{{p.pressed}}" onClick="{{p.pick}}" style="{{p.style}}">{{p.name}}</button></sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 14px">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+<div role="group" aria-label="{{r.name}} weight" style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><b>{{r.name}}</b><span style="font-size: 13px; line-height: 18px; color: var(--muted)">{{r.hint}}</span></div>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden">
+<sc-for list="{{r.segs}}" as="s" hint-placeholder-count="6"><button aria-pressed="{{s.pressed}}" aria-label="{{s.aria}}" onClick="{{s.pick}}" style="{{s.style}}">{{s.n}}</button></sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: var(--surface2)">
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">How the plan weighs a spot</span>
+<div aria-hidden="true" style="display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--line)">
+<sc-for list="{{bar}}" as="b" hint-placeholder-count="2"><span style="{{b.style}}"></span></sc-for>
+</div>
+<b aria-live="polite">{{shareText}}</b>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px">
+<span aria-live="polite" style="font-size: 14px; line-height: 19px"><span style="color: var(--muted)">Plan:</span> <b>{{liveLine}}</b></span>
+<button style="min-height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer">Done</button>
+</div>
+</section>
+<article style="background: var(--surface); border: 2px solid var(--gold); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 6px; opacity: 0.85">
+<span style="font-size: 12px; line-height: 16px; letter-spacing: 0.08em; font-weight: 700; color: var(--muted)">STEP 1</span>
+<h3 style="margin: 0; font-size: 22px; line-height: 28px">{{liveLine}}</h3>
+<span style="color: var(--muted)">The rest of the plan continues below.</span>
+</article>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { w: { exp: 4, profit: 2, charms: 0, bounty: 0 } };
+}
+renderVals() {
+const w = this.state.w;
+const set = (nw) => this.setState({ w: nw });
+const presetDefs = [
+{ name: 'Exp', w: { exp: 5, profit: 0, charms: 0, bounty: 0 } },
+{ name: 'Profit', w: { exp: 0, profit: 5, charms: 0, bounty: 0 } },
+{ name: 'Mostly exp, some profit', w: { exp: 4, profit: 2, charms: 0, bounty: 0 } },
+{ name: 'Balanced', w: { exp: 3, profit: 3, charms: 0, bounty: 0 } },
+{ name: 'Charm points', w: { exp: 0, profit: 0, charms: 5, bounty: 0 } },
+{ name: 'Bounty points', w: { exp: 0, profit: 0, charms: 0, bounty: 5 } }
+];
+const same = (a, b) => ['exp', 'profit', 'charms', 'bounty'].every((k) => a[k] === b[k]);
+const match = presetDefs.find((p) => same(p.w, w));
+const presets = presetDefs.map((p) => {
+const on = same(p.w, w);
+return {
+name: p.name, pressed: on ? 'true' : 'false', pick: () => set(Object.assign({}, p.w)),
+style: 'min-height: 40px; padding: 0 12px; border-radius: 20px; font: inherit; font-size: 14px; cursor: pointer; border: 1px solid ' + (on ? 'var(--text)' : 'var(--line2)') + '; background: ' + (on ? 'var(--text)' : 'transparent') + '; color: ' + (on ? 'var(--bg)' : 'var(--text)') + '; font-weight: ' + (on ? '700' : '400')
+};
+});
+const defs = [
+{ k: 'exp', name: 'Exp', hint: 'exp per hour', color: 'var(--accent)' },
+{ k: 'profit', name: 'Profit', hint: 'profit per hour', color: 'var(--gold)' },
+{ k: 'charms', name: 'Charm points', hint: 'charm points per hour', color: 'var(--other)' },
+{ k: 'bounty', name: 'Bounty points', hint: 'bounty points per hour', color: 'var(--yours)' }
+];
+const rows = defs.map((d) => ({
+name: d.name, hint: d.hint,
+segs: [0, 1, 2, 3, 4, 5].map((n) => {
+const on = w[d.k] === n;
+return {
+n: String(n), pressed: on ? 'true' : 'false', aria: d.name + ' weight ' + n + (n === 0 ? ', off' : ''),
+pick: () => { const nw = Object.assign({}, w); nw[d.k] = n; set(nw); },
+style: 'min-height: 44px; border: 0; font: inherit; cursor: pointer; background: ' + (on ? 'var(--text)' : 'transparent') + '; color: ' + (on ? 'var(--bg)' : 'var(--text)') + '; font-weight: ' + (on ? '700' : '400')
+};
+})
+}));
+const total = w.exp + w.profit + w.charms + w.bounty;
+const parts = defs.filter((d) => w[d.k] > 0).map((d) => ({ name: d.name, pct: Math.round((w[d.k] / total) * 100), color: d.color }));
+const bar = parts.map((p) => ({ style: 'display: block; height: 100%; width: ' + p.pct + '%; background: ' + p.color + '; border-right: 2px solid var(--surface2)' }));
+const shareText = total === 0 ? 'Nothing weighted yet, so the plan uses Exp.' : parts.map((p) => p.name + ' ' + p.pct + '%').join(' · ');
+const goalLabel = match ? match.name : 'Custom mix';
+const profitHeavy = w.profit > w.exp;
+return {
+cls: 'hp-' + (this.props.theme ?? 'dark'),
+presets: presets, rows: rows, bar: bar, shareText: shareText, goalLabel: goalLabel,
+liveLine: total === 0 || !profitHeavy ? 'Go to Cobra Bastion' : 'Go to Ruins of Nuur'
+};
+}
+}
+</script>
+</body>
+</html>

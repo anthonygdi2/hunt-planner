@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hunt planner components</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9c4ff}a:hover{color:#d3e0ff}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{cls}}" style="width: 1440px; min-height: 2200px; box-sizing: border-box; padding: 64px; background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px; display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 44px; line-height: 52px">Components</h1>
+<p style="margin: 0; max-width: 900px; color: var(--muted); font-size: 17px; line-height: 25px">Plain HTML and CSS, no framework. Every interactive part is a real button, link, input or select. Flip the Theme tweak to see light.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start">
+
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Chip</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button aria-expanded="false" style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 14px; cursor: pointer"><span style="color: var(--muted)">Goal</span> <b>Mostly exp</b></button>
+<button aria-expanded="false" style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px dashed var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 14px; cursor: pointer">+ Today’s boosts</button>
+<button aria-expanded="true" style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 2px solid var(--accent); background: var(--surface2); color: var(--text); font: inherit; font-size: 14px; cursor: pointer"><span style="color: var(--muted)">Bounty</span> <b>Cobra Assassin · 4 tokens</b></button>
+</div>
+<ul style="margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 20px"><li>Set: label in muted, value in bold, solid border. Not set: dashed border, “+ name”. Open: 2px accent border, aria-expanded true.</li><li>Tapping opens its inline editor right below the chip row. Only one open at a time.</li></ul>
+</section>
+
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Source badges</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--yours); color: var(--yours); font-size: 12px; line-height: 17px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"></path></svg>Yours · 9 hunts</span>
+<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent-text); font-size: 12px; line-height: 17px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5h11l5 5v9z"></path></svg>Reference, adjusted to you</span>
+<span style="padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line2); color: var(--muted); font-size: 12px; line-height: 17px">Reference</span>
+<span style="padding: 2px 8px; border-radius: 999px; border: 1px dashed var(--other); color: var(--other); font-size: 12px; line-height: 17px">Other vocation</span>
+<span style="padding: 2px 8px; border-radius: 999px; border: 1px dotted var(--line2); color: var(--muted); font-size: 12px; line-height: 17px">Older · before the rebalance</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+<span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; line-height: 17px; color: var(--gold-text)"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"></path><path d="M12 10v5"></path></svg>Low sample</span>
+<span style="font-size: 13px; color: var(--muted); font-style: italic">Not enough data for your vocation</span>
+<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--surface2); border: 1px solid var(--line2); font-size: 12px; line-height: 17px; font-weight: 700">Taken · clears in 25 min</span>
+</div>
+<ul style="margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 20px"><li>Each source has its own words and border style (solid, dashed, dotted), so it never relies on color.</li><li>One badge per number: the source that number came from. Low sample sits beside it when there are 1–2 hunts.</li><li>“Not enough data” replaces the numbers rather than showing a zero.</li></ul>
+</section>
+
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Step card</h2>
+<article style="background: var(--bg); border: 2px solid var(--gold); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; line-height: 16px; letter-spacing: 0.08em; font-weight: 700; color: var(--muted)">STEP 1</span>
+<b style="font-size: 22px; line-height: 28px">Go to Cobra Bastion</b>
+<span style="color: var(--muted); font-size: 14px">Kills here count for your bounty: Cobra Assassin</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button style="min-height: 52px; border-radius: 12px; border: 0; background: var(--gold); color: var(--on-gold); font: inherit; font-size: 17px; font-weight: 700">Free</button>
+<button style="min-height: 52px; border-radius: 12px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 17px">Taken</button>
+</div>
+</article>
+<article style="background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<span><span style="font-size: 13px; color: var(--muted)">Taken? →</span><br><b>Ruins of Nuur</b></span>
+<button style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit">Taken</button>
+</article>
+<article style="border: 1px dashed var(--line2); border-radius: 14px; padding: 12px 14px"><span style="font-size: 13px; color: var(--muted)">Taken? →</span><br><b>Reroll and re-plan</b></article>
+<ul style="margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 20px"><li>Step 1: gold 2px border, title, bounty line, two stats, source badge, Free + Taken, Why? link that expands in place.</li><li>Fallback: compact, own Taken button. End of chain: dashed, no buttons.</li><li>Hunting now: the same card with a green border; shows the “pick offer A now” prompt while choosing offers.</li></ul>
+</section>
+
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Buttons</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<button style="min-height: 52px; padding: 0 20px; border-radius: 12px; border: 0; background: var(--gold); color: var(--on-gold); font: inherit; font-weight: 700">Primary</button>
+<button style="min-height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700">Solid</button>
+<button style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit">Secondary</button>
+<button style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px dashed var(--line2); background: transparent; color: var(--text); font: inherit">+ Add</button>
+<button style="min-height: 44px; padding: 0; border: 0; background: none; color: var(--accent-text); font: inherit; text-decoration: underline">Link</button>
+<button aria-label="Characters and settings" style="width: 48px; height: 48px; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text)"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg></button>
+</div>
+<ul style="margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 20px"><li>Primary (gold) is only for your next move: Free, Save hunt, Show my plan, Picked A. One per screen.</li><li>Solid closes or confirms an editor (Done, Back to plan). Secondary for everything else. Dashed adds something new.</li><li>Icon-only buttons always carry an aria-label.</li></ul>
+</section>
+
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Segmented, switch, stepper</h2>
+<div role="group" aria-label="Sort by" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden; max-width: 360px">
+<button aria-pressed="true" style="min-height: 44px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700">Score</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; border-left: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit">Exp/h</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; border-left: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit">Profit/h</button>
+</div>
+<div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap">
+<button role="switch" aria-checked="true" aria-label="Example switch on" style="width: 56px; height: 32px; border-radius: 16px; border: 0; background: var(--yours); position: relative"><span style="position: absolute; top: 4px; left: 28px; width: 24px; height: 24px; border-radius: 12px; background: #1a1408"></span></button>
+<button role="switch" aria-checked="false" aria-label="Example switch off" style="width: 56px; height: 32px; border-radius: 16px; border: 1px solid var(--line2); background: var(--surface2); position: relative"><span style="position: absolute; top: 3px; left: 4px; width: 24px; height: 24px; border-radius: 12px; background: var(--muted)"></span></button>
+<div style="display: flex; align-items: center; gap: 4px">
+<button aria-label="One fewer token" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 20px">−</button>
+<output style="min-width: 32px; text-align: center; font-weight: 700; font-size: 18px">4</output>
+<button aria-label="One more token" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 20px">+</button>
+</div>
+</div>
+<ul style="margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 20px"><li>Segmented: one choice, aria-pressed on each button, selected is filled with --text. Arrow keys move between options.</li><li>Switch: role=switch, knob position plus color. Stepper: tokens 0–10, output is aria-live.</li></ul>
+</section>
+
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Goal mixer</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 20px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 14px">Exp</button>
+<button aria-pressed="true" style="min-height: 40px; padding: 0 12px; border-radius: 20px; border: 1px solid var(--text); background: var(--text); color: var(--bg); font: inherit; font-size: 14px; font-weight: 700">Mostly exp, some profit</button>
+<button aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 20px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 14px">Balanced</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<b>Exp</b>
+<div role="group" aria-label="Exp weight" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden; max-width: 360px">
+<button aria-pressed="false" style="min-height: 44px; border: 0; background: transparent; color: var(--text); font: inherit">0</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; background: transparent; color: var(--text); font: inherit">1</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; background: transparent; color: var(--text); font: inherit">2</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; background: transparent; color: var(--text); font: inherit">3</button>
+<button aria-pressed="true" style="min-height: 44px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700">4</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; background: transparent; color: var(--text); font: inherit">5</button>
+</div>
+</div>
+<div aria-hidden="true" style="display: flex; height: 14px; border-radius: 7px; overflow: hidden; max-width: 360px"><span style="width: 67%; background: var(--accent); border-right: 2px solid var(--surface)"></span><span style="width: 33%; background: var(--gold)"></span></div>
+<b>Exp 67% · Profit 33%</b>
+<ul style="margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 20px"><li>Presets set all four weights at once; editing any weight shows “Custom mix” on the chip.</li><li>Four rows (Exp, Profit, Charm points, Bounty points), each 0–5. The bar is decorative; the text line carries the split.</li></ul>
+</section>
+
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Offer card and active bounty</h2>
+<div style="border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; background: var(--bg)">
+<div style="display: flex; align-items: center; justify-content: space-between"><span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 8px; background: var(--surface2); display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-weight: 700">B</span><b>Offer B</b></span><button style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit">Picked</button></div>
+<div style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px"><input aria-label="Offer B creature" value="Gorerilla" readonly style="min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 16px"><input aria-label="Offer B kills" value="400" readonly style="min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 16px"></div>
+<div role="group" aria-label="Kind" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden"><button aria-pressed="false" style="min-height: 44px; border: 0; background: transparent; color: var(--text); font: inherit">Normal</button><button aria-pressed="true" style="min-height: 44px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700">Silver</button><button aria-pressed="false" style="min-height: 44px; border: 0; background: transparent; color: var(--text); font: inherit">Gold</button></div>
+</div>
+<div style="border: 2px solid var(--gold); border-radius: 12px; padding: 12px; background: var(--bg)"><span style="font-size: 12px; letter-spacing: 0.08em; font-weight: 700; color: var(--muted)">ACTIVE BOUNTY</span><br><b>Cobra Assassin</b> · 450 kills · Normal</div>
+<ul style="margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 20px"><li>Offer: letter tile, creature (suggestions after 2 letters), kills (number pad), kind, Picked. Enter moves to the next field.</li><li>Active bounty: gold border, same fields, plus Finished it (+1) and Rerolled (−1, drops it).</li></ul>
+</section>
+
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Inline editor (instead of dialogs)</h2>
+<div style="border: 2px solid var(--accent); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: var(--bg)">
+<b style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 26px">Today’s boosts</b>
+<span style="color: var(--muted); font-size: 14px">Short line on what this input changes.</span>
+<div style="height: 44px; border-radius: 10px; border: 1px dashed var(--line2); display: grid; place-items: center; color: var(--muted); font-size: 13px">fields</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px"><span style="font-size: 14px"><span style="color: var(--muted)">Plan:</span> <b>Go to Cobra Bastion</b></span><button style="min-height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700">Done</button></div>
+</div>
+<div style="border: 1px solid var(--line2); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--bg)">
+<b>Delete Alt RP and its 4 logged hunts?</b>
+<span style="color: var(--muted); font-size: 14px">This can’t be undone. Download a backup first if you might want them.</span>
+<div style="display: flex; gap: 8px"><button style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit">Keep</button><button style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 2px solid var(--text); background: transparent; color: var(--text); font: inherit; font-weight: 700">Delete</button></div>
+</div>
+<ul style="margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 20px"><li>No modal pop-ups. Editors expand in the page; Log a clean hunt and Characters are full pages with a Back link.</li><li>Every editor ends with a live “Plan:” line and Done. Destructive actions confirm inline, in place of the button.</li></ul>
+</section>
+
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Tier row and tab bar</h2>
+<div style="display: flex; gap: 8px"><span aria-label="Tier S" style="flex: none; width: 48px; border-radius: 10px; background: #ff8a80; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; font-weight: 700">S</span><div style="flex: 1; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: 10px; background: var(--bg)"><a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Cobra Assassin</a><a href="#" style="min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 8px; background: var(--surface2); color: var(--text); text-decoration: none; font-size: 14px">Choking Fear</a></div></div>
+<nav aria-label="Example tab bar" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); padding: 6px">
+<a href="#" aria-current="page" style="min-height: 56px; display: grid; place-items: center; border-radius: 10px; background: var(--surface2); color: var(--text); font-size: 12px; font-weight: 700; text-decoration: none">Plan</a>
+<a href="#" style="min-height: 56px; display: grid; place-items: center; border-radius: 10px; color: var(--muted); font-size: 12px; text-decoration: none">Spots</a>
+<a href="#" style="min-height: 56px; display: grid; place-items: center; border-radius: 10px; color: var(--muted); font-size: 12px; text-decoration: none">Creatures</a>
+<a href="#" style="min-height: 56px; display: grid; place-items: center; border-radius: 10px; color: var(--muted); font-size: 12px; text-decoration: none">Weekly</a>
+</nav>
+<ul style="margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 20px"><li>Creature chips in a tier are links to the creature panel; 36 px tall inside a 44 px row hit area.</li><li>Tab bar on phone (icon + label, aria-current on the active one); on desktop the same four links sit in the header.</li></ul>
+</section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1440,"height":2200}}'>
+class Component extends DCLogic {
+renderVals() {
+return { cls: 'hp-' + (this.props.theme ?? 'dark') };
+}
+}
+</script>
+</body>
+</html>

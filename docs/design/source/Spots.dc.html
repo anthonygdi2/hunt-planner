@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spots, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9c4ff}a:hover{color:#d3e0ff}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.hp-dark ::placeholder,.hp-light ::placeholder{color:var(--muted);opacity:1}
+</style>
+</helmet>
+<div class="{{cls}}" style="width: 390px; min-height: 1750px; box-sizing: border-box; background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--surface)">
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 22px; line-height: 28px">Spots</h1>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">Main EK · EK 615</span>
+</header>
+<main style="padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Search<input type="search" placeholder="Spot or creature" style="min-height: 48px; box-sizing: border-box; width: 100%; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 16px"></label>
+<div role="group" aria-label="Sort by" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden">
+<button aria-pressed="true" style="min-height: 44px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer">Score</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; border-left: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Exp/h</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; border-left: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Profit/h</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 20px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 14px; cursor: pointer">All vocations</button>
+<button aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 20px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 14px; cursor: pointer">Any level</button>
+<button aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 20px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 14px; cursor: pointer">Hide taken</button>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--muted)">291 spots. Score is the hourly rate for your goal mix, with your bounty and weekly tasks counted in.</p>
+<a href="#" style="min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; border: 1px dashed var(--line2); color: var(--text); text-decoration: none"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Log a clean hunt at a new spot</a>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li><a href="#" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none">
+<span style="display: flex; justify-content: space-between; gap: 8px"><b style="font-size: 16px">Cobra Bastion</b><span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 18px">96</span></span>
+<span>7.8kk exp/h · 300k profit/h</span>
+<span style="font-size: 14px; line-height: 19px; color: var(--muted)">Cobra Assassin (your bounty), Cobra Scout, Cobra Vizier</span>
+<span style="display: flex; flex-wrap: wrap; gap: 6px"><span style="padding: 2px 8px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent-text); font-size: 12px; line-height: 17px">Reference, adjusted to you</span></span>
+</a></li>
+<li><a href="#" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none">
+<span style="display: flex; justify-content: space-between; gap: 8px"><span style="display: flex; flex-direction: column"><b style="font-size: 16px">Cobra Bastion · 2-box lure</b><span style="font-size: 13px; line-height: 18px; color: var(--muted)">Your variation of Cobra Bastion</span></span><span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 18px">93</span></span>
+<span>8.1kk exp/h · 240k profit/h</span>
+<span style="display: flex; flex-wrap: wrap; gap: 6px"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--yours); color: var(--yours); font-size: 12px; line-height: 17px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"></path></svg>Yours · 1 hunt</span><span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; line-height: 17px; color: var(--gold-text)"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"></path><path d="M12 10v5"></path></svg>Low sample</span></span>
+</a></li>
+<li><a href="#" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none">
+<span style="display: flex; justify-content: space-between; gap: 8px"><b style="font-size: 16px">Ruins of Nuur</b><span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 18px">91</span></span>
+<span>6.9kk exp/h · 450k profit/h</span>
+<span style="display: flex; flex-wrap: wrap; gap: 6px"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--yours); color: var(--yours); font-size: 12px; line-height: 17px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"></path></svg>Yours · 9 hunts</span></span>
+</a></li>
+<li><a href="#" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px dashed var(--line2); color: var(--text); text-decoration: none">
+<span style="display: flex; justify-content: space-between; gap: 8px"><b style="font-size: 16px">Asura Palace</b><span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 18px; color: var(--muted)">89</span></span>
+<span style="color: var(--muted)">6.4kk exp/h · 520k profit/h</span>
+<span style="display: flex; flex-wrap: wrap; gap: 6px">
+<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--surface2); border: 1px solid var(--line2); font-size: 12px; line-height: 17px; font-weight: 700"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 19L19 5"></path><circle cx="12" cy="12" r="9"></circle></svg>Taken · clears in 25 min</span>
+<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--yours); color: var(--yours); font-size: 12px; line-height: 17px">Yours · 2 hunts</span>
+<span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; line-height: 17px; color: var(--gold-text)"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"></path><path d="M12 10v5"></path></svg>Low sample</span>
+</span>
+</a></li>
+<li><a href="#" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none">
+<span style="display: flex; justify-content: space-between; gap: 8px"><b style="font-size: 16px">Upper Roshamuul</b><span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 18px">87</span></span>
+<span>9.35kk exp/h · 1.72kk profit/h</span>
+<span style="font-size: 14px; line-height: 19px; color: var(--muted)">Choking Fear, Retching Horror, Silencer, Frazzlemaw</span>
+<span style="display: flex; flex-wrap: wrap; gap: 6px"><span style="padding: 2px 8px; border-radius: 999px; border: 1px dashed var(--other); color: var(--other); font-size: 12px; line-height: 17px">Other vocation · shown as recorded</span></span>
+</a></li>
+<li><a href="#" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none">
+<span style="display: flex; justify-content: space-between; gap: 8px"><b style="font-size: 16px">Norcferatu Fortress</b><span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 18px">80</span></span>
+<span>9kk exp/h · 1.18kk profit/h</span>
+<span style="display: flex; flex-wrap: wrap; gap: 6px"><span style="padding: 2px 8px; border-radius: 999px; border: 1px dotted var(--line2); color: var(--muted); font-size: 12px; line-height: 17px">Older · before the rebalance</span></span>
+</a></li>
+<li><a href="#" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none">
+<span style="display: flex; justify-content: space-between; gap: 8px"><b style="font-size: 16px">Nimmersatt’s Dragons Main Floor -7</b><span style="font-size: 14px; color: var(--muted)">No score</span></span>
+<span style="color: var(--muted); font-style: italic">Not enough data for your vocation</span>
+<span style="font-size: 14px; line-height: 19px; color: var(--muted)">Dragolisk, Wardragon, Mega Dragon</span>
+</a></li>
+</ul>
+<details style="border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; background: var(--surface)">
+<summary style="min-height: 28px; cursor: pointer; font-weight: 700">What the badges mean</summary>
+<ul style="margin: 10px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 20px; color: var(--muted)">
+<li><b style="color: var(--yours)">Yours</b>: from your own logged hunts.</li>
+<li><b style="color: var(--accent-text)">Reference, adjusted to you</b>: a published hunt, scaled by how your logged hunts compare.</li>
+<li><b style="color: var(--text)">Reference</b>: a published hunt as recorded, likely more than you’ll get.</li>
+<li><b style="color: var(--other)">Other vocation</b>: another vocation’s hunt, used only when nothing better exists.</li>
+<li><b style="color: var(--text)">Older</b>: recorded before the last rebalance.</li>
+<li><b style="color: var(--gold-text)">Low sample</b>: one or two hunts, so treat it as a rough guide.</li>
+</ul>
+</details>
+</main>
+<nav aria-label="Main" style="margin-top: auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; border-top: 1px solid var(--line); background: var(--surface); padding: 6px 8px 12px">
+<a href="#" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; color: var(--muted); font-size: 12px; line-height: 16px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="M4 6h1M4 12h1M4 18h1"></path></svg>Plan</a>
+<a href="#" aria-current="page" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; background: var(--surface2); color: var(--text); font-size: 12px; line-height: 16px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>Spots</a>
+<a href="#" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; color: var(--muted); font-size: 12px; line-height: 16px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 10h12M4 15h8M4 20h4"></path></svg>Creatures</a>
+<a href="#" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; color: var(--muted); font-size: 12px; line-height: 16px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Weekly</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1750}}'>
+class Component extends DCLogic {
+renderVals() {
+return { cls: 'hp-' + (this.props.theme ?? 'dark') };
+}
+}
+</script>
+</body>
+</html>

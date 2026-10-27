@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Characters and settings, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9c4ff}a:hover{color:#d3e0ff}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{cls}}" style="width: 390px; min-height: 1700px; box-sizing: border-box; background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--surface)">
+<a href="#" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; color: var(--text); text-decoration: none"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>Plan</a>
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 24px">Characters and settings</h1>
+</header>
+<main style="padding: 16px; display: flex; flex-direction: column; gap: 22px">
+<section aria-labelledby="ch-h" style="display: flex; flex-direction: column; gap: 10px">
+<h2 id="ch-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">Characters</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button aria-pressed="true" style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 2px solid var(--gold); background: var(--surface2); color: var(--text); font: inherit; font-weight: 700; cursor: pointer">Main EK · 615</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Alt RP · 420</button>
+<button style="min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px dashed var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">+ Add</button>
+</div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Name (optional)<input value="Main EK" readonly style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+<div style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Vocation<select style="min-height: 44px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 16px"><option>Elite Knight</option><option>Royal Paladin</option><option>Elder Druid</option><option>Master Sorcerer</option><option>Exalted Monk</option></select></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Level<input value="615" readonly inputmode="numeric" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+</div>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Talisman bestiary bonus (%)<input value="0" readonly inputmode="numeric" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+<button style="align-self: flex-start; min-height: 44px; padding: 0; border: 0; background: none; color: var(--accent-text); font: inherit; text-decoration: underline; cursor: pointer">Delete this character…</button>
+</div>
+</section>
+<section aria-labelledby="src-h" style="display: flex; flex-direction: column; gap: 10px">
+<h2 id="src-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">Numbers from</h2>
+<div role="group" aria-label="Numbers from" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden">
+<button aria-pressed="false" style="min-height: 48px; border: 0; background: transparent; color: var(--text); font: inherit; font-size: 14px; cursor: pointer">Mine only</button>
+<button aria-pressed="false" style="min-height: 48px; border: 0; border-left: 1px solid var(--line2); border-right: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 14px; cursor: pointer">+ Reference</button>
+<button aria-pressed="true" style="min-height: 48px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">Everything</button>
+</div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line)">
+<span><b>Your logged hunts</b><br><span style="font-size: 13px; line-height: 18px; color: var(--muted)">Always used first.</span></span>
+<span style="font-size: 13px; color: var(--muted)">Always on</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line)">
+<span><b>Reference hunts</b><br><span style="font-size: 13px; line-height: 18px; color: var(--muted)">Published hunts for spots you haven’t logged. Adjusted to you once you’ve logged 1+ reference spot.</span></span>
+<button role="switch" aria-checked="true" aria-label="Reference hunts" style="flex: none; width: 56px; height: 32px; border-radius: 16px; border: 0; background: var(--yours); position: relative; cursor: pointer"><span style="position: absolute; top: 4px; left: 28px; width: 24px; height: 24px; border-radius: 12px; background: #1a1408"></span></button>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line)">
+<span><b>Other vocations’ hunts</b><br><span style="font-size: 13px; line-height: 18px; color: var(--muted)">Only where nothing better exists. Badged “Other vocation”.</span></span>
+<button role="switch" aria-checked="true" aria-label="Other vocations’ hunts" style="flex: none; width: 56px; height: 32px; border-radius: 16px; border: 0; background: var(--yours); position: relative; cursor: pointer"><span style="position: absolute; top: 4px; left: 28px; width: 24px; height: 24px; border-radius: 12px; background: #1a1408"></span></button>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px">
+<span><b>Older hunts</b><br><span style="font-size: 13px; line-height: 18px; color: var(--muted)">Recorded before the last rebalance. Badged “Older”.</span></span>
+<button role="switch" aria-checked="false" aria-label="Older hunts" style="flex: none; width: 56px; height: 32px; border-radius: 16px; border: 1px solid var(--line2); background: var(--surface2); position: relative; cursor: pointer"><span style="position: absolute; top: 3px; left: 4px; width: 24px; height: 24px; border-radius: 12px; background: var(--muted)"></span></button>
+</div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--muted)">Adjusting to you: 3 of your logged spots have a reference to compare against. Elite Knight references are scaled; other vocations are shown as recorded until you log one of their spots.</p>
+</section>
+<section aria-labelledby="tk-h" style="display: flex; flex-direction: column; gap: 10px">
+<h2 id="tk-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">Spots and world</h2>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">World (optional)<input placeholder="e.g. Antica" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">A Taken mark clears after<select style="min-height: 44px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 16px"><option>45 minutes</option><option>30 minutes</option><option>1 hour</option><option>2 hours</option></select></label>
+</div>
+</section>
+<section aria-labelledby="adv-h" style="display: flex; flex-direction: column; gap: 10px">
+<h2 id="adv-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">Advanced</h2>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<span><b>Advanced mode</b><br><span style="font-size: 13px; line-height: 18px; color: var(--muted)">Type your own numbers for a creature or spot, set raid counts, and see the full score breakdown in Why?</span></span>
+<button role="switch" aria-checked="false" aria-label="Advanced mode" style="flex: none; width: 56px; height: 32px; border-radius: 16px; border: 1px solid var(--line2); background: var(--surface2); position: relative; cursor: pointer"><span style="position: absolute; top: 3px; left: 4px; width: 24px; height: 24px; border-radius: 12px; background: var(--muted)"></span></button>
+</div>
+</section>
+<section aria-labelledby="ap-h" style="display: flex; flex-direction: column; gap: 10px">
+<h2 id="ap-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">Appearance</h2>
+<div role="group" aria-label="Theme" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden">
+<button aria-pressed="true" style="min-height: 44px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer">System</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; border-left: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Dark</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; border-left: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Light</button>
+</div>
+</section>
+<section aria-labelledby="bk-h" style="display: flex; flex-direction: column; gap: 10px">
+<h2 id="bk-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted)">Backup</h2>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">Your data stays in this browser. Download a backup to keep a copy or move it to another device.</p>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button style="min-height: 48px; border-radius: 12px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Download backup</button>
+<button style="min-height: 48px; border-radius: 12px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Restore</button>
+</div>
+</section>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--muted)">Creature data from <a href="#">TibiaWiki</a> (CC BY-SA). Reference hunts from Kusner’s videos via <a href="#">TibiaPal</a>. Classic view is now the Creatures tab.</p>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1700}}'>
+class Component extends DCLogic {
+renderVals() {
+return { cls: 'hp-' + (this.props.theme ?? 'dark') };
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+  /* Design tokens (docs/design/TOKENS.md). Themes are classes on the app root: hp-dark, hp-light, and hp-system,
+     which follows the device. */
+  .hp-dark, .hp-system {
+    --bg: #17191c; --surface: #212429; --surface2: #2c3036; --line: #3a3f47; --line2: #78808b;
+    --text: #ecebe8; --muted: #b4b8bf; --accent: #8fb3ff; --accent-text: #a9c4ff;
+    --gold: #e8b84a; --gold-text: #e8b84a; --on-gold: #1a1408; --yours: #7fd19b; --other: #c9a7ff; --focus: #8fb3ff;
+    --tier-s: #ff8a80; --tier-a: #ffb74d; --tier-b: #ffe082; --tier-c: #a5d6a7; --tier-d: #90caf9;
+    color-scheme: dark;
+  }
+  .hp-light {
+    --bg: #f4f2ee; --surface: #ffffff; --surface2: #ece8e1; --line: #d9d5cc; --line2: #857f73;
+    --text: #1c1b19; --muted: #55514a; --accent: #2f5fc4; --accent-text: #2a55b0;
+    --gold: #c99a2e; --gold-text: #7d5a00; --on-gold: #1a1408; --yours: #19683a; --other: #6b3fb8; --focus: #2f5fc4;
+    --tier-s: #f28b82; --tier-a: #f6b26b; --tier-b: #ffd966; --tier-c: #93c47d; --tier-d: #8ab4f8;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: light) {
+    .hp-system {
+      --bg: #f4f2ee; --surface: #ffffff; --surface2: #ece8e1; --line: #d9d5cc; --line2: #857f73;
+      --text: #1c1b19; --muted: #55514a; --accent: #2f5fc4; --accent-text: #2a55b0;
+      --gold: #c99a2e; --gold-text: #7d5a00; --on-gold: #1a1408; --yours: #19683a; --other: #6b3fb8; --focus: #2f5fc4;
+      --tier-s: #f28b82; --tier-a: #f6b26b; --tier-b: #ffd966; --tier-c: #93c47d; --tier-d: #8ab4f8;
+      color-scheme: light;
+    }
+  }
+  :root {
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+    --r-tile: 8px; --r-input: 10px; --r-button: 12px; --r-card: 14px; --r-editor: 16px; --r-step: 18px;
+    --font-title: "Pixelify Sans", system-ui, sans-serif;
+    --font-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }

@@ -1,0 +1,133 @@
+{
+  "app": "bounty-task-tier-list",
+  "version": 2,
+  "exportedAt": "2026-10-21T18:00:00.000Z",
+  "creatures": {
+    "dragon-lord": { "name": "Dragon Lord", "minLevel": { "Elite Knight": 700 } },
+    "frazzlemaw": { "name": "Frazzlemaw", "minLevel": { "Royal Paladin": 350, "Elite Knight": 400 } },
+    "vexclaw": { "name": "Vexclaw", "minLevel": { "Elite Knight": 500 } }
+  },
+  "characters": {
+    "ek": {
+      "profile": {
+        "name": "Test Knight", "vocation": "Elite Knight", "level": 615, "createdAt": "2026-09-01T10:00:00.000Z",
+        "weights": { "xp": 10, "profit": 0, "charm": 0, "bounty": 0 },
+        "bestiaryBonus": 50, "ref": "rp", "xpMode": "raw",
+        "slots": { "preferred": ["cobra-assassin", "retching-horror"], "unwanted": ["vexclaw"] },
+        "board": { "offers": [
+          { "name": "Cobra Assassin", "kills": 450, "exp": null, "kind": "normal" },
+          { "name": "Gorerilla", "kills": 400, "exp": 1627800, "kind": "silver" },
+          { "name": "Retching Horror", "kills": 520, "exp": null, "kind": "gold" }
+        ] },
+        "reroll": { "left": 4, "hpd": 3, "unknown": "average" },
+        "weekly": { "week": "2026-10-19", "diff": "master", "exp": null, "tasks": [
+          { "name": "Silencer", "kills": 600 },
+          { "name": "Choking Fear", "kills": 1000, "extra": 40 },
+          { "name": "Retching Horror", "kills": 300 },
+          { "name": "Dragon Lord", "kills": 200 }
+        ] },
+        "rewardObs": { "master": [
+          { "name": "Cobra Assassin", "kills": 450, "kind": "normal", "level": 615, "at": "2026-10-20T18:00:00.000Z" },
+          { "name": "Gorerilla", "kills": 400, "kind": "silver", "level": 615, "at": "2026-10-20T18:00:00.000Z" },
+          { "name": "Retching Horror", "kills": 520, "kind": "gold", "level": 615, "at": "2026-10-20T18:00:00.000Z" }
+        ] },
+        "chalRates": { "gorerilla": [
+          { "kills": 400, "exp": 1627800, "kind": "silver", "perKill": 2034.75, "level": 615, "at": "2026-10-20T18:00:00.000Z" }
+        ] }
+      },
+      "entries": {
+        "cobra-assassin": { "name": "Cobra Assassin", "notes": "Fixture note: pull two waves at a time.", "wardenDone": true, "updatedAt": "2026-10-10T10:00:00.000Z" },
+        "cobra-vizier": { "name": "Cobra Vizier", "bestiaryDone": true, "updatedAt": "2026-10-10T10:00:00.000Z" },
+        "choking-fear": { "name": "Choking Fear", "pinSpot": "Test Hideout", "updatedAt": "2026-10-19T21:00:00.000Z" },
+        "gorerilla": { "name": "Gorerilla", "kph": 150, "xph": 3500000, "pph": 200000, "numsAt": "2026-10-01T10:00:00.000Z", "updatedAt": "2026-10-01T10:00:00.000Z" },
+        "hellflayer": { "name": "Hellflayer", "kph": 90, "numsAt": "2026-06-01T10:00:00.000Z", "updatedAt": "2026-06-01T10:00:00.000Z" },
+        "vexclaw": { "name": "Vexclaw", "rating": "X", "updatedAt": "2026-10-02T10:00:00.000Z" }
+      },
+      "sessions": {
+        "e1": { "spot": "Cobra Bastion -1", "task": "cobra-assassin", "start": "2026-10-21T12:30:00.000Z", "end": "2026-10-21T13:30:00.000Z", "hours": 1,
+          "rawXp": 4300000, "xp": 6450000, "loot": 2100000, "supplies": 1250000, "balance": 850000, "breaks": false, "level": 615,
+          "kills": [{ "slug": "cobra-assassin", "name": "Cobra Assassin", "count": 300 }, { "slug": "cobra-vizier", "name": "Cobra Vizier", "count": 160 },
+            { "slug": "cobra-scout", "name": "Cobra Scout", "count": 130 }],
+          "raidsBy": { "Cobra Assassin": 1 }, "createdAt": "2026-10-21T13:31:00.000Z" },
+        "e2": { "spot": "Cobra Bastion -1", "task": null, "start": "2026-10-14T19:00:00.000Z", "end": "2026-10-14T20:30:00.000Z", "hours": 1.5,
+          "rawXp": 6000000, "xp": 9000000, "loot": 2700000, "supplies": 1900000, "balance": 800000, "breaks": true, "level": 615,
+          "kills": [{ "slug": "cobra-assassin", "name": "Cobra Assassin", "count": 650 }, { "slug": "cobra-vizier", "name": "Cobra Vizier", "count": 210 },
+            { "slug": "cobra-scout", "name": "Cobra Scout", "count": 160 }], "createdAt": "2026-10-14T20:31:00.000Z" },
+        "e3": { "spot": "Nightmare Isles", "task": null, "start": "2026-10-20T19:00:00.000Z", "end": "2026-10-20T20:00:00.000Z", "hours": 1,
+          "rawXp": 4100000, "xp": 6150000, "loot": 1300000, "supplies": 900000, "balance": 400000, "breaks": false, "level": 615,
+          "kills": [{ "slug": "retching-horror", "name": "Retching Horror", "count": 480 }, { "slug": "choking-fear", "name": "Choking Fear", "count": 400 }],
+          "raidsBy": {}, "createdAt": "2026-10-20T20:01:00.000Z" },
+        "e4": { "spot": "Test Hideout", "task": null, "start": "2026-10-19T20:00:00.000Z", "end": "2026-10-19T20:45:00.000Z", "hours": 0.75,
+          "rawXp": 2600000, "xp": 3900000, "loot": 900000, "supplies": 700000, "balance": 200000, "breaks": false, "level": 615,
+          "kills": [{ "slug": "choking-fear", "name": "Choking Fear", "count": 260 }, { "slug": "silencer", "name": "Silencer", "count": 210 },
+            { "slug": "retching-horror", "name": "Retching Horror", "count": 90 }], "createdAt": "2026-10-19T20:46:00.000Z" },
+        "e5": { "spot": "Warzone 2", "task": null, "start": "2026-05-01T18:00:00.000Z", "end": "2026-05-01T19:00:00.000Z", "hours": 1,
+          "rawXp": 4000000, "xp": 6000000, "loot": 1500000, "supplies": 1100000, "balance": 400000, "breaks": false, "level": 598,
+          "kills": [{ "slug": "magma-crawler", "name": "Magma Crawler", "count": 250 }, { "slug": "lost-berserker", "name": "Lost Berserker", "count": 210 },
+            { "slug": "weeper", "name": "Weeper", "count": 200 }, { "slug": "infected-weeper", "name": "Infected Weeper", "count": 20 }], "createdAt": "2026-05-01T19:01:00.000Z" },
+        "e6": { "spot": "Nightmare Isles", "task": "retching-horror", "start": "2026-10-18T18:00:00.000Z", "end": "2026-10-18T19:30:00.000Z", "hours": 1.5,
+          "rawXp": 5500000, "xp": 8250000, "loot": 1700000, "supplies": 1300000, "balance": 400000, "breaks": true, "level": 615,
+          "kills": [{ "slug": "retching-horror", "name": "Retching Horror", "count": 600 }, { "slug": "choking-fear", "name": "Choking Fear", "count": 450 }],
+          "createdAt": "2026-10-18T19:31:00.000Z" },
+        "e7": { "spot": "Bastion lure", "spotId": "my-bastion-lure", "task": "cobra-assassin", "start": "2026-10-22T18:00:00.000Z", "end": "2026-10-22T19:00:00.000Z", "hours": 1,
+          "rawXp": 5200000, "xp": 7800000, "loot": 2400000, "supplies": 1500000, "balance": 900000, "level": 615,
+          "kills": [{ "slug": "cobra-assassin", "name": "Cobra Assassin", "count": 520 }, { "slug": "cobra-scout", "name": "Cobra Scout", "count": 90 }],
+          "createdAt": "2026-10-22T19:01:00.000Z" },
+        "e8": { "spot": "Knight Den", "spotId": "my-knight-den", "task": null, "start": "2026-10-23T18:00:00.000Z", "end": "2026-10-23T19:00:00.000Z", "hours": 1,
+          "rawXp": 3800000, "xp": 5700000, "loot": 1100000, "supplies": 800000, "balance": 300000, "level": 615,
+          "kills": [{ "slug": "silencer", "name": "Silencer", "count": 380 }, { "slug": "choking-fear", "name": "Choking Fear", "count": 120 }],
+          "createdAt": "2026-10-23T19:01:00.000Z" }
+      },
+      "spots": {
+        "my-bastion-lure": { "name": "Bastion lure", "parentId": "cobra-bastion-1", "note": "Lure two boxes", "createdAt": "2026-10-22T19:01:00.000Z" },
+        "my-knight-den": { "name": "Knight Den", "parentId": null, "note": null, "createdAt": "2026-10-23T19:01:00.000Z" }
+      },
+      "planner": {
+        "state": {
+          "fixedHours": null, "diff": "master",
+          "held": { "slug": "cobra-assassin", "kills": 450, "done": 30, "kind": "normal", "exp": null, "i": 0, "since": "2026-10-21T12:00:00.000Z" },
+          "today": { "boosted": "silencer", "boostedDay": "2026-10-21", "prey": [{ "slug": "choking-fear", "kind": "xp", "pct": 25 }], "event": 0 },
+          "lens": {}, "active": null, "travel": { "nightmare-isles": 12 }, "world": "Testera"
+        },
+        "marks": {
+          "nightmare-isles": { "state": "taken", "at": "2026-10-21T17:40:00.000Z", "world": "Testera" },
+          "test-hideout": { "state": "free", "at": "2026-10-21T17:30:00.000Z", "world": "Testera" },
+          "warzone-2": { "state": "taken", "at": "2026-10-21T15:00:00.000Z", "world": "Testera" }
+        },
+        "occupancy": {
+          "cobra-bastion-1": { "counts": { "testera|18": [2, 1], "testera|3": [0, 2] } },
+          "nightmare-isles": { "counts": { "testera|17": [0, 3] } },
+          "test-hideout": { "counts": { "testera|17": [1, 0] } }
+        }
+      }
+    },
+    "rp": {
+      "profile": {
+        "name": "Test Paladin", "vocation": "Royal Paladin", "level": 300, "createdAt": "2026-09-15T10:00:00.000Z",
+        "weights": { "xp": 5, "profit": 5, "charm": 0, "bounty": 0 },
+        "bestiaryBonus": 0, "ref": null, "xpMode": "xp", "refOtherOff": true,
+        "board": { "offers": [
+          { "name": "Frazzlemaw", "kills": 280, "exp": null, "kind": "normal" },
+          { "name": "Crusader", "kills": 350, "exp": null, "kind": "silver" },
+          { "name": "", "kills": null, "exp": null, "kind": "normal" }
+        ] }
+      },
+      "entries": {
+        "guzzlemaw": { "name": "Guzzlemaw", "rating": "X", "updatedAt": "2026-10-12T10:00:00.000Z" },
+        "headwalker": { "name": "Headwalker", "notes": "Hits hard.", "updatedAt": "2026-10-12T10:00:00.000Z" }
+      },
+      "sessions": {
+        "r1": { "spot": "Roshamuul West", "task": "frazzlemaw", "start": "2026-10-20T18:00:00.000Z", "end": "2026-10-20T19:00:00.000Z", "hours": 1,
+          "rawXp": 2300000, "xp": 3450000, "loot": 900000, "supplies": 650000, "balance": 250000, "breaks": false, "level": 300,
+          "kills": [{ "slug": "frazzlemaw", "name": "Frazzlemaw", "count": 420 }, { "slug": "silencer", "name": "Silencer", "count": 330 },
+            { "slug": "guzzlemaw", "name": "Guzzlemaw", "count": 150 }], "createdAt": "2026-10-20T19:01:00.000Z" },
+        "r2": { "spot": "Paladin Test Cave", "task": null, "start": "2026-10-16T18:00:00.000Z", "end": "2026-10-16T19:00:00.000Z", "hours": 1,
+          "rawXp": 2000000, "xp": 3000000, "loot": 500000, "supplies": 450000, "balance": 50000, "breaks": false, "level": 300,
+          "kills": [{ "slug": "crusader", "name": "Crusader", "count": 210 }, { "slug": "headwalker", "name": "Headwalker", "count": 190 }], "createdAt": "2026-10-16T19:01:00.000Z" },
+        "r3": { "spot": "Paladin Test Cave", "task": null, "start": "2026-10-17T18:00:00.000Z", "end": "2026-10-17T18:45:00.000Z", "hours": 0.75,
+          "rawXp": 1300000, "xp": 1950000, "loot": 300000, "supplies": 320000, "balance": -20000, "breaks": true, "level": 300,
+          "kills": [{ "slug": "crusader", "name": "Crusader", "count": 140 }, { "slug": "headwalker", "name": "Headwalker", "count": 120 }], "createdAt": "2026-10-17T18:46:00.000Z" }
+      }
+    }
+  }
+}

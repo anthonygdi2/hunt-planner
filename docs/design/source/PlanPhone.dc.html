@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#8fb3ff}a:hover{color:#c3d5ff}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.hp-dark ::placeholder,.hp-light ::placeholder{color:var(--muted);opacity:1}
+</style>
+</helmet>
+<div class="{{cls}}" style="width: 390px; min-height: 1600px; box-sizing: border-box; background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--surface)">
+<span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 24px; font-weight: 700">Hunt planner</span>
+<div style="display: flex; align-items: center; gap: 8px">
+<button aria-label="Character: Main EK, Elite Knight level 615. Change character" style="min-height: 48px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 4px 12px; border-radius: 12px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; text-align: left; cursor: pointer"><span style="font-weight: 700; font-size: 15px; line-height: 19px">Main EK ▾</span><span style="font-size: 13px; line-height: 17px; color: var(--muted)">Elite Knight · 615</span></button>
+<button aria-label="Characters and settings" style="width: 48px; height: 48px; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); cursor: pointer"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+</div>
+</header>
+<main style="padding: 16px; display: flex; flex-direction: column; gap: 22px">
+<section aria-labelledby="using-h" style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px">
+<h2 id="using-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 700">Plan is using</h2>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">All optional</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{chips}}" as="c" hint-placeholder-count="6">
+<button style="{{c.style}}" aria-expanded="{{c.expanded}}" onClick="{{c.toggle}}"><sc-if value="{{c.isSet}}" hint-placeholder-val="{{true}}"><span style="color: var(--muted)">{{c.label}}</span> <b>{{c.value}}</b></sc-if><sc-if value="{{c.notSet}}" hint-placeholder-val="{{false}}"><span>+ {{c.label}}</span></sc-if></button>
+</sc-for>
+</div>
+</section>
+<sc-if value="{{openActive}}" hint-placeholder-val="{{false}}">
+<section aria-label="Your bounty" style="background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h3 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 26px">Your bounty</h3>
+<label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted)">Difficulty <select style="min-height: 40px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 15px"><option>Master</option><option>Expert</option><option>Adept</option><option>Beginner</option></select></label>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; background: var(--surface2); border-radius: 12px">
+<span><b>Reroll tokens</b><br><span style="font-size: 13px; line-height: 18px; color: var(--muted)">Set it to what the game shows.</span></span>
+<div style="display: flex; align-items: center; gap: 4px">
+<button aria-label="One fewer token" onClick="{{dec}}" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 20px; cursor: pointer">−</button>
+<output aria-live="polite" style="min-width: 32px; text-align: center; font-weight: 700; font-size: 18px">{{tokens}}</output>
+<button aria-label="One more token" onClick="{{inc}}" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 20px; cursor: pointer">+</button>
+</div>
+</div>
+<div style="border: 2px solid var(--gold); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; line-height: 16px; letter-spacing: 0.08em; font-weight: 700; color: var(--muted)">ACTIVE BOUNTY</span>
+<div style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Creature<input value="{{active.creature}}" onChange="{{onActiveCreature}}" placeholder="Start typing" autocomplete="off" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Kills<input value="{{active.kills}}" onChange="{{onActiveKills}}" inputmode="numeric" placeholder="450" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+</div>
+<div role="group" aria-label="Kind of bounty" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden">
+<sc-for list="{{activeKinds}}" as="k" hint-placeholder-count="3"><button aria-pressed="{{k.pressed}}" onClick="{{k.pick}}" style="{{k.style}}">{{k.k}}</button></sc-for>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button onClick="{{finished}}" style="min-height: 52px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; line-height: 18px; cursor: pointer"><b>Finished it</b><br><span style="font-size: 13px; color: var(--muted)">+1 token</span></button>
+<button onClick="{{dropReroll}}" style="min-height: 52px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; line-height: 18px; cursor: pointer"><b>Rerolled</b><br><span style="font-size: 13px; color: var(--muted)">−1 token, drops it</span></button>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--muted)">Both take you to three new offers. Did it in game without the app? Tap the one you did, or just type over the bounty.</p>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px">
+<span aria-live="polite" style="font-size: 14px; line-height: 19px"><span style="color: var(--muted)">Plan:</span> <b>{{liveLine}}</b></span>
+<button onClick="{{close}}" style="min-height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer">Done</button>
+</div>
+</section>
+</sc-if>
+<sc-if value="{{openOffers}}" hint-placeholder-val="{{false}}">
+<section aria-label="Bounty offers" style="background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h3 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 26px">Bounty offers</h3>
+<label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted)">Difficulty <select style="min-height: 40px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 15px"><option>Master</option><option>Expert</option><option>Adept</option><option>Beginner</option></select></label>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; background: var(--surface2); border-radius: 12px">
+<span><b>Reroll tokens</b><br><span style="font-size: 13px; line-height: 18px; color: var(--muted)">Set it to what the game shows.</span></span>
+<div style="display: flex; align-items: center; gap: 4px">
+<button aria-label="One fewer token" onClick="{{dec}}" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 20px; cursor: pointer">−</button>
+<output aria-live="polite" style="min-width: 32px; text-align: center; font-weight: 700; font-size: 18px">{{tokens}}</output>
+<button aria-label="One more token" onClick="{{inc}}" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 20px; cursor: pointer">+</button>
+</div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--muted)">Type the three offers you see. Picking one in game makes the other two disappear, so wait until you’ve checked its spot is free. Then tap Picked here.</p>
+<sc-for list="{{offers}}" as="o" hint-placeholder-count="3">
+<div style="border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 8px; background: var(--surface2); display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-weight: 700">{{o.l}}</span><b>Offer {{o.l}}</b></span>
+<button onClick="{{o.pick}}" aria-label="Picked offer {{o.l}}" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Picked</button>
+</div>
+<div style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Creature<input value="{{o.creature}}" onChange="{{o.onCreature}}" placeholder="Start typing" autocomplete="off" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Kills<input value="{{o.kills}}" onChange="{{o.onKills}}" inputmode="numeric" placeholder="450" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+</div>
+<div role="group" aria-label="Kind of offer {{o.l}}" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden">
+<sc-for list="{{o.kinds}}" as="k" hint-placeholder-count="3"><button aria-pressed="{{k.pressed}}" onClick="{{k.pick}}" style="{{k.style}}">{{k.k}}</button></sc-for>
+</div>
+</div>
+</sc-for>
+<button onClick="{{rerolled}}" style="min-height: 48px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer"><b>Rerolled</b> <span style="color: var(--muted)">−1 token, clears the offers</span></button>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px">
+<span aria-live="polite" style="font-size: 14px; line-height: 19px"><span style="color: var(--muted)">Plan:</span> <b>{{liveLine}}</b></span>
+<button onClick="{{close}}" style="min-height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer">Done</button>
+</div>
+</section>
+</sc-if>
+<sc-if value="{{openBoosts}}" hint-placeholder-val="{{false}}">
+<section aria-label="Today’s boosts" style="background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<h3 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 26px">Today’s boosts</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">Optional. Counts the boosted creature’s double exp, prey exp bonuses and exp events. Not yet loot, respawn, or prey loot and damage. Clears at server save.</p>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Boosted creature<input placeholder="On the login screen and tibia.com" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Prey 1<input placeholder="Creature" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit; font-size: 16px"></label>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Bonus<select style="min-height: 44px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 16px"><option>Exp</option><option>Loot</option><option>Damage</option><option>Defence</option></select></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Size<select style="min-height: 44px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 16px"><option>13%</option></select></label>
+</div>
+<button style="align-self: flex-start; min-height: 44px; padding: 0; border: 0; background: none; color: var(--accent-text); font: inherit; text-decoration: underline; cursor: pointer">Add a prey</button>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted)">Exp event<select style="min-height: 44px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; font-size: 16px"><option>No exp event</option></select></label>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px">
+<span aria-live="polite" style="font-size: 14px; line-height: 19px"><span style="color: var(--muted)">Plan:</span> <b>{{liveLine}}</b></span>
+<button onClick="{{close}}" style="min-height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer">Done</button>
+</div>
+</section>
+</sc-if>
+<sc-if value="{{openOther}}" hint-placeholder-val="{{false}}">
+<section aria-label="{{otherName}}" style="background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">The <b style="color: var(--text)">{{otherName}}</b> editor is designed in the next pass.</p>
+<button onClick="{{close}}" style="min-height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer">Done</button>
+</section>
+</sc-if>
+<section aria-labelledby="next-h" style="display: flex; flex-direction: column; gap: 10px">
+<h2 id="next-h" style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; line-height: 30px; font-weight: 700">Where to hunt now</h2>
+<sc-if value="{{showHero}}" hint-placeholder-val="{{true}}">
+<article style="background: var(--surface); border: 2px solid var(--gold); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 12px; line-height: 16px; letter-spacing: 0.08em; font-weight: 700; color: var(--muted)">STEP 1</span>
+<h3 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700">{{first.title}}</h3>
+<sc-if value="{{first.hasBountyLine}}" hint-placeholder-val="{{true}}"><span style="font-size: 14px; line-height: 19px; color: var(--muted)">{{first.bountyLine}}</span></sc-if>
+<div style="display: flex; gap: 28px">
+<div><div style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 32px">{{first.exp}}</div><div style="font-size: 13px; line-height: 18px; color: var(--muted)">exp/h</div></div>
+<div><div style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 32px">{{first.profit}}</div><div style="font-size: 13px; line-height: 18px; color: var(--muted)">profit/h</div></div>
+</div>
+<sc-if value="{{first.isRef}}" hint-placeholder-val="{{true}}"><span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent-text); font-size: 13px; line-height: 18px"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5h11l5 5v9z"></path><path d="M8 13h8M8 9h5"></path></svg>{{first.src}}</span></sc-if>
+<sc-if value="{{first.isYours}}" hint-placeholder-val="{{false}}"><span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--yours); color: var(--yours); font-size: 13px; line-height: 18px"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"></path></svg>{{first.src}}</span></sc-if>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button onClick="{{startHunt}}" style="min-height: 52px; border-radius: 12px; border: 0; background: var(--gold); color: var(--on-gold); font: inherit; font-size: 17px; font-weight: 700; cursor: pointer">Free</button>
+<button onClick="{{first.take}}" style="min-height: 52px; border-radius: 12px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 17px; cursor: pointer">Taken</button>
+</div>
+<button aria-expanded="{{whyExpanded}}" onClick="{{toggleWhy}}" style="align-self: flex-start; min-height: 44px; padding: 0; border: 0; background: none; color: var(--accent-text); font: inherit; text-decoration: underline; cursor: pointer">{{whyLabel}}</button>
+<sc-if value="{{why}}" hint-placeholder-val="{{false}}"><p style="margin: 0; padding: 12px; border-radius: 12px; background: var(--surface2); font-size: 14px; line-height: 20px">{{first.why}}</p></sc-if>
+</article>
+</sc-if>
+<sc-if value="{{showHunting}}" hint-placeholder-val="{{false}}">
+<article style="background: var(--surface); border: 2px solid var(--yours); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 12px; line-height: 16px; letter-spacing: 0.08em; font-weight: 700; color: var(--yours)">HUNTING NOW</span>
+<h3 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700">{{first.name}}</h3>
+<sc-if value="{{first.canPick}}" hint-placeholder-val="{{false}}">
+<div style="border: 2px solid var(--gold); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; line-height: 21px"><b>The spot is yours: pick offer {{first.pickLetter}} now.</b><br><span style="color: var(--muted)">{{first.pickCreature}} on the Task Board. The other two offers will disappear.</span></span>
+<button onClick="{{first.pick}}" style="min-height: 48px; border-radius: 10px; border: 0; background: var(--gold); color: var(--on-gold); font: inherit; font-weight: 700; cursor: pointer">Picked {{first.pickLetter}}</button>
+</div>
+</sc-if>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">No timer, nothing to track. If this turns into a focused, break-free hunt, you can log it now or any time later.</p>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button style="min-height: 52px; border-radius: 12px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Log a clean hunt</button>
+<button onClick="{{stopHunt}}" style="min-height: 52px; border-radius: 12px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer">Back to plan</button>
+</div>
+</article>
+</sc-if>
+<sc-if value="{{noFirst}}" hint-placeholder-val="{{false}}">
+<article style="background: var(--surface); border: 2px solid var(--gold); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; line-height: 16px; letter-spacing: 0.08em; font-weight: 700; color: var(--muted)">STEP 1</span>
+<h3 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700">Every planned spot is taken</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">See Spots for more, or free a spot below if it opened up.</p>
+</article>
+</sc-if>
+<sc-for list="{{rest}}" as="r" hint-placeholder-count="1">
+<article style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<div style="min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">Taken? →</span>
+<b style="font-size: 16px">{{r.title}}</b>
+<span style="font-size: 14px; line-height: 19px; color: var(--muted)">{{r.exp}} exp/h · {{r.profit}} profit/h</span>
+<sc-if value="{{r.isYours}}" hint-placeholder-val="{{true}}"><span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--yours); color: var(--yours); font-size: 12px; line-height: 17px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"></path></svg>{{r.src}}</span></sc-if>
+<sc-if value="{{r.isRef}}" hint-placeholder-val="{{false}}"><span style="align-self: flex-start; margin-top: 4px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent-text); font-size: 12px; line-height: 17px">{{r.src}}</span></sc-if>
+</div>
+<button onClick="{{r.take}}" style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Taken</button>
+</article>
+</sc-for>
+<article style="border: 1px dashed var(--line2); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">Taken? →</span>
+<b style="font-size: 16px">{{endTitle}}</b>
+<span style="font-size: 14px; line-height: 19px; color: var(--muted)">{{endLine}}</span>
+</article>
+</section>
+<sc-if value="{{hasTaken}}" hint-placeholder-val="{{true}}">
+<section aria-labelledby="taken-h" style="display: flex; flex-direction: column; gap: 8px">
+<h2 id="taken-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 700">Taken spots ({{takenCount}})</h2>
+<sc-for list="{{taken}}" as="t" hint-placeholder-count="1">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line)">
+<div style="display: flex; flex-direction: column"><b>{{t.name}}</b><span style="font-size: 13px; line-height: 18px; color: var(--muted)">{{t.meta}}</span></div>
+<button onClick="{{t.free}}" style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer; white-space: nowrap">Free again</button>
+</div>
+</sc-for>
+</section>
+</sc-if>
+</main>
+<nav aria-label="Main" style="margin-top: auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; border-top: 1px solid var(--line); background: var(--surface); padding: 6px 8px 12px">
+<a href="#" aria-current="page" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; background: var(--surface2); color: var(--text); font-size: 12px; line-height: 16px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="M4 6h1M4 12h1M4 18h1"></path></svg>Plan</a>
+<a href="#" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; color: var(--muted); font-size: 12px; line-height: 16px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>Spots</a>
+<a href="#" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; color: var(--muted); font-size: 12px; line-height: 16px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 10h12M4 15h8M4 20h4"></path></svg>Creatures</a>
+<a href="#" style="min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; color: var(--muted); font-size: 12px; line-height: 16px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Weekly</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"startOpen":{"editor":"enum","options":["none","bounty","boosts"],"default":"none"},"startMode":{"editor":"enum","options":["active","offers"],"default":"active"},"$preview":{"width":390,"height":1600}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+const p = props || {};
+this.state = {
+open: p.startOpen || 'none',
+mode: p.startMode || 'active',
+tokens: 4,
+active: { creature: 'Cobra Assassin', kills: '450', kind: 'Normal' },
+offers: [
+{ l: 'A', creature: 'Cobra Assassin', kills: '450', kind: 'Normal' },
+{ l: 'B', creature: 'Gorerilla', kills: '400', kind: 'Silver' },
+{ l: 'C', creature: 'Hellspawn', kills: '520', kind: 'Normal' }
+],
+taken: [{ name: 'Asura Palace', meta: 'Marked 20 min ago · clears in 25 min' }],
+hunting: false,
+why: false
+};
+}
+renderVals() {
+const s = this.state;
+const set = (p) => this.setState(p);
+const theme = this.props.theme ?? 'dark';
+const isActive = s.mode === 'active';
+const anyOffer = s.offers.some((o) => o.creature);
+const bountyValue = isActive
+? ((s.active.creature || 'Not set') + ' · ' + s.tokens + ' tokens')
+: ((anyOffer ? '3 offers' : 'No offers yet') + ' · ' + s.tokens + ' tokens');
+const chipDefs = [
+{ id: 'goal', label: 'Goal', value: 'Mostly exp' },
+{ id: 'bounty', label: 'Bounty', value: bountyValue },
+{ id: 'weekly', label: 'Weekly', value: '2 of 6 done' },
+{ id: 'boosts', label: 'Today’s boosts', value: '' },
+{ id: 'time', label: 'Time', value: 'No limit' },
+{ id: 'data', label: 'Data', value: 'All sources' }
+];
+const chips = chipDefs.map((c) => {
+const open = s.open === c.id;
+const isSet = !!c.value;
+const border = open ? '2px solid var(--accent)' : (isSet ? '1px solid var(--line2)' : '1px dashed var(--line2)');
+return {
+label: c.label, value: c.value, isSet: isSet, notSet: !isSet,
+expanded: open ? 'true' : 'false',
+style: 'min-height: 44px; padding: 0 14px; border-radius: 22px; font: inherit; font-size: 14px; cursor: pointer; color: var(--text); display: inline-flex; align-items: center; gap: 6px; background: ' + (isSet ? 'var(--surface2)' : 'transparent') + '; border: ' + border,
+toggle: () => set({ open: open ? 'none' : c.id })
+};
+});
+const kindButtons = (cur, onPick) => ['Normal', 'Silver', 'Gold'].map((k) => {
+const on = cur === k;
+return {
+k: k, pressed: on ? 'true' : 'false',
+style: 'min-height: 44px; border: 0; font: inherit; font-size: 14px; cursor: pointer; background: ' + (on ? 'var(--text)' : 'transparent') + '; color: ' + (on ? 'var(--bg)' : 'var(--text)') + '; font-weight: ' + (on ? '700' : '400'),
+pick: () => onPick(k)
+};
+});
+const updActive = (patch) => set({ active: Object.assign({}, s.active, patch) });
+const upd = (i, patch) => set({ offers: s.offers.map((o, j) => (j === i ? Object.assign({}, o, patch) : o)) });
+const pickOffer = (o) => set({ mode: 'active', active: { creature: o.creature, kills: o.kills, kind: o.kind } });
+const offers = s.offers.map((o, i) => ({
+l: o.l, creature: o.creature, kills: o.kills,
+pick: () => pickOffer(o),
+onCreature: (e) => upd(i, { creature: e.target.value }),
+onKills: (e) => upd(i, { kills: String(e.target.value).replace(/[^0-9]/g, '') }),
+kinds: kindButtons(o.kind, (k) => upd(i, { kind: k }))
+}));
+const cleared = s.offers.map((o) => Object.assign({}, o, { creature: '', kills: '', kind: 'Normal' }));
+const spots = [
+{ name: 'Cobra Bastion', creature: 'Cobra Assassin', exp: '7.8kk', profit: '300k', src: 'Reference, adjusted to you', kind: 'ref' },
+{ name: 'Ruins of Nuur', creature: '', exp: '6.9kk', profit: '450k', src: 'Yours · 9 hunts', kind: 'yours' }
+];
+const takenNames = s.taken.map((t) => t.name);
+const avail = spots.filter((sp) => takenNames.indexOf(sp.name) < 0).map((sp) => {
+const forActive = isActive && sp.creature && s.active.creature === sp.creature;
+const off = !isActive ? s.offers.find((o) => o.creature && o.creature === sp.creature) : null;
+let title = 'Go to ' + sp.name;
+let bountyLine = '';
+let why = sp.kind === 'yours' ? 'From your own 9 logged hunts. Less exp than Cobra Bastion, more profit.' : 'The best fit for “mostly exp, some profit” near level 615. Reference numbers come from a top player’s hunt, scaled to you by your logged hunts.';
+if (forActive) { bountyLine = 'Kills here count for your bounty: ' + sp.creature; why = sp.creature + 's here count toward your active bounty. ' + why; }
+if (off) { bountyLine = 'For offer ' + off.l + ': ' + off.creature + '. Pick it once you see the spot is free.'; why = 'Offer ' + off.l + ' is ' + off.creature + ', and this spot is full of them. Don’t pick it yet: if the spot is taken, you still have the other offers. ' + why; }
+return {
+name: sp.name, exp: sp.exp, profit: sp.profit, src: sp.src, why: why, title: title,
+bountyLine: bountyLine, hasBountyLine: !!bountyLine,
+canPick: !!off, pickLetter: off ? off.l : '', pickCreature: off ? off.creature : '', pick: () => { if (off) pickOffer(off); },
+isRef: sp.kind === 'ref', isYours: sp.kind === 'yours',
+take: () => set({ taken: [{ name: sp.name, meta: 'Marked just now · clears in 45 min' }].concat(s.taken), hunting: false, why: false })
+};
+});
+const first = avail[0] || null;
+return {
+cls: 'hp-' + theme,
+chips: chips,
+openActive: s.open === 'bounty' && isActive,
+openOffers: s.open === 'bounty' && !isActive,
+openBoosts: s.open === 'boosts',
+openOther: ['goal', 'weekly', 'time', 'data'].indexOf(s.open) >= 0,
+otherName: (chipDefs.find((c) => c.id === s.open) || { label: '' }).label,
+close: () => set({ open: 'none' }),
+active: s.active,
+onActiveCreature: (e) => updActive({ creature: e.target.value }),
+onActiveKills: (e) => updActive({ kills: String(e.target.value).replace(/[^0-9]/g, '') }),
+activeKinds: kindButtons(s.active.kind, (k) => updActive({ kind: k })),
+offers: offers,
+tokens: s.tokens,
+dec: () => set({ tokens: Math.max(0, s.tokens - 1) }),
+inc: () => set({ tokens: Math.min(10, s.tokens + 1) }),
+rerolled: () => set({ tokens: Math.max(0, s.tokens - 1), offers: cleared }),
+finished: () => set({ tokens: Math.min(10, s.tokens + 1), offers: cleared, mode: 'offers', active: { creature: '', kills: '', kind: 'Normal' } }),
+dropReroll: () => set({ tokens: Math.max(0, s.tokens - 1), offers: cleared, mode: 'offers', active: { creature: '', kills: '', kind: 'Normal' } }),
+liveLine: first ? first.title : 'See Spots for more',
+first: first || {},
+rest: avail.slice(1),
+showHero: !!first && !s.hunting,
+showHunting: !!first && s.hunting,
+noFirst: !first,
+endTitle: s.tokens > 0 ? 'Reroll and re-plan' : 'See Spots for more',
+endLine: s.tokens <= 0 ? 'No reroll tokens left. Every spot, sorted for your goal.' : (isActive ? ('Drops your bounty for three new offers. ' + s.tokens + ' tokens left. Or see Spots for more.') : (s.tokens + ' tokens left. A new set of offers may beat these.')),
+startHunt: () => set({ hunting: true, why: false }),
+stopHunt: () => set({ hunting: false }),
+why: s.why,
+whyExpanded: s.why ? 'true' : 'false',
+whyLabel: s.why ? 'Hide why' : 'Why?',
+toggleWhy: () => set({ why: !s.why }),
+taken: s.taken.map((t) => ({ name: t.name, meta: t.meta, free: () => set({ taken: s.taken.filter((x) => x.name !== t.name) }) })),
+hasTaken: s.taken.length > 0,
+takenCount: s.taken.length
+};
+}
+}
+</script>
+</body>
+</html>

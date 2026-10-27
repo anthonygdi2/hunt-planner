@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan, desktop</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9c4ff}a:hover{color:#d3e0ff}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{cls}}" style="min-height: 1180px; background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px">
+<header style="background: var(--surface); border-bottom: 1px solid var(--line)">
+<div style="max-width: 1280px; margin: 0 auto; padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px">
+<span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; line-height: 28px; font-weight: 700">Hunt planner</span>
+<nav aria-label="Main" style="display: flex; flex-wrap: wrap; gap: 4px">
+<a href="#" aria-current="page" style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 10px; background: var(--surface2); color: var(--text); font-weight: 700; text-decoration: none">Plan</a>
+<a href="#" style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 10px; color: var(--muted); text-decoration: none">Spots</a>
+<a href="#" style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 10px; color: var(--muted); text-decoration: none">Creatures</a>
+<a href="#" style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 10px; color: var(--muted); text-decoration: none">Weekly</a>
+</nav>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<button aria-label="Character: Main EK, Elite Knight level 615. Change character" style="min-height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit; cursor: pointer"><b>Main EK</b><span style="color: var(--muted)">Elite Knight · 615</span><span aria-hidden="true">▾</span></button>
+<button aria-label="Characters and settings" style="width: 48px; height: 48px; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); cursor: pointer"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+</div>
+</div>
+</header>
+<div style="max-width: 1280px; margin: 0 auto; padding: 32px 24px 48px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 32px">
+<aside aria-labelledby="using-h" style="flex: 1 1 340px; max-width: 420px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px">
+<h2 id="using-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 700">Plan is using</h2>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">All optional</span>
+</div>
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<span><span style="color: var(--muted)">Goal</span> <b>Mostly exp, some profit</b></span>
+<button style="min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Change</button>
+</section>
+<section aria-label="Your bounty" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h3 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 26px">Your bounty</h3>
+<label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted)">Difficulty <select style="min-height: 40px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface2); color: var(--text); font: inherit"><option>Master</option></select></label>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; background: var(--surface2); border-radius: 12px">
+<b>Reroll tokens</b>
+<div style="display: flex; align-items: center; gap: 4px">
+<button aria-label="One fewer token" style="width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 18px; cursor: pointer">−</button>
+<output style="min-width: 28px; text-align: center; font-weight: 700; font-size: 18px">4</output>
+<button aria-label="One more token" style="width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 18px; cursor: pointer">+</button>
+</div>
+</div>
+<div style="border: 2px solid var(--gold); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; line-height: 16px; letter-spacing: 0.08em; font-weight: 700; color: var(--muted)">ACTIVE BOUNTY</span>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 80px; gap: 8px">
+<input aria-label="Bounty creature" value="Cobra Assassin" readonly style="min-height: 40px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit">
+<input aria-label="Bounty kills" value="450" readonly style="min-height: 40px; box-sizing: border-box; width: 100%; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text); font: inherit">
+</div>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">Normal · 450 kills · Master</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button style="min-height: 44px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer"><b>Finished it</b> <span style="color: var(--muted)">+1</span></button>
+<button style="min-height: 44px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer"><b>Rerolled</b> <span style="color: var(--muted)">−1, drops it</span></button>
+</div>
+</section>
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<span><span style="color: var(--muted)">Weekly</span> <b>2 of 6 done</b><br><span style="font-size: 13px; line-height: 18px; color: var(--muted)">New board Monday, Nov 2</span></span>
+<a href="#" style="min-height: 40px; display: inline-flex; align-items: center; color: var(--accent-text)">Open</a>
+</section>
+<section style="border: 1px dashed var(--line2); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+<button style="align-self: flex-start; min-height: 40px; padding: 0 12px; border-radius: 20px; border: 1px dashed var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">+ Today’s boosts</button>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">Boosted creature, prey and exp events raise exp/h for the creatures they touch. Clears at server save.</span>
+</section>
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="color: var(--muted)">Session length</span>
+<div role="group" aria-label="Session length" style="display: flex; flex-wrap: wrap; gap: 6px">
+<button aria-pressed="true" style="min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--text); background: var(--text); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer">No limit</button>
+<button aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">30 min</button>
+<button aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">1 h</button>
+<button aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">2 h</button>
+<button aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">3 h</button>
+</div>
+</section>
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="color: var(--muted)">Numbers from</span>
+<div role="group" aria-label="Numbers from" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line2); border-radius: 10px; overflow: hidden">
+<button aria-pressed="false" style="min-height: 44px; border: 0; background: transparent; color: var(--text); font: inherit; font-size: 14px; cursor: pointer">Mine only</button>
+<button aria-pressed="false" style="min-height: 44px; border: 0; border-left: 1px solid var(--line2); border-right: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 14px; cursor: pointer">+ Reference</button>
+<button aria-pressed="true" style="min-height: 44px; border: 0; background: var(--text); color: var(--bg); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">Everything</button>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: var(--muted)">Everything adds other vocations’ hunts where nothing better exists. Fine-tune in Characters.</span>
+</section>
+</aside>
+<main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 34px; line-height: 40px">Where to hunt now</h1>
+<p style="margin: 0; color: var(--muted)">For Main EK, mostly exp with some profit, weighing your bounty and weekly tasks.</p>
+</div>
+<article style="background: var(--surface); border: 2px solid var(--gold); border-radius: 18px; padding: 20px 24px; display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: flex-start">
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 12px; line-height: 16px; letter-spacing: 0.08em; font-weight: 700; color: var(--muted)">STEP 1</span>
+<h2 style="margin: 0; font-size: 28px; line-height: 34px">Go to Cobra Bastion</h2>
+<span style="color: var(--muted)">Kills here count for your bounty: Cobra Assassin</span>
+<div style="display: flex; gap: 36px">
+<div><div style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 34px; line-height: 38px">7.8kk</div><div style="font-size: 13px; line-height: 18px; color: var(--muted)">exp/h</div></div>
+<div><div style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 34px; line-height: 38px">300k</div><div style="font-size: 13px; line-height: 18px; color: var(--muted)">profit/h</div></div>
+</div>
+<span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent-text); font-size: 13px; line-height: 18px"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5h11l5 5v9z"></path><path d="M8 13h8M8 9h5"></path></svg>Reference, adjusted to you</span>
+</div>
+<div style="flex: 0 1 260px; display: flex; flex-direction: column; gap: 8px">
+<button style="min-height: 52px; border-radius: 12px; border: 0; background: var(--gold); color: var(--on-gold); font: inherit; font-size: 17px; font-weight: 700; cursor: pointer">Free</button>
+<button style="min-height: 52px; border-radius: 12px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; font-size: 17px; cursor: pointer">Taken</button>
+</div>
+<div style="flex: 1 1 100%; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 14px">
+<button aria-expanded="true" style="align-self: flex-start; min-height: 32px; padding: 0; border: 0; background: none; color: var(--accent-text); font: inherit; text-decoration: underline; cursor: pointer">Hide why</button>
+<p style="margin: 0; max-width: 68ch; color: var(--text)">Cobra Assassins here count toward your active bounty. The best fit for “mostly exp, some profit” near level 615. Reference numbers come from a top player’s hunt, scaled to you by your logged hunts.</p>
+</div>
+</article>
+<article style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px">
+<span style="color: var(--muted)">Taken? →</span>
+<b style="font-size: 17px">Ruins of Nuur</b>
+<span style="color: var(--muted)">6.9kk exp/h · 450k profit/h</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--yours); color: var(--yours); font-size: 12px; line-height: 17px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"></path></svg>Yours · 9 hunts</span>
+</div>
+<button style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Taken</button>
+</article>
+<article style="border: 1px dashed var(--line2); border-radius: 14px; padding: 14px 18px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px">
+<span style="color: var(--muted)">Taken? →</span>
+<b style="font-size: 17px">Reroll and re-plan</b>
+<span style="color: var(--muted)">Drops Cobra Assassin for three new offers. 4 tokens left. Or <a href="#">see Spots for more</a>.</span>
+</article>
+<section aria-labelledby="taken-h" style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px">
+<h2 id="taken-h" style="margin: 0; font-size: 13px; line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 700">Taken spots (1)</h2>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 18px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line)">
+<span><b>Asura Palace</b> <span style="color: var(--muted)">· marked 20 min ago · clears in 25 min</span></span>
+<button style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text); font: inherit; cursor: pointer">Free again</button>
+</div>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+renderVals() {
+return { cls: 'hp-' + (this.props.theme ?? 'dark') };
+}
+}
+</script>
+</body>
+</html>

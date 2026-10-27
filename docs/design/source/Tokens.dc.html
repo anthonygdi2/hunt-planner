@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hunt planner token sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9c4ff}a:hover{color:#d3e0ff}
+</style>
+</helmet>
+<div style="width: 1440px; min-height: 2100px; box-sizing: border-box; padding: 64px; background: #17191c; color: #ecebe8; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px; display: flex; flex-direction: column; gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 44px; line-height: 52px">Token sheet</h1>
+<p style="margin: 0; max-width: 900px; color: #b4b8bf; font-size: 17px; line-height: 25px">Every color is a CSS variable set on a theme class (.hp-dark, .hp-light) at the app root. “System” follows prefers-color-scheme. Ratios are WCAG contrast against the surface the token sits on.</p>
+</div>
+<section aria-labelledby="col-h" style="display: flex; flex-direction: column; gap: 16px">
+<h2 id="col-h" style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">Color</h2>
+<div style="display: grid; grid-template-columns: 180px 260px 260px minmax(0, 1fr); gap: 0; border: 1px solid #3a3f47; border-radius: 14px; overflow: hidden">
+<div style="padding: 10px 14px; background: #2c3036; font-weight: 700">Token</div><div style="padding: 10px 14px; background: #2c3036; font-weight: 700">Dark</div><div style="padding: 10px 14px; background: #2c3036; font-weight: 700">Light</div><div style="padding: 10px 14px; background: #2c3036; font-weight: 700">Use</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--bg</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #17191c; border: 1px solid #78808b"></span>#17191c</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #f4f2ee; border: 1px solid #78808b"></span>#f4f2ee</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Page background</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--surface</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #212429; border: 1px solid #78808b"></span>#212429</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #ffffff; border: 1px solid #78808b"></span>#ffffff</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Cards, header, tab bar, editors</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--surface2</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #2c3036; border: 1px solid #78808b"></span>#2c3036</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #ece8e1; border: 1px solid #78808b"></span>#ece8e1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Set chips, inner panels, stat tiles, active tab</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--line</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #3a3f47"></span>#3a3f47</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #d9d5cc"></span>#d9d5cc</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Dividers and card outlines (decorative only)</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--line2</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #78808b"></span>#78808b · 3.9:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #857f73"></span>#857f73 · 4.0:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Borders of inputs, buttons, chips, dashed “not set” outlines (3:1 or more)</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--text</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #ecebe8"></span>#ecebe8 · 13.1:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #1c1b19; border: 1px solid #78808b"></span>#1c1b19 · 17.2:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Body text; also the fill of a selected segment and the Done button</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--muted</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #b4b8bf"></span>#b4b8bf · 7.8:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #55514a"></span>#55514a · 7.9:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Labels, hints, secondary lines (6.5:1 or more on every surface)</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--accent</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #8fb3ff"></span>#8fb3ff</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #2f5fc4"></span>#2f5fc4</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Open chip and its editor’s border; “Reference, adjusted” badge outline</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--accent-text</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #a9c4ff"></span>#a9c4ff · 8.9:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #2a55b0"></span>#2a55b0 · 6.9:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Links, Why?, reference badge text</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--gold</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #e8b84a"></span>#e8b84a</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #c99a2e"></span>#c99a2e</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Your next move: step 1 border, Free button, active bounty, selected vocation. Fill or border only.</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--gold-text</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #e8b84a"></span>#e8b84a · 8.4:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #7d5a00"></span>#7d5a00 · 6.3:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Gold as text or icon: “Low sample”, “Your bounty”</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--on-gold</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #1a1408; border: 1px solid #78808b"></span>#1a1408 · 9.9:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #1a1408; border: 1px solid #78808b"></span>#1a1408 · 7.1:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Text on gold, on tier tiles and on the green Done button</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--yours</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #7fd19b"></span>#7fd19b · 8.5:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #19683a"></span>#19683a · 6.8:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">“Yours” badge, Hunting now, Done, switch on</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--other</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #c9a7ff"></span>#c9a7ff · 7.7:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #6b3fb8"></span>#6b3fb8 · 6.9:1</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">“Other vocation” badge (always dashed)</div>
+<div style="padding: 10px 14px; border-top: 1px solid #3a3f47; font-family: ui-monospace, Menlo, monospace; font-size: 14px">--focus</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #8fb3ff"></span>#8fb3ff</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; display: flex; gap: 10px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 6px; background: #2f5fc4"></span>#2f5fc4</div><div style="padding: 10px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Keyboard focus: 3px outline, 2px offset, on every control</div>
+</div>
+</section>
+<section aria-labelledby="tier-h" style="display: flex; flex-direction: column; gap: 16px">
+<h2 id="tier-h" style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">Tiers and hazard</h2>
+<p style="margin: 0; color: #b4b8bf; max-width: 900px">Each tier tile always shows its letter, so color is never the only cue. Text on every tile is --on-gold (#1a1408), 7.7:1 or better.</p>
+<div style="display: flex; gap: 40px; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column; gap: 8px"><b>Dark</b>
+<div style="display: flex; gap: 8px">
+<span style="width: 64px; height: 64px; border-radius: 10px; background: #ff8a80; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; font-weight: 700">S</span>
+<span style="width: 64px; height: 64px; border-radius: 10px; background: #ffb74d; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; font-weight: 700">A</span>
+<span style="width: 64px; height: 64px; border-radius: 10px; background: #ffe082; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; font-weight: 700">B</span>
+<span style="width: 64px; height: 64px; border-radius: 10px; background: #a5d6a7; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; font-weight: 700">C</span>
+<span style="width: 64px; height: 64px; border-radius: 10px; background: #90caf9; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; font-weight: 700">D</span>
+</div>
+<span style="font-family: ui-monospace, Menlo, monospace; font-size: 13px; color: #b4b8bf">--tS #ff8a80 · --tA #ffb74d · --tB #ffe082 · --tC #a5d6a7 · --tD #90caf9</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px"><b>Light</b>
+<div style="display: flex; gap: 8px">
+<span style="width: 64px; height: 64px; border-radius: 10px; background: #f28b82; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; font-weight: 700">S</span>
+<span style="width: 64px; height: 64px; border-radius: 10px; background: #f6b26b; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; font-weight: 700">A</span>
+<span style="width: 64px; height: 64px; border-radius: 10px; background: #ffd966; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; font-weight: 700">B</span>
+<span style="width: 64px; height: 64px; border-radius: 10px; background: #93c47d; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; font-weight: 700">C</span>
+<span style="width: 64px; height: 64px; border-radius: 10px; background: #8ab4f8; color: #1a1408; display: grid; place-items: center; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; font-weight: 700">D</span>
+</div>
+<span style="font-family: ui-monospace, Menlo, monospace; font-size: 13px; color: #b4b8bf">--tS #f28b82 · --tA #f6b26b · --tB #ffd966 · --tC #93c47d · --tD #8ab4f8</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px"><b>Avoid / Trap (both themes)</b>
+<div style="display: flex; gap: 12px; align-items: center">
+<span style="width: 64px; height: 64px; border-radius: 10px; background: repeating-linear-gradient(135deg, #e8b84a 0 6px, #1a1408 6px 12px); display: grid; place-items: center"><span style="padding: 2px 4px; border-radius: 4px; background: #1a1408; color: #e8b84a; font-size: 11px; font-weight: 700; letter-spacing: 0.04em">AVOID</span></span>
+<span style="max-width: 300px; color: #b4b8bf; font-size: 14px; line-height: 20px">45° stripes of gold and #1a1408, a black label with the word, and a dashed gold outline on the row. The word carries the meaning.</span>
+</div>
+</div>
+</div>
+</section>
+<section aria-labelledby="type-h" style="display: flex; flex-direction: column; gap: 16px">
+<h2 id="type-h" style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">Type</h2>
+<p style="margin: 0; color: #b4b8bf; max-width: 900px">Pixelify Sans for titles and big numbers only, never below 18px. Atkinson Hyperlegible for everything people read. Form inputs are 16px so phones don’t zoom in.</p>
+<div style="display: grid; grid-template-columns: 200px 300px minmax(0, 1fr); border: 1px solid #3a3f47; border-radius: 14px; overflow: hidden">
+<div style="padding: 10px 14px; background: #2c3036; font-weight: 700">Style</div><div style="padding: 10px 14px; background: #2c3036; font-weight: 700">Font · size/line · weight</div><div style="padding: 10px 14px; background: #2c3036; font-weight: 700">Sample</div>
+<div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Display</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Pixelify · 30/36 phone, 34/40 desktop · 700</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 30px; line-height: 36px; font-weight: 700">Where should you hunt?</div>
+<div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Title</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Pixelify · 24/30 · 700</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 24px; line-height: 30px; font-weight: 700">Where to hunt now</div>
+<div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Panel title</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Pixelify · 20/26 · 700</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 26px; font-weight: 700">Your bounty</div>
+<div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Stat number</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Pixelify · 28/32 phone, 34/38 desktop · 500</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 32px">7.8kk</div>
+<div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Step title</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Atkinson · 22/28 phone, 28/34 desktop · 700</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; font-size: 22px; line-height: 28px; font-weight: 700">Go to Cobra Bastion</div>
+<div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Body</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Atkinson · 15/21 · 400 (700 for emphasis)</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Kills here count for your bounty: Cobra Assassin</div>
+<div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Small</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Atkinson · 14/20 · 400</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; font-size: 14px; line-height: 20px">Why? explanations, editor intros</div>
+<div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Caption</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Atkinson · 13/18 · 400</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; font-size: 13px; line-height: 18px; color: #b4b8bf">Field labels, hints, badge text on desktop</div>
+<div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Eyebrow</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Atkinson · 12/16 · 700 · caps · 0.08em</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.08em; color: #b4b8bf">STEP 1 · PLAN IS USING</div>
+<div style="padding: 12px 14px; border-top: 1px solid #3a3f47">Badge</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47; color: #b4b8bf">Atkinson · 12/17 list, 13/18 step 1 · 400</div><div style="padding: 12px 14px; border-top: 1px solid #3a3f47"><span style="padding: 2px 8px; border-radius: 999px; border: 1px solid #7fd19b; color: #7fd19b; font-size: 12px; line-height: 17px">Yours · 9 hunts</span></div>
+</div>
+</section>
+<section aria-labelledby="sp-h" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<h2 id="sp-h" style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">Spacing</h2>
+<span style="color: #b4b8bf; font-size: 14px; line-height: 20px">4 px base. Gaps inside a component 8–12, between sections 24, page padding 16 phone and 24–32 desktop.</span>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 4px; height: 16px; background: #8fb3ff"></span><span style="font-family: ui-monospace, Menlo, monospace; font-size: 14px">--s1 4</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 8px; height: 16px; background: #8fb3ff"></span><span style="font-family: ui-monospace, Menlo, monospace; font-size: 14px">--s2 8</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 12px; height: 16px; background: #8fb3ff"></span><span style="font-family: ui-monospace, Menlo, monospace; font-size: 14px">--s3 12</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 16px; height: 16px; background: #8fb3ff"></span><span style="font-family: ui-monospace, Menlo, monospace; font-size: 14px">--s4 16</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 24px; height: 16px; background: #8fb3ff"></span><span style="font-family: ui-monospace, Menlo, monospace; font-size: 14px">--s5 24</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 32px; height: 16px; background: #8fb3ff"></span><span style="font-family: ui-monospace, Menlo, monospace; font-size: 14px">--s6 32</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 48px; height: 16px; background: #8fb3ff"></span><span style="font-family: ui-monospace, Menlo, monospace; font-size: 14px">--s7 48</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">Radii</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><span style="width: 64px; height: 48px; border: 2px solid #78808b; border-radius: 8px"></span><span style="font-size: 13px; color: #b4b8bf">8 tiles</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><span style="width: 64px; height: 48px; border: 2px solid #78808b; border-radius: 10px"></span><span style="font-size: 13px; color: #b4b8bf">10 inputs</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><span style="width: 64px; height: 48px; border: 2px solid #78808b; border-radius: 12px"></span><span style="font-size: 13px; color: #b4b8bf">12 buttons</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><span style="width: 64px; height: 48px; border: 2px solid #78808b; border-radius: 14px"></span><span style="font-size: 13px; color: #b4b8bf">14 cards</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><span style="width: 64px; height: 48px; border: 2px solid #78808b; border-radius: 16px"></span><span style="font-size: 13px; color: #b4b8bf">16 editors</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><span style="width: 64px; height: 48px; border: 2px solid #e8b84a; border-radius: 18px"></span><span style="font-size: 13px; color: #b4b8bf">18 step 1</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><span style="width: 64px; height: 32px; border: 2px solid #78808b; border-radius: 999px"></span><span style="font-size: 13px; color: #b4b8bf">pill chips</span></div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 28px; line-height: 34px">Sizes and layout</h2>
+<ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: #b4b8bf; font-size: 14px; line-height: 20px">
+<li>Any tap target: 44 px minimum. Main actions 52 px. Tab bar items 56 px.</li>
+<li>Phone design width 390 px; works down to 320.</li>
+<li>Desktop: content max 1280 px. The inputs column is 340–420 px; the plan takes the rest. Below about 900 px the columns stack.</li>
+<li>Borders: 1 px default, 2 px for “open”, “next move” and selected.</li>
+<li>Focus: 3 px --focus outline, 2 px offset.</li>
+<li>Motion: none needed. If added, 150 ms, and none under prefers-reduced-motion.</li>
+</ul>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2100}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

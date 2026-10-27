@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>First run, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Pixelify+Sans:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#8fb3ff}a:hover{color:#c3d5ff}
+.hp-dark{--bg:#17191c;--surface:#212429;--surface2:#2c3036;--line:#3a3f47;--line2:#78808b;--text:#ecebe8;--muted:#b4b8bf;--accent:#8fb3ff;--accent-text:#a9c4ff;--gold:#e8b84a;--gold-text:#e8b84a;--on-gold:#1a1408;--yours:#7fd19b;--other:#c9a7ff;--focus:#8fb3ff}
+.hp-light{--bg:#f4f2ee;--surface:#ffffff;--surface2:#ece8e1;--line:#d9d5cc;--line2:#857f73;--text:#1c1b19;--muted:#55514a;--accent:#2f5fc4;--accent-text:#2a55b0;--gold:#c99a2e;--gold-text:#7d5a00;--on-gold:#1a1408;--yours:#19683a;--other:#6b3fb8;--focus:#2f5fc4}
+.hp-dark :focus-visible,.hp-light :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.hp-dark ::placeholder,.hp-light ::placeholder{color:var(--muted);opacity:1}
+</style>
+</helmet>
+<div class="{{cls}}" style="width: 390px; min-height: 900px; box-sizing: border-box; background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 15px; line-height: 21px; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--line); background: var(--surface)">
+<span style="font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 20px; line-height: 24px; font-weight: 700">Hunt planner</span>
+</header>
+<main style="padding: 24px 16px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 30px; line-height: 36px">Where should you hunt?</h1>
+<p style="margin: 0; color: var(--muted)">Two answers and you get a plan. Your bounty, goals and logged hunts can come later, and they’re all optional.</p>
+</div>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="padding: 0; margin-bottom: 8px; font-weight: 700">1. Vocation</legend>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{vocs}}" as="v" hint-placeholder-count="5"><button aria-pressed="{{v.pressed}}" onClick="{{v.pick}}" style="{{v.style}}">{{v.name}}</button></sc-for>
+</div>
+</fieldset>
+<label style="display: flex; flex-direction: column; gap: 8px; font-weight: 700">2. Level
+<input value="{{level}}" onChange="{{onLevel}}" inputmode="numeric" placeholder="e.g. 615" style="min-height: 52px; box-sizing: border-box; width: 100%; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line2); background: var(--surface); color: var(--text); font: inherit; font-size: 20px; font-weight: 400"></label>
+<button disabled="{{notReady}}" style="{{goStyle}}">Show my plan</button>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--muted)">{{readyNote}}</p>
+<div style="border: 1px dashed var(--line2); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 6px">
+<b>What you’ll see first</b>
+<span style="font-size: 14px; line-height: 20px; color: var(--muted)">Spots ranked from reference hunts near your level. They’re top players’ numbers, likely more than you’ll get, until you log a clean hunt of your own.</span>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--muted)">Have a backup from another device? <a href="#">Restore it</a>.</p>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":900}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { voc: 'Elite Knight', level: '' };
+}
+renderVals() {
+const s = this.state;
+const names = ['Elite Knight', 'Royal Paladin', 'Elder Druid', 'Master Sorcerer', 'Exalted Monk'];
+const vocs = names.map((n) => {
+const on = s.voc === n;
+return {
+name: n, pressed: on ? 'true' : 'false', pick: () => this.setState({ voc: n }),
+style: 'min-height: 56px; border-radius: 12px; font: inherit; cursor: pointer; border: ' + (on ? '2px solid var(--gold)' : '1px solid var(--line2)') + '; background: ' + (on ? 'var(--surface2)' : 'var(--surface)') + '; color: var(--text); font-weight: ' + (on ? '700' : '400')
+};
+});
+const ready = !!s.voc && Number(s.level) > 0;
+return {
+cls: 'hp-' + (this.props.theme ?? 'dark'),
+vocs: vocs,
+level: s.level,
+onLevel: (e) => this.setState({ level: String(e.target.value).replace(/[^0-9]/g, '').slice(0, 4) }),
+notReady: !ready,
+goStyle: 'min-height: 56px; border-radius: 12px; border: 0; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; background: ' + (ready ? 'var(--gold)' : 'var(--surface2)') + '; color: ' + (ready ? 'var(--on-gold)' : 'var(--muted)'),
+readyNote: ready ? (s.voc + ', level ' + s.level + '. A name is optional; add one later in Characters.') : 'Type your level to continue. A name is optional; add one later in Characters.'
+};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "hunt-planner",
+  "private": true,
+  "license": "MIT",
+  "description": "Hunt Planner for Tibia: development tooling (assembly, tests and the offline build; the app has no runtime dependencies).",
+  "scripts": {
+    "test": "node tools/assemble.js && node --test tests/layers.test.js tests/data.test.js \"tests/unit/**/*.test.js\" \"tests/ui/**/*.test.js\" && node tests/golden.test.js",
+    "golden:update": "node tests/golden.test.js --update",
+    "build": "node tools/assemble.js && python3 tools/build.py dist/index.html . fonts-cache",
+    "test:unit": "node --test tests/layers.test.js \"tests/unit/**/*.test.js\"",
+    "test:ui": "node tools/assemble.js && node --test \"tests/ui/**/*.test.js\""
+  },
+  "devDependencies": {
+    "acorn": "8.14.0",
+    "acorn-walk": "8.3.4",
+    "esbuild": "0.28.2",
+    "jsdom": "^24.1.0"
+  }
+}
