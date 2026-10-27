@@ -1,0 +1,60 @@
+name: Something’s wrong
+description: A bug, or numbers that look off.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please don’t attach a backup file: it holds your characters and hunts, and issues are public.
+  - type: textarea
+    id: did
+    attributes:
+      label: What did you do?
+      description: The screen you were on and the steps, one per line.
+      placeholder: |
+        1. Plan, opened Today’s boosts
+        2. Tapped “+ Add a prey”
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened instead?
+      description: A screenshot helps. For numbers that look wrong, say which ones and where the right ones come from (a TibiaWiki page, an in-game screenshot, a video).
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where are you using it?
+      options:
+        - The website in a browser
+        - The installed app (Install app / Add to Home screen)
+        - Something else (say below)
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Browser and device
+      placeholder: Chrome on Android, Safari on iPhone, Firefox on Windows…
+  - type: dropdown
+    id: language
+    attributes:
+      label: App language
+      options:
+        - English
+        - Español
+        - Português (Brasil)
+        - Polski
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else?
+      description: Vocation and level, the goal mix, the bounty difficulty: whatever seems related.

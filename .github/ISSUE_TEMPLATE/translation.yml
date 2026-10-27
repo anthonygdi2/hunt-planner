@@ -1,0 +1,33 @@
+name: Translation fix
+description: Text in Español, Português or Polski that reads wrong or is missing.
+body:
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options:
+        - Español
+        - Português (Brasil)
+        - Polski
+    validations:
+      required: true
+  - type: input
+    id: screen
+    attributes:
+      label: Where is it?
+      description: The screen or file (for example Plan, Today’s boosts; or README.pl.md).
+    validations:
+      required: true
+  - type: textarea
+    id: now
+    attributes:
+      label: What it says now
+    validations:
+      required: true
+  - type: textarea
+    id: better
+    attributes:
+      label: What it should say
+      description: Creature, spot and in-game feature names stay in English, as Tibia’s client shows them.
+    validations:
+      required: true
