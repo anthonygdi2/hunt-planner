@@ -13,7 +13,7 @@ import { staleProfitText } from "../core/reference.js";
 import { slotOdds, slotSuggestions } from "../core/slots.js";
 import { aVoc } from "../core/explain.js";
 import { parseSession, sessionProblems } from "../core/session.js";
-import { weekKey } from "../core/weekly.js";
+import { weekKey, serverDay } from "../core/weekly.js";
 import { markAge, markActive } from "../core/occupancy.js";
 import { isChallengingMaster } from "../core/rewards.js";
 import { t, _, translator, locale } from "./lang.js";
@@ -70,12 +70,14 @@ const DIFF_LABELS = [["master", _("Master")], ["expert", _("Expert")], ["adept",
 const diffOptions = () => DIFF_LABELS.map(([value, label]) => ({ value, label: t(label) }));
 export function bountyView(b, catalog) {
   const c = (slug) => (slug && catalog.bySlug[slug]) || null, name = (slug) => (c(slug) ? c(slug).name : "");
-  const tokens = b.tokens == null ? t("tokens not set") : t.n(b.tokens, "{n} token", "{n} tokens"), n = b.offers.filter((o) => o.slug).length;
+  const tokens = b.tokens == null ? t("tokens not set") : b.assumed ? t.n(b.tokens, "{n} token (assumed)", "{n} tokens (assumed)") : t.n(b.tokens, "{n} token", "{n} tokens");
+  const n = b.offers.filter((o) => o.slug).length;
   const active = b.mode === "active" && b.active;
   const chip = active ? { set: true, value: name(b.active.slug) + " · " + tokens }
     : n ? { set: true, value: t.n(n, "{n} offer", "{n} offers") + " · " + tokens } : b.tokens != null ? { set: true, value: t("No offers") + " · " + tokens } : { set: false, value: "" };
   return {
-    chip: Object.assign({ label: t("Bounty") }, chip), mode: active ? "active" : "offers", difficulty: b.difficulty, tokens: b.tokens,
+    chip: Object.assign({ label: t("Bounty"), warn: b.tokens === 0 }, chip), mode: active ? "active" : "offers", difficulty: b.difficulty, tokens: b.tokens,
+    tokensNote: b.assumed ? t("Assumed. Set what you have in game.") : b.tokens === 0 ? t("None left: the plan won’t suggest a reroll.") : "",
     difficulties: diffOptions(),
     intro: active ? t("Your active bounty, as the game shows it.") : t("The three offers on your board."),
     offers: b.offers.map((o, i) => ({ i, letter: "ABC"[i], name: name(o.slug), kills: o.kills, kind: o.kind, exp: o.exp,
@@ -161,7 +163,10 @@ export function planScreenView(state, model, catalog, now) {
   const end = last.kind === "reroll" ? { kind: "reroll", title: last.label,
     line: (last.dropsBounty ? t("Drops your bounty.") + " " : "") + t.n(last.tokens, "{n} token left.", "{n} tokens left."), why: last.why }
     : { kind: "seeSpots", title: last.label, line: b.tokens === 0 ? t("No reroll tokens left.") : t("Every spot, best first."), why: last.why };
-  const notices = ch.steps.filter((s) => s.kind === "finish" || s.kind === "claim").map((s) => ({ kind: s.kind, text: s.text, why: s.why }));
+  // At 0 tokens the player confirms it once per server day (the daily token may be waiting); it replaces the claim step.
+  const tokenCheck = b.tokens === 0 && !b.assumed && b.zeroChecked !== serverDay(now) ? { title: t("Out of reroll tokens?"),
+    text: t("At 0 the plan can’t suggest a reroll. Claim today’s free token on the Task Board if you haven’t, then set how many you have.") } : null;
+  const notices = ch.steps.filter((s) => s.kind === "finish").map((s) => ({ kind: s.kind, text: s.text, why: s.why }));
   const first = go[0] || null;
   const refNote = first && (first.badges[0] || {}).kind !== "yours" && (first.badges[0] || {}).kind !== "refAdj" ? t("Top players’ numbers: expect less until you log a hunt.") : null;
 
@@ -180,8 +185,9 @@ export function planScreenView(state, model, catalog, now) {
 
   // The other chips and their editors.
   const wk = model.weekly(), rows = model.weeklyRows().filter((r) => r.name), done = rows.filter((r) => r.done);
-  const weekly = { chip: rows.length && wk.current ? { set: true, value: t("{done} of {slots} done", { done: done.length, slots: wk.slots }) } : { set: false, value: "" },
-    rows: wk.current ? rows.map((r) => ({ i: r.i, name: r.name, left: r.killsLeft, done: r.done })) : [] };
+  const anyTask = wk.current && wk.any && (wk.any.killsLeft != null || wk.any.done) ? { left: wk.any.killsLeft, done: wk.any.done } : null;
+  const weekly = { chip: (rows.length || anyTask) && wk.current ? { set: true, value: t("{done} of {slots} done", { done: done.length, slots: wk.slots }) } : { set: false, value: "" },
+    rows: wk.current ? rows.map((r) => ({ i: r.i, name: r.name, left: r.killsLeft, done: r.done })) : [], any: anyTask };
   const td = model.today(), prey = (td.prey || []).filter((q) => q.slug);
   const todayParts = [td.boosted ? t("{creature} boosted", { creature: name(td.boosted) }) : null, prey.length ? t.n(prey.length, "{n} prey", "{n} preys") : null,
     td.event ? t("+{pct}% event", { pct: td.event }) : null].filter(Boolean);
@@ -198,7 +204,7 @@ export function planScreenView(state, model, catalog, now) {
   const data = { chip: { set: true, value: t(SOURCE_LABELS[preset]) }, preset,
     presets: ["mine", "reference", "everything"].map((value) => ({ value, label: t(SOURCE_LABELS[value]), switches: SOURCE_PRESETS[value] })) };
 
-  return Object.assign(base, { weekly, today, time, data, steps: { first, fallbacks: go.slice(1), end, notices, refNote, notes: ch.notes }, taken, hunting: huntingView });
+  return Object.assign(base, { weekly, today, time, data, steps: { first, fallbacks: go.slice(1), end, notices, tokenCheck, refNote, notes: ch.notes }, taken, hunting: huntingView });
 }
 function preySizes(kind) { const r = PREY[kind] || PREY.xp, out = []; for (let v = r.lo; v <= r.hi; v += r.step) out.push({ value: v, label: v + "%" }); return out; }
 
@@ -216,6 +222,7 @@ export function weeklyView(w, rows, catalog, now) {
     stale: !w.current, staleText: t("A new week has started."),
     difficulty: w.difficulty, difficulties: diffOptions(), slots: w.slots,
     slotOptions: [{ value: 6, label: "6" }, { value: 9, label: t("9 (with expansion)") }],
+    any: { killsLeft: w.any && w.any.killsLeft != null ? w.any.killsLeft : "", done: !!(w.any && w.any.done) },
     rows: slots, doneCount: slots.filter((r) => r.done).length, reward: w.exp ? t("{exp} exp each", { exp: fmtBig(w.exp) }) : t("Set your level to see the reward."),
     names: catalog.list.map((c) => c.name),
   };

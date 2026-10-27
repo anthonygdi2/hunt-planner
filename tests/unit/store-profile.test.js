@@ -57,13 +57,16 @@ test("bounty: the current shape, and migrated from board, reroll, planner diff a
     { reroll: { left: 4 }, board: { offers: [{ name: "Cobra Assassin", kills: 450, kind: "normal" }, { name: "Gorerilla", kills: 400, exp: 1627800, kind: "silver" }, { name: "", kills: null }] } }, ctx);
   assert.deepEqual(old, { difficulty: "expert", tokens: 4, mode: "active",
     offers: [{ slug: "cobra-assassin", kills: 450, kind: "normal", exp: null }, { slug: "gorerilla", kills: 400, kind: "silver", exp: 1627800 }, { slug: null, kills: null, kind: "normal", exp: null }],
-    active: { slug: "cobra-assassin", kills: 450, killsLeft: 420, kind: "normal", exp: null, since: "t" } }, "kills left = kills − the kills typed as done");
+    active: { slug: "cobra-assassin", kills: 450, killsLeft: 420, kind: "normal", exp: null, since: "t" }, zeroChecked: null }, "kills left = kills − the kills typed as done");
   // No data: choosing offers, tokens never set.
-  assert.deepEqual(readBounty(undefined, {}, ctx), { difficulty: "master", tokens: null, mode: "offers", offers: [0, 1, 2].map(() => ({ slug: null, kills: null, kind: "normal", exp: null })), active: null });
+  assert.deepEqual(readBounty(undefined, {}, ctx), { difficulty: "master", tokens: null, mode: "offers", offers: [0, 1, 2].map(() => ({ slug: null, kills: null, kind: "normal", exp: null })), active: null, zeroChecked: null });
   // New data wins over the old fields; an active mode without an active bounty falls back to offers.
   const cur = readBounty({ diff: "beginner", bounty: { difficulty: "adept", tokens: 12, mode: "active", active: { slug: "gorerilla", kills: 300, killsLeft: 500, kind: "gold" }, offers: [] } }, { reroll: { left: 2 } }, ctx);
   assert.deepEqual([cur.difficulty, cur.tokens, cur.mode, cur.active.killsLeft], ["adept", 10, "active", 300], "tokens capped at 10, kills left at kills");
   assert.equal(readBounty({ bounty: { mode: "active", active: { slug: "unknown" } } }, {}, ctx).mode, "offers");
+  // The day the player last confirmed having no tokens (server day).
+  assert.equal(readBounty({ bounty: { tokens: 0, zeroChecked: "2026-10-21" } }, {}, ctx).zeroChecked, "2026-10-21");
+  assert.equal(readBounty({ bounty: { tokens: 0, zeroChecked: 5 } }, {}, ctx).zeroChecked, null);
 });
 
 test("Hunting now: the current field, migrated from the old timer session", async () => {
@@ -79,13 +82,15 @@ test("weekly tasks: the current shape, and from the old weekly with the old rule
   const known = (s) => s === "silencer";
   const w = readWeeklyTasks({ weekStart: "2026-10-19", difficulty: "expert", slots: 9, exp: 0, tasks: [{ slug: "silencer", killsLeft: 300, done: false }, { name: " Varg ", killsLeft: -2, done: true }, { slug: "gone", name: "x" }] }, known);
   assert.deepEqual(w, { weekStart: "2026-10-19", difficulty: "expert", slots: 9, exp: null, tasks: [
-    { slug: "silencer", name: null, killsLeft: 300, done: false }, { slug: null, name: "Varg", killsLeft: null, done: true }, { slug: null, name: "x", killsLeft: null, done: false }] });
+    { slug: "silencer", name: null, killsLeft: 300, done: false }, { slug: null, name: "Varg", killsLeft: null, done: true }, { slug: null, name: "x", killsLeft: null, done: false }], any: { killsLeft: null, done: false } });
+  assert.deepEqual(readWeeklyTasks({ any: { killsLeft: 2500, done: false } }, known).any, { killsLeft: 2500, done: false }, "the Any Creature task");
+  assert.deepEqual(readWeeklyTasks({ any: { killsLeft: -1, done: "yes" } }, known).any, { killsLeft: null, done: false });
   assert.equal(readWeeklyTasks({ slots: 7, tasks: new Array(8).fill({}) }, known).tasks.length, 6, "6 or 9 slots");
   // Old rows as the old app computed them: kills left = K − logged − extra.
   const rows = [{ name: "Silencer", creature: { slug: "silencer" }, K: 600, rem: 390 }, { name: "Retching Horror", creature: { slug: "retching-horror" }, K: 300, rem: 0 },
     { name: "Mystery", K: null, rem: null }, { name: "" }];
   assert.deepEqual(weeklyTasksFromOld({ week: "2026-10-19", diff: "master", exp: null, tasks: [{ name: "Silencer", kills: 600 }, { name: "Retching Horror", kills: 300 }, { name: "Mystery" }] }, rows), {
     weekStart: "2026-10-19", difficulty: "master", slots: 6, exp: null, tasks: [
-      { slug: "silencer", name: null, killsLeft: 390, done: false }, { slug: "retching-horror", name: null, killsLeft: 0, done: true }, { slug: null, name: "Mystery", killsLeft: null, done: false }] });
+      { slug: "silencer", name: null, killsLeft: 390, done: false }, { slug: "retching-horror", name: null, killsLeft: 0, done: true }, { slug: null, name: "Mystery", killsLeft: null, done: false }], any: { killsLeft: null, done: false } });
   assert.equal(weeklyTasksFromOld({ tasks: new Array(7).fill({ name: "a", kills: 1 }) }, []).slots, 9, "more than 6 tasks: 9 slots");
 });

@@ -113,18 +113,31 @@ test("browser storage: first run, characters and settings, no page errors", asyn
   assert.equal(p.$("#chip-goal").textContent, "Goal Custom mix");
   assert.equal(p.$("#goal-share").textContent, "Exp 43% · Profit 43% · Charm points 14%");
   // The Bounty: offers, pick, kills left, finished.
+  // Tokens never set: 5 assumed, said on the chip and in the editor; stepping from there makes them real.
+  assert.match(p.$("#chip-bounty").textContent, /5 tokens \(assumed\)/);
   await p.click("#chip-bounty");
+  assert.equal(p.$("#bounty-tokens-note").textContent, "Assumed. Set what you have in game.");
   await p.click("#bounty-tokens-inc");
   await p.type("#offer-0-name", "Frazzlemaw");
   await p.type("#offer-0-kills", "280");
   await p.click("#offer-0-pick");
-  assert.match(p.$("#chip-bounty").textContent, /Frazzlemaw · 1 token/);
+  assert.match(p.$("#chip-bounty").textContent, /Frazzlemaw · 6 tokens$/);
   await p.type("#active-left", "50");
   const plState = () => Object.entries(p.local()).find(([k]) => k.endsWith("/planner/state"))[1];
   await until(() => plState().bounty && plState().bounty.active && plState().bounty.active.killsLeft === 50, "the kills left write");
   await p.click("#bounty-finished");
-  await until(() => plState().bounty.mode === "offers" && plState().bounty.tokens === 2, "the finished write");
-  assert.equal(p.local()[path].reroll.left, 2, "tokens in step for older builds");
+  await until(() => plState().bounty.mode === "offers" && plState().bounty.tokens === 7, "the finished write");
+  assert.equal(p.local()[path].reroll.left, 7, "tokens in step for older builds");
+  // Down to 0: the Plan asks to check, until the player says they have none (for the rest of the server day).
+  assert.equal(p.$("#token-check"), null);
+  for (let i = 0; i < 7; i++) await p.click("#bounty-tokens-dec");
+  await until(() => plState().bounty.tokens === 0, "the 0 tokens write");
+  assert.match(p.$("#chip-bounty").className, /warn/);
+  assert.match(p.$("#token-check").textContent, /Out of reroll tokens\?/);
+  await p.click("#token-check-none");
+  await until(() => typeof plState().bounty.zeroChecked === "string", "the confirmation");
+  assert.equal(p.$("#token-check"), null);
+  assert.equal(plState().bounty.tokens, 0);
   await p.go("characters");
   // Backup download in the browser.
   await p.click("#bk-download");
@@ -212,12 +225,18 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   assert.equal(store["profiles/ek/planner/state"].held.slug, "cobra-assassin", "the old held field is left in place");
   // Weekly: the old list read with the old rule; Done writes the new field and leaves the old one.
   await p.go("weekly");
-  assert.deepEqual([...p.d.querySelectorAll(".hp-wk-row")].slice(0, 4).map((r) => [r.querySelector("input").value, r.querySelectorAll("input")[1].value, r.querySelector("button").getAttribute("aria-pressed")]),
+  assert.deepEqual([...p.d.querySelectorAll(".hp-wk-row:not(.any)")].slice(0, 4).map((r) => [r.querySelector("input").value, r.querySelectorAll("input")[1].value, r.querySelector("button").getAttribute("aria-pressed")]),
     [["Silencer", "10", "false"], ["Choking Fear", "180", "false"], ["Retching Horror", "0", "true"], ["Dragon Lord", "200", "false"]]);
   await p.click("#wk-3-done");
   await until(() => store["profiles/ek"].weeklyTasks, "the weekly write");
   assert.deepEqual(store["profiles/ek"].weeklyTasks.tasks[3], { slug: "dragon-lord", name: null, killsLeft: 200, done: true });
   assert.equal(store["profiles/ek"].weekly.tasks[0].kills, 600, "the old weekly is left in place");
+  // The Any Creature task: kills left typed, then Done.
+  await p.type("#wk-any-left", "3000");
+  await until(() => (store["profiles/ek"].weeklyTasks.any || {}).killsLeft === 3000, "the Any Creature write");
+  await p.click("#wk-any-done");
+  await until(() => store["profiles/ek"].weeklyTasks.any.done === true, "Any Creature done");
+  assert.deepEqual(store["profiles/ek"].weeklyTasks.tasks[3], { slug: "dragon-lord", name: null, killsLeft: 200, done: true }, "the other tasks stay");
   assert.deepEqual(p.errors, []);
   p.w.close();
 });

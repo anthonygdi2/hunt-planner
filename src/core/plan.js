@@ -8,6 +8,7 @@ import { RHO, taskShape, rateThreshold } from "./reroll.js";
 import { markAge, markActive, occOdds, orderByOdds } from "./occupancy.js";
 import { offerLetter, goWhy, rerollWhy, seeSpotsWhy } from "./explain.js";
 import { EN } from "./i18n.js";
+import { ANY_CREATURE, allKph } from "./weekly.js";
 import { BOOSTED_EXP_MULT, RAID, TASK, TOKEN_CAP } from "../data/rules.js";
 
 // The chain shows at most this many spots.
@@ -70,7 +71,7 @@ export function spotValue(sp, nums, opts, ctx) {
     v.held = { slug: held.slug, kph: hk, kills: rate ? null : Math.min(held.left, hk * Hh), left: held.left, finishes: !rate && hf >= 1, hoursLeft: held.left / hk };
   }
   (opts.weekly || []).forEach((w) => {
-    const k = nums.kph[w.key];
+    const k = w.key === ANY_CREATURE ? allKph(nums.kph) : nums.kph[w.key];
     if (!(k > 0)) return;
     const f = rate ? k / w.rem : Math.min(1, k * Hh / w.rem);
     v.parts.weekly += w.exp * f / H;

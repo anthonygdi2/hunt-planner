@@ -89,8 +89,10 @@ export function createApp({ data, prefs, now, browserLang }) {
   // The whole bounty, written with a patch on top of what the model reads now (migrated or stored).
   function saveBounty(patch) {
     const b = model().bounty();
-    actions.savePlanner({ bounty: Object.assign({ difficulty: b.difficulty, tokens: b.tokens, mode: b.mode, offers: b.offers, active: b.active }, patch) });
+    actions.savePlanner({ bounty: Object.assign({ difficulty: b.difficulty, tokens: b.assumed ? null : b.tokens, mode: b.mode, offers: b.offers, active: b.active,
+      zeroChecked: b.zeroChecked }, patch) });
   }
+  // tokens: the new count, or null while they're still assumed (an assumed count never becomes a real one by itself).
   function endBounty(tokens) {
     saveBounty({ tokens, mode: "offers", active: null, offers: [blankOffer(), blankOffer(), blankOffer()] });
     updateCharacter({ reroll: Object.assign({}, (profile() || {}).reroll, { left: tokens }) });
@@ -106,7 +108,7 @@ export function createApp({ data, prefs, now, browserLang }) {
   const weeklyNow = () => model().weekly();
   function saveWeekly(patch) {
     const w = weeklyNow();
-    const next = Object.assign({ weekStart: w.weekStart || weekKey(new Date(now())), difficulty: w.difficulty, slots: w.slots, exp: w.override, tasks: w.tasks }, patch);
+    const next = Object.assign({ weekStart: w.weekStart || weekKey(new Date(now())), difficulty: w.difficulty, slots: w.slots, exp: w.override, tasks: w.tasks, any: w.any }, patch);
     next.tasks = next.tasks.slice(0, next.slots);
     updateCharacter({ weeklyTasks: next });
   }
@@ -315,9 +317,12 @@ export function createApp({ data, prefs, now, browserLang }) {
       learnReward(b.difficulty, a);
     },
     // Finished it: +1 token (at most 10), the bounty clears, back to choosing offers.
-    finishedBounty() { const t = model().bounty().tokens; endBounty(Math.min(TOKEN_CAP, (t || 0) + 1)); },
+    finishedBounty() { const b = model().bounty(); endBounty(b.assumed ? null : Math.min(TOKEN_CAP, b.tokens + 1)); },
     // Rerolled: −1 token, offers and any active bounty clear.
-    rerolled() { const t = model().bounty().tokens; endBounty(Math.max(0, (t || 0) - 1)); },
+    rerolled() { const b = model().bounty(); endBounty(b.assumed ? null : Math.max(0, b.tokens - 1)); },
+    // At 0 tokens the player says they really have none (the daily one claimed too): the Plan's check stays away until
+    // the next server save.
+    confirmNoTokens() { saveBounty({ zeroChecked: serverDay(now()) }); },
     // Plan: Free and Taken marks (each counted once per 15 minutes toward how often the spot is free), Hunting now.
     markTaken(spotId) { mark(spotId, "taken"); },
     markFree(spotId) { mark(spotId, "free"); },
@@ -358,8 +363,15 @@ export function createApp({ data, prefs, now, browserLang }) {
       tasks[i].done = !!on;
       saveWeekly({ tasks });
     },
+    // The Any Creature task: {killsLeft} as typed ("" clears it) and/or {done}.
+    setWeeklyAny(patch) {
+      const any = Object.assign({}, weeklyNow().any);
+      if ("killsLeft" in patch) any.killsLeft = patch.killsLeft === "" || patch.killsLeft == null ? null : Math.max(0, Math.min(100000, Math.floor(Number(patch.killsLeft)) || 0));
+      if ("done" in patch) any.done = !!patch.done;
+      saveWeekly({ any });
+    },
     // A new week: the rows clear (difficulty and slots stay).
-    startNewWeek() { saveWeekly({ weekStart: weekKey(new Date(now())), exp: null, tasks: [] }); },
+    startNewWeek() { saveWeekly({ weekStart: weekKey(new Date(now())), exp: null, tasks: [], any: { killsLeft: null, done: false } }); },
     // Logging a clean hunt. preview: parseSession's result. spot: {id} (a known spot) or {name, parentId, note} (a new
     // spot, or a variation of parentId). raidsBy: Echo Raids per creature (advanced). Saves the session at that spot (and
     // the new spot first); Hunting now ends. Returns the session's id, or null when there's nothing to save.

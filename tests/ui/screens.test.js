@@ -149,6 +149,16 @@ test("plan: the Bounty editor while choosing offers and once one is picked", asy
   $("#bounty-finished").click();
   assert.deepEqual(s.calls.slice(-2), [["active", { killsLeft: "100" }], ["finished"]]);
   assert.equal(bountyView({ difficulty: "master", tokens: null, mode: "offers", offers: [blank, blank, blank], active: null }, catalog).chip.set, false, "nothing set: dashed chip");
+  // Tokens never set: the model's assumed count, said as such.
+  v = bountyView({ difficulty: "master", tokens: 5, assumed: true, mode: "offers", offers: [blank, blank, blank], active: null }, catalog);
+  assert.deepEqual([v.chip.value, v.chip.warn, v.tokensNote], ["No offers · 5 tokens (assumed)", false, "Assumed. Set what you have in game."]);
+  $ = mount(plan.render({ goal, bounty: v }, { open: "bounty" }, { toggle() {}, bounty }));
+  assert.equal($("#bounty-tokens-note").textContent, "Assumed. Set what you have in game.");
+  // None left: the chip warns.
+  v = bountyView({ difficulty: "master", tokens: 0, assumed: false, mode: "offers", offers: [blank, blank, blank], active: null }, catalog);
+  assert.deepEqual([v.chip.value, v.chip.warn], ["No offers · 0 tokens", true]);
+  $ = mount(plan.render({ goal, bounty: v }, { open: null }, { toggle() {}, bounty }));
+  assert.match($("#chip-bounty").className, /\bwarn\b/);
 });
 
 test("plan: steps, Hunting now and Taken spots call their actions", async () => {
@@ -162,9 +172,10 @@ test("plan: steps, Hunting now and Taken spots call their actions", async () => 
       fallbacks: [{ id: "nuur", title: "Taken? → Ruins of Nuur", name: "Ruins of Nuur", exp: "6.9kk", profit: "450k", badges: [{ kind: "yours", text: "Yours · 9 hunts" }], why: "Also good." }],
       end: { kind: "reroll", title: "Reroll and re-plan", line: "4 tokens left. Or see Spots for more.", why: "" } } };
   const s = spy(), on = {};
-  ["toggle", "why", "free", "taken", "freeAgain", "pick", "stopHunting", "reroll", "spots", "hours"].forEach((k) => { on[k] = s.fn(k); });
+  ["toggle", "why", "free", "taken", "freeAgain", "pick", "stopHunting", "reroll", "spots", "hours", "setTokens", "confirmNoTokens", "weeklyDone", "weeklyAnyDone"].forEach((k) => { on[k] = s.fn(k); });
   let $ = mount(plan.render(view, { open: null, why: {} }, on));
   assert.equal($("#step1-title").textContent, "Go to Cobra Bastion");
+  assert.equal($("#token-check"), null);
   assert.match(document.body.textContent, /For offer B: Cobra Assassin/);
   assert.match(document.body.textContent, /Reference, adjusted to you/);
   assert.match(document.body.textContent, /Taken spots \(1\)/);
@@ -175,6 +186,16 @@ test("plan: steps, Hunting now and Taken spots call their actions", async () => 
   assert.match(document.body.textContent, /Because\./);
   $("#time-1").click();
   assert.deepEqual(s.calls.at(-1), ["hours", 2]);
+  // Out of tokens: the check, with Set tokens and I have none.
+  $ = mount(plan.render(Object.assign({}, view, { steps: Object.assign({}, view.steps, { tokenCheck: { title: "Out of reroll tokens?", text: "Check." } }) }), { open: null, why: {} }, on));
+  assert.equal($("#token-check-title").textContent, "Out of reroll tokens?");
+  $("#token-check-set").click(); $("#token-check-none").click();
+  assert.deepEqual(s.calls.slice(-2), [["setTokens"], ["confirmNoTokens"]]);
+  // The Weekly editor: the Any Creature task first.
+  $ = mount(plan.render(Object.assign({}, view, { weekly: { chip: { set: true, value: "0 of 6 done" }, rows: [{ i: 0, name: "Silencer", left: 300, done: false }], any: { left: 2000, done: false } } }), { open: "weekly", why: {} }, on));
+  assert.match($("#plan-editor").textContent, /Any Creature 2000 left/);
+  $("#wkchip-any-done").click(); $("#wkchip-0-done").click();
+  assert.deepEqual(s.calls.slice(-2), [["weeklyAnyDone", true], ["weeklyDone", 0, true]]);
   // Hunting now, with the offer to pick.
   $ = mount(plan.render(Object.assign({}, view, { hunting: { spotId: "bastion", name: "Cobra Bastion", pick: { i: 1, letter: "B", name: "Cobra Assassin" } } }), { open: null, why: {} }, on));
   assert.equal($("#step1-free"), null);
@@ -189,14 +210,18 @@ test("weekly: rows, Done, slots and a new week call their actions", async () => 
   const weekly = await import("../../src/ui/screens/weekly.js");
   const catalog = makeCatalog([{ n: "Silencer", c: "H", m: 12 }]);
   const NOW = Date.parse("2026-10-21T18:00:00Z");
-  const w = { weekStart: "2026-10-19", difficulty: "master", slots: 6, exp: 1226315, override: null, formula: 1226315, current: true, tasks: [] };
+  const w = { weekStart: "2026-10-19", difficulty: "master", slots: 6, exp: 1226315, override: null, formula: 1226315, current: true, tasks: [], any: { killsLeft: 2500, done: false } };
   const v = weeklyView(w, [{ i: 0, name: "Silencer", killsLeft: 390, done: false }, { i: 1, name: "Choking Fear", killsLeft: 0, done: true }], catalog, NOW);
   assert.match(v.intro, /^Week of Oct 19 · new tasks Oct 26$/);
   assert.equal(v.rows.length, 6);
   assert.equal(v.doneCount, 1);
   const s = spy(), on = {};
-  ["difficulty", "slots", "task", "done", "newWeek", "arm"].forEach((k) => { on[k] = s.fn(k); });
+  ["difficulty", "slots", "task", "done", "any", "newWeek", "arm"].forEach((k) => { on[k] = s.fn(k); });
   let $ = mount(weekly.render(v, { armed: false }, on));
+  assert.equal($("#wk-any-left").value, "2500");
+  $("#wk-any-left").value = "2400"; $("#wk-any-left").dispatchEvent(new dom.window.Event("change"));
+  $("#wk-any-done").click();
+  assert.deepEqual(s.calls.splice(0), [["any", { killsLeft: "2400" }], ["any", { done: true }]]);
   assert.equal($("#wk-0-name").value, "Silencer");
   assert.equal($("#wk-1-done").getAttribute("aria-pressed"), "true");
   assert.equal($("#wk-new-now"), null, "this week: no prompt");

@@ -174,6 +174,7 @@ export function readPlState(v, known) {
 // {weekStart, difficulty, slots 6 | 9, exp (an override, or null), tasks [{slug or name, killsLeft, done}]}. Older
 // profiles have `weekly` {week, diff, exp, tasks [{name, kills, extra}]}, read by weeklyTasksFromOld; it stays as it was.
 export const WEEKLY_SLOTS = [6, 9];
+// {weekStart, difficulty, slots, exp, tasks [{slug, name, killsLeft, done}], any {killsLeft, done}}.
 export function readWeeklyTasks(v, known) {
   const w = v && typeof v === "object" ? v : {}, slots = w.slots === 9 ? 9 : 6;
   const tasks = (Array.isArray(w.tasks) ? w.tasks : []).slice(0, slots).map((t) => {
@@ -181,14 +182,20 @@ export function readWeeklyTasks(v, known) {
     const slug = t.slug && known(t.slug) ? t.slug : null;
     return { slug, name: slug ? null : (typeof t.name === "string" ? t.name.trim().slice(0, 60) : "") || null, killsLeft: plNum(t.killsLeft, 0, 100000), done: t.done === true };
   });
-  return { weekStart: typeof w.weekStart === "string" ? w.weekStart : null, difficulty: TASK[w.difficulty] ? w.difficulty : "master", slots, exp: plNum(w.exp, 1, 1e12), tasks };
+  return { weekStart: typeof w.weekStart === "string" ? w.weekStart : null, difficulty: TASK[w.difficulty] ? w.difficulty : "master", slots, exp: plNum(w.exp, 1, 1e12), tasks,
+    any: readAnyTask(w.any) };
+}
+// The week's Any Creature kill task {killsLeft, done}; weeks saved before it existed have none set.
+export function readAnyTask(v) {
+  v = v && typeof v === "object" ? v : {};
+  return { killsLeft: plNum(v.killsLeft, 0, 100000), done: v.done === true };
 }
 // The old weekly as the new shape. rows: the old rows as the old app computed them (core/weekly.js weeklyRows: name,
 // creature, K, rem), so kills left = kills − kills logged since the reset − kills added by hand, computed once here.
 export function weeklyTasksFromOld(old, rows) {
   const w = old && typeof old === "object" ? old : {}, n = Array.isArray(w.tasks) ? w.tasks.filter((t) => t && (t.name || t.kills)).length : 0;
   const tasks = rows.filter((r) => r.name).map((r) => ({ slug: r.creature ? r.creature.slug : null, name: r.creature ? null : r.name, killsLeft: r.K ? r.rem : null, done: !!(r.K && r.rem === 0) }));
-  return { weekStart: typeof w.week === "string" ? w.week : null, difficulty: TASK[w.diff] ? w.diff : "master", slots: n > 6 ? 9 : 6, exp: plNum(w.exp, 1, 1e12), tasks };
+  return { weekStart: typeof w.week === "string" ? w.week : null, difficulty: TASK[w.diff] ? w.diff : "master", slots: n > 6 ? 9 : 6, exp: plNum(w.exp, 1, 1e12), tasks, any: readAnyTask(null) };
 }
 
 // Hunting now: {spotId, at} or null. Older planner states had a timer session `active` {spot, at}, which becomes
@@ -226,7 +233,8 @@ export function readBounty(plState, profile, ctx) {
   if (b && typeof b === "object") {
     const active = readActive(b.active, ctx);
     return { difficulty: TASK[b.difficulty] ? b.difficulty : "master", tokens: b.tokens == null ? null : Math.max(0, Math.min(10, Math.floor(Number(b.tokens)) || 0)),
-      mode: b.mode === "active" && active ? "active" : "offers", offers: offers(Array.isArray(b.offers) ? b.offers : []), active };
+      mode: b.mode === "active" && active ? "active" : "offers", offers: offers(Array.isArray(b.offers) ? b.offers : []), active,
+      zeroChecked: typeof b.zeroChecked === "string" ? b.zeroChecked : null };
   }
   const p = profile || {}, reroll = p.reroll || {}, board = p.board || {}, h = st.held;
   const left = reroll.left == null ? null : Math.max(0, Math.min(10, parseInt(reroll.left, 10) || 0));
@@ -236,7 +244,8 @@ export function readBounty(plState, profile, ctx) {
     active = { slug: h.slug, kills, killsLeft: kills != null ? Math.max(0, kills - done) : null, kind: OFFER_KINDS.indexOf(h.kind) !== -1 ? h.kind : "normal",
       exp: plNum(h.exp, 1, 1e13), since: typeof h.since === "string" ? h.since : null };
   }
-  return { difficulty: TASK[st.diff] ? st.diff : "master", tokens: left, mode: active ? "active" : "offers", offers: offers(Array.isArray(board.offers) ? board.offers : []), active };
+  return { difficulty: TASK[st.diff] ? st.diff : "master", tokens: left, mode: active ? "active" : "offers", offers: offers(Array.isArray(board.offers) ? board.offers : []), active,
+    zeroChecked: null };
 }
 
 // ---------- marks and occupancy: profiles/{pid}/marks/{spotId}, profiles/{pid}/occupancy/{spotId} ----------
