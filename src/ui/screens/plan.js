@@ -41,12 +41,14 @@ const textInput = (id, label, value, onCommit, opts) => h("label", { class: "hp-
 const kinds = () => [{ value: "normal", label: t("Normal") }, { value: "silver", label: "Silver" }, { value: "gold", label: "Gold" }];
 
 // The Bounty editor: difficulty and tokens, then the three offers while choosing, or the active bounty.
-// view: app/views.js bountyView. on: {difficulty(d), tokens(n), offer(i, patch), pick(i), active(patch), finished(), rerolled(), done()}.
+// view: app/views.js bountyView. on: {difficulty(d), tokens(n), offer(i, patch), pick(i), active(patch), finished(), rerolled(), lists(),
+// done()}.
 export function bountyEditor(view, on) {
   const KINDS = kinds();
   const offerCard = (o) => h("div", { class: "hp-offer", role: "group", "aria-label": t("Offer {letter}", { letter: o.letter }) },
     h("div", { class: "hp-offer-top" }, h("span", { class: "hp-letter", "aria-hidden": "true" }, o.letter),
       textInput("offer-" + o.i + "-name", t("Offer {letter}: creature", { letter: o.letter }), o.name, (v) => on.offer(o.i, { name: v }), { list: "bounty-names", autocomplete: "off" })),
+    o.mark ? h("span", { id: "offer-" + o.i + "-mark", class: "hp-caption hp-mark " + o.mark.kind }, o.mark.text) : null,
     h("div", { class: "hp-offer-row" },
       textInput("offer-" + o.i + "-kills", t("Kills needed"), o.kills, (v) => on.offer(o.i, { kills: v }), { inputmode: "numeric" }),
       segmented({ label: t("Offer {letter} kind", { letter: o.letter }), options: KINDS, value: o.kind, onPick: (k) => on.offer(o.i, { kind: k }) })),
@@ -71,6 +73,8 @@ export function bountyEditor(view, on) {
         view.difficulties.map((d) => h("option", { value: d.value, selected: d.value === view.difficulty }, d.label)))),
       h("div", { class: "hp-field" }, t("Reroll tokens"), stepper({ id: "bounty-tokens", label: t("Reroll tokens"), value: view.tokens, min: 0, max: 10, onSet: on.tokens }),
         view.tokensNote ? h("span", { id: "bounty-tokens-note", class: "hp-caption warn" }, view.tokensNote) : null)),
+    h("div", { class: "hp-lists-line" }, h("span", { class: "hp-small" }, view.lists),
+      h("button", { id: "bounty-lists", type: "button", class: "hp-linkbtn", onClick: on.lists }, t("Edit lists"))),
     h("datalist", { id: "bounty-names" }, view.suggestions.map((n) => h("option", { value: n }))),
     view.mode === "active" ? activeCard : [view.offers.map(offerCard),
       h("button", { id: "bounty-rerolled", type: "button", class: "hp-btn dashed", onClick: on.rerolled }, t("Rerolled (−1, clears the offers)"))],

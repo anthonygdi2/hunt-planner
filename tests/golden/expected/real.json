@@ -36749,7 +36749,15 @@
          },
          "pool": {"known":{"$set":343}},
          "skipped": {"$set":[]},
-         "steps": {"$set":[{"kind":"reroll","text":"Reroll and re-plan","why":"The next spot, Bastion lure (31), is worth less than a reroll (34). Rerolling drops Cobra Assassin."}]}
+         "steps": {
+          "$set": [
+           {
+            "kind": "reroll",
+            "text": "Reroll and re-plan",
+            "why": "The next spot, Bastion lure (31), is worth less than a reroll (34). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
+          ]
+         }
         }
        },
        "charm": {
@@ -51706,7 +51714,11 @@
            {"kind":"go","text":"Taken? → Cobra Basement -1","why":"Scores 52: 31.3 bounty points/h. Bounty done in about 52 min here. A reroll is worth 36 with 4 tokens left."},
            {"kind":"go","text":"Taken? → Cobra Bastion for Beginners","why":"Scores 49: 29.3 bounty points/h. Bounty done in about 55 min here. A reroll is worth 38 with 4 tokens left."},
            {"kind":"go","text":"Taken? → Cobra Bastion","why":"Scores 45: 27.3 bounty points/h. Bounty done in about 59 min here. A reroll is worth 39 with 4 tokens left."},
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Cobra Bastion -1 (37), is worth less than a reroll (42). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Cobra Bastion -1 (37), is worth less than a reroll (42). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }

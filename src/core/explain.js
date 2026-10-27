@@ -96,6 +96,8 @@ export function rerollWhy(cutoff, skipped, ctx) {
   else if (!ctx.options.length) s = t("None of your spots has numbers for this character yet.");
   else s = skipped.length && !ctx.chosen.length ? t("Every spot worth checking is marked taken.") : t("Every spot worth checking is on this list.");
   if (ctx.active) s += " " + t("Rerolling drops {creature}.", { creature: ctx.active.name });
+  const l = ctx.sc && ctx.sc.model && ctx.sc.model.lists;
+  if (l && (l.preferred || l.unwanted)) s += " " + t("Counts your lists: {preferred} Preferred, {unwanted} Unwanted in this pool.", l);
   return s;
 }
 

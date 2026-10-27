@@ -68,7 +68,11 @@ export function goalMixView(goal) {
 // The Bounty chip and its editor. b: the model's bounty(); catalog: makeCatalog(...).
 const DIFF_LABELS = [["master", _("Master")], ["expert", _("Expert")], ["adept", _("Adept")], ["beginner", _("Beginner")]];
 const diffOptions = () => DIFF_LABELS.map(([value, label]) => ({ value, label: t(label) }));
-export function bountyView(b, catalog) {
+// slots: the model's {preferred, unwanted} lists (slugs), or none.
+export function bountyView(b, catalog, slots) {
+  const sl = slots || { preferred: [], unwanted: [] };
+  const mark = (slug) => (!slug ? null : sl.preferred.indexOf(slug) !== -1 ? { kind: "pref", text: "★ " + t("Preferred") }
+    : sl.unwanted.indexOf(slug) !== -1 ? { kind: "unw", text: "⊘ " + t("Unwanted") } : null);
   const c = (slug) => (slug && catalog.bySlug[slug]) || null, name = (slug) => (c(slug) ? c(slug).name : "");
   const tokens = b.tokens == null ? t("tokens not set") : b.assumed ? t.n(b.tokens, "{n} token (assumed)", "{n} tokens (assumed)") : t.n(b.tokens, "{n} token", "{n} tokens");
   const n = b.offers.filter((o) => o.slug).length;
@@ -80,7 +84,9 @@ export function bountyView(b, catalog) {
     tokensNote: b.assumed ? t("Assumed. Set what you have in game.") : b.tokens === 0 ? t("None left: the plan won’t suggest a reroll.") : "",
     difficulties: diffOptions(),
     intro: active ? t("Your active bounty, as the game shows it.") : t("The three offers on your board."),
-    offers: b.offers.map((o, i) => ({ i, letter: "ABC"[i], name: name(o.slug), kills: o.kills, kind: o.kind, exp: o.exp,
+    lists: sl.preferred.length || sl.unwanted.length ? t("★ Preferred {preferred} of {max} · ⊘ Unwanted {unwanted} of {max}", { preferred: sl.preferred.length, unwanted: sl.unwanted.length, max: SLOTS.max })
+      : t("Preferred and Unwanted lists: not set"),
+    offers: b.offers.map((o, i) => ({ i, letter: "ABC"[i], name: name(o.slug), kills: o.kills, kind: o.kind, exp: o.exp, mark: mark(o.slug),
       showExp: isChallengingMaster(b.difficulty, c(o.slug)), canPick: !!o.slug })),
     active: active ? { name: name(b.active.slug), kills: b.active.kills, killsLeft: b.active.killsLeft, kind: b.active.kind, exp: b.active.exp,
       showExp: isChallengingMaster(b.difficulty, c(b.active.slug)) } : null,
@@ -92,7 +98,7 @@ export function bountyView(b, catalog) {
 // The Plan screen (F2: Goal; F3: Bounty; F4 adds the rest). model: the active character's model; catalog for names.
 export function planView(state, model, catalog) {
   const p = state.profiles[state.pid] || {};
-  return { goal: goalMixView(readGoal(p)), bounty: model && catalog ? bountyView(model.bounty(), catalog) : null };
+  return { goal: goalMixView(readGoal(p)), bounty: model && catalog ? bountyView(model.bounty(), catalog, model.slots()) : null };
 }
 
 const MINUTES_LABEL = { 30: _("30 minutes"), 45: _("45 minutes"), 60: _("1 hour"), 120: _("2 hours") };

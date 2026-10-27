@@ -50,7 +50,9 @@ export function poolModel(diff, { weights: w, pool, preferred, unwanted, metrics
     r.v1 = weightedValue(r.m, w, keys, max);
     if (r.v1 != null) known.push(r.v1);
   });
-  const model = { keys, w, max, rows, known: known.length, diff };
+  // How many of the player's Preferred and Unwanted creatures are in this pool (they're what the odds above use).
+  const lists = { preferred: rows.filter((r) => r.w > 1).length, unwanted: pool.filter((p) => unw[p.it.slug]).length };
+  const model = { keys, w, max, rows, known: known.length, diff, lists };
   if (!known.length) return model;
   known.sort((a, b) => a - b);
   kphs.sort((a, b) => a - b);

@@ -2126,7 +2126,11 @@
          "steps": {
           "$set": [
            {"kind":"go","text":"Go to Bastion lure","why":"Scores 48: 19.8 bounty points/h. Bounty done in about 48 min here. A reroll is worth 46 with 4 tokens left."},
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Cobra Bastion -1 (32), is worth less than a reroll (47). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Cobra Bastion -1 (32), is worth less than a reroll (47). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }
@@ -2257,7 +2261,11 @@
            },
            {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 65: 26 charm points/h. Today: Silencer is boosted (double exp). A reroll is worth 47 with 4 tokens left."},
            {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 63: 25.2 charm points/h. A reroll is worth 47 with 4 tokens left."},
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Nightmare Isles (47), is worth less than a reroll (47). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Nightmare Isles (47), is worth less than a reroll (47). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }
@@ -3112,7 +3120,11 @@
             "text": "Taken? → Cobra Bastion -1",
             "why": "Scores 67: 604.66k profit/h. Bounty done in about 1 h 12 min here. A reroll is worth 47 with 4 tokens left. Free 2 of 3 times you checked around this hour."
            },
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Warzone 2 (44), is worth less than a reroll (51). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Warzone 2 (44), is worth less than a reroll (51). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }
@@ -3230,7 +3242,11 @@
             "text": "Taken? → Cobra Bastion -1",
             "why": "Scores 70: 4.47kk exp/h (3.77kk hunting, 699.38k from the bounty), 604.66k profit/h. Bounty done in about 1 h 12 min here. A reroll is worth 57 with 4 tokens left. Free 2 of 3 times you checked around this hour."
            },
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Feru Way (61), is worth less than a reroll (65). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Feru Way (61), is worth less than a reroll (65). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }
@@ -3346,7 +3362,11 @@
             "text": "Taken? → Cobra Bastion -1",
             "why": "Scores 48: 22.4 bounty points/h. Bounty done in about 1 h 12 min here. A reroll is worth 27 with 4 tokens left. Free 2 of 3 times you checked around this hour."
            },
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Nightmare Isles (0), is worth less than a reroll (38). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Nightmare Isles (0), is worth less than a reroll (38). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }
@@ -3443,7 +3463,11 @@
            },
            {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 65: 26 charm points/h. Today: Silencer is boosted (double exp). A reroll is worth 48 with 4 tokens left."},
            {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 63: 25.2 charm points/h. A reroll is worth 48 with 4 tokens left."},
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Nightmare Isles (47), is worth less than a reroll (48). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Nightmare Isles (47), is worth less than a reroll (48). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }
@@ -3947,7 +3971,11 @@
            "why": "Scores 101: 6.24kk exp/h (5.2kk hunting, 1.04kk from the bounty). Bounty done in about 48 min here. A reroll is worth 68 with 4 tokens left."
           },
           {"kind":"go","text":"Taken? → Feru Way","why":"Scores 90: 5.54kk exp/h. A reroll is worth 79 with 4 tokens left."},
-          {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Asura Mirror (75), is worth less than a reroll (79). Rerolling drops Cobra Assassin."}
+          {
+           "kind": "reroll",
+           "text": "Taken? → Reroll and re-plan",
+           "why": "The next spot, Asura Mirror (75), is worth less than a reroll (79). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+          }
          ],
          "tokens": 4
         },
@@ -4053,7 +4081,11 @@
             "text": "Taken? → Bastion lure",
             "why": "Scores 101: 6.24kk exp/h (5.2kk hunting, 1.04kk from the bounty), 900k profit/h. Bounty done in about 48 min here. A reroll is worth 62 with 4 tokens left."
            },
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Feru Way (71), is worth less than a reroll (72). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Feru Way (71), is worth less than a reroll (72). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }
@@ -4146,7 +4178,11 @@
             "text": "Taken? → Cobra Bastion -1",
             "why": "Scores 67: 604.66k profit/h. Bounty done in about 1 h 12 min here. A reroll is worth 43 with 4 tokens left. Free 2 of 3 times you checked around this hour."
            },
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Warzone 2 (44), is worth less than a reroll (54). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Warzone 2 (44), is worth less than a reroll (54). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }
@@ -8209,7 +8245,11 @@
              "text": "Taken? → Cobra Bastion -1",
              "why": "Scores 70: 3.96kk exp/h (3.77kk hunting, 190.23k from the bounty), 604.66k profit/h. Bounty done in about 1 h 12 min here. A reroll is worth 66 with 4 tokens left. Free 2 of 3 times you checked around this hour."
             },
-            {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Feru Way (64), is worth less than a reroll (69). Rerolling drops Cobra Assassin."}
+            {
+             "kind": "reroll",
+             "text": "Taken? → Reroll and re-plan",
+             "why": "The next spot, Feru Way (64), is worth less than a reroll (69). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+            }
            ]
           }
          },
@@ -8443,7 +8483,11 @@
             "text": "Taken? → Bastion lure",
             "why": "Scores 83: 5.48kk exp/h (5.2kk hunting, 284.14k from the bounty). Bounty done in about 48 min here. A reroll is worth 74 with 4 tokens left."
            },
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Asura Mirror (70), is worth less than a reroll (77). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Asura Mirror (70), is worth less than a reroll (77). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }
@@ -8563,7 +8607,11 @@
              "why": "Scores 100: 5.48kk exp/h (5.2kk hunting, 284.14k from the bounty), 900k profit/h. Bounty done in about 48 min here. A reroll is worth 70 with 4 tokens left."
             },
             {"kind":"go","text":"Taken? → Feru Way","why":"Scores 75: 5.54kk exp/h, 292.92k profit/h. A reroll is worth 75 with 4 tokens left."},
-            {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Cobra Bastion -1 (71), is worth less than a reroll (71). Rerolling drops Cobra Assassin."}
+            {
+             "kind": "reroll",
+             "text": "Taken? → Reroll and re-plan",
+             "why": "The next spot, Cobra Bastion -1 (71), is worth less than a reroll (71). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+            }
            ]
           }
          },
@@ -8737,7 +8785,11 @@
              "text": "Taken? → Cobra Bastion -1",
              "why": "Scores 70: 4.47kk exp/h (3.77kk hunting, 699.38k from the bounty), 604.66k profit/h. Bounty done in about 1 h 12 min here. A reroll is worth 61 with 4 tokens left. Free 2 of 3 times you checked around this hour."
             },
-            {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Feru Way (60), is worth less than a reroll (69). Rerolling drops Cobra Assassin."}
+            {
+             "kind": "reroll",
+             "text": "Taken? → Reroll and re-plan",
+             "why": "The next spot, Feru Way (60), is worth less than a reroll (69). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+            }
            ]
           }
          }
@@ -8930,7 +8982,11 @@
             "text": "Taken? → Bastion lure",
             "why": "Scores 94: 6.24kk exp/h (5.2kk hunting, 1.04kk from the bounty). Bounty done in about 48 min here. A reroll is worth 79 with 4 tokens left."
            },
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Feru Way (83), is worth less than a reroll (85). Rerolling drops Cobra Assassin."}
+           {
+            "kind": "reroll",
+            "text": "Taken? → Reroll and re-plan",
+            "why": "The next spot, Feru Way (83), is worth less than a reroll (85). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+           }
           ]
          }
         }
@@ -9044,7 +9100,11 @@
              "text": "Taken? → Cobra Bastion -1",
              "why": "Scores 71: 4.47kk exp/h (3.77kk hunting, 699.38k from the bounty), 604.66k profit/h. Bounty done in about 1 h 12 min here. A reroll is worth 66 with 4 tokens left. Free 2 of 3 times you checked around this hour."
             },
-            {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Feru Way (70), is worth less than a reroll (74). Rerolling drops Cobra Assassin."}
+            {
+             "kind": "reroll",
+             "text": "Taken? → Reroll and re-plan",
+             "why": "The next spot, Feru Way (70), is worth less than a reroll (74). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+            }
            ]
           }
          }

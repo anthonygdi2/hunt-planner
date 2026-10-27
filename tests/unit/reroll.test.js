@@ -40,6 +40,8 @@ test("pool model", () => {
   assert.equal(u.rows.length, 4);
   assert.equal(u.best, 1, "c4 is now the best");
   assert.equal(u.rows.find((r) => r.it.slug === "c4").w, 5);
+  assert.deepEqual(u.lists, { preferred: 1, unwanted: 1 }, "list creatures in this pool");
+  assert.deepEqual(poolModel("master", ctx({ unwanted: ["nope"], preferred: [] })).lists, { preferred: 0, unwanted: 0 }, "not in this pool: not counted");
   // Ten logged boards with two Gold: Gold offers are 4×.
   const g = poolModel("master", ctx({ rewardObs: Array.from({ length: 10 }, (_, i) => ({ kind: i < 2 ? "gold" : "normal" })) }));
   assert.deepEqual(g.kinds, [0.8, 0, 0.2]);
