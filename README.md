@@ -1,3 +1,5 @@
+**English** · [Español](README.es.md) · [Português (Brasil)](README.pt-BR.md) · [Polski](README.pl.md)
+
 # Hunt Planner
 
 Where should you hunt right now? Hunt Planner answers that for Tibia players, around the Bounty Task board: enter your three bounty offers (or the one you picked), and it gives you a short plan: go to this spot, for this offer; taken? try that one; else reroll. It weighs your bounty, your weekly kill tasks, today’s boosted creature and prey, and what you hunt for (exp, profit, charm points or bounty points). It used to be called the Bounty Task tier list.
@@ -15,12 +17,12 @@ Where should you hunt right now? Hunt Planner answers that for Tibia players, ar
 - **Plan**: the steps for right now, each with Free and Taken (spots marked taken are skipped for a while), and a “Why?” under each.
 - **Spots**: every hunting spot that fits your vocation and level, scored for your goal, with where the numbers come from.
 - **Creatures**: every bounty creature ranked S to D for your goal, your Preferred and Unwanted lists with the odds they give you, and each creature’s spots, bestiary and notes.
-- **Weekly**: your weekly kill tasks, so spots with open tasks score higher.
+- **Weekly**: your weekly kill tasks, so spots with open tasks score higher, and which weekly difficulty pays the most exp at your level.
 - **Log a clean hunt**: paste Tibia’s Hunting Session Analyser text, and that spot’s numbers become your own. Published reference hunts fill in until then, and they’re adjusted to you once you’ve logged a few.
 
 ## Languages
 
-English, Español, Português (Brasil) and Polski: the app picks your browser’s language the first time, and you can change it on the first screen or in Characters and settings. The translations are new, so if something reads wrong, [open an issue](https://github.com/anthonygdi2/hunt-planner/issues). Creature and spot names stay as Tibia shows them.
+English, Español, Português (Brasil) and Polski: the app picks your browser’s language the first time, and you can change it on the first screen or in Characters and settings. The translations are new, so if something reads wrong, [open an issue](https://github.com/anthonygdi2/hunt-planner/issues). Creature and spot names stay as Tibia shows them. This README is also in [Español](README.es.md), [Português (Brasil)](README.pt-BR.md) and [Polski](README.pl.md); those cover using the app, and this English one stays the full reference.
 
 ## Your data
 
