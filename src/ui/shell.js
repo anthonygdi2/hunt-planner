@@ -90,8 +90,9 @@ export function mount(root, app, host) {
         today: { boosted: a.setBoosted, prey: a.setPrey, addPrey: a.addPrey, removePrey: a.removePrey, event: a.setEvent },
         hours: a.setFixedHours, sources: a.setSources,
         free: (id) => { P.why = {}; a.startHunting(id); }, taken: (id) => { P.why = {}; a.markTaken(id); }, freeAgain: a.markFree,
-        pick: a.pickOffer, stopHunting: a.stopHunting, weeklyDone: a.setWeeklyDone, logHunt: (spotId) => openLog({ spotId, where: "known" }, "plan"),
+        pick: a.pickOffer, stopHunting: a.stopHunting, weeklyDone: a.setWeeklyDone, weeklyAnyDone: (on) => a.setWeeklyAny({ done: on }), logHunt: (spotId) => openLog({ spotId, where: "known" }, "plan"),
         reroll: () => { P.open = "bounty"; draw(); }, spots: () => go("spots"), openSpot,
+        setTokens: () => { P.open = "bounty"; draw(); }, confirmNoTokens: a.confirmNoTokens,
         preset: a.applyPreset,
         weight: (key, n) => { const w = {}; v.goal.rows.forEach((row) => { w[row.key] = row.value; }); w[key] = n; a.setWeights(w); },
         bounty: { difficulty: a.setDifficulty, tokens: a.setTokens, offer: a.setOffer, pick: a.pickOffer, active: a.setActive, finished: a.finishedBounty, rerolled: a.rerolled },
@@ -147,7 +148,7 @@ export function mount(root, app, host) {
     if (r === "weekly") {
       const M = app.model(), a = app.actions, W = ui.weekly;
       return weeklyScreen.render(weeklyView(M.weekly(), M.weeklyRows(), app.catalog, Date.now()), W, {
-        difficulty: a.setWeeklyDifficulty, slots: a.setWeeklySlots, task: a.setWeeklyTask, done: a.setWeeklyDone,
+        difficulty: a.setWeeklyDifficulty, slots: a.setWeeklySlots, task: a.setWeeklyTask, done: a.setWeeklyDone, any: a.setWeeklyAny,
         newWeek: () => { W.armed = false; a.startNewWeek(); }, arm: (b) => { W.armed = b; draw(); },
       });
     }

@@ -3,7 +3,8 @@ import { h } from "../dom.js";
 import { selectField, confirmButton } from "../components.js";
 import { t } from "../../app/lang.js";
 
-// view: app/views.js weeklyView; ui: {armed}. on: {difficulty(d), slots(n), task(i, patch), done(i, on), newWeek(), arm(b)}.
+// view: app/views.js weeklyView; ui: {armed}. on: {difficulty(d), slots(n), task(i, patch), done(i, on), any(patch), newWeek(),
+// arm(b)}.
 export function render(view, ui, on) {
   const row = (r) => h("div", { class: "hp-wk-row", role: "group", "aria-label": t("Task {n}", { n: r.i + 1 }) },
     h("input", { id: "wk-" + r.i + "-name", class: "hp-input", "aria-label": t("Task {n} creature", { n: r.i + 1 }), value: r.name, list: "wk-names", autocomplete: "off",
@@ -23,7 +24,14 @@ export function render(view, ui, on) {
     h("p", { class: "hp-p hp-caption" }, t("{done} of {slots} done", { done: view.doneCount, slots: view.slots }) + " · " + view.reward),
     h("datalist", { id: "wk-names" }, view.names.map((n) => h("option", { value: n }))),
     h("div", { class: "hp-wk-head", "aria-hidden": "true" }, h("span", null, t("Creature")), h("span", null, t("Kills left")), h("span")),
-    h("div", { class: "hp-wk-rows" }, view.rows.map(row)),
+    h("div", { class: "hp-wk-rows" },
+      h("div", { class: "hp-wk-row any", role: "group", "aria-label": "Any Creature" },
+        h("span", { class: "hp-wk-any" }, h("b", null, "Any Creature"), h("span", { class: "hp-caption" }, t("Every kill counts"))),
+        h("input", { id: "wk-any-left", class: "hp-input", "aria-label": t("Any Creature kills left"), value: String(view.any.killsLeft), inputmode: "numeric",
+          onChange: (e) => on.any({ killsLeft: e.target.value }) }),
+        h("button", { id: "wk-any-done", type: "button", class: "hp-btn hp-done", "aria-pressed": view.any.done ? "true" : "false", "aria-label": t("Any Creature done"),
+          onClick: () => on.any({ done: !view.any.done }) }, view.any.done ? "✓ " + t("Done") : t("Done"))),
+      view.rows.map(row)),
     view.stale ? null : confirmButton({ id: "wk-new", label: t("Start a new week"), confirmLabel: t("Tap again to clear this week’s tasks"), armed: ui.armed,
       onArm: () => on.arm(true), onConfirm: on.newWeek }));
 }

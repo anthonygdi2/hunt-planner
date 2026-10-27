@@ -6,8 +6,8 @@ import { segmented, stepper, selectField, badges } from "../components.js";
 import { t } from "../../app/lang.js";
 
 // A chip: set (label and value), not set (dashed "+ label"), open (aria-expanded).
-export function chip({ id, label, value, set, open, onToggle }) {
-  return h("button", { id, type: "button", class: "hp-chip" + (set ? "" : " unset"), "aria-expanded": open ? "true" : "false", "aria-controls": "plan-editor", onClick: onToggle },
+export function chip({ id, label, value, set, warn, open, onToggle }) {
+  return h("button", { id, type: "button", class: "hp-chip" + (set ? "" : " unset") + (warn ? " warn" : ""), "aria-expanded": open ? "true" : "false", "aria-controls": "plan-editor", onClick: onToggle },
     set ? [h("span", { class: "label" }, label), " ", h("b", null, value)] : "+ " + label);
 }
 
@@ -69,7 +69,8 @@ export function bountyEditor(view, on) {
     h("div", { class: "hp-inline" },
       h("label", { class: "hp-field" }, t("Difficulty"), h("select", { id: "bounty-diff", class: "hp-select", onChange: (e) => on.difficulty(e.target.value) },
         view.difficulties.map((d) => h("option", { value: d.value, selected: d.value === view.difficulty }, d.label)))),
-      h("div", { class: "hp-field" }, t("Reroll tokens"), stepper({ id: "bounty-tokens", label: t("Reroll tokens"), value: view.tokens, min: 0, max: 10, onSet: on.tokens }))),
+      h("div", { class: "hp-field" }, t("Reroll tokens"), stepper({ id: "bounty-tokens", label: t("Reroll tokens"), value: view.tokens, min: 0, max: 10, onSet: on.tokens }),
+        view.tokensNote ? h("span", { id: "bounty-tokens-note", class: "hp-caption warn" }, view.tokensNote) : null)),
     h("datalist", { id: "bounty-names" }, view.suggestions.map((n) => h("option", { value: n }))),
     view.mode === "active" ? activeCard : [view.offers.map(offerCard),
       h("button", { id: "bounty-rerolled", type: "button", class: "hp-btn dashed", onClick: on.rerolled }, t("Rerolled (−1, clears the offers)"))],
@@ -84,11 +85,14 @@ const editorFrame = (id, title, intro, planLine, body, done) => h("section", { i
     h("button", { id: id + "-done", type: "button", class: "hp-btn solid", onClick: done }, t("Done"))));
 
 function weeklyEditor(v, planLine, on) {
+  const item = (id, name, left, done, toggle) => h("li", null, h("span", null, h("b", null, name), " ",
+    h("span", { class: "hp-muted" }, left == null ? "" : t("{n} left", { n: left }))),
+    h("button", { id: "wkchip-" + id + "-done", type: "button", class: "hp-btn hp-done", "aria-pressed": done ? "true" : "false", "aria-label": t("{creature} done", { creature: name }),
+      onClick: toggle }, done ? "✓ " + t("Done") : t("Done")));
+  const items = (v.any ? [item("any", "Any Creature", v.any.left, v.any.done, () => on.weeklyAnyDone(!v.any.done))] : [])
+    .concat(v.rows.map((r) => item(r.i, r.name, r.left, r.done, () => on.weeklyDone(r.i, !r.done))));
   return editorFrame("weekly", t("Weekly"), null, planLine, [
-    v.rows.length ? h("ul", { class: "hp-list" }, v.rows.map((r) => h("li", null, h("span", null, h("b", null, r.name), " ",
-      h("span", { class: "hp-muted" }, r.left == null ? "" : t("{n} left", { n: r.left }))),
-      h("button", { id: "wkchip-" + r.i + "-done", type: "button", class: "hp-btn hp-done", "aria-pressed": r.done ? "true" : "false", "aria-label": t("{creature} done", { creature: r.name }),
-        onClick: () => on.weeklyDone(r.i, !r.done) }, r.done ? "✓ " + t("Done") : t("Done"))))) :
+    items.length ? h("ul", { class: "hp-list" }, items) :
       h("p", { class: "hp-p hp-muted" }, t("No open weekly tasks.")),
     h("a", { href: "#/weekly", id: "weekly-open" }, t("Edit them on the Weekly tab"))], on.done);
 }
@@ -122,6 +126,12 @@ const whyToggle = (id, text, open, onWhy) => [
 
 function steps(v, ui, on) {
   const st = v.steps, f = st.first, kids = [], takenLead = () => h("span", { class: "hp-muted" }, t("Taken? →") + " ");
+  if (st.tokenCheck) kids.push(h("article", { id: "token-check", class: "hp-step note", role: "status", "aria-labelledby": "token-check-title" },
+    h("h3", { id: "token-check-title", class: "hp-step-title" }, st.tokenCheck.title),
+    h("p", { class: "hp-p hp-small" }, st.tokenCheck.text),
+    h("div", { class: "hp-grid2" },
+      h("button", { id: "token-check-set", type: "button", class: "hp-btn solid", onClick: on.setTokens }, t("Set tokens")),
+      h("button", { id: "token-check-none", type: "button", class: "hp-btn", onClick: on.confirmNoTokens }, t("I have none")))));
   st.notices.forEach((n, i) => kids.push(h("article", { class: "hp-step note" }, h("b", null, n.text), whyToggle("n" + i, n.why, ui.why["n" + i], () => on.why("n" + i)))));
   if (v.hunting) {
     const hu = v.hunting;
@@ -160,14 +170,14 @@ function steps(v, ui, on) {
 
 // view: app/views.js planScreenView; ui: {open: editor id or null, why: {id: true}}. on: {toggle(id), why(id), preset(id),
 // weight(key, n), bounty: {...}, today: {...}, hours(h), sources(s), free(id), taken(id), freeAgain(id), pick(i),
-// stopHunting(), reroll(), spots()}.
+// stopHunting(), reroll(), spots(), setTokens(), confirmNoTokens()}.
 export function render(view, ui, on) {
   const planLine = view.steps ? (view.hunting ? t("Hunting at {spot}", { spot: view.hunting.name }) : view.steps.first ? view.steps.first.title : view.steps.end.title) : "";
   const close = () => on.toggle(null);
   const editors = {
     goal: () => goalEditor(view.goal, { preset: on.preset, weight: on.weight, done: close }),
     bounty: () => bountyEditor(view.bounty, Object.assign({}, on.bounty, { done: close })),
-    weekly: () => weeklyEditor(view.weekly, planLine, { weeklyDone: on.weeklyDone, done: close }),
+    weekly: () => weeklyEditor(view.weekly, planLine, { weeklyDone: on.weeklyDone, weeklyAnyDone: on.weeklyAnyDone, done: close }),
     today: () => todayEditor(view.today, planLine, Object.assign({}, on.today, { done: close })),
     time: () => timeEditor(view.time, planLine, { hours: on.hours, done: close }),
     data: () => dataEditor(view.data, planLine, { sources: on.sources, done: close }),
@@ -178,7 +188,7 @@ export function render(view, ui, on) {
   const inputs = h("div", { class: "hp-section hp-plan-inputs" },
     h("section", { class: "hp-section", "aria-labelledby": "using-h" },
       h("h2", { id: "using-h", class: "hp-eyebrow" }, t("Plan is using")),
-      h("div", { class: "hp-chips" }, chips.map(([id, label, c]) => chip({ id: "chip-" + id, label, value: c.value, set: c.set, open: ui.open === id, onToggle: toggle(id) })))),
+      h("div", { class: "hp-chips" }, chips.map(([id, label, c]) => chip({ id: "chip-" + id, label, value: c.value, set: c.set, warn: c.warn, open: ui.open === id, onToggle: toggle(id) })))),
     ui.open && editors[ui.open] ? editors[ui.open]() : null);
   if (!view.steps) return inputs;
   return h("div", { class: "hp-plan" }, inputs,

@@ -519,4 +519,15 @@ export default {
   "Couldn’t create the backup. Try again in a moment.": "Nie udało się utworzyć kopii. Spróbuj ponownie za chwilę.",
   "That isn’t a number. Type it like 450, 3.2kk or 800k.": "To nie jest liczba. Wpisz np. 450, 3.2kk albo 800k.",
   "Dismiss": "Zamknij",
+  // Reroll tokens assumed or at 0; the Any Creature weekly task
+  "{n} token (assumed)": { one: "{n} token (zakładany)", few: "{n} tokeny (zakładane)", many: "{n} tokenów (zakładanych)", other: "{n} tokena (zakładane)" },
+  "Assumed. Set what you have in game.": "Zakładane. Ustaw tyle, ile masz w grze.",
+  "None left: the plan won’t suggest a reroll.": "Brak tokenów: plan nie zaproponuje rerolla.",
+  "Out of reroll tokens?": "Brak tokenów reroll?",
+  "At 0 the plan can’t suggest a reroll. Claim today’s free token on the Task Board if you haven’t, then set how many you have.": "Przy 0 plan nie może zaproponować rerolla. Odbierz dzisiejszy darmowy token na Task Board, jeśli jeszcze tego nie zrobiłeś, a potem ustaw, ile masz.",
+  "Set tokens": "Ustaw tokeny",
+  "I have none": "Nie mam żadnych",
+  "Every kill counts": "Liczy się każde zabicie",
+  "Any Creature kills left": "Pozostałe zabicia Any Creature",
+  "Any Creature done": "Any Creature zrobione",
 };

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { weekStart, weekKey, weeklyReward, readWeekly, loggedSince, weeklyRows, openWeeklies, weeklyBonus } from "../../src/core/weekly.js";
+import { weekStart, weekKey, weeklyReward, readWeekly, loggedSince, weeklyRows, openWeeklies, weeklyBonus, ANY_CREATURE, allKph } from "../../src/core/weekly.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 
 const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }, { n: "Cobra Scout", c: "M", m: 6 }]);
@@ -73,4 +73,14 @@ test("weekly bonus per hour", () => {
   assert.equal(weeklyBonus(open, null, 2, "cobra-assassin", 200), 1e6 * 0.5 / 2);
   assert.equal(weeklyBonus([], { "cobra-scout": 100 }, 1), 0);
   assert.equal(weeklyBonus(open, { "cobra-scout": 100 }, 0), 0);
+});
+
+test("the Any Creature weekly takes every kill at the spot", () => {
+  assert.equal(allKph({ a: 100, b: 50, c: null }), 150);
+  assert.equal(allKph(null), 0);
+  const any = [{ key: ANY_CREATURE, rem: 3000, exp: 1e6 }];
+  assert.equal(weeklyBonus(any, { "cobra-scout": 100, "cobra-assassin": 200 }, 2, null, 0), 1e6 * 600 / 3000 / 2);
+  assert.equal(weeklyBonus(any, { "cobra-scout": 2000 }, 2, null, 0), 1e6 / 2, "capped at the reward");
+  // No spot numbers: the bounty kills still count.
+  assert.equal(weeklyBonus(any, null, 1, "cobra-assassin", 300), 1e6 * 300 / 3000);
 });

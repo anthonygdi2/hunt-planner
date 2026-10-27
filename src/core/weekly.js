@@ -62,13 +62,24 @@ export function openWeeklies(weekly, rows) {
   return out;
 }
 
+// The key of the weekly "Any Creature" kill task (one every week since the winter update 2025, TibiaWiki BR Weekly
+// Tasks and TibiaQA 38271): every kill counts toward it. The kill count isn't published, so the player types it.
+export const ANY_CREATURE = "any";
+// All kills per hour at a spot ({key: kph}).
+export const allKph = (kph) => Object.keys(kph || {}).reduce((a, k) => a + (kph[k] > 0 ? kph[k] : 0), 0);
+
 // Weekly exp per hour from hunting `hours` at a spot whose kills/h are `spotKph` ({key: kph}, or null). Each kill still
 // needed for an open weekly is worth an equal share of its reward. The bounty creature's own task kills (selfSlug,
-// selfKills) always count toward its weekly; other weeklies need the spot to have them.
+// selfKills) always count toward its weekly; other weeklies need the spot to have them; Any Creature takes every kill.
 export function weeklyBonus(open, spotKph, hours, selfSlug, selfKills) {
   if (!open.length || !(hours > 0)) return 0;
   let v = 0;
   open.forEach((w) => {
+    if (w.key === ANY_CREATURE) {
+      const all = Math.max(allKph(spotKph) * hours, selfKills || 0);
+      if (all > 0) v += w.exp * Math.min(1, all / w.rem);
+      return;
+    }
     if (selfSlug && w.key === selfSlug) { v += w.exp * Math.min(1, (selfKills || 0) / w.rem); return; }
     const k = spotKph && spotKph[w.key];
     if (k > 0) v += w.exp * Math.min(1, k * hours / w.rem);

@@ -47,6 +47,9 @@ test("a spot's value per hour", () => {
   assert.equal(s.parts.held, 1875 * 400 / 2);
   assert.equal(s.weekly[0].kills, 300);
   assert.equal(spotValue(SP, null, { diff: "master" }, ctx), null);
+  // Any Creature: all 500 kills/h count.
+  const any = spotValue(SP, NUMS, { diff: "master", weekly: [{ key: "any", name: "Any Creature", rem: 5000, exp: 1e6 }] }, ctx);
+  assert.equal(any.parts.weekly, 1e6 * 500 / 5000);
 });
 
 test("scaling spots", () => {

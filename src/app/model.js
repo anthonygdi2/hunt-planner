@@ -18,6 +18,9 @@ import { heldTask as coreHeldTask, spotValue as coreSpotValue, scaleSpots, spotS
 import { GOAL_KEYS } from "../core/score.js";
 import { EN } from "../core/i18n.js";
 
+// Reroll tokens assumed while the player hasn't set theirs: enough that the plan suggests rerolling bad offers.
+export const ASSUMED_TOKENS = 5;
+
 // A reroll plan cache shared across models (solvePlan is the slow part); keyed by planKey.
 export function makePlanCache() { return { key: "", plan: null }; }
 
@@ -43,8 +46,12 @@ export function makeModel(state, derived, now, opts) {
   const eff = (c) => effective(entries[c.slug], d.derived[c.slug]);
   const metricsFor = (c, rec, diff, kills, mult, rewardExp) => metrics(c, rec, Object.assign(d.ctx(diff), { kills, mult, rewardExp }));
   const boardDiff = () => (state.difficulty === "all" ? "master" : state.difficulty);
-  // The bounty (store readBounty): difficulty, reroll tokens, offers or the active bounty.
-  const bounty = () => readBounty(plState, p, { known: (s) => !!catalog.bySlug[s], slugOf: (name) => { const c = catalog.byName[norm(name || "")]; return c ? c.slug : null; } });
+  // The bounty (store readBounty): difficulty, reroll tokens, offers or the active bounty. Tokens never set are assumed
+  // (ASSUMED_TOKENS, with assumed: true), so the plan still weighs a reroll until the player sets theirs.
+  const bounty = () => {
+    const b = readBounty(plState, p, { known: (s) => !!catalog.bySlug[s], slugOf: (name) => { const c = catalog.byName[norm(name || "")]; return c ? c.slug : null; } });
+    return Object.assign(b, b.tokens == null ? { tokens: ASSUMED_TOKENS, assumed: true } : { assumed: false });
+  };
   // Reroll settings: tokens from the bounty; hours per day and the unknown-creature assumption from the profile.
   const rerollSettings = () => { const b = bounty(); return readReroll(Object.assign({}, p.reroll, { left: b.tokens })); };
   const poolModels = {};

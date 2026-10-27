@@ -4594,14 +4594,20 @@
         "creatures": {"midnight-asura":{"score":{"$del":1},"tier":{"$del":1}},"silencer":{"score":{"$set":1},"tier":{"$set":"S"}}},
         "planner": {
          "chosen": {"$set":["roshamuul-west","bookworld-chapter-iv","paladin-test-cave"]},
-         "options": {"$set":[["roshamuul-west",null,0.781150749202,null,null,0.5],["bookworld-chapter-iv",null,0.735615091835,null,null,0.5],["paladin-test-cave",null,0.280842548713,null,null,0.5]]},
+         "options": {
+          "$set": [
+           ["roshamuul-west",null,0.781150749202,0.0204113874206,null,0.5],
+           ["bookworld-chapter-iv",null,0.735615091835,0.0204113874206,null,0.5],
+           ["paladin-test-cave",null,0.280842548713,0.0204113874206,null,0.5]
+          ]
+         },
          "pool": {"known":{"$set":1}},
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Roshamuul West","why":"Scores 100: 3.45kk exp/h, 250k profit/h."},
-           {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 94: 4.86kk exp/h, 169.62k profit/h."},
-           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 36: 3kk exp/h, 18.18k profit/h."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"go","text":"Go to Roshamuul West","why":"Scores 100: 3.45kk exp/h, 250k profit/h. A reroll is worth 3 with 5 tokens left."},
+           {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 94: 4.86kk exp/h, 169.62k profit/h. A reroll is worth 3 with 5 tokens left."},
+           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 36: 3kk exp/h, 18.18k profit/h. A reroll is worth 3 with 5 tokens left."},
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -4632,17 +4638,17 @@
         },
         "creatures": {"silencer":{"score":{"$set":0.577933450088}}},
         "planner": {
-         "chosen": {"$set":["roshamuul-west","bookworld-chapter-iv","asura-mirror","paladin-test-cave"]},
-         "options": {"$set":[["roshamuul-west",null,0,null,null,0.5],["bookworld-chapter-iv",null,0,null,null,0.5],["asura-mirror",null,0,null,null,0.5],["paladin-test-cave",null,0,null,null,0.5]]},
-         "steps": {
+         "chosen": {"$set":[]},
+         "cutoff": {"$set":"roshamuul-west"},
+         "options": {
           "$set": [
-           {"kind":"go","text":"Go to Roshamuul West","why":"Scores 0: 0 bounty points/h."},
-           {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 0: 0 bounty points/h."},
-           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 0: 0 bounty points/h."},
-           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 0: 0 bounty points/h."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           ["roshamuul-west",null,0,0.0302712957014,null,null],
+           ["bookworld-chapter-iv",null,0,0.0302712957014,null,null],
+           ["asura-mirror",null,0,0.0302712957014,null,null],
+           ["paladin-test-cave",null,0,0.0302712957014,null,null]
           ]
-         }
+         },
+         "steps": {"$set":[{"kind":"reroll","text":"Reroll and re-plan","why":"The next spot, Roshamuul West (0), is worth less than a reroll (3)."}]}
         }
        },
        "charm": {
@@ -4674,19 +4680,19 @@
          "chosen": {"$set":["bookworld-chapter-iv","asura-mirror","roshamuul-west","paladin-test-cave"]},
          "options": {
           "$set": [
-           ["bookworld-chapter-iv",null,1.13216389657,null,null,0.5],
-           ["asura-mirror",null,1.00016819817,null,null,0.5],
-           ["roshamuul-west",null,0.814151760299,null,null,0.5],
-           ["paladin-test-cave",null,0.336054962255,null,null,0.5]
+           ["bookworld-chapter-iv",null,1.13216389657,0.0368251918167,null,0.5],
+           ["asura-mirror",null,1.00016819817,0.0368251918167,null,0.5],
+           ["roshamuul-west",null,0.814151760299,0.0368251918167,null,0.5],
+           ["paladin-test-cave",null,0.336054962255,0.0368251918167,null,0.5]
           ]
          },
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Bookworld: Chapter IV","why":"Scores 113: 29 charm points/h."},
-           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 100: 25.6 charm points/h."},
-           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 81: 20.8 charm points/h."},
-           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 34: 8.6 charm points/h."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"go","text":"Go to Bookworld: Chapter IV","why":"Scores 113: 29 charm points/h. A reroll is worth 4 with 5 tokens left."},
+           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 100: 25.6 charm points/h. A reroll is worth 4 with 5 tokens left."},
+           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 81: 20.8 charm points/h. A reroll is worth 4 with 5 tokens left."},
+           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 34: 8.6 charm points/h. A reroll is worth 4 with 5 tokens left."},
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -4713,7 +4719,7 @@
           {"i":2,"name":""}
          ],
          "planH": [1.18594267324,1.18933283082,1.19272257555,1.1961119075,1.1995008267,1.20288933319,1.20627742666,1.20966509614,1.21305220356,1.21643299406,1.2197689074],
-         "settings": {"hasLeft":false,"hpd":3,"left":0,"unknown":"poor"}
+         "settings": {"hasLeft":true,"hpd":3,"left":5,"unknown":"poor"}
         },
         "creatures": {
          "midnight-asura": {
@@ -4766,21 +4772,21 @@
          "hours": null,
          "notes": [],
          "options": [
-          ["asura-mirror",null,0.990926185596,null,null,0.5],
-          ["bookworld-chapter-iv",null,0.792740948477,null,null,0.5],
-          ["roshamuul-west",null,0.562301498403,null,null,0.5],
-          ["paladin-test-cave",null,0.488957824698,null,null,0.5]
+          ["asura-mirror",null,0.990926185596,0.0299875206676,null,0.5],
+          ["bookworld-chapter-iv",null,0.792740948477,0.0299875206676,null,0.5],
+          ["roshamuul-west",null,0.562301498403,0.0299875206676,null,0.5],
+          ["paladin-test-cave",null,0.488957824698,0.0299875206676,null,0.5]
          ],
          "pool": {"known":2,"size":450},
          "skipped": [],
          "steps": [
-          {"kind":"go","text":"Go to Asura Mirror","why":"Scores 99: 6.08kk exp/h."},
-          {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 79: 4.86kk exp/h."},
-          {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 56: 3.45kk exp/h."},
-          {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 49: 3kk exp/h."},
-          {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+          {"kind":"go","text":"Go to Asura Mirror","why":"Scores 99: 6.08kk exp/h. A reroll is worth 3 with 5 tokens left."},
+          {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 79: 4.86kk exp/h. A reroll is worth 3 with 5 tokens left."},
+          {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 56: 3.45kk exp/h. A reroll is worth 3 with 5 tokens left."},
+          {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 49: 3kk exp/h. A reroll is worth 3 with 5 tokens left."},
+          {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
          ],
-         "tokens": 0
+         "tokens": 5
         },
         "withoutData": 447
        },
@@ -4811,14 +4817,20 @@
         "creatures": {"midnight-asura":{"score":{"$del":1},"tier":{"$del":1}},"silencer":{"score":{"$set":1},"tier":{"$set":"S"}}},
         "planner": {
          "chosen": {"$set":["bookworld-chapter-iv","roshamuul-west","paladin-test-cave"]},
-         "options": {"$set":[["bookworld-chapter-iv",null,0.754657044049,null,null,0.5],["roshamuul-west",null,0.708200998935,null,null,0.5],["paladin-test-cave",null,0.350214307375,null,null,0.5]]},
+         "options": {
+          "$set": [
+           ["bookworld-chapter-iv",null,0.754657044049,0.018534356421,null,0.5],
+           ["roshamuul-west",null,0.708200998935,0.018534356421,null,0.5],
+           ["paladin-test-cave",null,0.350214307375,0.018534356421,null,0.5]
+          ]
+         },
          "pool": {"known":{"$set":1}},
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Bookworld: Chapter IV","why":"Scores 106: 4.86kk exp/h, 169.62k profit/h."},
-           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 100: 3.45kk exp/h, 250k profit/h."},
-           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 49: 3kk exp/h, 18.18k profit/h."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"go","text":"Go to Bookworld: Chapter IV","why":"Scores 106: 4.86kk exp/h, 169.62k profit/h. A reroll is worth 3 with 5 tokens left."},
+           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 100: 3.45kk exp/h, 250k profit/h. A reroll is worth 3 with 5 tokens left."},
+           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 49: 3kk exp/h, 18.18k profit/h. A reroll is worth 3 with 5 tokens left."},
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -4850,14 +4862,20 @@
         "creatures": {"midnight-asura":{"score":{"$del":1},"tier":{"$del":1}},"silencer":{"score":{"$set":1},"tier":{"$set":"S"}}},
         "planner": {
          "chosen": {"$set":["roshamuul-west","bookworld-chapter-iv","paladin-test-cave"]},
-         "options": {"$set":[["roshamuul-west",null,1,null,null,0.5],["bookworld-chapter-iv",null,0.678489235193,null,null,0.5],["paladin-test-cave",null,0.0727272727273,null,null,0.5]]},
+         "options": {
+          "$set": [
+           ["roshamuul-west",null,1,0.0260424804194,null,0.5],
+           ["bookworld-chapter-iv",null,0.678489235193,0.0260424804194,null,0.5],
+           ["paladin-test-cave",null,0.0727272727273,0.0260424804194,null,0.5]
+          ]
+         },
          "pool": {"known":{"$set":1}},
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Roshamuul West","why":"Scores 100: 250k profit/h."},
-           {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 68: 169.62k profit/h."},
-           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 7: 18.18k profit/h."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"go","text":"Go to Roshamuul West","why":"Scores 100: 250k profit/h. A reroll is worth 3 with 5 tokens left."},
+           {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 68: 169.62k profit/h. A reroll is worth 3 with 5 tokens left."},
+           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 7: 18.18k profit/h. A reroll is worth 3 with 5 tokens left."},
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -5034,7 +5052,7 @@
           {"i":2,"name":""}
          ],
          "planH": [1.81805652162,1.84982836579,1.8815518993,1.91322719056,1.9448542908,1.97643304072,2.0079627221,2.0394323331,2.07081825025,2.10156967222,2.13134320821],
-         "settings": {"hasLeft":false,"hpd":3,"left":0,"unknown":"poor"}
+         "settings": {"hasLeft":true,"hpd":3,"left":5,"unknown":"poor"}
         },
         "creatures": {
          "crusader": {
@@ -5269,7 +5287,7 @@
            {"kind":"go","text":"Go to Roshamuul West","why":"Scores 100: 3.45kk exp/h, 250k profit/h."},
            {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 94: 4.86kk exp/h, 169.62k profit/h."},
            {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 36: 3kk exp/h, 18.18k profit/h."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Log some hunts to compare with a reroll."}
           ]
          }
         }
@@ -5285,7 +5303,7 @@
            {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 0: 0 bounty points/h."},
            {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 0: 0 bounty points/h."},
            {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 0: 0 bounty points/h."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Log some hunts to compare with a reroll."}
           ]
          }
         }
@@ -5308,7 +5326,7 @@
            {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 88: 25.6 charm points/h."},
            {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 72: 20.8 charm points/h."},
            {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 30: 8.6 charm points/h."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Log some hunts to compare with a reroll."}
           ]
          }
         }
@@ -5345,7 +5363,7 @@
           },
           {"i":2,"name":""}
          ],
-         "settings": {"hasLeft":false,"hpd":3,"left":0,"unknown":"poor"}
+         "settings": {"hasLeft":true,"hpd":3,"left":5,"unknown":"poor"}
         },
         "creatures": {},
         "planner": {
@@ -5366,9 +5384,9 @@
           {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 80: 4.86kk exp/h."},
           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 57: 3.45kk exp/h."},
           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 49: 3kk exp/h."},
-          {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+          {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Log some hunts to compare with a reroll."}
          ],
-         "tokens": 0
+         "tokens": 5
         },
         "withoutData": 153
        },
@@ -5382,7 +5400,7 @@
            {"kind":"go","text":"Go to Bookworld: Chapter IV","why":"Scores 100: 4.86kk exp/h, 169.62k profit/h."},
            {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 94: 3.45kk exp/h, 250k profit/h."},
            {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 47: 3kk exp/h, 18.18k profit/h."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Log some hunts to compare with a reroll."}
           ]
          }
         }
@@ -5397,7 +5415,7 @@
            {"kind":"go","text":"Go to Roshamuul West","why":"Scores 100: 250k profit/h."},
            {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 68: 169.62k profit/h."},
            {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 7: 18.18k profit/h."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Log some hunts to compare with a reroll."}
           ]
          }
         }
@@ -5455,9 +5473,9 @@
          "chosen": {"$set":["roshamuul-west","bookworld-chapter-iv","paladin-test-cave"]},
          "options": {
           "$set": [
-           ["roshamuul-west","o0 frazzlemaw",0.787567045611,null,null,0.5],
-           ["bookworld-chapter-iv","o1 crusader",0.775970145977,null,null,0.5],
-           ["paladin-test-cave","o1 crusader",0.288784407206,null,null,0.5]
+           ["roshamuul-west","o0 frazzlemaw",0.787567045611,-0.0029220090045,null,0.5],
+           ["bookworld-chapter-iv","o1 crusader",0.775970145977,-0.0112049194566,null,0.5],
+           ["paladin-test-cave","o1 crusader",0.288784407206,0.0130814327108,null,0.5]
           ]
          },
          "pool": {"known":{"$set":3}},
@@ -5466,19 +5484,19 @@
            {
             "kind": "go",
             "text": "Go to Roshamuul West",
-            "why": "Scores 100: 3.66kk exp/h (3.45kk hunting, 214.2k from the bounty), 250k profit/h. Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+            "why": "Scores 100: 3.66kk exp/h (3.45kk hunting, 214.2k from the bounty), 250k profit/h. Bounty done in about 40 min here. A reroll can’t beat it. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Bookworld: Chapter IV",
-            "why": "Scores 99: 5.56kk exp/h (4.86kk hunting, 700.93k from the bounty), 169.62k profit/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 99: 5.56kk exp/h (4.86kk hunting, 700.93k from the bounty), 169.62k profit/h. Bounty done in about 31 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Paladin Test Cave",
-            "why": "Scores 37: 3.22kk exp/h (3kk hunting, 216.36k from the bounty), 18.18k profit/h. Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 37: 3.22kk exp/h (3kk hunting, 216.36k from the bounty), 18.18k profit/h. Bounty done in about 1 h 39 min here. A reroll is worth 2 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -5527,13 +5545,14 @@
          "silencer": {"score":{"$set":0.577933450088}}
         },
         "planner": {
-         "chosen": {"$set":["bookworld-chapter-iv","roshamuul-west","paladin-test-cave","asura-mirror"]},
+         "chosen": {"$set":["bookworld-chapter-iv","roshamuul-west","paladin-test-cave"]},
+         "cutoff": {"$set":"asura-mirror"},
          "options": {
           "$set": [
-           ["bookworld-chapter-iv","o1 crusader",2.06309798997,null,null,0.5],
-           ["roshamuul-west","o0 frazzlemaw",0.788091068301,null,null,0.5],
-           ["paladin-test-cave","o1 crusader",0.636841267314,null,null,0.5],
-           ["asura-mirror","o1 crusader",0,null,null,0.5]
+           ["bookworld-chapter-iv","o1 crusader",2.06309798997,-0.0187827317935,null,0.5],
+           ["roshamuul-west","o0 frazzlemaw",0.788091068301,-0.00473966194506,null,0.5],
+           ["paladin-test-cave","o1 crusader",0.636841267314,0.0223929902179,null,0.5],
+           ["asura-mirror","o1 crusader",0,0.0453090878066,null,null]
           ]
          },
          "steps": {
@@ -5541,20 +5560,19 @@
            {
             "kind": "go",
             "text": "Go to Bookworld: Chapter IV",
-            "why": "Scores 206: 62.8 bounty points/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 206: 62.8 bounty points/h. Bounty done in about 31 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 79: 24 bounty points/h. Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+            "why": "Scores 79: 24 bounty points/h. Bounty done in about 40 min here. A reroll can’t beat it. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Paladin Test Cave",
-            "why": "Scores 64: 19.4 bounty points/h. Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 64: 19.4 bounty points/h. Bounty done in about 1 h 39 min here. A reroll is worth 2 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 0: 0 bounty points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Asura Mirror (0), is worth less than a reroll (5)."}
           ]
          }
         }
@@ -5607,10 +5625,10 @@
          "chosen": {"$set":["bookworld-chapter-iv","asura-mirror","roshamuul-west","paladin-test-cave"]},
          "options": {
           "$set": [
-           ["bookworld-chapter-iv","o1 crusader",1.13175471221,null,null,0.5],
-           ["asura-mirror","o1 crusader",0.999806719431,null,null,0.5],
-           ["roshamuul-west","o1 crusader",0.813857511242,null,null,0.5],
-           ["paladin-test-cave","o1 crusader",0.33593350596,null,null,0.5]
+           ["bookworld-chapter-iv","o1 crusader",1.13175471221,-0.020534345242,null,0.5],
+           ["asura-mirror","o1 crusader",0.999806719431,0.0497153773048,null,0.5],
+           ["roshamuul-west","o1 crusader",0.813857511242,0.0497153773048,null,0.5],
+           ["paladin-test-cave","o1 crusader",0.33593350596,0.024597526517,null,0.5]
           ]
          },
          "steps": {
@@ -5618,16 +5636,24 @@
            {
             "kind": "go",
             "text": "Go to Bookworld: Chapter IV",
-            "why": "Scores 113: 29 charm points/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 113: 29 charm points/h. Bounty done in about 31 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 100: 25.6 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
-           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 81: 20.8 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {
+            "kind": "go",
+            "text": "Taken? → Asura Mirror",
+            "why": "Scores 100: 25.6 charm points/h. A reroll is worth 5 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Roshamuul West",
+            "why": "Scores 81: 20.8 charm points/h. A reroll is worth 5 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+           },
            {
             "kind": "go",
             "text": "Taken? → Paladin Test Cave",
-            "why": "Scores 34: 8.6 charm points/h. Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 34: 8.6 charm points/h. Bounty done in about 1 h 39 min here. A reroll is worth 2 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -5665,7 +5691,7 @@
           {"i":2,"name":""}
          ],
          "planH": [2.07279912547,2.09075133754,2.10868925739,2.1266128961,2.14452226284,2.16241734426,2.18029800547,2.19816223397,2.21600150606,2.23363964406,2.25075182902],
-         "settings": {"hasLeft":false,"hpd":3,"left":0,"unknown":"poor"}
+         "settings": {"hasLeft":true,"hpd":3,"left":5,"unknown":"poor"}
         },
         "creatures": {
          "crusader": {
@@ -5822,10 +5848,10 @@
          "hours": null,
          "notes": [],
          "options": [
-          ["asura-mirror","o1 crusader",0.954291597997,null,null,0.5],
-          ["bookworld-chapter-iv","o1 crusader",0.873451056762,null,null,0.5],
-          ["roshamuul-west","o0 frazzlemaw",0.575134091222,null,null,0.5],
-          ["paladin-test-cave","o1 crusader",0.504841541684,null,null,0.5]
+          ["asura-mirror","o1 crusader",0.954291597997,0.0536130565709,null,0.5],
+          ["bookworld-chapter-iv","o1 crusader",0.873451056762,-0.0220990420528,null,0.5],
+          ["roshamuul-west","o0 frazzlemaw",0.575134091222,-0.00550986062193,null,0.5],
+          ["paladin-test-cave","o1 crusader",0.504841541684,0.0265421400971,null,0.5]
          ],
          "pool": {"known":5,"size":498},
          "skipped": [],
@@ -5833,26 +5859,26 @@
           {
            "kind": "go",
            "text": "Go to Asura Mirror",
-           "why": "Scores 95: 6.08kk exp/h. No offer’s creature is here, but this beats the best spot with one, Bookworld: Chapter IV (87), by 8. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+           "why": "Scores 95: 6.08kk exp/h. No offer’s creature is here, but this beats the best spot with one, Bookworld: Chapter IV (87), by 8. A reroll is worth 5 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
           },
           {
            "kind": "go",
            "text": "Taken? → Bookworld: Chapter IV",
-           "why": "Scores 87: 5.56kk exp/h (4.86kk hunting, 700.93k from the bounty). Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+           "why": "Scores 87: 5.56kk exp/h (4.86kk hunting, 700.93k from the bounty). Bounty done in about 31 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
           },
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 58: 3.66kk exp/h (3.45kk hunting, 214.2k from the bounty). Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+           "why": "Scores 58: 3.66kk exp/h (3.45kk hunting, 214.2k from the bounty). Bounty done in about 40 min here. A reroll can’t beat it. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
           },
           {
            "kind": "go",
            "text": "Taken? → Paladin Test Cave",
-           "why": "Scores 50: 3.22kk exp/h (3kk hunting, 216.36k from the bounty). Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+           "why": "Scores 50: 3.22kk exp/h (3kk hunting, 216.36k from the bounty). Bounty done in about 1 h 39 min here. A reroll is worth 3 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
           },
-          {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+          {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
          ],
-         "tokens": 0
+         "tokens": 5
         },
         "withoutData": 490
        },
@@ -5904,9 +5930,9 @@
          "chosen": {"$set":["bookworld-chapter-iv","roshamuul-west","paladin-test-cave"]},
          "options": {
           "$set": [
-           ["bookworld-chapter-iv","o1 crusader",0.808463782905,null,null,0.5],
-           ["roshamuul-west","o0 frazzlemaw",0.716756060814,null,null,0.5],
-           ["paladin-test-cave","o1 crusader",0.360803452032,null,null,0.5]
+           ["bookworld-chapter-iv","o1 crusader",0.808463782905,-0.0121462185649,null,0.5],
+           ["roshamuul-west","o0 frazzlemaw",0.716756060814,-0.003114671919,null,0.5],
+           ["paladin-test-cave","o1 crusader",0.360803452032,0.014335212526,null,0.5]
           ]
          },
          "pool": {"known":{"$set":3}},
@@ -5915,19 +5941,19 @@
            {
             "kind": "go",
             "text": "Go to Bookworld: Chapter IV",
-            "why": "Scores 114: 5.56kk exp/h (4.86kk hunting, 700.93k from the bounty), 169.62k profit/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 114: 5.56kk exp/h (4.86kk hunting, 700.93k from the bounty), 169.62k profit/h. Bounty done in about 31 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 101: 3.66kk exp/h (3.45kk hunting, 214.2k from the bounty), 250k profit/h. Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+            "why": "Scores 101: 3.66kk exp/h (3.45kk hunting, 214.2k from the bounty), 250k profit/h. Bounty done in about 40 min here. A reroll can’t beat it. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Paladin Test Cave",
-            "why": "Scores 51: 3.22kk exp/h (3kk hunting, 216.36k from the bounty), 18.18k profit/h. Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 51: 3.22kk exp/h (3kk hunting, 216.36k from the bounty), 18.18k profit/h. Bounty done in about 1 h 39 min here. A reroll is worth 2 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -5980,9 +6006,9 @@
          "chosen": {"$set":["roshamuul-west","bookworld-chapter-iv","paladin-test-cave"]},
          "options": {
           "$set": [
-           ["roshamuul-west","o0 frazzlemaw",1,null,null,0.5],
-           ["bookworld-chapter-iv","o0 frazzlemaw",0.678489235193,null,null,0.5],
-           ["paladin-test-cave","o0 frazzlemaw",0.0727272727273,null,null,0.5]
+           ["roshamuul-west","o0 frazzlemaw",1,-0.00234717504436,null,0.5],
+           ["bookworld-chapter-iv","o0 frazzlemaw",0.678489235193,0.0191749129,null,0.5],
+           ["paladin-test-cave","o0 frazzlemaw",0.0727272727273,0.0191749129,null,0.5]
           ]
          },
          "pool": {"known":{"$set":3}},
@@ -5991,11 +6017,19 @@
            {
             "kind": "go",
             "text": "Go to Roshamuul West",
-            "why": "Scores 100: 250k profit/h. Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+            "why": "Scores 100: 250k profit/h. Bounty done in about 40 min here. A reroll can’t beat it. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
-           {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 68: 169.62k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
-           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 7: 18.18k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {
+            "kind": "go",
+            "text": "Taken? → Bookworld: Chapter IV",
+            "why": "Scores 68: 169.62k profit/h. A reroll is worth 2 with 5 tokens left. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Paladin Test Cave",
+            "why": "Scores 7: 18.18k profit/h. A reroll is worth 2 with 5 tokens left. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+           },
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -6051,9 +6085,9 @@
          "chosen": {"$set":["bookworld-chapter-iv","roshamuul-west","paladin-test-cave"]},
          "options": {
           "$set": [
-           ["bookworld-chapter-iv","o1 crusader",0.869418022207,null,null,0.5],
-           ["roshamuul-west","o0 frazzlemaw",0.801931248456,null,null,0.5],
-           ["paladin-test-cave","o1 crusader",0.306798168367,null,null,0.5]
+           ["bookworld-chapter-iv","o1 crusader",0.869418022207,-0.0341901790966,null,0.5],
+           ["roshamuul-west","o0 frazzlemaw",0.801931248456,-0.0224098267591,null,0.5],
+           ["paladin-test-cave","o1 crusader",0.306798168367,0.000350994813444,null,0.5]
           ]
          },
          "pool": {"known":{"$set":2}},
@@ -6062,19 +6096,19 @@
            {
             "kind": "go",
             "text": "Go to Bookworld: Chapter IV",
-            "why": "Scores 312: 7.44kk exp/h (4.86kk hunting, 2.58kk from the bounty), 169.62k profit/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 312: 7.44kk exp/h (4.86kk hunting, 2.58kk from the bounty), 169.62k profit/h. Bounty done in about 31 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 288: 4.24kk exp/h (3.45kk hunting, 787.5k from the bounty), 250k profit/h. Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+            "why": "Scores 288: 4.24kk exp/h (3.45kk hunting, 787.5k from the bounty), 250k profit/h. Bounty done in about 40 min here. A reroll can’t beat it. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Paladin Test Cave",
-            "why": "Scores 110: 3.8kk exp/h (3kk hunting, 795.45k from the bounty), 18.18k profit/h. Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 110: 3.8kk exp/h (3kk hunting, 795.45k from the bounty), 18.18k profit/h. Bounty done in about 1 h 39 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -6121,13 +6155,14 @@
          "headwalker": {"score":{"$set":0.376},"tier":{"$set":"D"}}
         },
         "planner": {
-         "chosen": {"$set":["bookworld-chapter-iv","roshamuul-west","paladin-test-cave","asura-mirror"]},
+         "chosen": {"$set":["bookworld-chapter-iv","roshamuul-west","paladin-test-cave"]},
+         "cutoff": {"$set":"asura-mirror"},
          "options": {
           "$set": [
-           ["bookworld-chapter-iv","o1 crusader",3.53408685681,null,null,0.5],
-           ["roshamuul-west","o0 frazzlemaw",1.35,null,null,0.5],
-           ["paladin-test-cave","o1 crusader",1.09090909091,null,null,0.5],
-           ["asura-mirror","o1 crusader",0,null,null,0.5]
+           ["bookworld-chapter-iv","o1 crusader",3.53408685681,-0.0747323498332,null,0.5],
+           ["roshamuul-west","o0 frazzlemaw",1.35,-0.0489896911178,null,0.5],
+           ["paladin-test-cave","o1 crusader",1.09090909091,0.000747662356071,null,0.5],
+           ["asura-mirror","o1 crusader",0,0.0427434359571,null,null]
           ]
          },
          "steps": {
@@ -6135,20 +6170,19 @@
            {
             "kind": "go",
             "text": "Go to Bookworld: Chapter IV",
-            "why": "Scores 353: 106 bounty points/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 353: 106 bounty points/h. Bounty done in about 31 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 135: 40.5 bounty points/h. Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+            "why": "Scores 135: 40.5 bounty points/h. Bounty done in about 40 min here. A reroll can’t beat it. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Paladin Test Cave",
-            "why": "Scores 109: 32.7 bounty points/h. Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 109: 32.7 bounty points/h. Bounty done in about 1 h 39 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 0: 0 bounty points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Asura Mirror (0), is worth less than a reroll (4)."}
           ]
          }
         }
@@ -6197,10 +6231,10 @@
         "planner": {
          "options": {
           "$set": [
-           ["bookworld-chapter-iv","o1 crusader",1.13175471221,null,null,0.5],
-           ["asura-mirror","o1 crusader",0.999806719431,null,null,0.5],
-           ["roshamuul-west","o1 crusader",0.813857511242,null,null,0.5],
-           ["paladin-test-cave","o1 crusader",0.33593350596,null,null,0.5]
+           ["bookworld-chapter-iv","o1 crusader",1.13175471221,-0.0669817640594,null,0.5],
+           ["asura-mirror","o1 crusader",0.999806719431,0.0382836357575,null,0.5],
+           ["roshamuul-west","o1 crusader",0.813857511242,0.0382836357575,null,0.5],
+           ["paladin-test-cave","o1 crusader",0.33593350596,0.00065292074232,null,0.5]
           ]
          },
          "steps": {
@@ -6208,16 +6242,24 @@
            {
             "kind": "go",
             "text": "Go to Bookworld: Chapter IV",
-            "why": "Scores 113: 29 charm points/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 113: 29 charm points/h. Bounty done in about 31 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 100: 25.6 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
-           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 81: 20.8 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {
+            "kind": "go",
+            "text": "Taken? → Asura Mirror",
+            "why": "Scores 100: 25.6 charm points/h. A reroll is worth 4 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Roshamuul West",
+            "why": "Scores 81: 20.8 charm points/h. A reroll is worth 4 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+           },
            {
             "kind": "go",
             "text": "Taken? → Paladin Test Cave",
-            "why": "Scores 34: 8.6 charm points/h. Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 34: 8.6 charm points/h. Bounty done in about 1 h 39 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -6255,7 +6297,7 @@
           {"i":2,"name":""}
          ],
          "planH": [1.81805652162,1.84982836579,1.8815518993,1.91322719056,1.9448542908,1.97643304072,2.0079627221,2.0394323331,2.07081825025,2.10156967222,2.13134320821],
-         "settings": {"hasLeft":false,"hpd":3,"left":0,"unknown":"poor"}
+         "settings": {"hasLeft":true,"hpd":3,"left":5,"unknown":"poor"}
         },
         "creatures": {
          "crusader": {
@@ -6347,10 +6389,10 @@
          "hours": null,
          "notes": [],
          "options": [
-          ["bookworld-chapter-iv","o1 crusader",1.06034680922,null,null,0.5],
-          ["asura-mirror","o1 crusader",0.866402120314,null,null,0.5],
-          ["roshamuul-west","o0 frazzlemaw",0.603862496911,null,null,0.5],
-          ["paladin-test-cave","o1 crusader",0.540869064007,null,null,0.5]
+          ["bookworld-chapter-iv","o1 crusader",1.06034680922,-0.0849206210471,null,0.5],
+          ["asura-mirror","o1 crusader",0.866402120314,0.0486213572699,null,0.5],
+          ["roshamuul-west","o0 frazzlemaw",0.603862496911,-0.0556573231142,null,0.5],
+          ["paladin-test-cave","o1 crusader",0.540869064007,0.000882251164727,null,0.5]
          ],
          "pool": {"known":3,"size":280},
          "skipped": [],
@@ -6358,22 +6400,26 @@
           {
            "kind": "go",
            "text": "Go to Bookworld: Chapter IV",
-           "why": "Scores 106: 7.44kk exp/h (4.86kk hunting, 2.58kk from the bounty). Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+           "why": "Scores 106: 7.44kk exp/h (4.86kk hunting, 2.58kk from the bounty). Bounty done in about 31 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
           },
-          {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 87: 6.08kk exp/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+          {
+           "kind": "go",
+           "text": "Taken? → Asura Mirror",
+           "why": "Scores 87: 6.08kk exp/h. A reroll is worth 5 with 5 tokens left. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+          },
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 60: 4.24kk exp/h (3.45kk hunting, 787.5k from the bounty). Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+           "why": "Scores 60: 4.24kk exp/h (3.45kk hunting, 787.5k from the bounty). Bounty done in about 40 min here. A reroll can’t beat it. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
           },
           {
            "kind": "go",
            "text": "Taken? → Paladin Test Cave",
-           "why": "Scores 54: 3.8kk exp/h (3kk hunting, 795.45k from the bounty). Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+           "why": "Scores 54: 3.8kk exp/h (3kk hunting, 795.45k from the bounty). Bounty done in about 1 h 39 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
           },
-          {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+          {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
          ],
-         "tokens": 0
+         "tokens": 5
         },
         "withoutData": 275
        },
@@ -6423,9 +6469,9 @@
          "chosen": {"$set":["bookworld-chapter-iv","roshamuul-west","paladin-test-cave"]},
          "options": {
           "$set": [
-           ["bookworld-chapter-iv","o1 crusader",0.933060951211,null,null,0.5],
-           ["roshamuul-west","o0 frazzlemaw",0.735908331274,null,null,0.5],
-           ["paladin-test-cave","o1 crusader",0.384821800247,null,null,0.5]
+           ["bookworld-chapter-iv","o1 crusader",0.933060951211,-0.0425918686416,null,0.5],
+           ["roshamuul-west","o0 frazzlemaw",0.735908331274,-0.027916683177,null,0.5],
+           ["paladin-test-cave","o1 crusader",0.384821800247,0.0004372461737,null,0.5]
           ]
          },
          "pool": {"known":{"$set":2}},
@@ -6434,19 +6480,19 @@
            {
             "kind": "go",
             "text": "Go to Bookworld: Chapter IV",
-            "why": "Scores 269: 7.44kk exp/h (4.86kk hunting, 2.58kk from the bounty), 169.62k profit/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 269: 7.44kk exp/h (4.86kk hunting, 2.58kk from the bounty), 169.62k profit/h. Bounty done in about 31 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 212: 4.24kk exp/h (3.45kk hunting, 787.5k from the bounty), 250k profit/h. Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+            "why": "Scores 212: 4.24kk exp/h (3.45kk hunting, 787.5k from the bounty), 250k profit/h. Bounty done in about 40 min here. A reroll can’t beat it. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Paladin Test Cave",
-            "why": "Scores 111: 3.8kk exp/h (3kk hunting, 795.45k from the bounty), 18.18k profit/h. Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
+            "why": "Scores 111: 3.8kk exp/h (3kk hunting, 795.45k from the bounty), 18.18k profit/h. Bounty done in about 1 h 39 min here. A reroll can’t beat it. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
@@ -6497,9 +6543,9 @@
          "chosen": {"$set":["roshamuul-west","bookworld-chapter-iv","paladin-test-cave"]},
          "options": {
           "$set": [
-           ["roshamuul-west","o0 frazzlemaw",1,null,null,0.5],
-           ["bookworld-chapter-iv","o0 frazzlemaw",0.678489235193,null,null,0.5],
-           ["paladin-test-cave","o0 frazzlemaw",0.0727272727273,null,null,0.5]
+           ["roshamuul-west","o0 frazzlemaw",1,-0.00588853679289,null,0.5],
+           ["bookworld-chapter-iv","o0 frazzlemaw",0.678489235193,0.00514402734994,null,0.5],
+           ["paladin-test-cave","o0 frazzlemaw",0.0727272727273,0.00514402734994,null,0.5]
           ]
          },
          "pool": {"known":{"$set":2}},
@@ -6508,11 +6554,19 @@
            {
             "kind": "go",
             "text": "Go to Roshamuul West",
-            "why": "Scores 1375: 250k profit/h. Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+            "why": "Scores 1375: 250k profit/h. Bounty done in about 40 min here. A reroll can’t beat it. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
-           {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 933: 169.62k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
-           {"kind":"go","text":"Taken? → Paladin Test Cave","why":"Scores 100: 18.18k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
-           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"Set your reroll tokens (Bounty) to compare with a reroll."}
+           {
+            "kind": "go",
+            "text": "Taken? → Bookworld: Chapter IV",
+            "why": "Scores 933: 169.62k profit/h. A reroll is worth 7 with 5 tokens left. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Paladin Test Cave",
+            "why": "Scores 100: 18.18k profit/h. A reroll is worth 7 with 5 tokens left. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
+           },
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"Every spot worth checking is on this list."}
           ]
          }
         }
