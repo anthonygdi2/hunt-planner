@@ -26,7 +26,7 @@ export function noNumsWhy(sp, ctx) {
 
 // Why to pick an offer only at the spot: picking it in game makes the other two disappear.
 export function pickWhy(offer) {
-  return "Pick " + offerLabel(offer) + " once you see the spot is free: picking makes the other two offers disappear in game.";
+  return "Pick " + offerLabel(offer) + " once the spot is free: the other offers disappear.";
 }
 
 export function oddsText(od) {
@@ -47,9 +47,10 @@ export function partsWhy(o, ctx) {
   ctx.sc.keys.forEach((k) => {
     if (k === "xp") {
       const sub = [fmtBig(o.parts.hunt) + " hunting"];
-      if (o.parts.today > 0) sub.push(fmtBig(o.parts.today) + " from today’s bonuses");
-      if (o.parts.held > 0) sub.push(fmtBig(o.parts.held) + " from " + o.offer.name + "’s task");
-      if (o.parts.weekly > 0) sub.push(fmtBig(o.parts.weekly) + " from your " + joinAnd(o.weekly.map((x) => x.name)) + " weekly task" + (o.weekly.length > 1 ? "s" : ""));
+      const some = (x) => x > 0 && fmtBig(x) !== "0";
+      if (some(o.parts.today)) sub.push(fmtBig(o.parts.today) + " from today’s boosts");
+      if (some(o.parts.held)) sub.push(fmtBig(o.parts.held) + " from the bounty");
+      if (some(o.parts.weekly)) sub.push(fmtBig(o.parts.weekly) + " from weekly tasks");
       bits.push(fmtBig(o.m.xp) + " exp/h" + (sub.length > 1 ? " (" + sub.join(", ") + ")" : ""));
     } else if (k === "profit") bits.push(fmtBig(o.m.profit) + " profit/h");
     else if (k === "charm") bits.push(fmtSmall(o.m.charm) + " charm points/h");
@@ -57,9 +58,9 @@ export function partsWhy(o, ctx) {
   });
   let s = "Scores " + ctx.pct(o.v) + (bits.length ? ": " + bits.join(", ") : "") + ".";
   if (o.today && o.today.length) s += " Today: " + joinAnd(o.today) + ".";
-  if (o.travelMin && o.hours) s += " Counts " + o.travelMin + " min of travel out of your " + fmtHours(o.hours) + ".";
-  if (o.held) s += !o.hours ? " " + (o.held.hoursLeft < 0.25 ? "The task share only lasts about " : "Finishes the task in about ") + fmtHours(o.held.hoursLeft) + " here." :
-    o.held.finishes ? " You’d finish the task this session." : " About " + Math.round(o.held.kills) + " of the " + Math.round(o.held.left) + " kills left this session.";
+  if (o.travelMin && o.hours) s += " Includes " + o.travelMin + " min of travel.";
+  if (o.held) s += !o.hours ? " Bounty done in about " + fmtHours(o.held.hoursLeft) + " here." :
+    o.held.finishes ? " Finishes the bounty this session." : " About " + Math.round(o.held.kills) + " of " + Math.round(o.held.left) + " bounty kills this session.";
   return s;
 }
 
@@ -71,12 +72,11 @@ export function goWhy(o, n, ctx) {
   const margin = (x) => { const d = ctx.pct(o.v) - ctx.pct(x.v); return d >= 1 ? "by " + d : "by a hair"; };
   // A spot without the bounty creature (or any offer's creature) that still outranks every spot with one says why, once.
   const ignoreLead = !o.held && ctx.offers.length > 0 && ctx.chosen.filter((x) => !x.held)[0] === o && (!task || o.v > task.v);
-  if (ignoreLead && ctx.active) s += task ? " Your bounty creature, " + ctx.active.name + ", isn’t here, but this spot beats the best spot with it, " + task.name + " (" + ctx.pct(task.v) + "), " + margin(task) + "." :
-    " Your bounty creature, " + ctx.active.name + ", isn’t at any spot with numbers.";
-  else if (ignoreLead) s += task ? " None of your offers’ creatures live here, but it beats the best spot with one, " + task.name + " (" + ctx.pct(task.v) + "), " + margin(task) + "." :
-    " None of your offers’ creatures live at a spot with numbers.";
-  if (next && !(ignoreLead && next === task)) s += " It beats " + next.name + " (" + ctx.pct(next.v) + ") " + margin(next) + ".";
-  if (o.thr != null) s += ctx.pct(o.thr) < 1 ? " A reroll can’t beat it with " + left + " left." : " That clears the " + ctx.pct(o.thr) + " a reroll is worth with " + left + " left.";
+  if (ignoreLead && ctx.active) s += task ? " " + ctx.active.name + " isn’t here, but this beats its best spot, " + task.name + " (" + ctx.pct(task.v) + "), " + margin(task) + "." :
+    " " + ctx.active.name + " isn’t at any spot with numbers.";
+  else if (ignoreLead) s += task ? " No offer’s creature is here, but this beats the best spot with one, " + task.name + " (" + ctx.pct(task.v) + "), " + margin(task) + "." :
+    " No offer’s creature is at a spot with numbers.";
+  if (o.thr != null) s += ctx.pct(o.thr) < 1 ? " A reroll can’t beat it." : " A reroll is worth " + ctx.pct(o.thr) + " with " + left + " left.";
   if (o.mark && o.mark.state === "free") s += " Marked free " + Math.round(markAge(o.mark, ctx.now)) + " min ago.";
   if (o.odds && o.odds.nAll) s += " " + oddsText(o.odds) + ".";
   // A better-scoring spot this one is checked before, including one pushed off the end of the list.
@@ -84,23 +84,23 @@ export function goWhy(o, n, ctx) {
   if (passed && o.odds && passed.odds) s += " It comes before " + passed.name + " (" + ctx.pct(passed.v) + ") because " +
     (o.odds.p > passed.odds.p + 0.05 ? "it’s more often free" : "it’s quicker to check") + ".";
   if (o.offer && !o.offer.held) s += " " + pickWhy(o.offer);
-  return s + " " + srcWhy(o);
+  return s;
 }
 
 // Why the chain ends with a reroll.
 export function rerollWhy(cutoff, skipped, ctx) {
   let s = "";
-  if (cutoff) s = "The next spot, " + cutoff.name + ", scores " + ctx.pct(cutoff.v) + ", below the " + ctx.pct(cutoff.thr) + " a reroll is worth with " + plural(ctx.tokens, "token") + " left.";
+  if (cutoff) s = "The next spot, " + cutoff.name + " (" + ctx.pct(cutoff.v) + "), is worth less than a reroll (" + ctx.pct(cutoff.thr) + ").";
   else if (!ctx.options.length) s = "None of your spots has numbers for this character yet.";
   else s = skipped.length && !ctx.chosen.length ? "Every spot worth checking is marked taken." : "Every spot worth checking is on this list.";
-  if (ctx.active) s += " Rerolling drops your active bounty, " + ctx.active.name + ".";
+  if (ctx.active) s += " Rerolling drops " + ctx.active.name + ".";
   return s;
 }
 
 // Why the chain ends by pointing at Spots.
 export function seeSpotsWhy({ unknown, tokens, model }) {
-  if (unknown) return "Set your reroll tokens in the Bounty chip and the plan will say when a reroll beats these spots.";
-  if (tokens === 0) return "No reroll tokens left, so there’s no better bounty to wait for. Spots lists every place with numbers.";
-  if (!model) return "Pick a goal and log some hunts so the plan can tell when a reroll pays.";
+  if (unknown) return "Set your reroll tokens (Bounty) to compare with a reroll.";
+  if (tokens === 0) return "No reroll tokens left.";
+  if (!model) return "Log some hunts to compare with a reroll.";
   return "";
 }

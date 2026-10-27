@@ -158,7 +158,7 @@ test("plan: steps, Hunting now and Taken spots call their actions", async () => 
   const view = { goal, bounty: null, weekly: { chip: { set: false }, rows: [] }, today: null, time: { chip: { set: false }, value: null, options: [{ value: null, label: "No limit" }, { value: 2, label: "2 h" }] },
     data: { chip: { set: true, value: "Everything" }, preset: "everything", presets: [] }, taken: [{ id: "lair", name: "Lair", meta: "Marked 5 min ago · clears in 40 min" }], hunting: null,
     steps: { notices: [], refNote: null, notes: [],
-      first: { id: "bastion", title: "Go to Cobra Bastion", name: "Cobra Bastion", bounty: "For offer B: Cobra Assassin. Pick it once you see the spot is free.", exp: "7.8kk", profit: "300k", badges: badge, why: "Because." },
+      first: { id: "bastion", title: "Go to Cobra Bastion", name: "Cobra Bastion", bounty: "For offer B: Cobra Assassin. Pick it once the spot is free.", exp: "7.8kk", profit: "300k", badges: badge, why: "Because." },
       fallbacks: [{ id: "nuur", title: "Taken? → Ruins of Nuur", name: "Ruins of Nuur", exp: "6.9kk", profit: "450k", badges: [{ kind: "yours", text: "Yours · 9 hunts" }], why: "Also good." }],
       end: { kind: "reroll", title: "Reroll and re-plan", line: "4 tokens left. Or see Spots for more.", why: "" } } };
   const s = spy(), on = {};
@@ -191,7 +191,7 @@ test("weekly: rows, Done, slots and a new week call their actions", async () => 
   const NOW = Date.parse("2026-10-21T18:00:00Z");
   const w = { weekStart: "2026-10-19", difficulty: "master", slots: 6, exp: 1226315, override: null, formula: 1226315, current: true, tasks: [] };
   const v = weeklyView(w, [{ i: 0, name: "Silencer", killsLeft: 390, done: false }, { i: 1, name: "Choking Fear", killsLeft: 0, done: true }], catalog, NOW);
-  assert.match(v.intro, /^Week of Oct 19\. New tasks Monday, Oct 26, at server save\./);
+  assert.match(v.intro, /^Week of Oct 19 · new tasks Oct 26$/);
   assert.equal(v.rows.length, 6);
   assert.equal(v.doneCount, 1);
   const s = spy(), on = {};
@@ -240,7 +240,7 @@ test("spots: search, sort, toggles, rows, more, and the badges legend", async ()
   const { BADGE_LEGEND } = await import("../../src/app/views.js");
   const view = { query: "co", sort: "score", sorts: [{ value: "score", label: "Score" }, { value: "exp", label: "Exp/h" }, { value: "profit", label: "Profit/h" }],
     toggles: [{ key: "allVocations", label: "All vocations", on: false }, { key: "anyLevel", label: "Any level", on: true }, { key: "hideTaken", label: "Hide taken", on: false }],
-    count: "2 spots. Score is …", more: 3, empty: "", legend: BADGE_LEGEND,
+    count: "2 spots", more: 3, empty: "", legend: BADGE_LEGEND,
     rows: [{ id: "cobra-bastion", name: "Cobra Bastion", sub: null, score: "96", numbers: "7.8kk exp/h · 300k profit/h", none: null, creatures: "Cobra Assassin (your bounty)", badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: "Taken · clears in 25 min" },
       { id: "my-lure", name: "Lure", sub: "Your variation of Cobra Bastion", score: null, numbers: null, none: "Not enough data for your vocation", creatures: "", badges: [], taken: null }] };
   const s = spy(), on = {};

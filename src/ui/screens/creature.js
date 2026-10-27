@@ -46,10 +46,10 @@ export function render(view, on) {
       h("div", { class: "hp-grid3" }, a.nums.map((n) => h("label", { class: "hp-field" }, n.label,
         h("input", { id: "cr-num-" + n.key, class: "hp-input", inputmode: "decimal", value: n.value, autocomplete: "off", onChange: (e) => on.nums(n.key, e.target.value),
           onKeydown: (e) => { if (e.key === "Enter") e.target.blur(); } })))),
-      h("span", { class: "hp-caption" }, "Typed numbers win over hunts and the reference, field by field. Clear a field to go back."),
+      h("span", { class: "hp-caption" }, "Overrides hunts and the reference. Clear a field to undo."),
       a.pin ? selectField({ id: "cr-pin", label: "Spot its numbers come from", value: a.pin.value, options: a.pin.options, onPick: on.pin }) : null,
       h("label", { class: "hp-field" }, a.minLevelLabel, h("input", { id: "cr-minlevel", class: "hp-input", inputmode: "numeric", value: a.minLevel, autocomplete: "off",
         onChange: (e) => on.minLevel(e.target.value), onKeydown: (e) => { if (e.key === "Enter") e.target.blur(); } })),
-      h("span", { class: "hp-caption" }, "Shared by every character of this vocation. Below it, the creature is marked and left out of suggestions.")) : null,
+      h("span", { class: "hp-caption" }, "For all your characters of this vocation.")) : null,
     view.updated ? h("span", { class: "hp-caption" }, view.updated) : null);
 }

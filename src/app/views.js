@@ -39,21 +39,20 @@ export function firstRunView({ vocation, level }) {
   const lvl = String(level || "").replace(/[^0-9]/g, "").slice(0, 4), ready = !!vocation && Number(lvl) > 0;
   return {
     vocations: VOCATIONS.map((v) => ({ name: v, pressed: v === vocation })), level: lvl, ready,
-    note: ready ? vocation + ", level " + lvl + ". A name is optional; add one later in Characters." : "Type your level to continue. A name is optional; add one later in Characters.",
+    note: ready ? vocation + ", level " + lvl + "." : "Type your level to continue.",
   };
 }
 
 // The goal mixer (Plan's Goal chip and its editor). goal: the character's weights 0-5 (store readGoal).
-const GOAL_ROWS = [["xp", "Exp", "exp per hour"], ["profit", "Profit", "profit per hour"], ["charm", "Charm points", "charm points per hour"], ["bounty", "Bounty points", "bounty points per hour"]];
+const GOAL_ROWS = [["xp", "Exp"], ["profit", "Profit"], ["charm", "Charm points"], ["bounty", "Bounty points"]];
 const PRESET_LABELS = { exp: "Exp", profit: "Profit", mostly: "Mostly exp, some profit", balanced: "Balanced", charm: "Charm points", bounty: "Bounty points" };
 export function goalMixView(goal) {
   const preset = presetOf(goal), total = GOAL_KEYS.reduce((a, k) => a + goal[k], 0);
   const split = GOAL_ROWS.filter(([k]) => goal[k] > 0).map(([key, name]) => ({ key, name, pct: Math.round(goal[key] / total * 100) }));
   return {
     chip: { label: "Goal", value: preset === "custom" ? "Custom mix" : PRESET_LABELS[preset], set: true },
-    intro: "What should a good hunt give you? Start from a preset, then nudge the weights.",
     presets: PRESET_IDS.map((id) => ({ id, label: PRESET_LABELS[id], pressed: id === preset })),
-    rows: GOAL_ROWS.map(([key, name, hint]) => ({ key, name, hint, value: goal[key],
+    rows: GOAL_ROWS.map(([key, name]) => ({ key, name, value: goal[key],
       options: [0, 1, 2, 3, 4, 5].map((n) => ({ n, pressed: goal[key] === n, label: name + " weight " + n + (n === 0 ? ", off" : "") })) })),
     split, shareText: total === 0 ? "Nothing weighted yet, so the plan uses Exp." : split.map((p) => p.name + " " + p.pct + "%").join(" · "),
   };
@@ -70,13 +69,12 @@ export function bountyView(b, catalog) {
   return {
     chip: Object.assign({ label: "Bounty" }, chip), mode: active ? "active" : "offers", difficulty: b.difficulty, tokens: b.tokens,
     difficulties: DIFF_LABELS.map(([value, label]) => ({ value, label })),
-    intro: active ? "Your active bounty. Type over anything the game shows differently; kills left feeds the plan."
-      : "The three bounty offers on the board. The plan says which to go for; pick it in game once the spot is free.",
+    intro: active ? "Your active bounty, as the game shows it." : "The three offers on your board.",
     offers: b.offers.map((o, i) => ({ i, letter: "ABC"[i], name: name(o.slug), kills: o.kills, kind: o.kind, exp: o.exp,
       showExp: isChallengingMaster(b.difficulty, c(o.slug)), canPick: !!o.slug })),
     active: active ? { name: name(b.active.slug), kills: b.active.kills, killsLeft: b.active.killsLeft, kind: b.active.kind, exp: b.active.exp,
       showExp: isChallengingMaster(b.difficulty, c(b.active.slug)) } : null,
-    note: "Picking makes the other two disappear in game, so pick after checking the spot is free.",
+    note: "Pick in game only once the spot is free: the other offers disappear.",
     suggestions: catalog.poolOf(b.difficulty).map((x) => x.name),
   };
 }
@@ -92,11 +90,8 @@ const MINUTES_LABEL = { 30: "30 minutes", 45: "45 minutes", 60: "1 hour", 120: "
 export function calibrationText({ sources, calib, calibOther, vocation }) {
   if (!sources.reference) return "Reference hunts are off, so only your own logged hunts are used.";
   const others = Object.keys(calibOther || {}).filter((v) => calibOther[v]);
-  const otherPart = !sources.otherVocation ? "" : others.length ? " Other vocations’ references are scaled for " + others.join(", ") + "; the rest are shown as recorded."
-    : " Other vocations are shown as recorded until you log one of their spots.";
-  if (!calib) return "Not adjusted to you yet: log a clean hunt at a spot that has a reference hunt and every reference is scaled to you." + otherPart;
-  const n = calib.spots.length;
-  return "Adjusting to you: " + n + " of your logged spots " + (n === 1 ? "has" : "have") + " a reference to compare against. " + vocation + " references are scaled." + otherPart;
+  if (!calib) return "Not adjusted to you yet: log a clean hunt at a spot with a reference hunt.";
+  return "Adjusted to you from " + plural(calib.spots.length, "logged spot") + (sources.otherVocation && others.length ? " (other vocations too: " + others.join(", ") + ")." : ".");
 }
 
 // Characters and settings (full page). app: {state, profile()}; model: the active character's model, for the
@@ -114,8 +109,7 @@ export function charactersPageView(state, model) {
       calibration: p ? calibrationText({ sources, calib: d && d.calib, calibOther: d && d.calibOther, vocation: p.vocation || VOCATIONS[0] }) : "" },
     settings: { world: settings.world || "", takenMinutes: settings.takenMinutes, takenOptions: TAKEN_MINUTES.map((m) => ({ value: m, label: MINUTES_LABEL[m] })) },
     advanced: state.advanced, theme: state.theme, themes: THEMES,
-    backupNote: state.local ? "Your data stays in this browser. Download a backup to keep a copy or move it to another device."
-      : "Your data is saved to this page and syncs across your devices. A backup is a copy you can keep or restore elsewhere.",
+    backupNote: state.local ? "Your data stays in this browser. A backup moves it to another device." : "Your data syncs across your devices.",
     notice: state.notice,
   };
 }
@@ -147,17 +141,18 @@ export function planScreenView(state, model, catalog, now) {
 
   // The chain.
   const ch = model.planChain(model.plannerCtx({ marks: pl.marks }));
-  const bountyLine = (s) => (!s.offer ? null : s.offer.held ? "Kills here count for your bounty: " + s.offer.name
-    : "For offer " + "ABC"[s.offer.i] + ": " + s.offer.name + ". Pick it once you see the spot is free.");
+  // Only when the spot has the bounty's (or the offer's) creature.
+  const bountyLine = (s) => (!s.offer || !s.option.held ? null : s.offer.held ? "Counts for your bounty: " + s.offer.name
+    : "For offer " + "ABC"[s.offer.i] + ": " + s.offer.name + ". Pick it once the spot is free.");
   const card = (s) => { const o = s.option; return { id: o.id, title: s.text, name: o.name, bounty: bountyLine(s), exp: fmtBig(o.m.xp), profit: o.m.profit != null ? fmtBig(o.m.profit) : "–",
     badges: sourceBadges(o, sessionsAt(o.id)), why: s.why, offer: s.offer && !s.offer.held ? { i: s.offer.i, letter: "ABC"[s.offer.i], name: s.offer.name } : null }; };
   const go = ch.steps.filter((s) => s.kind === "go").map(card), last = ch.steps[ch.steps.length - 1], b = model.bounty();
   const end = last.kind === "reroll" ? { kind: "reroll", title: "Reroll and re-plan",
-    line: (last.dropsBounty ? "Drops your bounty for three new offers. " : "") + plural(last.tokens, "token") + " left. Or see Spots for more.", why: last.why }
-    : { kind: "seeSpots", title: last.text.replace(/^Taken\? → /, ""), line: b.tokens === 0 ? "No reroll tokens left. Every spot, sorted for your goal." : "Every spot, sorted for your goal.", why: last.why };
+    line: (last.dropsBounty ? "Drops your bounty. " : "") + plural(last.tokens, "token") + " left.", why: last.why }
+    : { kind: "seeSpots", title: last.text.replace(/^Taken\? → /, ""), line: b.tokens === 0 ? "No reroll tokens left." : "Every spot, best first.", why: last.why };
   const notices = ch.steps.filter((s) => s.kind === "finish" || s.kind === "claim").map((s) => ({ kind: s.kind, text: s.text, why: s.why }));
   const first = go[0] || null;
-  const refNote = first && (first.badges[0] || {}).kind !== "yours" && (first.badges[0] || {}).kind !== "refAdj" ? "Top players’ numbers, likely more than you’ll get, until a logged hunt adjusts them." : null;
+  const refNote = first && (first.badges[0] || {}).kind !== "yours" && (first.badges[0] || {}).kind !== "refAdj" ? "Top players’ numbers: expect less until you log a hunt." : null;
 
   // Taken spots: marks still in effect.
   const taken = Object.keys(pl.marks || {}).filter((id) => pl.marks[id].state === "taken" && markActive(pl.marks[id], now, settings.takenMinutes)).map((id) => {
@@ -204,12 +199,11 @@ export function weeklyView(w, rows, catalog, now) {
   const slots = [];
   for (let i = 0; i < w.slots; i++) { const r = rows[i] || {}; slots.push({ i, name: r.name || "", killsLeft: r.killsLeft == null ? "" : r.killsLeft, done: !!r.done }); }
   return {
-    intro: "Week of " + fmtDay(start) + ". New tasks Monday, " + fmtDay(next) + ", at server save. Kills aren’t counted here: type kills left and tick Done when you claim a task in game.",
-    stale: !w.current, staleText: "A new week started at Monday’s server save. Last week’s tasks don’t count any more.",
+    intro: "Week of " + fmtDay(start) + " · new tasks " + fmtDay(next),
+    stale: !w.current, staleText: "A new week has started.",
     difficulty: w.difficulty, difficulties: DIFF_LABELS.map(([value, label]) => ({ value, label })), slots: w.slots,
     slotOptions: [{ value: 6, label: "6" }, { value: 9, label: "9 (with expansion)" }],
     rows: slots, doneCount: slots.filter((r) => r.done).length, reward: w.exp ? fmtBig(w.exp) + " exp each" : "Set your level to see the reward.",
-    how: "Spots with open weekly creatures score higher. Done tasks stop counting. Delivery tasks don’t affect where to hunt, so they aren’t listed.",
     names: catalog.list.map((c) => c.name),
   };
 }
@@ -238,11 +232,8 @@ export function logView(draft, model, catalog, advanced) {
     preview: ok ? p : null, where, spotId, spots, parents: [{ value: "", label: "None, it’s a new spot" }].concat(parents.map((s) => ({ value: s.id, label: s.name }))),
     name: draft.name || "", parentId: draft.parentId || "", note: draft.note || "",
     nameHint: nameTaken ? "There’s already a spot called that. Pick it under Known spot, or give this one its own name." : "",
-    creaturesLine: creatures.length ? "Creatures come from your paste: " + joinAnd(creatures) + "." : "",
     exp: exp != null ? fmtBig(exp) : "–", profit: profit != null ? fmtBig(profit) : "–",
     kph: kills.map((k) => ({ name: k.name, perHour: Math.round(k.count / p.hours) + "/h" })),
-    saveText: where === "new" ? "Adds " + (draft.name ? "“" + draft.name.trim() + "”" : "the spot") + " to Spots and the plan with your numbers (Yours · 1 hunt, low sample)" + (draft.parentId ? ", listed under its parent too." : ".") :
-      "Updates this spot’s numbers (Yours) and how the reference is adjusted to you.",
     raids: advanced && ok ? kills.map((k) => ({ name: k.name, value: (draft.raids || {})[k.name] || "" })) : null,
     canSave: !!ok && (where === "known" ? !!spotId : !!(draft.name && draft.name.trim()) && !nameTaken),
   };
@@ -319,7 +310,7 @@ export function spotsView(state, model, catalog, ui, now) {
   return {
     query: ui.query || "", sort, sorts: SORTS.map(([value, label]) => ({ value, label })),
     toggles: [["allVocations", "All vocations"], ["anyLevel", "Any level"], ["hideTaken", "Hide taken"]].map(([k, label]) => ({ key: k, label, on: !!ui[k] })),
-    count: plural(all.length, "spot") + ". Score is the hourly rate for your goal mix, with your bounty and weekly tasks counted in.",
+    count: plural(all.length, "spot"),
     rows, more: Math.max(0, all.length - limit),
     empty: all.length ? "" : q ? "No spot or creature matches “" + String(ui.query).trim() + "”." : "No spots fit. Try All vocations or Any level.",
     legend: BADGE_LEGEND,
@@ -350,8 +341,7 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
 
   // Where the numbers come from: hunts here, the reference hunt (used, or the one that would be), the rest skipped.
   const hrs = sp.sessions.reduce((a, x) => a + (Number(x.hours) || 0), 0);
-  const hunts = !sp.sessions.length ? "None yet. Log one clean hunt and these become your own numbers."
-    : plural(sp.sessions.length, "hunt") + ", " + fmtHours(hrs) + " in all." + (nums && nums.src === "own" ? " These numbers come from them." : " They have breaks, so they don’t give a clean rate.");
+  const hunts = !sp.sessions.length ? "None yet." : plural(sp.sessions.length, "hunt") + ", " + fmtHours(hrs) + (nums && nums.src === "own" ? "." : ", all with breaks: no clean rate.");
   const refNums = nums && nums.src === "own" ? model.spotNums(Object.assign({}, sp, { sessions: [] })) : nums;
   const e = (refNums && refNums.entry) || null;
   const mineVoc = (x) => x.vocation === vocation || x.vocation === "any";
@@ -365,17 +355,16 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
         (src.date ? " (" + fmtMonth(src.date) + ")" : "") + (src.postRebalance === false ? ", before the rebalance" : ""),
       url: src.url || null,
       recorded: "As recorded: " + fmtBig(recXp) + " exp/h · " + (e.profitph != null ? fmtBig(e.profitph) : "–") + " profit/h",
-      adjusted: nums.src === "own" ? "Not used while you have your own hunts here."
+      adjusted: nums.src === "own" ? "Not used: you have your own hunts here."
         : refNums.src === "refAdj" || refNums.src === "otherAdj" ? "Adjusted to you: " + fmtBig(refNums.xph) + " · " + (refNums.pph != null ? fmtBig(refNums.pph) : "–") +
           ", from how your " + plural(n, "logged spot") + " compare" + (n === 1 ? "s" : "") + " to " + (n === 1 ? "its reference." : "their references.")
-        : mineVoc(e) ? "Not adjusted to you yet: log a clean hunt at any spot with a reference and every reference is scaled to you."
-        : "Not adjusted to you yet: log a clean hunt at a spot with " + aVoc(e.vocation) + " reference and that vocation’s hunts are scaled to you.",
+        : "Not adjusted to you yet.",
     };
   }
   const skipped = sp.entries.filter((x) => x !== e).map((x) => {
     const why = mineVoc(x) ? (Number(p.level) && x.levelMin > Number(p.level) ? "needs level " + x.levelMin : "another hunt here fits you better")
       : e && mineVoc(e) ? aVoc(vocation) + " hunt exists" : "another hunt here fits you better";
-    return x.vocation + " reference, " + levelRange(x) + " (skipped: " + why + ")";
+    return x.vocation + ", " + levelRange(x) + ": " + why;
   });
 
   const varRow = (v) => {
@@ -401,7 +390,7 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
     taken: taken[id] ? "Taken · clears in " + taken[id] + " min" : null,
     creatures, sources: { hunts, reference, skipped },
     variations: sp.parentId ? null : variations.map(varRow), canVary: !sp.parentId,
-    sessions, emptySessions: "No sessions logged at this spot. Only clean, break-free hunts belong here.",
+    sessions, emptySessions: "No hunts logged here.",
     own: advanced && sp.userMade ? { name: sp.name, armed: ui.armed === "spot",
       deleteText: "Deletes this spot" + (sp.sessions.length ? " and its " + plural(sp.sessions.length, "hunt") : "") +
         (variations.length ? "; its " + plural(variations.length, "variation") + " stay as spots of their own" : "") + "." } : null,
@@ -448,7 +437,6 @@ export function creaturesView(state, model, catalog, ui) {
   const unscored = items.filter((x) => !x.avoid && !x.tier).sort((a, b) => a.name.localeCompare(b.name));
   return {
     sub: DIFF_NAME[diff] + (diff === "all" ? " tasks" : " bounties") + " · " + displayName(p),
-    intro: "How good each creature is as a bounty for your goal mix (" + goalMixView(readGoal(p)).chip.value + ").",
     difficulty: diff, difficulties: CREATURE_DIFFS.map((value) => ({ value, label: DIFF_NAME[value] })), mode: ui.mode === "table" ? "table" : "tiers", query: ui.query || "",
     tiers, unscored, unscoredText: plural(unscored.length, "creature") + " without numbers yet",
     table: items.slice().sort(byScore),
@@ -486,15 +474,15 @@ export function slotsView(state, model, catalog, diff, add) {
     };
   };
   const so = slotOdds(pool, sl, (slug) => { const c = catalog.bySlug[slug], x = info(c); return !x.locked && !x.avoided && !!(x.score && (x.score.tier === "S" || x.score.tier === "A")); });
-  const oneIn = (v) => (v > 0 ? " (about 1 board in " + (1 / v < 10 ? Math.round(10 / v) / 10 : Math.round(1 / v)) + ")" : "");
-  const odds = [displayName(p) + " on " + DIFF_NAME[diff] + " tasks: " + so.poolSize + " creatures in the pool" + (so.unwanted ? ", " + so.unwanted + " removed by Unwanted" : "") + "."];
+  const oneIn = (v) => (v > 0 ? " (1 in " + Math.max(1, Math.round(1 / v)) + ")" : "");
+  const odds = [DIFF_NAME[diff] + " pool: " + so.poolSize + " creatures" + (so.unwanted ? " (" + so.unwanted + " removed by Unwanted)" : "") + "."];
   if (so.preferred) {
-    odds.push(pct(so.pAny) + " of boards show at least one of your Preferred creatures" + oneIn(so.pAny) + ".");
-    odds.push("Each Preferred creature shows up on about " + pct(so.pEach) + " of boards, versus " + pct(so.pBase) + " without a slot.");
-  } else odds.push("Add Preferred creatures to see how often they’ll show up on your board.");
-  if (so.good) odds.push("Boards with at least one S or A creature for you (" + so.good + " of them): about " + pct(so.pGood) + oneIn(so.pGood) + ".");
-  return { difficulty: diff, intro: "Mirror the lists you set in game: Preferred creatures show up more often, Unwanted ones never. Five of each.",
-    preferred: list("preferred"), unwanted: list("unwanted"), odds, note: "Odds follow a community model of the board, not official numbers." };
+    odds.push("A Preferred creature on " + pct(so.pAny) + " of boards" + oneIn(so.pAny) + ".");
+    odds.push("Each one: " + pct(so.pEach) + " of boards (" + pct(so.pBase) + " without a slot).");
+  }
+  if (so.good) odds.push("An S or A creature on " + pct(so.pGood) + " of boards" + oneIn(so.pGood) + ".");
+  return { difficulty: diff,
+    preferred: list("preferred"), unwanted: list("unwanted"), odds, note: "Community model, not official odds." };
 }
 
 // One creature's page. model: the model for the Creatures screen's difficulty (diff); ui: {notes (a draft)};
@@ -508,17 +496,15 @@ export function creatureView(state, model, catalog, slug, diff, ui, advanced) {
   const cdiff = diff !== "all" && creatureInPool(c, diff) ? diff : topPool(c), m = model.metricsFor(c, e, cdiff) || {};
   const idx = model.spotIndex(), dash = "–", tag = tags[c.slug];
   const b = bestiaryOf(c);
-  const bestiary = b.kills.toLocaleString("en-US") + " kills for " + b.charmPoints + " charm points." + (c.r ? " It’s a rare creature, so it can’t start Echo Raids and has no Echo Warden bonus."
-    : " Your first Echo Warden kill gives " + b.warden + " more. Wardens lead " + (entry.bestiaryDone ? "20%" : "10%") + " of Echo Raids" + (entry.bestiaryDone ? " now that the bestiary is finished." : ", 20% once the bestiary is finished."));
+  const bestiary = b.kills.toLocaleString("en-US") + " kills · " + b.charmPoints + " charm points" + (c.r ? " · rare: no Echo Raids" : " · Echo Warden +" + b.warden);
 
   // Where the numbers come from.
-  let source = "No numbers yet: log a clean hunt where it lives, or switch on reference hunts (Characters).";
+  let source = "No numbers yet.";
   if (e.src === "own") source = !e.fromSessions ? "From numbers you typed (Advanced)." : (manualNums(entry) ? "From numbers you typed and your hunts at " : "From your hunts at ") + e.spot + ".";
   else if (e.refEntry) {
     const ev = e.refEntry.vocation, who = (e.refEntry.source || {}).who;
     source = (e.src === "refAdj" ? "A reference hunt at " + e.spot + ", adjusted to you" : e.src === "ref" ? "A reference hunt at " + e.spot + ", as recorded"
       : aVoc(ev) + "’s reference hunt at " + e.spot + (e.src === "otherAdj" ? ", adjusted to you" : ", as recorded")) + (who ? " (" + who + ")" : "") + "." +
-      (e.src === "ref" ? " Log a hunt at any reference spot to adjust these to you." : e.src === "other" ? " Log a hunt at a spot that also has " + aVoc(ev) + " reference to adjust them." : "") +
       (e.profitStale ? " " + staleProfitText(e.refEntry) + "." : "");
   }
 
@@ -544,7 +530,7 @@ export function creatureView(state, model, catalog, slug, diff, ui, advanced) {
     badge: numbersBadge(e), source, weekly: m.weeklyXph > 0 ? "Exp/h includes " + fmtBig(m.weeklyXph) + " from open weekly tasks at " + e.spot + "." : "",
     spots, noSpots: "No hunts or reference spots for it yet.",
     preferred: sl.preferred.indexOf(slug) !== -1, unwanted: sl.unwanted.indexOf(slug) !== -1, avoid: model.ratingOf(c) === "X",
-    listsNote: "Preferred and Unwanted mirror the in-game lists (five each). Avoid keeps it out of your tiers and the plan’s offers.",
+    listsNote: "Avoid keeps it out of your tiers and the plan.",
     bestiary, bestiaryDone: !!entry.bestiaryDone, wardenDone: !!entry.wardenDone, rare: !!c.r,
     notes: ui.notes != null ? ui.notes : entry.notes || "",
     advanced: advanced ? {

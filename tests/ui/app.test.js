@@ -145,7 +145,7 @@ test("Claude db with old-shape data: migrations read it, writes go to the shared
   assert.equal(p.$("#src-other").getAttribute("aria-checked"), "false");
   assert.equal(p.d.querySelector('[aria-label="Numbers from"] button[aria-pressed="true"]').textContent, "+ Reference");
   assert.equal(p.$("#set-world").value, "Secura", "world from the planner state");
-  assert.match(p.d.body.textContent, /saved to this page and syncs/);
+  assert.match(p.d.body.textContent, /Your data syncs across your devices/);
   await p.click('[aria-label="Numbers from"] button:nth-child(3)');
   await until(() => store["profiles/main"].sources, "the sources write");
   assert.deepEqual(store["profiles/main"].sources, { reference: true, otherVocation: true, older: true });
@@ -226,7 +226,7 @@ test("Spots and a spot page over the golden fixture: search, a variation, Taken,
   const p = load({ store, prefs: { "btl.profile": "ek", "btl.adv": "1" }, now: Date.parse("2026-10-24T18:00:00Z") });
   await until(() => p.$("#step1-title"), "the plan");
   await p.go("spots");
-  assert.match(p.$("#spots-count").textContent, /^\d+ spots?\. Score is/);
+  assert.match(p.$("#spots-count").textContent, /^\d+ spots?$/);
   assert.equal(p.$('.hp-tabbar a[aria-current="page"]').textContent, "Spots");
   await p.type("#spots-q", "lure", "input");
   const rows = [...p.d.querySelectorAll(".hp-spot")].map((a) => a.textContent);
@@ -241,7 +241,7 @@ test("Spots and a spot page over the golden fixture: search, a variation, Taken,
   await wait(20);
   assert.equal(p.w.location.hash, "#/spot/my-bastion-lure");
   assert.match(p.d.body.textContent, /Your variation of Cobra Bastion -1/);
-  assert.match(p.d.body.textContent, /Your hunts here1 hunt, 1 h in all\. These numbers come from them\./);
+  assert.match(p.d.body.textContent, /Your hunts here1 hunt, 1 h\./);
   await p.click("#spot-taken");
   await until(() => (store["profiles/ek/marks/my-bastion-lure"] || {}).state === "taken", "the Taken mark");
   assert.ok(p.$("#spot-free"));
@@ -251,7 +251,7 @@ test("Spots and a spot page over the golden fixture: search, a variation, Taken,
   assert.match(p.d.body.textContent, /Delete this hunt\?/);
   await p.click("#ses-yes-e7");
   await until(() => !store["profiles/ek/sessions/e7"], "the hunt deleted");
-  assert.match(p.d.body.textContent, /No sessions logged at this spot/);
+  assert.match(p.d.body.textContent, /No hunts logged here/);
   await p.type("#spot-name", "Bastion two-box lure");
   await until(() => store["profiles/ek/spots/my-bastion-lure"].name === "Bastion two-box lure", "the rename");
   await p.click("#spot-delete");
@@ -309,7 +309,7 @@ test("Creatures over the golden fixture: tiers, a creature page's writes, and th
   const slug = sug.id.replace("list-preferred-sug-", "");
   sug.click();
   await until(() => store["profiles/ek"].slots.preferred.indexOf(slug) !== -1, "a suggested Preferred creature");
-  assert.match(p.d.body.textContent, /of boards show at least one of your Preferred creatures/);
+  assert.match(p.d.body.textContent, /A Preferred creature on [\d.]+% of boards/);
   assert.deepEqual(p.errors, []);
   p.w.close();
 });

@@ -13,11 +13,11 @@ export function chip({ id, label, value, set, open, onToggle }) {
 // The goal mixer editor. view: app/views.js goalMixView. on: {preset(id), weight(key, n), done()}.
 export function goalEditor(view, on) {
   return h("section", { id: "plan-editor", class: "hp-editor", "aria-label": "Goal mix" },
-    h("div", { class: "hp-editor-head" }, h("h3", { class: "hp-panel-title" }, "Goal mix"), h("p", { class: "hp-p hp-small hp-muted" }, view.intro)),
+    h("div", { class: "hp-editor-head" }, h("h3", { class: "hp-panel-title" }, "Goal mix")),
     h("div", { class: "hp-presets", role: "group", "aria-label": "Presets" },
       view.presets.map((p) => h("button", { id: "goal-preset-" + p.id, type: "button", "aria-pressed": p.pressed ? "true" : "false", onClick: () => on.preset(p.id) }, p.label))),
     view.rows.map((r) => h("div", { class: "hp-weight", role: "group", "aria-label": r.name + " weight" },
-      h("div", { class: "hp-weight-head" }, h("b", null, r.name), h("span", { class: "hp-caption" }, r.hint)),
+      h("div", { class: "hp-weight-head" }, h("b", null, r.name)),
       segmented({ label: r.name + " weight", value: r.value, options: r.options.map((o) => ({ value: o.n, label: String(o.n) })), onPick: (n) => on.weight(r.key, n) }))),
     h("div", { class: "hp-split" },
       h("span", { class: "hp-caption" }, "How the plan weighs a spot"),
@@ -75,13 +75,13 @@ export function bountyEditor(view, on) {
 }
 
 const editorFrame = (id, title, intro, planLine, body, done) => h("section", { id: "plan-editor", class: "hp-editor", "aria-label": title },
-  h("div", { class: "hp-editor-head" }, h("h3", { class: "hp-panel-title" }, title), h("p", { class: "hp-p hp-small hp-muted" }, intro)),
+  h("div", { class: "hp-editor-head" }, h("h3", { class: "hp-panel-title" }, title), intro ? h("p", { class: "hp-p hp-small hp-muted" }, intro) : null),
   body,
   h("div", { class: "hp-editor-foot" }, h("span", { "aria-live": "polite" }, h("span", { class: "hp-muted" }, "Plan: "), h("b", null, planLine)),
     h("button", { id: id + "-done", type: "button", class: "hp-btn solid", onClick: done }, "Done")));
 
 function weeklyEditor(v, planLine, on) {
-  return editorFrame("weekly", "Weekly", "Your open weekly kill tasks and their kills left. The plan counts each kill a spot gives toward them.", planLine, [
+  return editorFrame("weekly", "Weekly", null, planLine, [
     v.rows.length ? h("ul", { class: "hp-list" }, v.rows.map((r) => h("li", null, h("span", null, h("b", null, r.name), " ", h("span", { class: "hp-muted" }, r.left == null ? "" : r.left + " left")),
       h("button", { id: "wkchip-" + r.i + "-done", type: "button", class: "hp-btn hp-done", "aria-pressed": r.done ? "true" : "false", "aria-label": r.name + " done",
         onClick: () => on.weeklyDone(r.i, !r.done) }, r.done ? "✓ Done" : "Done")))) :
@@ -89,7 +89,7 @@ function weeklyEditor(v, planLine, on) {
     h("a", { href: "#/weekly", id: "weekly-open" }, "Edit them on the Weekly tab")], on.done);
 }
 function todayEditor(v, planLine, on) {
-  return editorFrame("today", "Today’s boosts", "Counts the boosted creature’s double exp, prey bonus exp and exp events. Clears at server save.", planLine, [
+  return editorFrame("today", "Today’s boosts", "Clears at server save.", planLine, [
     h("datalist", { id: "today-names" }, v.names.map((n) => h("option", { value: n }))),
     textInput("today-boosted", "Boosted creature", v.boosted, on.boosted, { list: "today-names", autocomplete: "off" }),
     v.prey.map((q) => h("div", { class: "hp-offer", role: "group", "aria-label": "Prey " + (q.i + 1) },
@@ -102,12 +102,12 @@ function todayEditor(v, planLine, on) {
     selectField({ id: "today-event", label: "Exp event", value: v.event, options: v.events, onPick: (x) => on.event(Number(x)) })], on.done);
 }
 function timeEditor(v, planLine, on) {
-  return editorFrame("time", "Time", "How long you’ll hunt. With a limit, travel time counts and only kills you can finish do.", planLine,
+  return editorFrame("time", "Time", null, planLine,
     h("div", { class: "hp-presets", role: "group", "aria-label": "Session length" }, v.options.map((o, i) =>
       h("button", { id: "time-" + i, type: "button", "aria-pressed": o.value === v.value ? "true" : "false", onClick: () => on.hours(o.value) }, o.label))), on.done);
 }
 function dataEditor(v, planLine, on) {
-  return editorFrame("data", "Data", "Where the plan’s numbers come from: your logged hunts always come first.", planLine, [
+  return editorFrame("data", "Data", "Your own hunts always come first.", planLine, [
     segmented({ label: "Numbers from", options: v.presets, value: v.preset, onPick: (k) => on.sources(v.presets.filter((x) => x.value === k)[0].switches) }),
     h("a", { href: "#/characters", id: "data-more" }, "Detailed switches in Characters")], on.done);
 }
@@ -126,7 +126,7 @@ function steps(v, ui, on) {
       hu.pick ? h("div", { class: "hp-pick" }, h("span", null, h("b", null, "The spot is yours: pick offer " + hu.pick.letter + " now."), h("br"),
         h("span", { class: "hp-small" }, hu.pick.name + " on the Task Board. The other two offers will disappear.")),
         h("button", { id: "hunt-picked", type: "button", class: "hp-btn primary", onClick: () => on.pick(hu.pick.i) }, "Picked " + hu.pick.letter)) : null,
-      h("p", { class: "hp-p hp-small hp-muted" }, "No timer, nothing to track. If this turns into a focused, break-free hunt, you can log it any time."),
+      h("p", { class: "hp-p hp-small hp-muted" }, "Log it if it was a focused hunt with no breaks."),
       h("div", { class: "hp-grid2" }, h("button", { id: "hunt-log", type: "button", class: "hp-btn", onClick: () => on.logHunt(hu.spotId) }, "Log a clean hunt"),
         h("button", { id: "hunt-back", type: "button", class: "hp-btn solid", onClick: on.stopHunting }, "Back to plan"))));
   } else if (f) {

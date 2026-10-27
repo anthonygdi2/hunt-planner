@@ -23,7 +23,6 @@ export function render(view, ui, on) {
     h("datalist", { id: "wk-names" }, view.names.map((n) => h("option", { value: n }))),
     h("div", { class: "hp-wk-head", "aria-hidden": "true" }, h("span", null, "Creature"), h("span", null, "Kills left"), h("span")),
     h("div", { class: "hp-wk-rows" }, view.rows.map(row)),
-    h("div", { class: "hp-hint" }, h("b", null, "How the plan uses these"), h("span", { class: "hp-small hp-muted" }, view.how)),
     view.stale ? null : confirmButton({ id: "wk-new", label: "Start a new week", confirmLabel: "Tap again to clear this week’s tasks", armed: ui.armed,
       onArm: () => on.arm(true), onConfirm: on.newWeek }));
 }

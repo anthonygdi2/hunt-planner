@@ -35,14 +35,14 @@ test("the parts of a spot's score", () => {
   const o = { v: 0.92, m: { xp: 4.84e6, profit: 2e5 }, parts: { hunt: 4.1e6, today: 0, held: 5.4e5, weekly: 2e5 }, offer: { name: "Cobra Assassin" },
     weekly: [{ name: "Silencer" }], today: [], held: { hoursLeft: 1.5 }, hours: null };
   assert.equal(partsWhy(o, { sc: { keys: ["xp", "profit"] }, pct }),
-    "Scores 92: 4.84kk exp/h (4.1kk hunting, 540k from Cobra Assassin’s task, 200k from your Silencer weekly task), 200k profit/h. Finishes the task in about 1 h 30 min here.");
+    "Scores 92: 4.84kk exp/h (4.1kk hunting, 540k from the bounty, 200k from weekly tasks), 200k profit/h. Bounty done in about 1 h 30 min here.");
 });
 
 test("picking, rerolling and the end of the chain", () => {
-  assert.equal(pickWhy({ name: "Rat", i: 0 }), "Pick Rat (offer A) once you see the spot is free: picking makes the other two offers disappear in game.");
+  assert.equal(pickWhy({ name: "Rat", i: 0 }), "Pick Rat (offer A) once the spot is free: the other offers disappear.");
   const active = { key: "held", name: "Rat", kills: 100, done: 40, held: true, i: -1 };
   const ctx = { chosen: [{ held: true, offer: active, name: "Sewers" }], worth: {}, options: [{}], offers: [active], tokens: 2, pct, active };
-  assert.equal(rerollWhy({ name: "Cave", v: 0.4, thr: 0.5 }, [], ctx), "The next spot, Cave, scores 40, below the 50 a reroll is worth with 2 tokens left. Rerolling drops your active bounty, Rat.");
+  assert.equal(rerollWhy({ name: "Cave", v: 0.4, thr: 0.5 }, [], ctx), "The next spot, Cave (40), is worth less than a reroll (50). Rerolling drops Rat.");
   assert.equal(rerollWhy(null, [], Object.assign({}, ctx, { options: [], offers: [], active: null })), "None of your spots has numbers for this character yet.");
   assert.match(seeSpotsWhy({ unknown: true }), /Set your reroll tokens/);
   assert.match(seeSpotsWhy({ tokens: 0 }), /No reroll tokens left/);

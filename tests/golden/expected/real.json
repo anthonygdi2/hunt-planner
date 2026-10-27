@@ -1074,27 +1074,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 436: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (97), by 339. It beats Upper Roshamuul (783) by a hair. That clears the 66 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 436: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (97), by 339. A reroll is worth 66 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 783: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (563) by 220. That clears the 66 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 783: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 66 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 563: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (472) by 91. That clears the 66 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 563: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 66 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 472: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (450) by 22. That clears the 66 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 472: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 66 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 450: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 66 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 450: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 66 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -2540,15 +2540,7 @@
           ]
          },
          "skipped": {"$set":[]},
-         "steps": {
-          "$set": [
-           {
-            "kind": "reroll",
-            "text": "Reroll and re-plan",
-            "why": "The next spot, Bastion lure, scores 15, below the 30 a reroll is worth with 4 tokens left. Rerolling drops your active bounty, Cobra Assassin."
-           }
-          ]
-         }
+         "steps": {"$set":[{"kind":"reroll","text":"Reroll and re-plan","why":"The next spot, Bastion lure (15), is worth less than a reroll (30). Rerolling drops Cobra Assassin."}]}
         }
        },
        "charm": {
@@ -3621,28 +3613,16 @@
            {
             "kind": "go",
             "text": "Go to Oramond West (raid)",
-            "why": "Scores 91: 54.3 charm points/h. Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion for Beginners (32), by 59. It beats Brimstone Bugs WOTE Zao Plantations (86) by 5. That clears the 77 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
+            "why": "Scores 91: 54.3 charm points/h. Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion for Beginners (32), by 59. A reroll is worth 77 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 86: 51.1 charm points/h. It beats Upper Roshamuul (85) by 1. That clears the 77 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 86: 51.1 charm points/h. A reroll is worth 77 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 85: 50.5 charm points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Forbidden Temple (83) by 2. That clears the 77 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 85: 50.5 charm points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 77 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Forbidden Temple",
-            "why": "Scores 83: 49.5 charm points/h. It beats Ramoa Island (82) by 1. That clears the 77 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Ramoa Island",
-            "why": "Scores 82: 48.7 charm points/h. That clears the 77 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Forbidden Temple","why":"Scores 83: 49.5 charm points/h. A reroll is worth 77 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Ramoa Island","why":"Scores 82: 48.7 charm points/h. A reroll is worth 77 with 4 tokens left."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -10465,27 +10445,27 @@
           {
            "kind": "go",
            "text": "Go to Test Hideout",
-           "why": "Scores 705: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (96), by 609. It beats Upper Roshamuul (1167) by a hair. That clears the 67 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+           "why": "Scores 705: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (96), by 609. A reroll is worth 67 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
           },
           {
            "kind": "go",
            "text": "Taken? → Upper Roshamuul",
-           "why": "Scores 1167: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (913) by 254. That clears the 67 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+           "why": "Scores 1167: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 67 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Knight Den",
-           "why": "Scores 913: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (718) by 195. That clears the 67 a reroll is worth with 4 tokens left. From your own sessions here."
+           "why": "Scores 913: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 67 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Upper Roshamuul South",
-           "why": "Scores 718: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (680) by 38. That clears the 67 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+           "why": "Scores 718: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 67 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 680: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task). Today: Silencer is boosted (double exp). That clears the 67 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+           "why": "Scores 680: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 67 with 4 tokens left."
           },
           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
          ],
@@ -11505,27 +11485,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 543: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (98), by 445. It beats Upper Roshamuul (938) by a hair. That clears the 65 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 543: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (98), by 445. A reroll is worth 65 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 938: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (702) by 236. That clears the 65 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 938: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 65 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 702: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (571) by 131. That clears the 65 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 702: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 65 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 571: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (543) by 28. That clears the 65 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 571: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 65 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 543: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 65 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 543: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 65 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -12752,28 +12732,16 @@
            {
             "kind": "go",
             "text": "Go to Warzone 9",
-            "why": "Scores 149: 2.19kk profit/h. Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (65), by 84. It beats Flimsies Venore -1 & -2 (134) by 15. That clears the 55 a reroll is worth with 4 tokens left. From an Exalted Monk’s reference hunt not adjusted to you yet, so likely optimistic. Profit from 2025, may be out of date."
+            "why": "Scores 149: 2.19kk profit/h. Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (65), by 84. A reroll is worth 55 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Flimsies Venore -1 & -2",
-            "why": "Scores 134: 1.96kk profit/h. It beats Upper Roshamuul (133) by 1. That clears the 55 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Flimsies Venore -1 & -2","why":"Scores 134: 1.96kk profit/h. A reroll is worth 55 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 133: 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Warzone 8 (Grotto of the Lost) (131) by 2. That clears the 55 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 133: 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 55 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Warzone 8 (Grotto of the Lost)",
-            "why": "Scores 131: 1.93kk profit/h. It beats Deep Desert (125) by 6. That clears the 55 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Deep Desert",
-            "why": "Scores 125: 1.83kk profit/h. That clears the 55 a reroll is worth with 4 tokens left. From an Exalted Monk’s reference hunt not adjusted to you yet, so likely optimistic. Profit from 2025, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Warzone 8 (Grotto of the Lost)","why":"Scores 131: 1.93kk profit/h. A reroll is worth 55 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Deep Desert","why":"Scores 125: 1.83kk profit/h. A reroll is worth 55 with 4 tokens left."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -29794,27 +29762,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 439: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (104), by 335. It beats Upper Roshamuul (799) by a hair. That clears the 56 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 439: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (104), by 335. A reroll is worth 56 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 799: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (566) by 233. That clears the 56 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 799: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 56 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 566: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (480) by 86. That clears the 56 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 566: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 56 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 480: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (458) by 22. That clears the 56 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 480: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 56 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 458: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 56 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 458: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 56 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -30452,15 +30420,7 @@
           ]
          },
          "skipped": {"$set":[]},
-         "steps": {
-          "$set": [
-           {
-            "kind": "reroll",
-            "text": "Reroll and re-plan",
-            "why": "The next spot, Bastion lure, scores 14, below the 35 a reroll is worth with 4 tokens left. Rerolling drops your active bounty, Cobra Assassin."
-           }
-          ]
-         }
+         "steps": {"$set":[{"kind":"reroll","text":"Reroll and re-plan","why":"The next spot, Bastion lure (14), is worth less than a reroll (35). Rerolling drops Cobra Assassin."}]}
         }
        },
        "charm": {
@@ -31024,28 +30984,16 @@
            {
             "kind": "go",
             "text": "Go to Oramond West (raid)",
-            "why": "Scores 97: 54.3 charm points/h. Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion for Beginners (34), by 63. It beats Brimstone Bugs WOTE Zao Plantations (92) by 5. That clears the 76 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
+            "why": "Scores 97: 54.3 charm points/h. Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion for Beginners (34), by 63. A reroll is worth 76 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 92: 51.1 charm points/h. It beats Upper Roshamuul (91) by 1. That clears the 76 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 92: 51.1 charm points/h. A reroll is worth 76 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 91: 50.5 charm points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Forbidden Temple (89) by 2. That clears the 76 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 91: 50.5 charm points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 76 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Forbidden Temple",
-            "why": "Scores 89: 49.5 charm points/h. It beats Ramoa Island (87) by 2. That clears the 76 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Ramoa Island",
-            "why": "Scores 87: 48.7 charm points/h. That clears the 76 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Forbidden Temple","why":"Scores 89: 49.5 charm points/h. A reroll is worth 76 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Ramoa Island","why":"Scores 87: 48.7 charm points/h. A reroll is worth 76 with 4 tokens left."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -32672,27 +32620,27 @@
           {
            "kind": "go",
            "text": "Go to Test Hideout",
-           "why": "Scores 756: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (103), by 653. It beats Upper Roshamuul (1252) by a hair. That clears the 62 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+           "why": "Scores 756: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (103), by 653. A reroll is worth 62 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
           },
           {
            "kind": "go",
            "text": "Taken? → Upper Roshamuul",
-           "why": "Scores 1252: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (980) by 272. That clears the 62 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+           "why": "Scores 1252: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 62 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Knight Den",
-           "why": "Scores 980: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (770) by 210. That clears the 62 a reroll is worth with 4 tokens left. From your own sessions here."
+           "why": "Scores 980: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 62 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Upper Roshamuul South",
-           "why": "Scores 770: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (730) by 40. That clears the 62 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+           "why": "Scores 770: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 62 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 730: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task). Today: Silencer is boosted (double exp). That clears the 62 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+           "why": "Scores 730: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 62 with 4 tokens left."
           },
           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
          ],
@@ -33198,27 +33146,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 576: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (108), by 468. It beats Upper Roshamuul (1003) by a hair. That clears the 57 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 576: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (108), by 468. A reroll is worth 57 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 1003: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (745) by 258. That clears the 57 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 1003: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 57 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 745: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (609) by 136. That clears the 57 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 745: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 57 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 609: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (579) by 30. That clears the 57 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 609: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 57 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 579: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 57 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 579: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 57 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -33818,28 +33766,16 @@
            {
             "kind": "go",
             "text": "Go to Warzone 9",
-            "why": "Scores 211: 2.19kk profit/h. Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (92), by 119. It beats Flimsies Venore -1 & -2 (189) by 22. That clears the 64 a reroll is worth with 4 tokens left. From an Exalted Monk’s reference hunt not adjusted to you yet, so likely optimistic. Profit from 2025, may be out of date."
+            "why": "Scores 211: 2.19kk profit/h. Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (92), by 119. A reroll is worth 64 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Flimsies Venore -1 & -2",
-            "why": "Scores 189: 1.96kk profit/h. It beats Upper Roshamuul (188) by 1. That clears the 64 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Flimsies Venore -1 & -2","why":"Scores 189: 1.96kk profit/h. A reroll is worth 64 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 188: 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Warzone 8 (Grotto of the Lost) (186) by 2. That clears the 64 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 188: 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 64 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Warzone 8 (Grotto of the Lost)",
-            "why": "Scores 186: 1.93kk profit/h. It beats Deep Desert (177) by 9. That clears the 64 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Deep Desert",
-            "why": "Scores 177: 1.83kk profit/h. That clears the 64 a reroll is worth with 4 tokens left. From an Exalted Monk’s reference hunt not adjusted to you yet, so likely optimistic. Profit from 2025, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Warzone 8 (Grotto of the Lost)","why":"Scores 186: 1.93kk profit/h. A reroll is worth 64 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Deep Desert","why":"Scores 177: 1.83kk profit/h. A reroll is worth 64 with 4 tokens left."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -35072,27 +35008,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 240: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (59), by 181. It beats Upper Roshamuul (440) by a hair. That clears the 68 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 240: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (59), by 181. A reroll is worth 68 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 440: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (310) by 130. That clears the 68 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 440: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 68 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 310: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (264) by 46. That clears the 68 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 310: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 68 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 264: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (252) by 12. That clears the 68 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 264: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 68 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 252: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 68 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 252: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 68 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -36813,15 +36749,7 @@
          },
          "pool": {"known":{"$set":343}},
          "skipped": {"$set":[]},
-         "steps": {
-          "$set": [
-           {
-            "kind": "reroll",
-            "text": "Reroll and re-plan",
-            "why": "The next spot, Bastion lure, scores 31, below the 34 a reroll is worth with 4 tokens left. Rerolling drops your active bounty, Cobra Assassin."
-           }
-          ]
-         }
+         "steps": {"$set":[{"kind":"reroll","text":"Reroll and re-plan","why":"The next spot, Bastion lure (31), is worth less than a reroll (34). Rerolling drops Cobra Assassin."}]}
         }
        },
        "charm": {
@@ -38056,28 +37984,16 @@
            {
             "kind": "go",
             "text": "Go to Oramond West (raid)",
-            "why": "Scores 91: 54.3 charm points/h. Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion for Beginners (32), by 59. It beats Brimstone Bugs WOTE Zao Plantations (86) by 5. That clears the 75 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
+            "why": "Scores 91: 54.3 charm points/h. Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion for Beginners (32), by 59. A reroll is worth 75 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 86: 51.1 charm points/h. It beats Upper Roshamuul (85) by 1. That clears the 75 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 86: 51.1 charm points/h. A reroll is worth 75 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 85: 50.5 charm points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Forbidden Temple (83) by 2. That clears the 75 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 85: 50.5 charm points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 75 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Forbidden Temple",
-            "why": "Scores 83: 49.5 charm points/h. It beats Ramoa Island (82) by 1. That clears the 75 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Ramoa Island",
-            "why": "Scores 82: 48.7 charm points/h. That clears the 75 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Forbidden Temple","why":"Scores 83: 49.5 charm points/h. A reroll is worth 75 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Ramoa Island","why":"Scores 82: 48.7 charm points/h. A reroll is worth 75 with 4 tokens left."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -47404,27 +47320,27 @@
           {
            "kind": "go",
            "text": "Go to Test Hideout",
-           "why": "Scores 384: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (54), by 330. It beats Upper Roshamuul (635) by a hair. That clears the 53 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+           "why": "Scores 384: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (54), by 330. A reroll is worth 53 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
           },
           {
            "kind": "go",
            "text": "Taken? → Upper Roshamuul",
-           "why": "Scores 635: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (497) by 138. That clears the 53 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+           "why": "Scores 635: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 53 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Knight Den",
-           "why": "Scores 497: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (391) by 106. That clears the 53 a reroll is worth with 4 tokens left. From your own sessions here."
+           "why": "Scores 497: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 53 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Upper Roshamuul South",
-           "why": "Scores 391: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (370) by 21. That clears the 53 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+           "why": "Scores 391: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 53 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 370: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task). Today: Silencer is boosted (double exp). That clears the 53 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+           "why": "Scores 370: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 53 with 4 tokens left."
           },
           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
          ],
@@ -48575,27 +48491,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 299: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (58), by 241. It beats Upper Roshamuul (522) by a hair. That clears the 64 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 299: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (58), by 241. A reroll is worth 64 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 522: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (387) by 135. That clears the 64 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 522: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 64 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 387: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (317) by 70. That clears the 64 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 387: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 64 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 317: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (301) by 16. That clears the 64 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 317: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 64 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 301: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 64 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 301: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 64 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -50123,28 +50039,16 @@
            {
             "kind": "go",
             "text": "Go to Warzone 9",
-            "why": "Scores 100: 2.19kk profit/h. Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (43), by 57. It beats Flimsies Venore -1 & -2 (90) by 10. That clears the 59 a reroll is worth with 4 tokens left. From an Exalted Monk’s reference hunt not adjusted to you yet, so likely optimistic. Profit from 2025, may be out of date."
+            "why": "Scores 100: 2.19kk profit/h. Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (43), by 57. A reroll is worth 59 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Flimsies Venore -1 & -2",
-            "why": "Scores 90: 1.96kk profit/h. It beats Upper Roshamuul (89) by 1. That clears the 59 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Flimsies Venore -1 & -2","why":"Scores 90: 1.96kk profit/h. A reroll is worth 59 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 89: 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Warzone 8 (Grotto of the Lost) (88) by 1. That clears the 59 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 89: 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 59 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Warzone 8 (Grotto of the Lost)",
-            "why": "Scores 88: 1.93kk profit/h. It beats Deep Desert (84) by 4. That clears the 59 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Deep Desert",
-            "why": "Scores 84: 1.83kk profit/h. That clears the 59 a reroll is worth with 4 tokens left. From an Exalted Monk’s reference hunt not adjusted to you yet, so likely optimistic. Profit from 2025, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Warzone 8 (Grotto of the Lost)","why":"Scores 88: 1.93kk profit/h. A reroll is worth 59 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Deep Desert","why":"Scores 84: 1.83kk profit/h. A reroll is worth 59 with 4 tokens left."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -50928,27 +50832,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 220: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (59), by 161. It beats Upper Roshamuul (406) by a hair. That clears the 77 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 220: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (59), by 161. A reroll is worth 77 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 406: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (284) by 122. That clears the 77 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 406: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 77 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 284: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (243) by 41. That clears the 77 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 284: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 77 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 243: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (232) by 11. That clears the 77 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 243: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 77 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 232: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 77 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 232: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 77 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -51798,31 +51702,11 @@
          "pool": {"known":{"$set":146}},
          "steps": {
           "$set": [
-           {
-            "kind": "go",
-            "text": "Go to Bastion lure",
-            "why": "Scores 55: 33.4 bounty points/h. Finishes the task in about 48 min here. It beats Cobra Basement -1 (52) by 3. That clears the 35 a reroll is worth with 4 tokens left. From your own sessions here."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Cobra Basement -1",
-            "why": "Scores 52: 31.3 bounty points/h. Finishes the task in about 52 min here. It beats Cobra Bastion for Beginners (49) by 3. That clears the 36 a reroll is worth with 4 tokens left. From a Master Sorcerer’s reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Cobra Bastion for Beginners",
-            "why": "Scores 49: 29.3 bounty points/h. Finishes the task in about 55 min here. It beats Cobra Bastion (45) by 4. That clears the 38 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Cobra Bastion",
-            "why": "Scores 45: 27.3 bounty points/h. Finishes the task in about 59 min here. That clears the 39 a reroll is worth with 4 tokens left. From a Master Sorcerer’s reference hunt, adjusted to you."
-           },
-           {
-            "kind": "reroll",
-            "text": "Taken? → Reroll and re-plan",
-            "why": "The next spot, Cobra Bastion -1, scores 37, below the 42 a reroll is worth with 4 tokens left. Rerolling drops your active bounty, Cobra Assassin."
-           }
+           {"kind":"go","text":"Go to Bastion lure","why":"Scores 55: 33.4 bounty points/h. Bounty done in about 48 min here. A reroll is worth 35 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Cobra Basement -1","why":"Scores 52: 31.3 bounty points/h. Bounty done in about 52 min here. A reroll is worth 36 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Cobra Bastion for Beginners","why":"Scores 49: 29.3 bounty points/h. Bounty done in about 55 min here. A reroll is worth 38 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Cobra Bastion","why":"Scores 45: 27.3 bounty points/h. Bounty done in about 59 min here. A reroll is worth 39 with 4 tokens left."},
+           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Cobra Bastion -1 (37), is worth less than a reroll (42). Rerolling drops Cobra Assassin."}
           ]
          }
         }
@@ -52490,28 +52374,16 @@
            {
             "kind": "go",
             "text": "Go to Oramond West (raid)",
-            "why": "Scores 111: 54.3 charm points/h. Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion for Beginners (38), by 73. It beats Brimstone Bugs WOTE Zao Plantations (104) by 7. That clears the 70 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
+            "why": "Scores 111: 54.3 charm points/h. Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion for Beginners (38), by 73. A reroll is worth 70 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 104: 51.1 charm points/h. It beats Upper Roshamuul (103) by 1. That clears the 70 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 104: 51.1 charm points/h. A reroll is worth 70 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 103: 50.5 charm points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Forbidden Temple (101) by 2. That clears the 70 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 103: 50.5 charm points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 70 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Forbidden Temple",
-            "why": "Scores 101: 49.5 charm points/h. It beats Ramoa Island (99) by 2. That clears the 70 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Ramoa Island",
-            "why": "Scores 99: 48.7 charm points/h. That clears the 70 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Forbidden Temple","why":"Scores 101: 49.5 charm points/h. A reroll is worth 70 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Ramoa Island","why":"Scores 99: 48.7 charm points/h. A reroll is worth 70 with 4 tokens left."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -56564,27 +56436,27 @@
           {
            "kind": "go",
            "text": "Go to Test Hideout",
-           "why": "Scores 359: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Basement -1 (56), by 303. It beats Upper Roshamuul (594) by a hair. That clears the 66 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+           "why": "Scores 359: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Basement -1 (56), by 303. A reroll is worth 66 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
           },
           {
            "kind": "go",
            "text": "Taken? → Upper Roshamuul",
-           "why": "Scores 594: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (465) by 129. That clears the 66 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+           "why": "Scores 594: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 66 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Knight Den",
-           "why": "Scores 465: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (366) by 99. That clears the 66 a reroll is worth with 4 tokens left. From your own sessions here."
+           "why": "Scores 465: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 66 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Upper Roshamuul South",
-           "why": "Scores 366: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (346) by 20. That clears the 66 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+           "why": "Scores 366: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 66 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 346: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task). Today: Silencer is boosted (double exp). That clears the 66 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+           "why": "Scores 346: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 66 with 4 tokens left."
           },
           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
          ],
@@ -57341,27 +57213,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 280: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (60), by 220. It beats Upper Roshamuul (490) by a hair. That clears the 76 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 280: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (60), by 220. A reroll is worth 76 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 490: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (362) by 128. That clears the 76 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 490: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 76 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 362: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (297) by 65. That clears the 76 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 362: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 76 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 297: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (283) by 14. That clears the 76 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 297: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 76 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 283: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 76 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 283: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 76 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -58332,28 +58204,16 @@
            {
             "kind": "go",
             "text": "Go to Warzone 9",
-            "why": "Scores 100: 2.19kk profit/h. Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (43), by 57. It beats Flimsies Venore -1 & -2 (90) by 10. That clears the 68 a reroll is worth with 4 tokens left. From an Exalted Monk’s reference hunt not adjusted to you yet, so likely optimistic. Profit from 2025, may be out of date."
+            "why": "Scores 100: 2.19kk profit/h. Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (43), by 57. A reroll is worth 68 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Flimsies Venore -1 & -2",
-            "why": "Scores 90: 1.96kk profit/h. It beats Upper Roshamuul (89) by 1. That clears the 68 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Flimsies Venore -1 & -2","why":"Scores 90: 1.96kk profit/h. A reroll is worth 68 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 89: 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Warzone 8 (Grotto of the Lost) (88) by 1. That clears the 68 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 89: 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 68 with 4 tokens left."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Warzone 8 (Grotto of the Lost)",
-            "why": "Scores 88: 1.93kk profit/h. It beats Deep Desert (84) by 4. That clears the 68 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Deep Desert",
-            "why": "Scores 84: 1.83kk profit/h. That clears the 68 a reroll is worth with 4 tokens left. From an Exalted Monk’s reference hunt not adjusted to you yet, so likely optimistic. Profit from 2025, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Warzone 8 (Grotto of the Lost)","why":"Scores 88: 1.93kk profit/h. A reroll is worth 68 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Deep Desert","why":"Scores 84: 1.83kk profit/h. A reroll is worth 68 with 4 tokens left."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -69072,23 +68932,11 @@
          },
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Warzone 5","why":"Scores 100: 4.32kk exp/h, 810.54k profit/h. It beats Oramond Wildlife Raid (91) by 9. From a reference hunt, adjusted to you."},
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 91: 3.84kk exp/h, 749.08k profit/h. It beats Werelions -1 (79) by 12. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -1",
-            "why": "Scores 79: 2.76kk exp/h (2.76kk hunting, 0 from today’s bonuses), 740.93k profit/h. It beats Oramond Minotaur Raid (78) by 1. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Minotaur Raid",
-            "why": "Scores 78: 2.82kk exp/h (2.82kk hunting, 0 from today’s bonuses), 718.61k profit/h. It beats Asura Mirror (75) by 3. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 75: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses), 291.07k profit/h. From a reference hunt, adjusted to you."},
+           {"kind":"go","text":"Go to Warzone 5","why":"Scores 100: 4.32kk exp/h, 810.54k profit/h."},
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 91: 3.84kk exp/h, 749.08k profit/h."},
+           {"kind":"go","text":"Taken? → Werelions -1","why":"Scores 79: 2.76kk exp/h, 740.93k profit/h."},
+           {"kind":"go","text":"Taken? → Oramond Minotaur Raid","why":"Scores 78: 2.82kk exp/h, 718.61k profit/h."},
+           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 75: 5.35kk exp/h, 291.07k profit/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -69804,11 +69652,11 @@
          },
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Liberty Bay Quaras","why":"Scores 0: 0 bounty points/h. It beats Old Masonry (Black Portal) (0) by a hair. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Old Masonry (Black Portal)","why":"Scores 0: 0 bounty points/h. It beats Mother of Scarabs Lair -5 (0) by a hair. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Mother of Scarabs Lair -5","why":"Scores 0: 0 bounty points/h. It beats Demonwar Crypt (0) by a hair. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Demonwar Crypt","why":"Scores 0: 0 bounty points/h. It beats Iksupan (0) by a hair. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Iksupan","why":"Scores 0: 0 bounty points/h. From a reference hunt, adjusted to you."},
+           {"kind":"go","text":"Go to Liberty Bay Quaras","why":"Scores 0: 0 bounty points/h."},
+           {"kind":"go","text":"Taken? → Old Masonry (Black Portal)","why":"Scores 0: 0 bounty points/h."},
+           {"kind":"go","text":"Taken? → Mother of Scarabs Lair -5","why":"Scores 0: 0 bounty points/h."},
+           {"kind":"go","text":"Taken? → Demonwar Crypt","why":"Scores 0: 0 bounty points/h."},
+           {"kind":"go","text":"Taken? → Iksupan","why":"Scores 0: 0 bounty points/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -70300,23 +70148,11 @@
          },
          "steps": {
           "$set": [
-           {
-            "kind": "go",
-            "text": "Go to Oramond West (raid)",
-            "why": "Scores 100: 65.8 charm points/h. It beats Oramond Wildlife Raid (78) by 22. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 78: 51.3 charm points/h. It beats Brimstone Bugs WOTE Zao Plantations (61) by 17. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 61: 40.2 charm points/h. It beats Forbidden Temple (59) by 2. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {"kind":"go","text":"Taken? → Forbidden Temple","why":"Scores 59: 38.9 charm points/h. It beats Ramoa Island (58) by 1. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Ramoa Island","why":"Scores 58: 38.3 charm points/h. From a reference hunt, adjusted to you."},
+           {"kind":"go","text":"Go to Oramond West (raid)","why":"Scores 100: 65.8 charm points/h."},
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 78: 51.3 charm points/h."},
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 61: 40.2 charm points/h."},
+           {"kind":"go","text":"Taken? → Forbidden Temple","why":"Scores 59: 38.9 charm points/h."},
+           {"kind":"go","text":"Taken? → Ramoa Island","why":"Scores 58: 38.3 charm points/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -74428,11 +74264,11 @@
          "pool": {"known":158,"size":450},
          "skipped": [],
          "steps": [
-          {"kind":"go","text":"Go to Flimsy Venore -1","why":"Scores 112: 6.04kk exp/h. It beats Asura Mirror (99) by 13. From a reference hunt, adjusted to you."},
-          {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 99: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses). It beats Warzone 5 (80) by 19. From a reference hunt, adjusted to you."},
-          {"kind":"go","text":"Taken? → Warzone 5","why":"Scores 80: 4.32kk exp/h. It beats Bookworld: Chapter IV (78) by 2. From a reference hunt, adjusted to you."},
-          {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 78: 4.19kk exp/h. It beats Bookworld: Chapter III (73) by 5. From a reference hunt, adjusted to you."},
-          {"kind":"go","text":"Taken? → Bookworld: Chapter III","why":"Scores 73: 3.95kk exp/h. From a reference hunt, adjusted to you."},
+          {"kind":"go","text":"Go to Flimsy Venore -1","why":"Scores 112: 6.04kk exp/h."},
+          {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 99: 5.35kk exp/h."},
+          {"kind":"go","text":"Taken? → Warzone 5","why":"Scores 80: 4.32kk exp/h."},
+          {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 78: 4.19kk exp/h."},
+          {"kind":"go","text":"Taken? → Bookworld: Chapter III","why":"Scores 73: 3.95kk exp/h."},
           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
          ],
          "tokens": 0
@@ -75012,23 +74848,11 @@
          },
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Warzone 5","why":"Scores 100: 4.32kk exp/h, 810.54k profit/h. It beats Oramond Wildlife Raid (90) by 10. From a reference hunt, adjusted to you."},
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 90: 3.84kk exp/h, 749.08k profit/h. It beats Asura Mirror (90) by a hair. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Asura Mirror",
-            "why": "Scores 90: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses), 291.07k profit/h. It beats Flimsy Venore -1 (89) by 1. From a reference hunt, adjusted to you."
-           },
-           {"kind":"go","text":"Taken? → Flimsy Venore -1","why":"Scores 89: 6.04kk exp/h, 80.11k profit/h. It beats Werelions -1 (74) by 15. From a reference hunt, adjusted to you."},
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -1",
-            "why": "Scores 74: 2.76kk exp/h (2.76kk hunting, 0 from today’s bonuses), 740.93k profit/h. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
+           {"kind":"go","text":"Go to Warzone 5","why":"Scores 100: 4.32kk exp/h, 810.54k profit/h."},
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 90: 3.84kk exp/h, 749.08k profit/h."},
+           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 90: 5.35kk exp/h, 291.07k profit/h."},
+           {"kind":"go","text":"Taken? → Flimsy Venore -1","why":"Scores 89: 6.04kk exp/h, 80.11k profit/h."},
+           {"kind":"go","text":"Taken? → Werelions -1","why":"Scores 74: 2.76kk exp/h, 740.93k profit/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -75947,23 +75771,11 @@
          },
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Warzone 5","why":"Scores 100: 810.54k profit/h. It beats Oramond Wildlife Raid (92) by 8. From a reference hunt, adjusted to you."},
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 92: 749.08k profit/h. It beats Werelions -1 (91) by 1. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -1",
-            "why": "Scores 91: 740.93k profit/h. It beats Brimstone Bugs WOTE Zao Plantations (91) by a hair. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 91: 736.76k profit/h. It beats Oramond Minotaur Raid (89) by 2. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {"kind":"go","text":"Taken? → Oramond Minotaur Raid","why":"Scores 89: 718.61k profit/h. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."},
+           {"kind":"go","text":"Go to Warzone 5","why":"Scores 100: 810.54k profit/h."},
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 92: 749.08k profit/h."},
+           {"kind":"go","text":"Taken? → Werelions -1","why":"Scores 91: 740.93k profit/h."},
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 91: 736.76k profit/h."},
+           {"kind":"go","text":"Taken? → Oramond Minotaur Raid","why":"Scores 89: 718.61k profit/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -83928,23 +83740,11 @@
          },
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Warzone 5","why":"Scores 197: 4.32kk exp/h, 810.54k profit/h. It beats Oramond Wildlife Raid (178) by 19. From a reference hunt, adjusted to you."},
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 178: 3.84kk exp/h, 749.08k profit/h. It beats Asura Mirror (162) by 16. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Asura Mirror",
-            "why": "Scores 162: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses), 291.07k profit/h. It beats Flimsy Venore -1 (155) by 7. From a reference hunt, adjusted to you."
-           },
-           {"kind":"go","text":"Taken? → Flimsy Venore -1","why":"Scores 155: 6.04kk exp/h, 80.11k profit/h. It beats Werelions -1 (151) by 4. From a reference hunt, adjusted to you."},
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -1",
-            "why": "Scores 151: 2.76kk exp/h (2.76kk hunting, 0 from today’s bonuses), 740.93k profit/h. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
+           {"kind":"go","text":"Go to Warzone 5","why":"Scores 197: 4.32kk exp/h, 810.54k profit/h."},
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 178: 3.84kk exp/h, 749.08k profit/h."},
+           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 162: 5.35kk exp/h, 291.07k profit/h."},
+           {"kind":"go","text":"Taken? → Flimsy Venore -1","why":"Scores 155: 6.04kk exp/h, 80.11k profit/h."},
+           {"kind":"go","text":"Taken? → Werelions -1","why":"Scores 151: 2.76kk exp/h, 740.93k profit/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -84143,11 +83943,11 @@
          },
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Liberty Bay Quaras","why":"Scores 0: 0 bounty points/h. It beats Old Masonry (Black Portal) (0) by a hair. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Old Masonry (Black Portal)","why":"Scores 0: 0 bounty points/h. It beats Mother of Scarabs Lair -5 (0) by a hair. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Mother of Scarabs Lair -5","why":"Scores 0: 0 bounty points/h. It beats Demonwar Crypt (0) by a hair. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Demonwar Crypt","why":"Scores 0: 0 bounty points/h. It beats Iksupan (0) by a hair. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Iksupan","why":"Scores 0: 0 bounty points/h. From a reference hunt, adjusted to you."},
+           {"kind":"go","text":"Go to Liberty Bay Quaras","why":"Scores 0: 0 bounty points/h."},
+           {"kind":"go","text":"Taken? → Old Masonry (Black Portal)","why":"Scores 0: 0 bounty points/h."},
+           {"kind":"go","text":"Taken? → Mother of Scarabs Lair -5","why":"Scores 0: 0 bounty points/h."},
+           {"kind":"go","text":"Taken? → Demonwar Crypt","why":"Scores 0: 0 bounty points/h."},
+           {"kind":"go","text":"Taken? → Iksupan","why":"Scores 0: 0 bounty points/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -84307,23 +84107,11 @@
          },
          "steps": {
           "$set": [
-           {
-            "kind": "go",
-            "text": "Go to Oramond West (raid)",
-            "why": "Scores 169: 65.8 charm points/h. It beats Oramond Wildlife Raid (132) by 37. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 132: 51.3 charm points/h. It beats Brimstone Bugs WOTE Zao Plantations (103) by 29. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 103: 40.2 charm points/h. It beats Forbidden Temple (100) by 3. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {"kind":"go","text":"Taken? → Forbidden Temple","why":"Scores 100: 38.9 charm points/h. It beats Ramoa Island (98) by 2. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Ramoa Island","why":"Scores 98: 38.3 charm points/h. From a reference hunt, adjusted to you."},
+           {"kind":"go","text":"Go to Oramond West (raid)","why":"Scores 169: 65.8 charm points/h."},
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 132: 51.3 charm points/h."},
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 103: 40.2 charm points/h."},
+           {"kind":"go","text":"Taken? → Forbidden Temple","why":"Scores 100: 38.9 charm points/h."},
+           {"kind":"go","text":"Taken? → Ramoa Island","why":"Scores 98: 38.3 charm points/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -84867,15 +84655,11 @@
          "pool": {"known":23,"size":153},
          "skipped": [],
          "steps": [
-          {"kind":"go","text":"Go to Flimsy Venore -1","why":"Scores 260: 6.04kk exp/h. It beats Asura Mirror (230) by 30. From a reference hunt, adjusted to you."},
-          {
-           "kind": "go",
-           "text": "Taken? → Asura Mirror",
-           "why": "Scores 230: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses). It beats Warzone 5 (186) by 44. From a reference hunt, adjusted to you."
-          },
-          {"kind":"go","text":"Taken? → Warzone 5","why":"Scores 186: 4.32kk exp/h. It beats Bookworld: Chapter IV (181) by 5. From a reference hunt, adjusted to you."},
-          {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 181: 4.19kk exp/h. It beats Bookworld: Chapter III (170) by 11. From a reference hunt, adjusted to you."},
-          {"kind":"go","text":"Taken? → Bookworld: Chapter III","why":"Scores 170: 3.95kk exp/h. From a reference hunt, adjusted to you."},
+          {"kind":"go","text":"Go to Flimsy Venore -1","why":"Scores 260: 6.04kk exp/h."},
+          {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 230: 5.35kk exp/h."},
+          {"kind":"go","text":"Taken? → Warzone 5","why":"Scores 186: 4.32kk exp/h."},
+          {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 181: 4.19kk exp/h."},
+          {"kind":"go","text":"Taken? → Bookworld: Chapter III","why":"Scores 170: 3.95kk exp/h."},
           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
          ],
          "tokens": 0
@@ -85092,23 +84876,11 @@
          },
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Warzone 5","why":"Scores 198: 4.32kk exp/h, 810.54k profit/h. It beats Flimsy Venore -1 (198) by a hair. From a reference hunt, adjusted to you."},
-           {"kind":"go","text":"Taken? → Flimsy Venore -1","why":"Scores 198: 6.04kk exp/h, 80.11k profit/h. It beats Asura Mirror (192) by 6. From a reference hunt, adjusted to you."},
-           {
-            "kind": "go",
-            "text": "Taken? → Asura Mirror",
-            "why": "Scores 192: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses), 291.07k profit/h. It beats Oramond Wildlife Raid (178) by 14. From a reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 178: 3.84kk exp/h, 749.08k profit/h. It beats Oramond Minotaur Raid (144) by 34. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Minotaur Raid",
-            "why": "Scores 144: 2.82kk exp/h (2.82kk hunting, 0 from today’s bonuses), 718.61k profit/h. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
+           {"kind":"go","text":"Go to Warzone 5","why":"Scores 198: 4.32kk exp/h, 810.54k profit/h."},
+           {"kind":"go","text":"Taken? → Flimsy Venore -1","why":"Scores 198: 6.04kk exp/h, 80.11k profit/h."},
+           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 192: 5.35kk exp/h, 291.07k profit/h."},
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 178: 3.84kk exp/h, 749.08k profit/h."},
+           {"kind":"go","text":"Taken? → Oramond Minotaur Raid","why":"Scores 144: 2.82kk exp/h, 718.61k profit/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -85344,23 +85116,11 @@
          },
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Warzone 5","why":"Scores 166: 810.54k profit/h. It beats Oramond Wildlife Raid (153) by 13. From a reference hunt, adjusted to you."},
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 153: 749.08k profit/h. It beats Werelions -1 (152) by 1. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -1",
-            "why": "Scores 152: 740.93k profit/h. It beats Brimstone Bugs WOTE Zao Plantations (151) by 1. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 151: 736.76k profit/h. It beats Oramond Minotaur Raid (147) by 4. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {"kind":"go","text":"Taken? → Oramond Minotaur Raid","why":"Scores 147: 718.61k profit/h. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."},
+           {"kind":"go","text":"Go to Warzone 5","why":"Scores 166: 810.54k profit/h."},
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 153: 749.08k profit/h."},
+           {"kind":"go","text":"Taken? → Werelions -1","why":"Scores 152: 740.93k profit/h."},
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 151: 736.76k profit/h."},
+           {"kind":"go","text":"Taken? → Oramond Minotaur Raid","why":"Scores 147: 718.61k profit/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -86035,28 +85795,12 @@
            {
             "kind": "go",
             "text": "Go to Warzone 5",
-            "why": "Scores 98: 4.32kk exp/h, 810.54k profit/h. None of your offers’ creatures live here, but it beats the best spot with one, Lower Roshamuul (61), by 37. It beats Oramond Wildlife Raid (89) by 9. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+            "why": "Scores 98: 4.32kk exp/h, 810.54k profit/h. No offer’s creature is here, but this beats the best spot with one, Lower Roshamuul (61), by 37. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 89: 3.84kk exp/h, 749.08k profit/h. It beats Werelions -1 (79) by 10. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -1",
-            "why": "Scores 79: 2.76kk exp/h (2.76kk hunting, 0 from today’s bonuses), 740.93k profit/h. It beats Oramond Minotaur Raid (77) by 2. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Minotaur Raid",
-            "why": "Scores 77: 2.82kk exp/h (2.82kk hunting, 0 from today’s bonuses), 718.61k profit/h. It beats Asura Mirror (69) by 8. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Asura Mirror",
-            "why": "Scores 69: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses), 291.07k profit/h. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 89: 3.84kk exp/h, 749.08k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Werelions -1","why":"Scores 79: 2.76kk exp/h, 740.93k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Oramond Minotaur Raid","why":"Scores 77: 2.82kk exp/h, 718.61k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 69: 5.35kk exp/h, 291.07k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -86765,27 +86509,27 @@
            {
             "kind": "go",
             "text": "Go to Bookworld: Chapter IV",
-            "why": "Scores 120: 62.7 bounty points/h. Finishes the task in about 31 min here. It beats Roshamuul West (46) by 74. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+            "why": "Scores 120: 62.7 bounty points/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 46: 24 bounty points/h. Finishes the task in about 40 min here. It beats Paladin Test Cave (37) by 9. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From your own sessions here."
+            "why": "Scores 46: 24 bounty points/h. Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Paladin Test Cave",
-            "why": "Scores 37: 19.4 bounty points/h. Finishes the task in about 1 h 39 min here. It beats Lower Roshamuul (37) by a hair. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From your own sessions here."
+            "why": "Scores 37: 19.4 bounty points/h. Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Lower Roshamuul",
-            "why": "Scores 37: 19.3 bounty points/h. Finishes the task in about 50 min here. It beats Frazzlemaw Bridge (15) by 22. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
+            "why": "Scores 37: 19.3 bounty points/h. Bounty done in about 50 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Frazzlemaw Bridge",
-            "why": "Scores 15: 8.04 bounty points/h. Finishes the task in about 1 h 59 min here. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
+            "why": "Scores 15: 8.04 bounty points/h. Bounty done in about 1 h 59 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -87297,28 +87041,12 @@
            {
             "kind": "go",
             "text": "Go to Oramond West (raid)",
-            "why": "Scores 100: 65.8 charm points/h. None of your offers’ creatures live here, but it beats the best spot with one, Bookworld: Chapter IV (44), by 56. It beats Oramond Wildlife Raid (78) by 22. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
+            "why": "Scores 100: 65.8 charm points/h. No offer’s creature is here, but this beats the best spot with one, Bookworld: Chapter IV (44), by 56. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 78: 51.3 charm points/h. It beats Brimstone Bugs WOTE Zao Plantations (61) by 17. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 61: 40.2 charm points/h. It beats Forbidden Temple (59) by 2. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Forbidden Temple",
-            "why": "Scores 59: 38.9 charm points/h. It beats Ramoa Island (58) by 1. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Ramoa Island",
-            "why": "Scores 58: 38.3 charm points/h. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 78: 51.3 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 61: 40.2 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Forbidden Temple","why":"Scores 59: 38.9 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Ramoa Island","why":"Scores 58: 38.3 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -91385,28 +91113,16 @@
           {
            "kind": "go",
            "text": "Go to Flimsy Venore -1",
-           "why": "Scores 92: 6.04kk exp/h. None of your offers’ creatures live here, but it beats the best spot with one, Bookworld: Chapter IV (75), by 17. It beats Asura Mirror (82) by 10. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+           "why": "Scores 92: 6.04kk exp/h. No offer’s creature is here, but this beats the best spot with one, Bookworld: Chapter IV (75), by 17. Pick Crusader (offer B) once the spot is free: the other offers disappear."
           },
-          {
-           "kind": "go",
-           "text": "Taken? → Asura Mirror",
-           "why": "Scores 82: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses). It beats Bookworld: Chapter IV (75) by 7. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-          },
+          {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 82: 5.35kk exp/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
           {
            "kind": "go",
            "text": "Taken? → Bookworld: Chapter IV",
-           "why": "Scores 75: 4.89kk exp/h (4.19kk hunting, 699.98k from Crusader’s task). Finishes the task in about 31 min here. It beats Warzone 5 (66) by 9. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+           "why": "Scores 75: 4.89kk exp/h (4.19kk hunting, 699.98k from the bounty). Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
           },
-          {
-           "kind": "go",
-           "text": "Taken? → Warzone 5",
-           "why": "Scores 66: 4.32kk exp/h. It beats Bookworld: Chapter III (60) by 6. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-          },
-          {
-           "kind": "go",
-           "text": "Taken? → Bookworld: Chapter III",
-           "why": "Scores 60: 3.95kk exp/h. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-          },
+          {"kind":"go","text":"Taken? → Warzone 5","why":"Scores 66: 4.32kk exp/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+          {"kind":"go","text":"Taken? → Bookworld: Chapter III","why":"Scores 60: 3.95kk exp/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
          ],
          "tokens": 0
@@ -91984,28 +91700,12 @@
            {
             "kind": "go",
             "text": "Go to Warzone 5",
-            "why": "Scores 97: 4.32kk exp/h, 810.54k profit/h. None of your offers’ creatures live here, but it beats the best spot with one, Bookworld: Chapter IV (69), by 28. It beats Oramond Wildlife Raid (87) by 10. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+            "why": "Scores 97: 4.32kk exp/h, 810.54k profit/h. No offer’s creature is here, but this beats the best spot with one, Bookworld: Chapter IV (69), by 28. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 87: 3.84kk exp/h, 749.08k profit/h. It beats Asura Mirror (83) by 4. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Asura Mirror",
-            "why": "Scores 83: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses), 291.07k profit/h. It beats Flimsy Venore -1 (81) by 2. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Flimsy Venore -1",
-            "why": "Scores 81: 6.04kk exp/h, 80.11k profit/h. It beats Werelions -1 (73) by 8. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -1",
-            "why": "Scores 73: 2.76kk exp/h (2.76kk hunting, 0 from today’s bonuses), 740.93k profit/h. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 87: 3.84kk exp/h, 749.08k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 83: 5.35kk exp/h, 291.07k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Flimsy Venore -1","why":"Scores 81: 6.04kk exp/h, 80.11k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Werelions -1","why":"Scores 73: 2.76kk exp/h, 740.93k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -92927,28 +92627,12 @@
            {
             "kind": "go",
             "text": "Go to Warzone 5",
-            "why": "Scores 100: 810.54k profit/h. None of your offers’ creatures live here, but it beats the best spot with one, Lower Roshamuul (60), by 40. It beats Oramond Wildlife Raid (92) by 8. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+            "why": "Scores 100: 810.54k profit/h. No offer’s creature is here, but this beats the best spot with one, Lower Roshamuul (60), by 40. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 92: 749.08k profit/h. It beats Werelions -1 (91) by 1. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -1",
-            "why": "Scores 91: 740.93k profit/h. It beats Brimstone Bugs WOTE Zao Plantations (91) by a hair. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 91: 736.76k profit/h. It beats Oramond Minotaur Raid (89) by 2. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Minotaur Raid",
-            "why": "Scores 89: 718.61k profit/h. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 92: 749.08k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Werelions -1","why":"Scores 91: 740.93k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 91: 736.76k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Oramond Minotaur Raid","why":"Scores 89: 718.61k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -93139,28 +92823,12 @@
            {
             "kind": "go",
             "text": "Go to Warzone 5",
-            "why": "Scores 93: 4.32kk exp/h, 810.54k profit/h. None of your offers’ creatures live here, but it beats the best spot with one, Bookworld: Chapter IV (62), by 31. It beats Oramond Wildlife Raid (84) by 9. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+            "why": "Scores 93: 4.32kk exp/h, 810.54k profit/h. No offer’s creature is here, but this beats the best spot with one, Bookworld: Chapter IV (62), by 31. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 84: 3.84kk exp/h, 749.08k profit/h. It beats Werelions -1 (76) by 8. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -1",
-            "why": "Scores 76: 2.76kk exp/h (2.76kk hunting, 0 from today’s bonuses), 740.93k profit/h. It beats Oramond Minotaur Raid (74) by 2. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Minotaur Raid",
-            "why": "Scores 74: 2.82kk exp/h (2.82kk hunting, 0 from today’s bonuses), 718.61k profit/h. It beats Werelions -2 (65) by 9. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -2",
-            "why": "Scores 65: 2.55kk exp/h, 616.95k profit/h. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 84: 3.84kk exp/h, 749.08k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Werelions -1","why":"Scores 76: 2.76kk exp/h, 740.93k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Oramond Minotaur Raid","why":"Scores 74: 2.82kk exp/h, 718.61k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Werelions -2","why":"Scores 65: 2.55kk exp/h, 616.95k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -93383,27 +93051,27 @@
            {
             "kind": "go",
             "text": "Go to Bookworld: Chapter IV",
-            "why": "Scores 180: 106 bounty points/h. Finishes the task in about 31 min here. It beats Roshamuul West (69) by 111. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+            "why": "Scores 180: 106 bounty points/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 69: 40.5 bounty points/h. Finishes the task in about 40 min here. It beats Paladin Test Cave (56) by 13. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From your own sessions here."
+            "why": "Scores 69: 40.5 bounty points/h. Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Paladin Test Cave",
-            "why": "Scores 56: 32.7 bounty points/h. Finishes the task in about 1 h 39 min here. It beats Lower Roshamuul (55) by 1. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From your own sessions here."
+            "why": "Scores 56: 32.7 bounty points/h. Bounty done in about 1 h 39 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Lower Roshamuul",
-            "why": "Scores 55: 32.5 bounty points/h. Finishes the task in about 50 min here. It beats Frazzlemaw Bridge (23) by 32. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
+            "why": "Scores 55: 32.5 bounty points/h. Bounty done in about 50 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {
             "kind": "go",
             "text": "Taken? → Frazzlemaw Bridge",
-            "why": "Scores 23: 13.6 bounty points/h. Finishes the task in about 1 h 59 min here. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
+            "why": "Scores 23: 13.6 bounty points/h. Bounty done in about 1 h 59 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -93571,28 +93239,12 @@
            {
             "kind": "go",
             "text": "Go to Oramond West (raid)",
-            "why": "Scores 128: 65.8 charm points/h. None of your offers’ creatures live here, but it beats the best spot with one, Bookworld: Chapter IV (57), by 71. It beats Oramond Wildlife Raid (100) by 28. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
+            "why": "Scores 128: 65.8 charm points/h. No offer’s creature is here, but this beats the best spot with one, Bookworld: Chapter IV (57), by 71. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 100: 51.3 charm points/h. It beats Brimstone Bugs WOTE Zao Plantations (78) by 22. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 78: 40.2 charm points/h. It beats Forbidden Temple (76) by 2. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Forbidden Temple",
-            "why": "Scores 76: 38.9 charm points/h. It beats Ramoa Island (75) by 1. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Ramoa Island",
-            "why": "Scores 75: 38.3 charm points/h. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 100: 51.3 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 78: 40.2 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Forbidden Temple","why":"Scores 76: 38.9 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Ramoa Island","why":"Scores 75: 38.3 charm points/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -94322,27 +93974,15 @@
           {
            "kind": "go",
            "text": "Go to Bookworld: Chapter IV",
-           "why": "Scores 86: 6.76kk exp/h (4.19kk hunting, 2.57kk from Crusader’s task). Finishes the task in about 31 min here. It beats Flimsy Venore -1 (77) by 9. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+           "why": "Scores 86: 6.76kk exp/h (4.19kk hunting, 2.57kk from the bounty). Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
           },
-          {
-           "kind": "go",
-           "text": "Taken? → Flimsy Venore -1",
-           "why": "Scores 77: 6.04kk exp/h. It beats Asura Mirror (68) by 9. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-          },
-          {
-           "kind": "go",
-           "text": "Taken? → Asura Mirror",
-           "why": "Scores 68: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses). It beats Warzone 5 (55) by 13. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-          },
-          {
-           "kind": "go",
-           "text": "Taken? → Warzone 5",
-           "why": "Scores 55: 4.32kk exp/h. It beats Roshamuul West (54) by 1. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-          },
+          {"kind":"go","text":"Taken? → Flimsy Venore -1","why":"Scores 77: 6.04kk exp/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+          {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 68: 5.35kk exp/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+          {"kind":"go","text":"Taken? → Warzone 5","why":"Scores 55: 4.32kk exp/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 54: 4.24kk exp/h (3.45kk hunting, 787.5k from Frazzlemaw’s task). Finishes the task in about 40 min here. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From your own sessions here."
+           "why": "Scores 54: 4.24kk exp/h (3.45kk hunting, 787.5k from the bounty). Bounty done in about 40 min here. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
           },
           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
          ],
@@ -94530,28 +94170,16 @@
            {
             "kind": "go",
             "text": "Go to Warzone 5",
-            "why": "Scores 89: 4.32kk exp/h, 810.54k profit/h. None of your offers’ creatures live here, but it beats the best spot with one, Bookworld: Chapter IV (81), by 8. It beats Oramond Wildlife Raid (81) by 8. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+            "why": "Scores 89: 4.32kk exp/h, 810.54k profit/h. No offer’s creature is here, but this beats the best spot with one, Bookworld: Chapter IV (81), by 8. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 81: 3.84kk exp/h, 749.08k profit/h. It beats Bookworld: Chapter IV (81) by a hair. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 81: 3.84kk exp/h, 749.08k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
            {
             "kind": "go",
             "text": "Taken? → Bookworld: Chapter IV",
-            "why": "Scores 81: 6.76kk exp/h (4.19kk hunting, 2.57kk from Crusader’s task), 140.53k profit/h. Finishes the task in about 31 min here. It beats Asura Mirror (73) by 8. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+            "why": "Scores 81: 6.76kk exp/h (4.19kk hunting, 2.57kk from the bounty), 140.53k profit/h. Bounty done in about 31 min here. Pick Crusader (offer B) once the spot is free: the other offers disappear."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Asura Mirror",
-            "why": "Scores 73: 5.35kk exp/h (5.35kk hunting, 0 from today’s bonuses), 291.07k profit/h. It beats Flimsy Venore -1 (70) by 3. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Flimsy Venore -1",
-            "why": "Scores 70: 6.04kk exp/h, 80.11k profit/h. Pick Crusader (offer B) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
-           },
+           {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 73: 5.35kk exp/h, 291.07k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Flimsy Venore -1","why":"Scores 70: 6.04kk exp/h, 80.11k profit/h. Pick Crusader (offer B) once the spot is free: the other offers disappear."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -94795,28 +94423,12 @@
            {
             "kind": "go",
             "text": "Go to Warzone 5",
-            "why": "Scores 100: 810.54k profit/h. None of your offers’ creatures live here, but it beats the best spot with one, Lower Roshamuul (60), by 40. It beats Oramond Wildlife Raid (92) by 8. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you."
+            "why": "Scores 100: 810.54k profit/h. No offer’s creature is here, but this beats the best spot with one, Lower Roshamuul (60), by 40. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."
            },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Wildlife Raid",
-            "why": "Scores 92: 749.08k profit/h. It beats Werelions -1 (91) by 1. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Werelions -1",
-            "why": "Scores 91: 740.93k profit/h. It beats Brimstone Bugs WOTE Zao Plantations (91) by a hair. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Brimstone Bugs WOTE Zao Plantations",
-            "why": "Scores 91: 736.76k profit/h. It beats Oramond Minotaur Raid (89) by 2. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2023, may be out of date."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Oramond Minotaur Raid",
-            "why": "Scores 89: 718.61k profit/h. Pick Frazzlemaw (offer A) once you see the spot is free: picking makes the other two offers disappear in game. From a reference hunt, adjusted to you. Profit from 2024, may be out of date."
-           },
+           {"kind":"go","text":"Taken? → Oramond Wildlife Raid","why":"Scores 92: 749.08k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Werelions -1","why":"Scores 91: 740.93k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Brimstone Bugs WOTE Zao Plantations","why":"Scores 91: 736.76k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
+           {"kind":"go","text":"Taken? → Oramond Minotaur Raid","why":"Scores 89: 718.61k profit/h. Pick Frazzlemaw (offer A) once the spot is free: the other offers disappear."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -101468,27 +101080,27 @@
             {
              "kind": "go",
              "text": "Go to Test Hideout",
-             "why": "Scores 383: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (95), by 288. It beats Upper Roshamuul (705) by a hair. That clears the 66 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+             "why": "Scores 383: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (95), by 288. A reroll is worth 66 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
             },
             {
              "kind": "go",
              "text": "Taken? → Upper Roshamuul",
-             "why": "Scores 705: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (494) by 211. That clears the 66 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+             "why": "Scores 705: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 66 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Knight Den",
-             "why": "Scores 494: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (422) by 72. That clears the 66 a reroll is worth with 4 tokens left. From your own sessions here."
+             "why": "Scores 494: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 66 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Upper Roshamuul South",
-             "why": "Scores 422: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (403) by 19. That clears the 66 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+             "why": "Scores 422: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 66 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Roshamuul West",
-             "why": "Scores 403: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 66 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+             "why": "Scores 403: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 66 with 4 tokens left."
             },
             {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
            ]
@@ -102335,27 +101947,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 520: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (71), by 449. It beats Upper Roshamuul (861) by a hair. That clears the 50 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 520: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (71), by 449. A reroll is worth 50 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 861: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (674) by 187. That clears the 50 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 861: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 50 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 674: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (530) by 144. That clears the 50 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 674: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 50 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 530: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (502) by 28. That clears the 50 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 530: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 50 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 502: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task). Today: Silencer is boosted (double exp). That clears the 50 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 502: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 50 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -102997,27 +102609,27 @@
             {
              "kind": "go",
              "text": "Go to Test Hideout",
-             "why": "Scores 499: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (96), by 403. It beats Upper Roshamuul (873) by a hair. That clears the 64 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+             "why": "Scores 499: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (96), by 403. A reroll is worth 64 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
             },
             {
              "kind": "go",
              "text": "Taken? → Upper Roshamuul",
-             "why": "Scores 873: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (645) by 228. That clears the 64 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+             "why": "Scores 873: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 64 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Knight Den",
-             "why": "Scores 645: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (529) by 116. That clears the 64 a reroll is worth with 4 tokens left. From your own sessions here."
+             "why": "Scores 645: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 64 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Upper Roshamuul South",
-             "why": "Scores 529: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (504) by 25. That clears the 64 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+             "why": "Scores 529: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 64 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Roshamuul West",
-             "why": "Scores 504: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 64 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+             "why": "Scores 504: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 64 with 4 tokens left."
             },
             {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
            ]
@@ -104722,27 +104334,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 384: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (54), by 330. It beats Upper Roshamuul (635) by a hair. That clears the 54 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 384: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (54), by 330. A reroll is worth 54 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 635: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (497) by 138. That clears the 54 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 635: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 54 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 497: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (391) by 106. That clears the 54 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 497: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 54 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 391: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (370) by 21. That clears the 54 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 391: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 54 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 370: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task). Today: Silencer is boosted (double exp). That clears the 54 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 370: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 54 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -105125,27 +104737,27 @@
             {
              "kind": "go",
              "text": "Go to Test Hideout",
-             "why": "Scores 299: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Bastion (58), by 241. It beats Upper Roshamuul (522) by a hair. That clears the 65 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+             "why": "Scores 299: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Bastion (58), by 241. A reroll is worth 65 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
             },
             {
              "kind": "go",
              "text": "Taken? → Upper Roshamuul",
-             "why": "Scores 522: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (387) by 135. That clears the 65 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+             "why": "Scores 522: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks), 1.95kk profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 65 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Knight Den",
-             "why": "Scores 387: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (317) by 70. That clears the 65 a reroll is worth with 4 tokens left. From your own sessions here."
+             "why": "Scores 387: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 65 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Upper Roshamuul South",
-             "why": "Scores 317: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (301) by 16. That clears the 65 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+             "why": "Scores 317: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks), 954.65k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 65 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Roshamuul West",
-             "why": "Scores 301: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task), 977.3k profit/h. Today: Silencer is boosted (double exp). That clears the 65 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+             "why": "Scores 301: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks), 977.3k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 65 with 4 tokens left."
             },
             {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
            ]
@@ -106003,27 +105615,27 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 359: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s bonuses, 36.7kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Your bounty creature, Cobra Assassin, isn’t here, but this spot beats the best spot with it, Cobra Basement -1 (56), by 303. It beats Upper Roshamuul (594) by a hair. That clears the 67 a reroll is worth with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour. From your own sessions here."
+            "why": "Scores 359: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Cobra Basement -1 (56), by 303. A reroll is worth 67 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul",
-            "why": "Scores 594: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s bonuses, 55.11kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Knight Den (465) by 129. That clears the 67 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you."
+            "why": "Scores 594: 69.49kk exp/h (11.05kk hunting, 3.34kk from today’s boosts, 55.11kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 67 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 465: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s bonuses, 47.42kk from your Silencer and Choking Fear weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. It beats Upper Roshamuul South (366) by 99. That clears the 67 a reroll is worth with 4 tokens left. From your own sessions here."
+            "why": "Scores 465: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 67 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Upper Roshamuul South",
-            "why": "Scores 366: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s bonuses, 33.51kk from your Silencer and Choking Fear weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). It beats Roshamuul West (346) by 20. That clears the 67 a reroll is worth with 4 tokens left. From a Royal Paladin’s reference hunt, adjusted to you. Profit from 2025, may be out of date."
+            "why": "Scores 366: 42.75kk exp/h (7.3kk hunting, 1.93kk from today’s boosts, 33.51kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). A reroll is worth 67 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 346: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s bonuses, 35.19kk from your Silencer weekly task). Today: Silencer is boosted (double exp). That clears the 67 a reroll is worth with 4 tokens left. From a reference hunt, adjusted to you. Profit from 2021, may be out of date."
+            "why": "Scores 346: 40.5kk exp/h (3.84kk hunting, 1.47kk from today’s boosts, 35.19kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 67 with 4 tokens left."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
