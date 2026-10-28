@@ -29,7 +29,7 @@ Wszystko, co wpiszesz, zostaje w twojej przeglądarce: nie ma konta ani serwera.
 ## Skąd są liczby
 
 - Dane stworów, exp stworów i zasady dziennych bonusów: [TibiaWiki](https://tibia.fandom.com/wiki/Task_Board), na licencji CC BY-SA.
-- Polowania referencyjne: odczytane z [filmów z polowań Kusniera](https://www.youtube.com/@Kusnierr/videos) (także na [TibiaPal](https://tibiapal.com)), każde z linkiem do filmu.
+- Polowania referencyjne: odczytane z [filmów z polowań Kusniera](https://www.youtube.com/@Kusnierr/videos), za jego zgodą (także na [TibiaPal](https://tibiapal.com)), każde z linkiem do filmu.
 - Zasady gry, ich źródła i licencje każdego pliku z danymi są opisane w [README po angielsku](README.md#where-the-numbers-come-from).
 
 Tibia jest znakiem towarowym CipSoft GmbH. Hunt Planner to projekt fanowski, niezwiązany z CipSoft ani przez nią niepopierany.

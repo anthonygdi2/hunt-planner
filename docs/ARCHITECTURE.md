@@ -54,7 +54,7 @@ A test (`tests/layers.test.js`) checks imports and forbidden globals per folder,
 | File | What | Source, license | Written by |
 |---|---|---|---|
 | `creatures.json` | 730 creatures: name, bestiary class, task-pool bitmask, wiki title, rare flag | TibiaWiki, CC BY-SA | by hand, rarely |
-| `reference.json` | reference hunts per spot and vocation | Kusnier's videos via TibiaPal (permission pending) | `tools/reference/generate.js` |
+| `reference.json` | reference hunts per spot and vocation | Kusnier's videos via TibiaPal (with his permission) | `tools/reference/generate.js` |
 | `creature-exp.json` | base exp per creature | TibiaWiki, CC BY-SA | `generate.js --exp` |
 | `rules.js` | game facts: pools, task sizes, bounty points, reward per kill, Silver/Gold multipliers, bestiary thresholds and charm points, Echo Warden points and raid rates, weekly exp formula and caps, token cap, Prey and event bonuses | each value commented with its source | by hand |
 | `index.js` | `DATA`, `REFERENCE`, `PL_EXP` for the bundle: each is a `__BTL_DATA__("<file>")` call that `tools/assemble.js` replaces with the file's contents (or a test's fixture). Only works in the bundle; Node code and tests read the JSON or take data as parameters | | |

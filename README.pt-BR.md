@@ -29,7 +29,7 @@ Tudo o que você digita fica no seu próprio navegador: não tem conta nem servi
 ## De onde vêm os números
 
 - Dados das criaturas, exp das criaturas e regras dos bônus do dia: [TibiaWiki](https://tibia.fandom.com/wiki/Task_Board), sob CC BY-SA.
-- Hunts de referência: lidas dos [vídeos de hunt do Kusnier](https://www.youtube.com/@Kusnierr/videos) (também listados no [TibiaPal](https://tibiapal.com)), cada uma com link para o vídeo.
+- Hunts de referência: lidas dos [vídeos de hunt do Kusnier](https://www.youtube.com/@Kusnierr/videos), com a permissão dele (também listados no [TibiaPal](https://tibiapal.com)), cada uma com link para o vídeo.
 - As regras do jogo, suas fontes e as licenças de cada arquivo de dados estão no [README em inglês](README.md#where-the-numbers-come-from).
 
 Tibia é uma marca registrada da CipSoft GmbH. O Hunt Planner é um projeto de fã e não é afiliado nem endossado pela CipSoft.

@@ -31,7 +31,7 @@ Everything you enter stays in your own browser: there’s no account and no serv
 ## Where the numbers come from
 
 - Creature data, creature exp and today’s bonus rules: [TibiaWiki](https://tibia.fandom.com/wiki/Task_Board), under CC BY-SA.
-- Reference hunts: read from [Kusnier’s hunt videos](https://www.youtube.com/@Kusnierr/videos) (also listed on [TibiaPal](https://tibiapal.com)), each with a link to its video.
+- Reference hunts: read from [Kusnier’s hunt videos](https://www.youtube.com/@Kusnierr/videos), with his permission (also listed on [TibiaPal](https://tibiapal.com)), each with a link to its video.
 - Game rules (task rewards, bounty points, bestiary, weekly rewards) are in [`src/data/rules.js`](src/data/rules.js), each with its source; how sure each one is, is in [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md).
 - Font: Atkinson Hyperlegible, under the SIL Open Font License (`fonts-OFL.txt`).
 
