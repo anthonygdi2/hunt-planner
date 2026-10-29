@@ -414,6 +414,21 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
     : t.n(sp.sessions.length, "{n} hunt, {time}, all with breaks: no clean rate.", "{n} hunts, {time}, all with breaks: no clean rate.", { time: fmtHours(hrs) });
   const refNums = nums && nums.src === "own" ? model.spotNums(Object.assign({}, sp, { sessions: [] })) : nums;
   const e = (refNums && refNums.entry) || null;
+  // A hunt's details, opened inline: amounts in total and per hour, then each creature's kills and kills/h (kills/h
+  // only for a reference reading, which keeps rates). key is also the screen's id prefix; link adds the video (a
+  // reading not used here, which has no Watch link of its own).
+  const open = ui.open || {};
+  const amount = (label, total, H) => ({ label, total: total != null ? fmtBig(total) : "–", perHour: total != null && H ? fmtBig(total / H) : "–" });
+  const details = (key, caption, amounts, kills, extra) => Object.assign({ key, open: !!open[key], caption, amounts,
+    kills: kills.slice().sort((a, b) => b.perHour - a.perHour).map((k) => ({ name: k.name, count: k.count != null ? k.count.toLocaleString(locale()) : null, perHour: Math.round(k.perHour) + "/h" })),
+    counts: kills.some((k) => k.count != null), notes: null, url: null }, extra);
+  const refDetails = (x, link) => {
+    const H = Number(x.hours) || 0, src = x.source || {}, total = (v) => (v != null && H ? v * H : null);
+    return details("ref-" + x.id, H ? t("Recorded over {time}.", { time: fmtHours(H) }) : "",
+      [amount(t("Raw exp"), total(x.rawXph), H), amount(t("Exp with bonuses"), total(x.xph), H), amount(t("Profit"), total(x.profitph), H)],
+      (x.creatures || []).filter((c) => c && c.slug && c.kph != null).map((c) => ({ name: name(c.slug), count: null, perHour: c.kph })),
+      { notes: x.notes || null, url: link && src.url || null, who: src.who || null });
+  };
   const mineVoc = (x) => x.vocation === vocation || x.vocation === "any";
   let reference = null;
   if (e) {
@@ -430,12 +445,13 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
         : refNums.src === "refAdj" || refNums.src === "otherAdj" ? t.n(n, "Adjusted to you: {exp} · {profit}, from how your {n} logged spot compares to its reference.",
           "Adjusted to you: {exp} · {profit}, from how your {n} logged spots compare to their references.", { exp: fmtBig(refNums.xph), profit: refNums.pph != null ? fmtBig(refNums.pph) : "–" })
         : t("Not adjusted to you yet."),
+      details: refDetails(e),
     };
   }
   const skipped = sp.entries.filter((x) => x !== e).map((x) => {
     const why = mineVoc(x) ? (Number(p.level) && x.levelMin > Number(p.level) ? t("needs level {level}", { level: x.levelMin }) : t("another hunt here fits you better"))
       : e && mineVoc(e) ? t("{aVoc} hunt exists", { aVoc: aVoc(vocation), voc: vocation }) : t("another hunt here fits you better");
-    return x.vocation + ", " + levelRange(x) + ": " + why;
+    return { text: x.vocation + ", " + levelRange(x) + (x.hours ? ", " + fmtHours(x.hours) : "") + ": " + why, details: refDetails(x, true) };
   });
 
   const varRow = (v) => {
@@ -447,9 +463,14 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
   const when = (x) => String(x.start || x.end || "");
   const sessions = sp.sessions.filter((x) => x.id).slice().sort((a, b) => when(b).localeCompare(when(a))).map((x) => {
     const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, raids = raidsOf(x);
+    const clock = (s) => (/T\d\d:\d\d/.test(s || "") ? String(s).slice(11, 16) : null), from = clock(x.start), to = clock(x.end);
+    const caption = [from && to ? from + "–" + to : null, x.level ? t("level {level}", { level: x.level }) : null, x.breaks ? t("with breaks") : null].filter(Boolean).join(" · ");
     return { id: x.id, date: when(x) ? fmtDay(when(x).slice(0, 10)) : t("Undated"), length: H ? fmtHours(H) : "–",
       exp: t("{amount} exp/h", { amount: H && xp != null ? fmtBig(xp / H) : "–" }), profit: t("{amount} profit/h", { amount: H && x.balance != null ? fmtBig(x.balance / H) : "–" }),
       breaks: !!x.breaks, armed: ui.armed === x.id, raidsBy: raids,
+      details: details("hunt-" + x.id, caption,
+        [amount(t("Raw exp"), x.rawXp, H), amount(t("Exp with bonuses"), x.xp, H), amount(t("Loot"), x.loot, H), amount(t("Supplies"), x.supplies, H), amount(t("Balance"), x.balance, H)],
+        (x.kills || []).filter((k) => k && k.count > 0).map((k) => ({ name: k.name || name(k.slug), count: k.count, perHour: H ? k.count / H : 0 }))),
       raids: advanced ? (x.kills || []).map((k) => { const n = k.name || name(k.slug); return { name: n, value: raids[n] != null ? String(raids[n]) : "" }; }) : null };
   });
   const variations = idx.list.filter((v) => v.parentId === id);

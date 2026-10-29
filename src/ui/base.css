@@ -226,6 +226,10 @@
   .hp-stack { display: flex; flex-direction: column; gap: 4px; }
   .hp-sep { border-top: 1px solid var(--line); padding-top: var(--s3); }
   .hp-empty { border: 1px dashed var(--line2); border-radius: var(--r-card); padding: 14px; color: var(--muted); font-size: 14px; line-height: 20px; }
+  .hp-tap { min-height: 44px; align-self: flex-start; }
+  .hp-session-actions { display: flex; flex-wrap: wrap; gap: var(--s4); }
+  .hp-details { display: flex; flex-direction: column; gap: var(--s2); }
+  .hp-details .hp-table th[scope="row"] { font-weight: 400; }
   .hp-raids { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--s2); }
 
   /* Creatures and the creature page */

@@ -23,7 +23,7 @@ const PAGES = ["characters", "log"];
 // app: app/app.js createApp(). host: {hash(), go(route), onHashChange(fn), download(name, text) → Promise<message>,
 // pickFile() → Promise<text>}.
 export function mount(root, app, host) {
-  const ui = { adding: false, firstRun: { vocation: null, level: "" }, characters: { armed: false, status: "" }, plan: { open: null, why: {} }, weekly: { armed: false }, spots: { query: "", sort: "score", allVocations: false, anyLevel: false, hideTaken: false, limit: 0 }, spot: { armed: null }, creatures: { difficulty: null, mode: "tiers", query: "", lists: false, add: {} }, creature: { notes: null }, log: { text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan" } };
+  const ui = { adding: false, firstRun: { vocation: null, level: "" }, characters: { armed: false, status: "" }, plan: { open: null, why: {} }, weekly: { armed: false }, spots: { query: "", sort: "score", allVocations: false, anyLevel: false, hideTaken: false, limit: 0 }, spot: { armed: null, open: {} }, creatures: { difficulty: null, mode: "tiers", query: "", lists: false, add: {} }, creature: { notes: null }, log: { text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan" } };
   // The route's name ("spot/<id>" is "spot") and its argument (the spot id).
   const path = () => String(host.hash() || "").replace(/^#\/?/, "");
   const route = () => { const r = path().split("/")[0]; return ROUTES.indexOf(r) !== -1 ? r : "plan"; };
@@ -118,11 +118,12 @@ export function mount(root, app, host) {
     }
     if (r === "spot") {
       const id = routeArg(), a = app.actions, U = ui.spot, here = "spot/" + encodeURIComponent(id);
-      const v = spotView(s, app.model(), app.catalog, id, { lens: { allVocations: ui.spots.allVocations, anyLevel: ui.spots.anyLevel }, armed: U.armed }, Date.now(), s.advanced);
+      const v = spotView(s, app.model(), app.catalog, id, { lens: { allVocations: ui.spots.allVocations, anyLevel: ui.spots.anyLevel }, armed: U.armed, open: U.open }, Date.now(), s.advanced);
       return spotScreen.render(v, {
         back: () => go("spots"), taken: () => a.markTaken(id), free: () => a.markFree(id),
         log: () => openLog({ spotId: id, where: "known" }, here), vary: () => openLog({ where: "new", parentId: id }, here), open: openSpot,
         arm: (x) => { U.armed = x; draw(); }, deleteSession: (x) => { U.armed = null; a.deleteSession(x); },
+        details: (k) => { U.open = Object.assign({}, U.open, { [k]: !(U.open || {})[k] }); draw(); },
         raid: (x, name, n) => { const ses = v.sessions.filter((y) => y.id === x)[0]; if (ses) a.setSessionRaids(x, Object.assign({}, ses.raidsBy, { [name]: n })); },
         rename: (n) => a.renameSpot(id, n), deleteSpot: () => { U.armed = null; a.deleteSpot(id); go("spots"); },
       });
@@ -159,7 +160,7 @@ export function mount(root, app, host) {
   // A creature's page.
   function openCreature(slug) { ui.creature = { notes: null }; go("creature/" + slug); }
   // A spot's page.
-  function openSpot(id) { ui.spot = { armed: null }; go("spot/" + encodeURIComponent(id)); }
+  function openSpot(id) { ui.spot = { armed: null, open: {} }; go("spot/" + encodeURIComponent(id)); }
   const blankLog = () => ({ text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan" });
   // Opens Log a clean hunt with some fields preset, returning to `back` afterwards.
   function openLog(preset, back) { ui.log = Object.assign(blankLog(), preset, { back: back || "plan" }); go("log"); }

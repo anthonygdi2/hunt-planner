@@ -334,28 +334,50 @@ test("spot page: sections, Mark taken, logs, variations, delete a hunt inline, a
   const view = { id: "cobra-bastion", name: "Cobra Bastion", sub: null, parentId: null, scoreLine: "Score 96 for Main EK · Mostly exp, some profit", exp: "7.8kk", profit: "300k",
     badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: null,
     creatures: [{ slug: "cobra-assassin", name: "Cobra Assassin", perHour: "≈ 400/h", tag: "Your bounty", gold: true }, { slug: "cobra-scout", name: "Cobra Scout", perHour: "≈ 90/h", tag: "Weekly task", gold: false }],
-    sources: { hunts: "None yet.", reference: { who: "Elite Knight, level 500+, from Kusnier’s video (Sep 2026)", url: "https://example.org/v", recorded: "As recorded: 9.1kk", adjusted: "Adjusted to you: 7.8kk" },
-      skipped: ["Royal Paladin reference, level 300+ (skipped: an Elite Knight hunt exists)"] },
+    sources: { hunts: "None yet.", reference: { who: "Elite Knight, level 500+, from Kusnier’s video (Sep 2026)", url: "https://example.org/v", recorded: "As recorded: 9.1kk", adjusted: "Adjusted to you: 7.8kk",
+      details: { key: "ref-cb", open: false, caption: "Recorded over 15 min.", amounts: [{ label: "Raw exp", total: "2.28kk", perHour: "9.1kk" }],
+        kills: [{ name: "Cobra Assassin", count: null, perHour: "400/h" }], counts: false, notes: "His slide.", url: null, who: null } },
+      skipped: [{ text: "Royal Paladin reference, level 300+ (skipped: an Elite Knight hunt exists)",
+        details: { key: "ref-rp", open: false, caption: "", amounts: [], kills: [], counts: false, notes: null, url: "https://example.org/rp", who: "Kusnier" } }] },
     variations: [{ id: "my-lure", name: "2-box lure", score: "93", numbers: "8.1kk exp/h · 240k profit/h", meta: "Lure two boxes · Yours · 1 hunt · low sample" }], canVary: true,
-    sessions: [{ id: "s1", date: "Oct 21", length: "1 h", exp: "4.3kk exp/h", profit: "850k profit/h", breaks: false, armed: false, raidsBy: {}, raids: [{ name: "Cobra Assassin", value: "1" }] }],
+    sessions: [{ id: "s1", date: "Oct 21", length: "1 h", exp: "4.3kk exp/h", profit: "850k profit/h", breaks: false, armed: false, raidsBy: {}, raids: [{ name: "Cobra Assassin", value: "1" }],
+      details: { key: "hunt-s1", open: false, caption: "18:00–19:00 · level 615", amounts: [{ label: "Raw exp", total: "4.3kk", perHour: "4.3kk" }, { label: "Balance", total: "850k", perHour: "850k" }],
+        kills: [{ name: "Cobra Assassin", count: "520", perHour: "520/h" }], counts: true, notes: null, url: null } }],
     emptySessions: "No sessions.", own: { name: "Cobra Bastion", armed: false, deleteText: "Deletes this spot." } };
   const s = spy(), on = {};
-  ["back", "taken", "free", "log", "vary", "open", "arm", "deleteSession", "raid", "rename", "deleteSpot"].forEach((k) => { on[k] = s.fn(k); });
+  ["back", "taken", "free", "log", "vary", "open", "arm", "deleteSession", "details", "raid", "rename", "deleteSpot"].forEach((k) => { on[k] = s.fn(k); });
   let $ = mount(spot.render(view, on));
   assert.match(document.body.textContent, /Creatures here.*Cobra AssassinYour bounty≈ 400\/h/);
   assert.match(document.body.textContent, /Other sources not used here.*skipped: an Elite Knight hunt exists/);
   assert.equal(document.querySelector('a[target="_blank"]').getAttribute("rel"), "noopener noreferrer");
   $("#spot-taken").click(); $("#spot-log").click(); $("#spot-vary").click(); document.querySelector('a[href="#/spot/my-lure"]').click();
+  assert.equal($("#hunt-s1-toggle").getAttribute("aria-expanded"), "false");
+  assert.equal($("#hunt-s1-details"), null, "details start closed");
+  $("#hunt-s1-toggle").click(); $("#ref-cb-toggle").click(); $("#ref-rp-toggle").click();
   $("#ses-del-s1").click();
   $("#ses-raid-s1-0").value = "3"; $("#ses-raid-s1-0").dispatchEvent(new dom.window.Event("change"));
   $("#spot-name").value = "Bastion"; $("#spot-name").dispatchEvent(new dom.window.Event("change"));
   $("#spot-delete").click();
   document.querySelector(".hp-back").click();
-  assert.deepEqual(s.calls, [["taken"], ["log"], ["vary"], ["open", "my-lure"], ["arm", "s1"], ["raid", "s1", "Cobra Assassin", "3"], ["rename", "Bastion"], ["arm", "spot"], ["back"]]);
+  assert.deepEqual(s.calls, [["taken"], ["log"], ["vary"], ["open", "my-lure"], ["details", "hunt-s1"], ["details", "ref-cb"], ["details", "ref-rp"], ["arm", "s1"], ["raid", "s1", "Cobra Assassin", "3"], ["rename", "Bastion"], ["arm", "spot"], ["back"]]);
   $ = mount(spot.render(Object.assign({}, view, { taken: "Taken · clears in 5 min", sessions: [Object.assign({}, view.sessions[0], { armed: true })], own: Object.assign({}, view.own, { armed: true }) }), on));
   assert.match(document.body.textContent, /Delete this hunt\?/);
   $("#spot-free").click(); $("#ses-yes-s1").click(); $("#spot-delete").click();
   assert.deepEqual(s.calls.slice(-3), [["free"], ["deleteSession", "s1"], ["deleteSpot"]]);
+  // Opened details: amounts in total and per hour, kills and kills/h (no kill count for a reference), notes, the video.
+  const opened = (d) => Object.assign({}, d, { open: true });
+  $ = mount(spot.render(Object.assign({}, view, { sessions: [Object.assign({}, view.sessions[0], { details: opened(view.sessions[0].details) })],
+    sources: Object.assign({}, view.sources, { reference: Object.assign({}, view.sources.reference, { details: opened(view.sources.reference.details) }),
+      skipped: [Object.assign({}, view.sources.skipped[0], { details: opened(view.sources.skipped[0].details) })] }) }), on));
+  assert.equal($("#hunt-s1-toggle").getAttribute("aria-expanded"), "true");
+  assert.equal($("#hunt-s1-toggle").textContent, "Hide details");
+  const rows = (id) => [...$(id).querySelectorAll("tr")].map((r) => [...r.children].map((c) => c.textContent));
+  assert.deepEqual(rows("#hunt-s1-details"), [["Amount", "Total", "Per hour"], ["Raw exp", "4.3kk", "4.3kk"], ["Balance", "850k", "850k"], ["Creature", "Kills", "Kills/h"], ["Cobra Assassin", "520", "520/h"]]);
+  assert.match($("#hunt-s1-details").textContent, /^18:00–19:00 · level 615/);
+  assert.deepEqual(rows("#ref-cb-details").slice(-2), [["Creature", "Kills/h"], ["Cobra Assassin", "400/h"]]);
+  assert.match($("#ref-cb-details").textContent, /His slide\.$/);
+  assert.match($("#ref-rp-details").textContent, /No kills recorded\.Kusnier · Watch$/);
+  assert.equal($("#ref-rp-details a").getAttribute("href"), "https://example.org/rp");
   mount(spot.render(null, on));
   assert.match(document.body.textContent, /isn’t in the list any more/);
 });
