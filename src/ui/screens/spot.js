@@ -5,8 +5,30 @@ import { h, icon } from "../dom.js";
 import { badges, confirmButton } from "../components.js";
 import { t } from "../../app/lang.js";
 
+// A hunt's details (view: spotView's details): a Show details toggle and, when open, the amounts in total and per
+// hour and each creature's kills and kills/h.
+function detailsToggle(d, on) {
+  return h("button", { id: d.key + "-toggle", type: "button", class: "hp-linkbtn hp-tap", "aria-expanded": d.open ? "true" : "false", "aria-controls": d.key + "-details",
+    onClick: () => on.details(d.key) }, d.open ? t("Hide details") : t("Show details"));
+}
+function detailsPanel(d) {
+  if (!d.open) return null;
+  const th = (text, num) => h("th", { scope: "col", class: num ? "num" : null }, text);
+  return h("div", { id: d.key + "-details", class: "hp-details" },
+    d.caption ? h("span", { class: "hp-small hp-muted" }, d.caption) : null,
+    h("div", { class: "hp-table-wrap" }, h("table", { class: "hp-table" },
+      h("thead", null, h("tr", null, th(t("Amount")), th(t("Total"), true), th(t("Per hour"), true))),
+      h("tbody", null, d.amounts.map((a) => h("tr", null, h("th", { scope: "row" }, a.label), h("td", { class: "num" }, a.total), h("td", { class: "num" }, a.perHour)))))),
+    d.kills.length ? h("div", { class: "hp-table-wrap" }, h("table", { class: "hp-table" },
+      h("thead", null, h("tr", null, th(t("Creature")), d.counts ? th(t("Kills"), true) : null, th(t("Kills/h"), true))),
+      h("tbody", null, d.kills.map((k) => h("tr", null, h("th", { scope: "row" }, k.name), d.counts ? h("td", { class: "num" }, k.count) : null, h("td", { class: "num" }, k.perHour))))))
+      : h("span", { class: "hp-small hp-muted" }, t("No kills recorded.")),
+    d.notes ? h("p", { class: "hp-p hp-small" }, d.notes) : null,
+    d.url ? h("span", { class: "hp-small" }, d.who ? d.who + " · " : null, h("a", { href: d.url, target: "_blank", rel: "noopener noreferrer" }, t("Watch"))) : null);
+}
+
 // view: app/views.js spotView (null: no such spot). on: {back(), taken(), free(), log(), vary(), open(id),
-// arm(id | "spot" | null), deleteSession(id), raid(sessionId, name, value), rename(name), deleteSpot()}.
+// arm(id | "spot" | null), deleteSession(id), details(key), raid(sessionId, name, value), rename(name), deleteSpot()}.
 export function render(view, on) {
   const back = h("div", null, h("a", { href: "#/spots", class: "hp-back", onClick: (e) => { e.preventDefault(); on.back(); } }, icon("back", 20), t("Spots")));
   if (!view) return h("div", { class: "hp-section hp-narrow" }, back, h("p", { class: "hp-p hp-muted" }, t("That spot isn’t in the list any more.")));
@@ -37,9 +59,10 @@ export function render(view, on) {
         h("div", { class: "hp-stack" }, h("b", null, t("Your hunts here")), h("span", { class: "hp-small hp-muted" }, src.hunts)),
         ref ? h("div", { class: "hp-stack hp-sep" }, h("b", null, t("Reference hunt")),
           h("span", { class: "hp-small" }, ref.who, ref.url ? [" · ", h("a", { href: ref.url, target: "_blank", rel: "noopener noreferrer" }, t("Watch"))] : null),
-          h("span", { class: "hp-small hp-muted" }, ref.recorded), h("span", { class: "hp-small hp-muted" }, ref.adjusted)) : null,
+          h("span", { class: "hp-small hp-muted" }, ref.recorded), h("span", { class: "hp-small hp-muted" }, ref.adjusted),
+          detailsToggle(ref.details, on), detailsPanel(ref.details)) : null,
         src.skipped.length ? h("div", { class: "hp-stack hp-sep" }, h("b", null, t("Other sources not used here")),
-          src.skipped.map((x) => h("span", { class: "hp-small hp-muted" }, x))) : null)),
+          src.skipped.map((x) => h("div", { class: "hp-stack" }, h("span", { class: "hp-small hp-muted" }, x.text), detailsToggle(x.details, on), detailsPanel(x.details)))) : null)),
     view.variations ? section("var-h", t("Your variations"),
       view.variations.map((v) => h("a", { href: "#/spot/" + encodeURIComponent(v.id), class: "hp-spot", onClick: (e) => { e.preventDefault(); on.open(v.id); } },
         h("span", { class: "hp-spot-head" }, h("b", null, v.name), v.score != null ? h("span", { class: "hp-spot-score", "aria-label": t("Score {score}", { score: v.score }) }, v.score) : null),
@@ -48,8 +71,10 @@ export function render(view, on) {
     section("ses-h", t("Your sessions"),
       view.sessions.length ? view.sessions.map((x) => h("div", { class: "hp-card hp-session" },
         h("div", { class: "hp-line" },
-          h("span", null, h("b", null, x.date + " · " + x.length), h("br"), h("span", { class: "hp-small hp-muted" }, x.exp + " · " + x.profit + (x.breaks ? " · " + t("with breaks") : ""))),
-          x.armed ? null : h("button", { id: "ses-del-" + x.id, type: "button", class: "hp-linkbtn", "aria-label": t("Delete the hunt of {date}", { date: x.date }), onClick: () => on.arm(x.id) }, t("Delete"))),
+          h("span", null, h("b", null, x.date + " · " + x.length), h("br"), h("span", { class: "hp-small hp-muted" }, x.exp + " · " + x.profit + (x.breaks ? " · " + t("with breaks") : "")))),
+        h("div", { class: "hp-session-actions" }, detailsToggle(x.details, on),
+          x.armed ? null : h("button", { id: "ses-del-" + x.id, type: "button", class: "hp-linkbtn hp-tap", "aria-label": t("Delete the hunt of {date}", { date: x.date }), onClick: () => on.arm(x.id) }, t("Delete"))),
+        detailsPanel(x.details),
         x.armed ? h("div", { class: "hp-pick", role: "alert" }, h("b", null, t("Delete this hunt?")),
           h("span", { class: "hp-small hp-muted" }, t("Its numbers stop counting for this spot. This can’t be undone.")),
           h("div", { class: "hp-grid2" }, h("button", { id: "ses-yes-" + x.id, type: "button", class: "hp-btn danger", onClick: () => on.deleteSession(x.id) }, t("Delete")),

@@ -272,11 +272,21 @@ test("Spots and a spot page over the golden fixture: search, a variation, Taken,
   // The parent spot lists its variation.
   await p.go("spot/cobra-bastion-1");
   assert.match(p.d.body.textContent, /Your variations.*Bastion lure\d*.*Lure two boxes · Yours · 1 hunt · low sample/);
+  // The reference hunt's details: its kills/h per creature.
+  const refToggle = p.d.querySelector('.hp-sep [id^="ref-"][id$="-toggle"]');
+  await p.click("#" + refToggle.id);
+  const refDetails = p.$("#" + refToggle.id.replace(/-toggle$/, "-details"));
+  assert.match(refDetails.textContent, /^Recorded over \d+ (min|h).*Raw exp.*CreatureKills\/h.*Cobra Assassin\d+\/h/);
   p.d.querySelector('a[href="#/spot/my-bastion-lure"]').click();
   await wait(20);
   assert.equal(p.w.location.hash, "#/spot/my-bastion-lure");
   assert.match(p.d.body.textContent, /Your variation of Cobra Bastion -1/);
   assert.match(p.d.body.textContent, /Your hunts here1 hunt, 1 h\./);
+  await p.click("#hunt-e7-toggle");
+  assert.deepEqual([...p.$("#hunt-e7-details").querySelectorAll("tr")].map((r) => [...r.children].map((c) => c.textContent)),
+    [["Amount", "Total", "Per hour"], ["Raw exp", "5.2kk", "5.2kk"], ["Exp with bonuses", "7.8kk", "7.8kk"], ["Loot", "2.4kk", "2.4kk"], ["Supplies", "1.5kk", "1.5kk"],
+      ["Balance", "900k", "900k"], ["Creature", "Kills", "Kills/h"], ["Cobra Assassin", "520", "520/h"], ["Cobra Scout", "90", "90/h"]]);
+  assert.match(p.$("#hunt-e7-details").textContent, /^18:00–19:00 · level 615/);
   await p.click("#spot-taken");
   await until(() => (store["profiles/ek/marks/my-bastion-lure"] || {}).state === "taken", "the Taken mark");
   assert.ok(p.$("#spot-free"));
