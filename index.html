@@ -285,6 +285,10 @@
   .hp-stack { display: flex; flex-direction: column; gap: 4px; }
   .hp-sep { border-top: 1px solid var(--line); padding-top: var(--s3); }
   .hp-empty { border: 1px dashed var(--line2); border-radius: var(--r-card); padding: 14px; color: var(--muted); font-size: 14px; line-height: 20px; }
+  .hp-tap { min-height: 44px; align-self: flex-start; }
+  .hp-session-actions { display: flex; flex-wrap: wrap; gap: var(--s4); }
+  .hp-details { display: flex; flex-direction: column; gap: var(--s2); }
+  .hp-details .hp-table th[scope="row"] { font-weight: 400; }
   .hp-raids { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--s2); }
 
   /* Creatures and the creature page */
@@ -2642,6 +2646,19 @@
     "Your sessions": "Tus sesiones",
     "with breaks": "con pausas",
     "Delete the hunt of {date}": "Borrar la caza del {date}",
+    "Recorded over {time}.": "Grabada durante {time}.",
+    "Raw exp": "Exp raw",
+    "Exp with bonuses": "Exp con bonus",
+    "level {level}": "nivel {level}",
+    "Supplies": "Supplies",
+    "Balance": "Balance",
+    "Hide details": "Ocultar detalles",
+    "Show details": "Ver detalles",
+    "Amount": "Concepto",
+    "Total": "Total",
+    "Per hour": "Por hora",
+    "Kills": "Kills",
+    "No kills recorded.": "Sin kills registradas.",
     "Delete": "Borrar",
     "Delete this hunt?": "¿Borrar esta caza?",
     "Its numbers stop counting for this spot. This can’t be undone.": "Sus números dejan de contar para este spot. No se puede deshacer.",
@@ -3203,6 +3220,19 @@
     "Your sessions": "Suas sessões",
     "with breaks": "com pausas",
     "Delete the hunt of {date}": "Apagar a hunt de {date}",
+    "Recorded over {time}.": "Gravada durante {time}.",
+    "Raw exp": "Exp raw",
+    "Exp with bonuses": "Exp com bônus",
+    "level {level}": "level {level}",
+    "Supplies": "Supplies",
+    "Balance": "Balance",
+    "Hide details": "Ocultar detalhes",
+    "Show details": "Ver detalhes",
+    "Amount": "Item",
+    "Total": "Total",
+    "Per hour": "Por hora",
+    "Kills": "Kills",
+    "No kills recorded.": "Nenhuma kill registrada.",
     "Delete": "Apagar",
     "Delete this hunt?": "Apagar esta hunt?",
     "Its numbers stop counting for this spot. This can’t be undone.": "Os números dela deixam de contar para este spot. Não dá para desfazer.",
@@ -3764,6 +3794,19 @@
     "Your sessions": "Twoje sesje",
     "with breaks": "z przerwami",
     "Delete the hunt of {date}": "Usuń polowanie z {date}",
+    "Recorded over {time}.": "Nagrane w ciągu {time}.",
+    "Raw exp": "Surowy exp",
+    "Exp with bonuses": "Exp z bonusami",
+    "level {level}": "poziom {level}",
+    "Supplies": "Supplies",
+    "Balance": "Balance",
+    "Hide details": "Ukryj szczegóły",
+    "Show details": "Pokaż szczegóły",
+    "Amount": "Pozycja",
+    "Total": "Razem",
+    "Per hour": "Na godzinę",
+    "Kills": "Zabicia",
+    "No kills recorded.": "Brak zapisanych zabić.",
     "Delete": "Usuń",
     "Delete this hunt?": "Usunąć to polowanie?",
     "Its numbers stop counting for this spot. This can’t be undone.": "Jego liczby przestaną się liczyć dla tego spotu. Tego nie da się cofnąć.",
@@ -6396,6 +6439,28 @@
     const hunts = !sp.sessions.length ? t("None yet.") : nums && nums.src === "own" ? t.n(sp.sessions.length, "{n} hunt, {time}.", "{n} hunts, {time}.", { time: fmtHours(hrs) }) : t.n(sp.sessions.length, "{n} hunt, {time}, all with breaks: no clean rate.", "{n} hunts, {time}, all with breaks: no clean rate.", { time: fmtHours(hrs) });
     const refNums2 = nums && nums.src === "own" ? model.spotNums(Object.assign({}, sp, { sessions: [] })) : nums;
     const e = refNums2 && refNums2.entry || null;
+    const open = ui.open || {};
+    const amount = (label, total, H) => ({ label, total: total != null ? fmtBig(total) : "–", perHour: total != null && H ? fmtBig(total / H) : "–" });
+    const details = (key, caption, amounts, kills, extra) => Object.assign({
+      key,
+      open: !!open[key],
+      caption,
+      amounts,
+      kills: kills.slice().sort((a, b) => b.perHour - a.perHour).map((k) => ({ name: k.name, count: k.count != null ? k.count.toLocaleString(locale()) : null, perHour: Math.round(k.perHour) + "/h" })),
+      counts: kills.some((k) => k.count != null),
+      notes: null,
+      url: null
+    }, extra);
+    const refDetails = (x, link) => {
+      const H = Number(x.hours) || 0, src = x.source || {}, total = (v) => v != null && H ? v * H : null;
+      return details(
+        "ref-" + x.id,
+        H ? t("Recorded over {time}.", { time: fmtHours(H) }) : "",
+        [amount(t("Raw exp"), total(x.rawXph), H), amount(t("Exp with bonuses"), total(x.xph), H), amount(t("Profit"), total(x.profitph), H)],
+        (x.creatures || []).filter((c) => c && c.slug && c.kph != null).map((c) => ({ name: name(c.slug), count: null, perHour: c.kph })),
+        { notes: x.notes || null, url: link && src.url || null, who: src.who || null }
+      );
+    };
     const mineVoc = (x) => x.vocation === vocation || x.vocation === "any";
     let reference = null;
     if (e) {
@@ -6412,12 +6477,13 @@
           "Adjusted to you: {exp} · {profit}, from how your {n} logged spot compares to its reference.",
           "Adjusted to you: {exp} · {profit}, from how your {n} logged spots compare to their references.",
           { exp: fmtBig(refNums2.xph), profit: refNums2.pph != null ? fmtBig(refNums2.pph) : "–" }
-        ) : t("Not adjusted to you yet.")
+        ) : t("Not adjusted to you yet."),
+        details: refDetails(e)
       };
     }
     const skipped = sp.entries.filter((x) => x !== e).map((x) => {
       const why = mineVoc(x) ? Number(p.level) && x.levelMin > Number(p.level) ? t("needs level {level}", { level: x.levelMin }) : t("another hunt here fits you better") : e && mineVoc(e) ? t("{aVoc} hunt exists", { aVoc: aVoc(vocation), voc: vocation }) : t("another hunt here fits you better");
-      return x.vocation + ", " + levelRange(x) + ": " + why;
+      return { text: x.vocation + ", " + levelRange(x) + (x.hours ? ", " + fmtHours(x.hours) : "") + ": " + why, details: refDetails(x, true) };
     });
     const varRow = (v) => {
       const vo = opts.byId[v.id] || null;
@@ -6433,6 +6499,8 @@
     const when = (x) => String(x.start || x.end || "");
     const sessions = sp.sessions.filter((x) => x.id).slice().sort((a, b) => when(b).localeCompare(when(a))).map((x) => {
       const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, raids = raidsOf(x);
+      const clock = (s) => /T\d\d:\d\d/.test(s || "") ? String(s).slice(11, 16) : null, from = clock(x.start), to = clock(x.end);
+      const caption = [from && to ? from + "–" + to : null, x.level ? t("level {level}", { level: x.level }) : null, x.breaks ? t("with breaks") : null].filter(Boolean).join(" · ");
       return {
         id: x.id,
         date: when(x) ? fmtDay(when(x).slice(0, 10)) : t("Undated"),
@@ -6442,6 +6510,12 @@
         breaks: !!x.breaks,
         armed: ui.armed === x.id,
         raidsBy: raids,
+        details: details(
+          "hunt-" + x.id,
+          caption,
+          [amount(t("Raw exp"), x.rawXp, H), amount(t("Exp with bonuses"), x.xp, H), amount(t("Loot"), x.loot, H), amount(t("Supplies"), x.supplies, H), amount(t("Balance"), x.balance, H)],
+          (x.kills || []).filter((k) => k && k.count > 0).map((k) => ({ name: k.name || name(k.slug), count: k.count, perHour: H ? k.count / H : 0 }))
+        ),
         raids: advanced ? (x.kills || []).map((k) => {
           const n = k.name || name(k.slug);
           return { name: n, value: raids[n] != null ? String(raids[n]) : "" };
@@ -7551,6 +7625,39 @@
   }
 
   // src/ui/screens/spot.js
+  function detailsToggle(d, on) {
+    return h("button", {
+      id: d.key + "-toggle",
+      type: "button",
+      class: "hp-linkbtn hp-tap",
+      "aria-expanded": d.open ? "true" : "false",
+      "aria-controls": d.key + "-details",
+      onClick: () => on.details(d.key)
+    }, d.open ? t("Hide details") : t("Show details"));
+  }
+  function detailsPanel(d) {
+    if (!d.open) return null;
+    const th = (text, num) => h("th", { scope: "col", class: num ? "num" : null }, text);
+    return h(
+      "div",
+      { id: d.key + "-details", class: "hp-details" },
+      d.caption ? h("span", { class: "hp-small hp-muted" }, d.caption) : null,
+      h("div", { class: "hp-table-wrap" }, h(
+        "table",
+        { class: "hp-table" },
+        h("thead", null, h("tr", null, th(t("Amount")), th(t("Total"), true), th(t("Per hour"), true))),
+        h("tbody", null, d.amounts.map((a) => h("tr", null, h("th", { scope: "row" }, a.label), h("td", { class: "num" }, a.total), h("td", { class: "num" }, a.perHour))))
+      )),
+      d.kills.length ? h("div", { class: "hp-table-wrap" }, h(
+        "table",
+        { class: "hp-table" },
+        h("thead", null, h("tr", null, th(t("Creature")), d.counts ? th(t("Kills"), true) : null, th(t("Kills/h"), true))),
+        h("tbody", null, d.kills.map((k) => h("tr", null, h("th", { scope: "row" }, k.name), d.counts ? h("td", { class: "num" }, k.count) : null, h("td", { class: "num" }, k.perHour))))
+      )) : h("span", { class: "hp-small hp-muted" }, t("No kills recorded.")),
+      d.notes ? h("p", { class: "hp-p hp-small" }, d.notes) : null,
+      d.url ? h("span", { class: "hp-small" }, d.who ? d.who + " · " : null, h("a", { href: d.url, target: "_blank", rel: "noopener noreferrer" }, t("Watch"))) : null
+    );
+  }
   function render7(view, on) {
     const back = h("div", null, h("a", { href: "#/spots", class: "hp-back", onClick: (e) => {
       e.preventDefault();
@@ -7607,13 +7714,15 @@
             h("b", null, t("Reference hunt")),
             h("span", { class: "hp-small" }, ref.who, ref.url ? [" · ", h("a", { href: ref.url, target: "_blank", rel: "noopener noreferrer" }, t("Watch"))] : null),
             h("span", { class: "hp-small hp-muted" }, ref.recorded),
-            h("span", { class: "hp-small hp-muted" }, ref.adjusted)
+            h("span", { class: "hp-small hp-muted" }, ref.adjusted),
+            detailsToggle(ref.details, on),
+            detailsPanel(ref.details)
           ) : null,
           src.skipped.length ? h(
             "div",
             { class: "hp-stack hp-sep" },
             h("b", null, t("Other sources not used here")),
-            src.skipped.map((x) => h("span", { class: "hp-small hp-muted" }, x))
+            src.skipped.map((x) => h("div", { class: "hp-stack" }, h("span", { class: "hp-small hp-muted" }, x.text), detailsToggle(x.details, on), detailsPanel(x.details)))
           ) : null
         )
       ),
@@ -7641,9 +7750,15 @@
           h(
             "div",
             { class: "hp-line" },
-            h("span", null, h("b", null, x.date + " · " + x.length), h("br"), h("span", { class: "hp-small hp-muted" }, x.exp + " · " + x.profit + (x.breaks ? " · " + t("with breaks") : ""))),
-            x.armed ? null : h("button", { id: "ses-del-" + x.id, type: "button", class: "hp-linkbtn", "aria-label": t("Delete the hunt of {date}", { date: x.date }), onClick: () => on.arm(x.id) }, t("Delete"))
+            h("span", null, h("b", null, x.date + " · " + x.length), h("br"), h("span", { class: "hp-small hp-muted" }, x.exp + " · " + x.profit + (x.breaks ? " · " + t("with breaks") : "")))
           ),
+          h(
+            "div",
+            { class: "hp-session-actions" },
+            detailsToggle(x.details, on),
+            x.armed ? null : h("button", { id: "ses-del-" + x.id, type: "button", class: "hp-linkbtn hp-tap", "aria-label": t("Delete the hunt of {date}", { date: x.date }), onClick: () => on.arm(x.id) }, t("Delete"))
+          ),
+          detailsPanel(x.details),
           x.armed ? h(
             "div",
             { class: "hp-pick", role: "alert" },
@@ -7937,7 +8052,7 @@
   var ROUTES = TABS.map((t2) => t2[0]).concat(["characters", "log", "spot", "creature"]);
   var PAGES = ["characters", "log"];
   function mount(root, app2, host2) {
-    const ui = { adding: false, firstRun: { vocation: null, level: "" }, characters: { armed: false, status: "" }, plan: { open: null, why: {} }, weekly: { armed: false }, spots: { query: "", sort: "score", allVocations: false, anyLevel: false, hideTaken: false, limit: 0 }, spot: { armed: null }, creatures: { difficulty: null, mode: "tiers", query: "", lists: false, add: {} }, creature: { notes: null }, log: { text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan" } };
+    const ui = { adding: false, firstRun: { vocation: null, level: "" }, characters: { armed: false, status: "" }, plan: { open: null, why: {} }, weekly: { armed: false }, spots: { query: "", sort: "score", allVocations: false, anyLevel: false, hideTaken: false, limit: 0 }, spot: { armed: null, open: {} }, creatures: { difficulty: null, mode: "tiers", query: "", lists: false, add: {} }, creature: { notes: null }, log: { text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan" } };
     const path = () => String(host2.hash() || "").replace(/^#\/?/, "");
     const route = () => {
       const r = path().split("/")[0];
@@ -8206,7 +8321,7 @@
       }
       if (r === "spot") {
         const id = routeArg(), a = app2.actions, U = ui.spot, here = "spot/" + encodeURIComponent(id);
-        const v = spotView(s, app2.model(), app2.catalog, id, { lens: { allVocations: ui.spots.allVocations, anyLevel: ui.spots.anyLevel }, armed: U.armed }, Date.now(), s.advanced);
+        const v = spotView(s, app2.model(), app2.catalog, id, { lens: { allVocations: ui.spots.allVocations, anyLevel: ui.spots.anyLevel }, armed: U.armed, open: U.open }, Date.now(), s.advanced);
         return render7(v, {
           back: () => go("spots"),
           taken: () => a.markTaken(id),
@@ -8221,6 +8336,10 @@
           deleteSession: (x) => {
             U.armed = null;
             a.deleteSession(x);
+          },
+          details: (k) => {
+            U.open = Object.assign({}, U.open, { [k]: !(U.open || {})[k] });
+            draw();
           },
           raid: (x, name, n) => {
             const ses = v.sessions.filter((y) => y.id === x)[0];
@@ -8316,7 +8435,7 @@
       go("creature/" + slug);
     }
     function openSpot(id) {
-      ui.spot = { armed: null };
+      ui.spot = { armed: null, open: {} };
       go("spot/" + encodeURIComponent(id));
     }
     const blankLog = () => ({ text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan" });
