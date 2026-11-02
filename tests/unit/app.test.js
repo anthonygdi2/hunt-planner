@@ -69,3 +69,26 @@ test("compute on a small state", () => {
   assert.deepEqual(Object.keys(off.spotKph), ["Bastion"]);
   assert.equal(off.derived["cobra-scout"], undefined);
 });
+
+test("compute counts only the hunts that apply to the character", () => {
+  const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }, { n: "Cobra Scout", c: "M", m: 6 }]);
+  const reference = [{ id: "bastion", spot: "Cobra Bastion", vocation: "Elite Knight", levelMin: 500, rawXph: 4e6, creatures: [{ slug: "cobra-assassin", kph: 300 }], source: { date: "2026-09-01", postRebalance: true } }];
+  const sessions = [
+    { id: "ek", spot: "Cobra Bastion", hours: 1, rawXp: 3e6, kills: [{ slug: "cobra-assassin", count: 400 }] },
+    { id: "cave", spot: "Scout Cave", hours: 1, rawXp: 1e6, kills: [{ slug: "cobra-scout", count: 200 }] },
+    { id: "rp", spot: "Scout Cave", hours: 1, rawXp: 2e5, vocation: "Royal Paladin", kills: [{ slug: "cobra-scout", count: 100 }] },
+  ];
+  const run = (profile) => compute({ catalog, reference, profile: Object.assign({ vocation: "Royal Paladin", level: 45 }, profile), sessions, entries: {}, advanced: false, difficulty: "all" }, 0);
+  // A knight's untagged hunts on a character switched to paladin: they still read as the paladin's until told.
+  let d = run({});
+  assert.deepEqual(d.hunts.use.map((x) => x.id), ["cave", "rp"], "the level-500 spot is cut off at level 45");
+  assert.equal(d.derived["cobra-assassin"], undefined);
+  d = run({ untaggedVocation: "Elite Knight" });
+  assert.deepEqual(d.hunts.use.map((x) => x.id), ["rp"]);
+  assert.equal(d.derived["cobra-scout"].best.kph, 100, "only the paladin's hunt");
+  d = run({ untaggedVocation: "Elite Knight", otherVocationHunts: true });
+  assert.deepEqual(d.hunts.use.map((x) => x.id), ["cave", "rp"], "other vocations on: the level still applies");
+  d = run({ untaggedVocation: "Elite Knight", otherVocationHunts: true, level: 500 });
+  assert.equal(d.hunts.use.length, 3);
+  assert.equal(d.derived["cobra-assassin"].best.spot, "Cobra Bastion");
+});

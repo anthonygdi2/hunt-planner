@@ -11,7 +11,7 @@ import { makeCatalog } from "../core/catalog.js";
 import { PRESETS, readWeights } from "../core/score.js";
 import { makeRepo } from "../store/repo.js";
 import { PREF } from "../store/prefs.js";
-import { plDefaults, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, WEEKLY_SLOTS, readHunting } from "../store/schema.js";
+import { plDefaults, readHuntSources, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, WEEKLY_SLOTS, readHunting } from "../store/schema.js";
 import { makeActions } from "./actions.js";
 import { makeWatchers, mergeProfiles } from "./state.js";
 import { makeModel, makePlanCache } from "./model.js";
@@ -69,10 +69,13 @@ export function createApp({ data, prefs, now, browserLang }) {
   }
 
   // A patch to the active character's profile: shown at once, written in the background; on failure the unsaved
-  // keys are dropped and a notice says so.
+  // keys are dropped and a notice says so. A new vocation first records the old one as what the hunts saved without a
+  // vocation were logged as (untaggedVocation), unless that's set already.
   function updateCharacter(patch) {
-    const pid = state.pid;
-    if (!act || !pid || !state.profiles[pid]) return;
+    const pid = state.pid, cur = state.profiles[pid];
+    if (!act || !pid || !cur) return;
+    const was = cur.vocation || VOCATIONS[0];
+    if (patch.vocation && patch.vocation !== was && !readHuntSources(cur).loggedAs && state.sessions.some((x) => !x.vocation)) patch = Object.assign({ untaggedVocation: was }, patch);
     state.profiles = Object.assign({}, state.profiles, { [pid]: Object.assign({}, state.profiles[pid], patch) });
     pending[pid] = Object.assign({}, pending[pid] || {}, patch);
     act.updateProfile(pid, patch, () => {
@@ -223,6 +226,10 @@ export function createApp({ data, prefs, now, browserLang }) {
       if (state.order[0]) actions.switchCharacter(state.order[0]); else { watchCharacter(null); changed(); }
     },
     setSources(s) { updateCharacter(sourcesPatch(s)); },
+    // Whether the character's hunts logged as another vocation count, and which vocation its hunts saved without one
+    // were logged as.
+    setOtherVocationHunts(on) { updateCharacter({ otherVocationHunts: !!on }); },
+    setLoggedAs(vocation) { if (VOCATIONS.indexOf(vocation) !== -1) updateCharacter({ untaggedVocation: vocation }); },
     // Goal mix: weights 0-5 each, or a preset by id.
     setWeights(w) { updateCharacter(goalPatch(readWeights(w))); },
     applyPreset(id) { if (PRESETS[id]) updateCharacter(goalPatch(PRESETS[id])); },
@@ -394,7 +401,7 @@ export function createApp({ data, prefs, now, browserLang }) {
       const body = { spot: name, spotId, task, start: preview.start || null, end: preview.end || iso().slice(0, 19), hours: Math.round(preview.hours * 10000) / 10000,
         rawXp: preview.rawXp != null ? preview.rawXp : null, xp: preview.xp != null ? preview.xp : null, loot: preview.loot != null ? preview.loot : null,
         supplies: preview.supplies != null ? preview.supplies : null, balance: preview.balance != null ? preview.balance : null,
-        kills: preview.kills.map((k) => (k.slug ? { slug: k.slug, name: k.name, count: k.count } : { name: k.name, count: k.count })), level: Number(p.level) || null, createdAt: iso() };
+        kills: preview.kills.map((k) => (k.slug ? { slug: k.slug, name: k.name, count: k.count } : { name: k.name, count: k.count })), level: Number(p.level) || null, vocation: p.vocation || VOCATIONS[0], createdAt: iso() };
       const raids = {};
       Object.keys(raidsBy || {}).forEach((k) => { const n = parseInt(raidsBy[k], 10); if (n >= 0 && n < 1000) raids[k] = n; });
       if (Object.keys(raids).length) body.raidsBy = raids;

@@ -17,6 +17,8 @@ export function offerLabel(o, t) {
 // Why a spot in the lens has no numbers for this character. ctx: {level, vocation, refOn, otherOn, t}.
 export function noNumsWhy(sp, ctx) {
   const t = ctx.t || EN, lvl = Number(ctx.level) || 0, voc = ctx.vocation;
+  if (!sp.sessions.length && (sp.skipped || []).length && !sp.entries.length)
+    return t("Your hunts here were logged as another vocation, and those are off for this character (Characters).");
   if (sp.sessions.length && !sp.entries.length) return t("Only sessions with breaks are logged here, so there’s no clean kill rate yet.");
   if (!ctx.refOn) return t("Reference hunts are off for this character (Characters).");
   const mins = sp.entries.map((e) => e.levelMin || 0);

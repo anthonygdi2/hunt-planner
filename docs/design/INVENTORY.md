@@ -108,7 +108,7 @@ Reached from Hunting now, a spot page, a variation button, or Spots → "Log a c
 
 ## 6. Spot page
 
-**Shows:** name, score for this character and goal, exp/h, profit/h, source badge. Creatures here with kills/h, marked "Your bounty", "Bounty offer B" or "Weekly task". Where the numbers come from: your hunts, the reference as recorded and as adjusted, sources skipped and why. Your variations (name, score, numbers, note, hunts). Your sessions (date, length, exp/h, profit/h).
+**Shows:** name, score for this character and goal, exp/h, profit/h, source badge. Creatures here with kills/h, marked "Your bounty", "Bounty offer B" or "Weekly task". Where the numbers come from: your hunts, the reference as recorded and as adjusted, sources skipped and why. Your variations (name, score, numbers, note, hunts). Your sessions (date, length, exp/h, profit/h; a hunt that doesn't count for this character says why: logged as another vocation, or below the spot's level).
 
 **You can:** **Mark taken** / Free again; **Log a clean hunt** here; **Log a hunt as a new variation** (opens Log with New spot and this spot as parent); open a variation; open a creature; delete one of your sessions (inline confirm). Advanced mode: type your own numbers for this spot; **[Decision]** rename or delete a spot you created; edit a session's Echo Raid counts.
 
@@ -126,7 +126,7 @@ Reached from Hunting now, a spot page, a variation button, or Spots → "Log a c
 
 ## 9. Characters and settings (full page)
 
-**Shows:** character pills; this character's name, vocation, level, Talisman bestiary bonus. Numbers from: preset plus switches for reference hunts, other vocations, older hunts; calibration status in plain words. World; how long a Taken mark lasts. Advanced mode. Theme. Backup. Credits.
+**Shows:** character pills; this character's name, vocation, level, Talisman bestiary bonus. Numbers from: preset plus switches for reference hunts, other vocations, older hunts, and your hunts as other vocations (outside the presets); while some hunts have no saved vocation, which vocation they were logged as; calibration status in plain words. World; how long a Taken mark lasts. Advanced mode. Theme. Backup. Credits.
 
 **You can:** switch, add or delete a character (inline confirm); choose Mine only / + Reference / Everything, or flip each switch (the preset shows "Custom" when switches don't match one); set world and Taken length (30 min, 45 min default, 1 h, 2 h); turn on Advanced mode; Theme System / Dark / Light; Download backup, Restore. **[Decision]** Advanced mode adds: Raw or boosted exp, hunting hours per day (reroll model), logging boards for Silver/Gold odds, full score breakdown in Why?
 

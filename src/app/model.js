@@ -114,7 +114,8 @@ export function makeModel(state, derived, now, opts) {
     return { boosted: t.boostedDay === serverDay(now) ? t.boosted : null, prey: t.prey || [], event: t.event || 0 };
   };
   const todayFactor = (kph, td) => coreTodayFactor(kph, td, { catalog, expTable: state.expTable, t });
-  const spotIndex = () => coreSpotIndex({ reference: state.reference, sessions: state.sessions, catalog, spotMeta: state.spotMeta, userSpots: state.userSpots });
+  const spotIndex = () => coreSpotIndex({ reference: state.reference, sessions: state.sessions, catalog, spotMeta: state.spotMeta, userSpots: state.userSpots,
+    skip: (x) => d.hunts.why.get(x) || "" });
   const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost });
   const heldTask = (h, diff) => coreHeldTask(h, diff, { catalog, chalRates: chalRates() });
   const spotValue = (sp, o) => {

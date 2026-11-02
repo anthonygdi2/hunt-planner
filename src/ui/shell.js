@@ -75,7 +75,7 @@ export function mount(root, app, host) {
       const a = app.actions, c = ui.characters;
       return characters.render(charactersPageView(s, app.model()), c, {
         back: () => go("plan"), switchCharacter: (id) => { c.armed = false; a.switchCharacter(id); }, add: () => { c.armed = false; ui.firstRun = { vocation: null, level: "" }; ui.adding = true; draw(); },
-        update: a.updateCharacter, setSources: a.setSources, setWorld: a.setWorld, setTakenMinutes: a.setTakenMinutes, setAdvanced: a.setAdvanced, setTheme: a.setTheme, setLang: a.setLang,
+        update: a.updateCharacter, setSources: a.setSources, setOtherVocationHunts: a.setOtherVocationHunts, setLoggedAs: a.setLoggedAs, setWorld: a.setWorld, setTakenMinutes: a.setTakenMinutes, setAdvanced: a.setAdvanced, setTheme: a.setTheme, setLang: a.setLang,
         arm: (b) => { c.armed = b; draw(); }, deleteCharacter: () => { c.armed = false; a.deleteCharacter(); },
         download: () => a.exportBackup().then((bk) => host.download("hunt-planner-backup-" + bk.exportedAt.slice(0, 10) + ".json", JSON.stringify(bk, null, 2)))
           .then((msg) => { c.status = msg || t("Backup saved."); draw(); }, () => { c.status = t("Couldn’t create the backup. Try again in a moment."); draw(); }),

@@ -88,6 +88,26 @@ test("characters page: each control calls its action", () => {
   assert.equal(document.querySelector("#src-ref").disabled, true);
 });
 
+test("characters page: your hunts as other vocations, and the vocation older hunts were logged as", () => {
+  const s = spy(), on = new Proxy({}, { get: (t, k) => s.fn(k) });
+  let $ = mount(characters.render(charactersPageView(STATE, null), { armed: false, status: "" }, on));
+  assert.equal($("#src-own-other").getAttribute("aria-checked"), "false", "off unless set");
+  assert.equal($("#src-logged-as"), null, "no older hunts: no question");
+  assert.match(document.body.textContent, /Always used first, at spots your level reaches./);
+  const state = Object.assign({}, STATE, { sessions: [{ id: "x", vocation: "Elite Knight" }, { id: "y" }, { id: "z" }],
+    profiles: Object.assign({}, STATE.profiles, { a: Object.assign({}, STATE.profiles.a, { vocation: "Royal Paladin", level: 45, untaggedVocation: "Elite Knight", otherVocationHunts: true }) }) });
+  $ = mount(characters.render(charactersPageView(state, null), { armed: false, status: "" }, on));
+  assert.equal($("#src-own-other").getAttribute("aria-checked"), "true");
+  assert.equal($("#src-logged-as").value, "Elite Knight");
+  assert.match(document.body.textContent, /2 older hunts don’t say which vocation logged them\./);
+  $("#src-own-other").click();
+  $("#src-logged-as").value = "Royal Paladin"; $("#src-logged-as").dispatchEvent(new dom.window.Event("change"));
+  assert.deepEqual(s.calls, [["setOtherVocationHunts", false], ["setLoggedAs", "Royal Paladin"]]);
+  mount(characters.render(charactersPageView(Object.assign({}, state, { canWrite: false }), null), { armed: false, status: "" }, on));
+  assert.equal(document.querySelector("#src-own-other").disabled, true);
+  assert.equal(document.querySelector("#src-logged-as").disabled, true);
+});
+
 test("plan: the Goal chip opens the goal mixer; presets and weights call their actions", async () => {
   const { goalMixView, planView } = await import("../../src/app/views.js");
   const plan = await import("../../src/ui/screens/plan.js");
@@ -349,6 +369,10 @@ test("spot page: sections, Mark taken, logs, variations, delete a hunt inline, a
   let $ = mount(spot.render(view, on));
   assert.match(document.body.textContent, /Creatures here.*Cobra AssassinYour bounty≈ 400\/h/);
   assert.match(document.body.textContent, /Other sources not used here.*skipped: an Elite Knight hunt exists/);
+  assert.doesNotMatch(document.body.textContent, /Doesn’t count/);
+  mount(spot.render(Object.assign({}, view, { sessions: [Object.assign({}, view.sessions[0], { skipped: "Doesn’t count: logged as Elite Knight." })] }), on));
+  assert.match(document.querySelector(".hp-session").textContent, /850k profit\/hDoesn’t count: logged as Elite Knight\./,"a hunt that doesn’t count says why");
+  $ = mount(spot.render(view, on));
   assert.equal(document.querySelector('a[target="_blank"]').getAttribute("rel"), "noopener noreferrer");
   $("#spot-taken").click(); $("#spot-log").click(); $("#spot-vary").click(); document.querySelector('a[href="#/spot/my-lure"]').click();
   assert.equal($("#hunt-s1-toggle").getAttribute("aria-expanded"), "false");
