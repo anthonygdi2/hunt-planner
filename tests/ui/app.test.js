@@ -252,6 +252,25 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   await p.click("#wk-any-done");
   await until(() => store["profiles/ek"].weeklyTasks.any.done === true, "Any Creature done");
   assert.deepEqual(store["profiles/ek"].weeklyTasks.tasks[3], { slug: "dragon-lord", name: null, killsLeft: 200, done: true }, "the other tasks stay");
+  // A new hunt saves its vocation. Switched to a level 45 paladin, the hunts saved without one are remembered as the
+  // knight's and stop counting, until hunts as other vocations are on (and then only at spots level 45 reaches).
+  assert.equal(store[logged[0]].vocation, "Elite Knight");
+  await p.go("characters");
+  assert.equal(p.$("#src-own-other").getAttribute("aria-checked"), "false");
+  assert.equal(p.$("#src-logged-as").value, "Elite Knight", "older hunts read as the character's vocation");
+  await p.type("#ch-voc", "Royal Paladin");
+  await p.type("#ch-level", "45");
+  await until(() => store["profiles/ek"].level === 45, "the level write");
+  assert.equal(store["profiles/ek"].untaggedVocation, "Elite Knight", "the old vocation, for the hunts saved without one");
+  assert.equal(p.$("#src-logged-as").value, "Elite Knight");
+  await p.go("spot/" + at);
+  assert.match(p.d.body.textContent, /hunts? here (doesn’t|don’t) count for this character/);
+  assert.match(p.d.body.textContent, /Doesn’t count: logged as Elite Knight\./);
+  await p.go("characters");
+  await p.click("#src-own-other");
+  await until(() => store["profiles/ek"].otherVocationHunts === true, "the switch write");
+  await p.type("#src-logged-as", "Royal Paladin");
+  await until(() => store["profiles/ek"].untaggedVocation === "Royal Paladin", "the logged-as write");
   assert.deepEqual(p.errors, []);
   p.w.close();
 });

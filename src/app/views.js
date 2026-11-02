@@ -3,7 +3,7 @@
 // translated where they're shown.
 
 import { VOCATIONS, PREY, PREY_SLOTS, EXP_EVENTS, SLOTS } from "../data/rules.js";
-import { readSources, sourcesPreset, SOURCE_PRESETS, readSettings, TAKEN_MINUTES, THEMES, readGoal, readHunting } from "../store/schema.js";
+import { readSources, readHuntSources, sourcesPreset, SOURCE_PRESETS, readSettings, TAKEN_MINUTES, THEMES, readGoal, readHunting } from "../store/schema.js";
 import { GOAL_KEYS, PRESET_IDS, presetOf } from "../core/score.js";
 import { fmtBig, fmtHours, fmtSmall, fmtField, pct, norm } from "../core/text.js";
 import { creatureInPool, poolsOf, topPool } from "../core/catalog.js";
@@ -12,6 +12,7 @@ import { manualNums, NUM_FIELDS } from "../core/numbers.js";
 import { staleProfitText } from "../core/reference.js";
 import { slotOdds, slotSuggestions } from "../core/slots.js";
 import { aVoc } from "../core/explain.js";
+import { spotMinLevel } from "../core/spots.js";
 import { parseSession, sessionProblems } from "../core/session.js";
 import { weekKey, serverDay, weeklyDifficulties } from "../core/weekly.js";
 import { markAge, markActive } from "../core/occupancy.js";
@@ -145,7 +146,7 @@ export function calibrationText({ sources, calib, calibOther }) {
 // calibration line (or null before there is one).
 export function charactersPageView(state, model) {
   const p = state.profiles[state.pid] || null, sources = readSources(p || {}), settings = readSettings(p || {}, state.planner && state.planner.state);
-  const d = model && model.derived;
+  const d = model && model.derived, hs = readHuntSources(p || {}), untagged = (state.sessions || []).filter((x) => !x.vocation).length;
   return {
     canWrite: state.canWrite && state.status === "ready",
     pills: state.order.map((id) => { const x = state.profiles[id] || {}; return { id, label: displayName(x) + (x.level && x.name ? " · " + x.level : ""), pressed: id === state.pid }; }),
@@ -154,6 +155,11 @@ export function charactersPageView(state, model) {
     sources: { preset: sourcesPreset(sources), switches: sources,
       presets: [["mine", _("Mine only")], ["reference", _("+ Reference")], ["everything", _("Everything")]].map(([value, label]) => ({ value, label: t(label), switches: SOURCE_PRESETS[value] })),
       calibration: p ? calibrationText({ sources, calib: d && d.calib, calibOther: d && d.calibOther }) : "" },
+    // The character's own hunts: whether those logged as another vocation count, and (while some hunts were saved
+    // without a vocation) which vocation those were logged as.
+    hunts: { otherVocation: hs.otherVocation, untagged: p && untagged ? { loggedAs: hs.loggedAs || p.vocation || VOCATIONS[0],
+      note: t.n(untagged, "{n} older hunt doesn’t say which vocation logged it. Only hunts logged as this character’s vocation count, unless the switch above is on.",
+        "{n} older hunts don’t say which vocation logged them. Only hunts logged as this character’s vocation count, unless the switch above is on.") } : null },
     settings: { world: settings.world || "", takenMinutes: settings.takenMinutes, takenOptions: TAKEN_MINUTES.map((m) => ({ value: m, label: t(MINUTES_LABEL[m]) })) },
     advanced: state.advanced, theme: state.theme, themes: THEMES, lang: state.lang, langs: langOptions(),
     langNote: state.lang && state.lang !== "en" ? t("Translations are new: if something reads wrong, please report it.") : "",
@@ -410,8 +416,12 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
 
   // Where the numbers come from: hunts here, the reference hunt (used, or the one that would be), the rest skipped.
   const hrs = sp.sessions.reduce((a, x) => a + (Number(x.hours) || 0), 0);
-  const hunts = !sp.sessions.length ? t("None yet.") : nums && nums.src === "own" ? t.n(sp.sessions.length, "{n} hunt, {time}.", "{n} hunts, {time}.", { time: fmtHours(hrs) })
-    : t.n(sp.sessions.length, "{n} hunt, {time}, all with breaks: no clean rate.", "{n} hunts, {time}, all with breaks: no clean rate.", { time: fmtHours(hrs) });
+  const hs = readHuntSources(p), minLevel = spotMinLevel(sp, vocation);
+  const skipText = (k) => (k.why === "level" ? t("Doesn’t count: this spot is for level {level} and up.", { level: minLevel })
+    : t("Doesn’t count: logged as {voc}.", { voc: k.x.vocation || hs.loggedAs || vocation }));
+  const notCounted = sp.skipped.length ? t.n(sp.skipped.length, "{n} hunt here doesn’t count for this character.", "{n} hunts here don’t count for this character.") : "";
+  const hunts = !sp.sessions.length ? notCounted || t("None yet.") : (nums && nums.src === "own" ? t.n(sp.sessions.length, "{n} hunt, {time}.", "{n} hunts, {time}.", { time: fmtHours(hrs) })
+    : t.n(sp.sessions.length, "{n} hunt, {time}, all with breaks: no clean rate.", "{n} hunts, {time}, all with breaks: no clean rate.", { time: fmtHours(hrs) })) + (notCounted ? " " + notCounted : "");
   const refNums = nums && nums.src === "own" ? model.spotNums(Object.assign({}, sp, { sessions: [] })) : nums;
   const e = (refNums && refNums.entry) || null;
   // A hunt's details, opened inline: amounts in total and per hour, then each creature's kills and kills/h (kills/h
@@ -461,20 +471,21 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
   };
   const raidsOf = (x) => (x.raidsBy && typeof x.raidsBy === "object" ? x.raidsBy : {});
   const when = (x) => String(x.start || x.end || "");
-  const sessions = sp.sessions.filter((x) => x.id).slice().sort((a, b) => when(b).localeCompare(when(a))).map((x) => {
+  const notCounting = new Map(sp.skipped.map((k) => [k.x, skipText(k)]));
+  const sessions = sp.sessions.concat(sp.skipped.map((k) => k.x)).filter((x) => x.id).sort((a, b) => when(b).localeCompare(when(a))).map((x) => {
     const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, raids = raidsOf(x);
     const clock = (s) => (/T\d\d:\d\d/.test(s || "") ? String(s).slice(11, 16) : null), from = clock(x.start), to = clock(x.end);
     const caption = [from && to ? from + "–" + to : null, x.level ? t("level {level}", { level: x.level }) : null, x.breaks ? t("with breaks") : null].filter(Boolean).join(" · ");
     return { id: x.id, date: when(x) ? fmtDay(when(x).slice(0, 10)) : t("Undated"), length: H ? fmtHours(H) : "–",
       exp: t("{amount} exp/h", { amount: H && xp != null ? fmtBig(xp / H) : "–" }), profit: t("{amount} profit/h", { amount: H && x.balance != null ? fmtBig(x.balance / H) : "–" }),
-      breaks: !!x.breaks, armed: ui.armed === x.id, raidsBy: raids,
+      breaks: !!x.breaks, skipped: notCounting.get(x) || null, armed: ui.armed === x.id, raidsBy: raids,
       details: details("hunt-" + x.id, caption,
         [amount(t("Raw exp"), x.rawXp, H), amount(t("Exp with bonuses"), x.xp, H), amount(t("Loot"), x.loot, H), amount(t("Supplies"), x.supplies, H), amount(t("Balance"), x.balance, H)],
         (x.kills || []).filter((k) => k && k.count > 0).map((k) => ({ name: k.name || name(k.slug), count: k.count, perHour: H ? k.count / H : 0 }))),
       raids: advanced ? (x.kills || []).map((k) => { const n = k.name || name(k.slug); return { name: n, value: raids[n] != null ? String(raids[n]) : "" }; }) : null };
   });
   const variations = idx.list.filter((v) => v.parentId === id);
-  const ns = sp.sessions.length, nv = variations.length;
+  const ns = sp.sessions.length, nv = variations.length, nAll = ns + sp.skipped.length;
   return {
     id, name: sp.name, sub: parent ? t("Your variation of {spot}", { spot: parent.name }) : sp.userMade ? t("Your spot") : null, parentId: parent ? parent.id : null,
     scoreLine, exp: o ? fmtBig(o.m.xp) : nums ? fmtBig(nums.xph) : "–",
@@ -485,7 +496,7 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
     variations: sp.parentId ? null : variations.map(varRow), canVary: !sp.parentId,
     sessions, emptySessions: t("No hunts logged here."),
     own: advanced && sp.userMade ? { name: sp.name, armed: ui.armed === "spot",
-      deleteText: (ns ? t.n(ns, "Deletes this spot and its {n} hunt", "Deletes this spot and its {n} hunts") : t("Deletes this spot")) +
+      deleteText: (nAll ? t.n(nAll, "Deletes this spot and its {n} hunt", "Deletes this spot and its {n} hunts") : t("Deletes this spot")) +
         (nv ? "; " + t.n(nv, "its {n} variation stays as a spot of its own", "its {n} variations stay as spots of their own") : "") + "." } : null,
   };
 }

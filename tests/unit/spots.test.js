@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { spotIndex, spotNumbers, lensCheck, LEVEL_BAND } from "../../src/core/spots.js";
+import { spotIndex, spotNumbers, lensCheck, LEVEL_BAND, spotMinLevel, huntCheck, splitHunts } from "../../src/core/spots.js";
 import { pickReference } from "../../src/core/reference.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 
@@ -81,4 +81,45 @@ test("the character's own spots and variations join the index; sessions with a s
   assert.equal(idx.spots["my-empty"].sessions.length, 0);
   assert.equal(idx.spots["my-cave"].sessions.length, 1, "a spotId that no longer exists falls back to the name");
   assert.equal(idx.idOf("bastion lure"), "my-bastion-lure");
+});
+
+test("which logged hunts count: the vocation they were logged as, and the spot's recommended level", () => {
+  const idx = spotIndex({ reference: REF, sessions: [], catalog });
+  const bastion = idx.spots["cobra-bastion"], deep = idx.spots["deep-place"];
+  assert.equal(spotMinLevel(bastion, EK), 250, "its own vocation's entry");
+  assert.equal(spotMinLevel(bastion, "Royal Paladin"), 300);
+  assert.equal(spotMinLevel(bastion, "Elder Druid"), 250, "no entry for the vocation: the lowest of any");
+  assert.equal(spotMinLevel(idx.spots["my-cave"] || { entries: [] }, EK), null, "no reference, no level");
+  const rp = { vocation: "Royal Paladin", level: 45, loggedAs: null, otherVocation: false };
+  assert.equal(huntCheck({ vocation: EK }, bastion, rp), "voc");
+  assert.equal(huntCheck({}, bastion, rp), "level", "no vocation saved: the character's own, then the level");
+  assert.equal(huntCheck({}, bastion, Object.assign({}, rp, { loggedAs: EK })), "voc", "saved without a vocation, logged as another");
+  assert.equal(huntCheck({ vocation: EK }, bastion, Object.assign({}, rp, { otherVocation: true })), "level", "other vocations on: the level still applies");
+  assert.equal(huntCheck({ vocation: EK }, bastion, Object.assign({}, rp, { otherVocation: true, level: 300 })), "");
+  assert.equal(huntCheck({ vocation: "Royal Paladin" }, deep, Object.assign({}, rp, { level: 899 })), "level");
+  assert.equal(huntCheck({}, { entries: [] }, rp), "", "a spot without a reference has no level to miss");
+  assert.equal(huntCheck({}, bastion, Object.assign({}, rp, { level: null })), "", "no level: no cut-off");
+
+  // Split at the spots they belong to: skipped hunts still make their spot, listed apart, with no creatures.
+  const sessions = [
+    { id: "a", spot: "Bastion", hours: 1, vocation: EK, kills: [{ slug: "cobra-assassin", count: 300 }] },
+    { id: "b", spot: "My Cave", hours: 1, vocation: EK, kills: [{ slug: "cobra-scout", count: 200 }] },
+    { id: "c", spot: "Bastion", hours: 1, vocation: "Royal Paladin", kills: [{ slug: "cobra-assassin", count: 100 }] },
+    { id: "d", spot: "My Cave", hours: 1, kills: [{ slug: "cobra-scout", count: 50 }] },
+  ];
+  const split = splitHunts({ reference: REF, sessions, catalog }, rp);
+  assert.deepEqual(split.use.map((x) => x.id), ["d"]);
+  assert.deepEqual([...split.why].map(([x, w]) => x.id + ":" + w), ["a:voc", "b:voc", "c:level"]);
+  const why = (x) => split.why.get(x) || "", idx2 = spotIndex({ reference: REF, sessions, catalog, skip: why });
+  const cave = idx2.spots["my-cave"];
+  assert.deepEqual([cave.sessions.map((x) => x.id), cave.skipped.map((k) => k.x.id + ":" + k.why)], [["d"], ["b:voc"]]);
+  assert.deepEqual(idx2.spots["cobra-bastion"].skipped.map((k) => k.why), ["voc", "level"]);
+  assert.deepEqual(idx2.spots["cobra-bastion"].sessions, []);
+  // Only skipped hunts: the spot fits under the widening that would count them.
+  const solo = spotIndex({ reference: [], sessions: [sessions[1]], catalog, skip: why }).spots["my-cave"];
+  assert.deepEqual(Object.keys(solo.creatures), [], "skipped hunts add no creatures");
+  const ctx = { level: 45, vocation: "Royal Paladin", otherOn: false };
+  assert.equal(lensCheck(solo, null, ctx), "voc");
+  assert.equal(lensCheck(solo, { anyLevel: true }, ctx), "voc");
+  assert.equal(lensCheck(solo, { allVocations: true }, ctx), "");
 });

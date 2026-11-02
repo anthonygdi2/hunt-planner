@@ -63,3 +63,9 @@ test("marks and occupancy", () => {
   assert.deepEqual(S.readOcc(null), { counts: {} });
   assert.deepEqual(S.readOccs(docs({ a: null })), { a: { counts: {} } });
 });
+
+test("which own hunts count: the vocation older hunts were logged as, and other vocations' hunts", () => {
+  assert.deepEqual(S.readHuntSources(undefined), { loggedAs: null, otherVocation: false });
+  assert.deepEqual(S.readHuntSources({ untaggedVocation: "Elite Knight", otherVocationHunts: true }), { loggedAs: "Elite Knight", otherVocation: true });
+  assert.deepEqual(S.readHuntSources({ untaggedVocation: "Knight", otherVocationHunts: "yes" }), { loggedAs: null, otherVocation: false }, "unknown values read as unset");
+});

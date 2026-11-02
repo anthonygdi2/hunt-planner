@@ -10,13 +10,15 @@ export const LEVEL_BAND = [-100, 150];
 // Every spot: reference spots (all vocations and levels, so the lens can filter later), the character's own spots
 // (userSpots: {id: {name, parentId?, note?}}; a variation has a parent and is a spot of its own), and spots logged in
 // sessions that match none of them. A session with a spotId belongs to that spot; others match by normalized name,
-// spot names before aliases. spotMeta: spot id → {travelMin, access, team, notes}. Returns {spots (id → spot), list,
-// idOf(name)}; each spot is {id, name, aliases, entries, sessions, names (logged name → count), creatures {slug: 1},
-// vocations, teams, levelMin, levelMax, own (only the character's), userMade, parentId, note, meta}.
-export function spotIndex({ reference, sessions, catalog, spotMeta, userSpots }) {
+// spot names before aliases. spotMeta: spot id → {travelMin, access, team, notes}. skip(session, spot): why a hunt
+// doesn't count for the character (huntCheck), "" when it does; a skipped hunt still makes and names its spot but goes
+// in its `skipped` [{x, why}] instead of `sessions`, and adds no creatures. Returns {spots (id → spot), list,
+// idOf(name)}; each spot is {id, name, aliases, entries, sessions, skipped, names (logged name → count), creatures
+// {slug: 1}, vocations, teams, levelMin, levelMax, own (only the character's), userMade, parentId, note, meta}.
+export function spotIndex({ reference, sessions, catalog, spotMeta, userSpots, skip }) {
   const spots = {}, byKey = {}, list = [];
   const blank = (id, name) => {
-    const sp = { id, name, aliases: [], entries: [], sessions: [], names: {}, creatures: {}, vocations: [], teams: [],
+    const sp = { id, name, aliases: [], entries: [], sessions: [], skipped: [], names: {}, creatures: {}, vocations: [], teams: [],
       lo: Infinity, hi: 0, own: false, userMade: false, parentId: null, note: null, meta: (spotMeta || {})[id] || {} };
     spots[id] = sp; list.push(sp);
     return sp;
@@ -47,9 +49,10 @@ export function spotIndex({ reference, sessions, catalog, spotMeta, userSpots })
     const raw = (x.spot || "Unnamed spot").trim(), k = norm(raw);
     let id = x.spotId && spots[x.spotId] ? x.spotId : byKey[k];
     if (!id) { id = byKey[k] = slugify(raw) || "unnamed-spot"; if (!spots[id]) blank(id, raw).own = true; }
-    const sp = spots[id];
-    sp.sessions.push(x);
+    const sp = spots[id], why = skip ? skip(x, sp) : "";
     sp.names[raw] = (sp.names[raw] || 0) + 1;
+    if (why) { sp.skipped.push({ x, why }); return; }
+    sp.sessions.push(x);
     (x.kills || []).forEach((kl) => { if (kl.slug && catalog.bySlug[kl.slug]) sp.creatures[kl.slug] = 1; });
   });
   list.forEach((sp) => {
@@ -86,16 +89,44 @@ export function spotNumbers(sp, ctx) {
   return n ? { src: n.src, kph: n.kph, xph: n.xph, pph: n.pph, profitStale: n.profitStale, hours: 0, kills: 0, entry: e } : null;
 }
 
-// Whether a spot fits the character: "" when it's in the lens, else "voc" or "level". Logged spots always fit. By
+// Whether a spot fits the character: "" when it's in the lens, else "voc" or "level". Logged spots always fit, and so
+// do spots with only skipped hunts under the widening that matches why they're skipped (All vocations, Any level). By
 // default: reference spots for its vocation or "any" (any vocation with otherOn or lens.allVocations) whose level range
 // overlaps LEVEL_BAND around its level (any level with lens.anyLevel or no level). ctx: {level, vocation, otherOn}.
 export function lensCheck(sp, lens, ctx) {
   if (sp.sessions.length) return "";
   lens = lens || {};
+  if ((sp.skipped || []).some((s) => (s.why === "voc" ? lens.allVocations : lens.anyLevel))) return "";
   const lvl = Number(ctx.level) || 0, voc = ctx.vocation;
   const es = sp.entries.filter((e) => e.vocation === voc || e.vocation === "any" || lens.allVocations || ctx.otherOn);
   if (!es.length) return "voc";
   if (lens.anyLevel || !lvl) return "";
   const lo = lvl + LEVEL_BAND[0], hi = lvl + LEVEL_BAND[1];
   return es.some((e) => !(e.levelMin > hi) && !(e.levelMax > 0 && e.levelMax < lo)) ? "" : "level";
+}
+
+// The level Kusnier's videos recommend at a spot for a vocation: the lowest levelMin among its entries for that
+// vocation or "any", else among all of them. Null without one (no entries, or none with a level).
+export function spotMinLevel(sp, vocation) {
+  const mine = sp.entries.filter((e) => e.vocation === vocation || e.vocation === "any");
+  const mins = (mine.length ? mine : sp.entries).map((e) => e.levelMin).filter((v) => v > 0);
+  return mins.length ? Math.min.apply(null, mins) : null;
+}
+
+// Whether a logged hunt counts for the character: "" when it does, "voc" when it was logged as another vocation (and
+// ctx.otherVocation is off), "level" when the character is below the spot's recommended level (spotMinLevel for its
+// vocation). A hunt saved without a vocation was logged as ctx.loggedAs. ctx: {vocation, level, loggedAs, otherVocation}.
+export function huntCheck(x, sp, ctx) {
+  const lvl = Number(ctx.level) || 0;
+  if (!ctx.otherVocation && (x.vocation || ctx.loggedAs || ctx.vocation) !== ctx.vocation) return "voc";
+  const min = lvl ? spotMinLevel(sp, ctx.vocation) : null;
+  return min && lvl < min ? "level" : "";
+}
+
+// The character's hunts split by huntCheck at the spots spotIndex puts them in: {use (the hunts that count, in their
+// order), why (Map: skipped hunt → "voc" | "level")}. index: spotIndex's arguments; ctx: huntCheck's.
+export function splitHunts(index, ctx) {
+  const why = new Map();
+  spotIndex(Object.assign({}, index, { skip: (x, sp) => { const w = huntCheck(x, sp, ctx); if (w) why.set(x, w); return w; } }));
+  return { use: index.sessions.filter((x) => !why.has(x)), why };
 }

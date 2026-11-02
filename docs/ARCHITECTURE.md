@@ -148,7 +148,8 @@ Per character (stored under `profiles/{pid}`; locations stay where they are toda
 | Settings | {world, takenMinutes (30, 45, 60, 120; default 45)} | stored as `settings` in `profiles/{pid}`; world is read from the planner state until the profile has one (the planner state keeps its copy) |
 | Advanced | xpMode, reroll {hpd, unknown}, rewardObs, chalRates, slots {preferred, unwanted}, ref (compare-against) | unchanged |
 | Entries | `profiles/{pid}/entries/{slug}` as today | unchanged |
-| Sessions | `profiles/{pid}/sessions/{id}` as today, plus optional `spotId` | logging new breaks-allowed sessions is no longer offered, but existing sessions with breaks still count as they do now |
+| Sessions | `profiles/{pid}/sessions/{id}` as today, plus optional `spotId` and `vocation` (the vocation it was logged as; saved on new hunts since November 2026) | logging new breaks-allowed sessions is no longer offered, but existing sessions with breaks still count as they do now. A session without `vocation` was logged as the profile's `untaggedVocation`, else its current vocation |
+| Own hunts | {loggedAs (`untaggedVocation`: the vocation the hunts saved without one were logged as, set when the vocation changes and on Characters), otherVocation (`otherVocationHunts`: hunts logged as another vocation count too)}, in `profiles/{pid}` | neither set: loggedAs is the current vocation, otherVocation off. A hunt counts for the character only if it was logged as its vocation (or otherVocation is on) and its level reaches the spot's recommended level (the lowest `levelMin` of the spot's reference entries for its vocation or "any", else of all of them; no cut-off at spots without one) |
 
 Shared: `creatures/{slug}` {minLevel {vocation: level}}, unchanged.
 

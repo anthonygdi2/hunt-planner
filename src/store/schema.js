@@ -1,6 +1,6 @@
 // Document paths and shapes. Each reader takes whatever is stored and returns a valid current-shape value with
 // defaults; none throws on bad data. Writers elsewhere write these shapes.
-import { TASK, KIND_MULT, PREY, PREY_SLOTS } from "../data/rules.js";
+import { TASK, KIND_MULT, PREY, PREY_SLOTS, VOCATIONS } from "../data/rules.js";
 
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 
@@ -44,6 +44,11 @@ export function sourcesPreset(s) {
 // The profile fields that store sources: the current shape, plus the old flags kept in step so an older build still
 // reads them.
 export const sourcesPatch = (s) => ({ sources: { reference: !!s.reference, otherVocation: !!s.otherVocation, older: !!s.older }, refOff: !s.reference, refOtherOff: !s.otherVocation });
+// Which of the character's own hunts count (core huntCheck): {loggedAs (`untaggedVocation`: the vocation its hunts
+// saved without one were logged as; null means its current vocation), otherVocation (`otherVocationHunts`: hunts
+// logged as another vocation count too; off unless set)}.
+export const readHuntSources = (p) => ({ loggedAs: p && VOCATIONS.indexOf(p.untaggedVocation) !== -1 ? p.untaggedVocation : null,
+  otherVocation: !!(p && p.otherVocationHunts === true) });
 
 // The goal weights, whole numbers 0-5: stored as `goal` since the redesign. Older profiles have `weights` on a 0-10
 // scale, read as w > 0 ? max(1, round(w / 2)) : 0 (ARCHITECTURE.md, State model). Neither: Exp.
