@@ -1593,6 +1593,10 @@
     return hit || "custom";
   }
   var sourcesPatch = (s) => ({ sources: { reference: !!s.reference, otherVocation: !!s.otherVocation, older: !!s.older }, refOff: !s.reference, refOtherOff: !s.otherVocation });
+  var readHuntSources = (p) => ({
+    loggedAs: p && VOCATIONS.indexOf(p.untaggedVocation) !== -1 ? p.untaggedVocation : null,
+    otherVocation: !!(p && p.otherVocationHunts === true)
+  });
   var GOAL_FIELDS = ["xp", "profit", "charm", "bounty"];
   function readGoal(p) {
     const out = {}, g = p && p.goal, old = p && p.weights;
@@ -2467,7 +2471,7 @@
     "Tap again to delete {name} and everything saved for it": "Toca otra vez para borrar {name} y todo lo guardado",
     "Numbers from": "Números de",
     "Your logged hunts": "Tus cazas registradas",
-    "Always used first.": "Siempre se usan primero.",
+    "Always used first, at spots your level reaches.": "Siempre se usan primero, en los spots que alcanza tu nivel.",
     "Always on": "Siempre activas",
     "Reference hunts": "Cazas de referencia",
     "For spots you haven’t logged.": "Para spots que no has registrado.",
@@ -2733,7 +2737,15 @@
     "With numbers": "Con números",
     "Exp per kill task": "Exp por kill task",
     "Points": "Puntos",
-    "(current)": "(actual)"
+    "(current)": "(actual)",
+    "Your hunts as other vocations": "Tus cazas con otras vocaciones",
+    "Hunts this character logged as another vocation.": "Cazas que este personaje registró con otra vocación.",
+    "Older hunts were logged as": "Las cazas antiguas se registraron como",
+    "{n} older hunt doesn’t say which vocation logged it. Only hunts logged as this character’s vocation count, unless the switch above is on.": { one: "{n} caza antigua no dice con qué vocación se registró. Solo cuentan las cazas con la vocación de este personaje, salvo que actives el interruptor de arriba.", many: "{n} cazas antiguas no dicen con qué vocación se registraron. Solo cuentan las cazas con la vocación de este personaje, salvo que actives el interruptor de arriba.", other: "{n} cazas antiguas no dicen con qué vocación se registraron. Solo cuentan las cazas con la vocación de este personaje, salvo que actives el interruptor de arriba." },
+    "{n} hunt here doesn’t count for this character.": { one: "{n} caza aquí no cuenta para este personaje.", many: "{n} cazas aquí no cuentan para este personaje.", other: "{n} cazas aquí no cuentan para este personaje." },
+    "Doesn’t count: this spot is for level {level} and up.": "No cuenta: este spot es para nivel {level} o más.",
+    "Doesn’t count: logged as {voc}.": "No cuenta: registrada como {voc}.",
+    "Your hunts here were logged as another vocation, and those are off for this character (Characters).": "Tus cazas aquí se registraron con otra vocación, y esas están desactivadas para este personaje (Personajes)."
   };
 
   // src/data/i18n/pt.js
@@ -3041,7 +3053,7 @@
     "Tap again to delete {name} and everything saved for it": "Toque de novo para apagar {name} e tudo que foi salvo dele",
     "Numbers from": "Números de",
     "Your logged hunts": "Suas hunts registradas",
-    "Always used first.": "Sempre usadas primeiro.",
+    "Always used first, at spots your level reaches.": "Sempre usadas primeiro, nos spots que o seu level alcança.",
     "Always on": "Sempre ligadas",
     "Reference hunts": "Hunts de referência",
     "For spots you haven’t logged.": "Para spots que você não registrou.",
@@ -3307,7 +3319,15 @@
     "With numbers": "Com números",
     "Exp per kill task": "Exp por kill task",
     "Points": "Pontos",
-    "(current)": "(atual)"
+    "(current)": "(atual)",
+    "Your hunts as other vocations": "Suas hunts com outras vocações",
+    "Hunts this character logged as another vocation.": "Hunts que este personagem registrou com outra vocação.",
+    "Older hunts were logged as": "As hunts antigas foram registradas como",
+    "{n} older hunt doesn’t say which vocation logged it. Only hunts logged as this character’s vocation count, unless the switch above is on.": { one: "{n} hunt antiga não diz com qual vocação foi registrada. Só contam as hunts com a vocação deste personagem, a não ser que o botão acima esteja ligado.", many: "{n} hunts antigas não dizem com qual vocação foram registradas. Só contam as hunts com a vocação deste personagem, a não ser que o botão acima esteja ligado.", other: "{n} hunts antigas não dizem com qual vocação foram registradas. Só contam as hunts com a vocação deste personagem, a não ser que o botão acima esteja ligado." },
+    "{n} hunt here doesn’t count for this character.": { one: "{n} hunt aqui não conta para este personagem.", many: "{n} hunts aqui não contam para este personagem.", other: "{n} hunts aqui não contam para este personagem." },
+    "Doesn’t count: this spot is for level {level} and up.": "Não conta: este spot é para level {level} ou mais.",
+    "Doesn’t count: logged as {voc}.": "Não conta: registrada como {voc}.",
+    "Your hunts here were logged as another vocation, and those are off for this character (Characters).": "Suas hunts aqui foram registradas com outra vocação, e elas estão desligadas para este personagem (Personagens)."
   };
 
   // src/data/i18n/pl.js
@@ -3615,7 +3635,7 @@
     "Tap again to delete {name} and everything saved for it": "Dotknij ponownie, aby usunąć {name} i wszystko, co zapisano",
     "Numbers from": "Liczby z",
     "Your logged hunts": "Twoje zapisane polowania",
-    "Always used first.": "Zawsze używane najpierw.",
+    "Always used first, at spots your level reaches.": "Zawsze używane najpierw, na spotach dostępnych na twoim poziomie.",
     "Always on": "Zawsze włączone",
     "Reference hunts": "Polowania referencyjne",
     "For spots you haven’t logged.": "Dla spotów, których nie zapisałeś.",
@@ -3881,7 +3901,15 @@
     "With numbers": "Z liczbami",
     "Exp per kill task": "Exp za kill task",
     "Points": "Punkty",
-    "(current)": "(obecny)"
+    "(current)": "(obecny)",
+    "Your hunts as other vocations": "Twoje polowania innymi profesjami",
+    "Hunts this character logged as another vocation.": "Polowania zapisane przez tę postać jako inna profesja.",
+    "Older hunts were logged as": "Starsze polowania zapisano jako",
+    "{n} older hunt doesn’t say which vocation logged it. Only hunts logged as this character’s vocation count, unless the switch above is on.": { one: "{n} starsze polowanie nie mówi, jaką profesją je zapisano. Liczą się tylko polowania profesją tej postaci, chyba że przełącznik wyżej jest włączony.", few: "{n} starsze polowania nie mówią, jaką profesją je zapisano. Liczą się tylko polowania profesją tej postaci, chyba że przełącznik wyżej jest włączony.", many: "{n} starszych polowań nie mówi, jaką profesją je zapisano. Liczą się tylko polowania profesją tej postaci, chyba że przełącznik wyżej jest włączony.", other: "{n} starszego polowania nie mówi, jaką profesją je zapisano. Liczą się tylko polowania profesją tej postaci, chyba że przełącznik wyżej jest włączony." },
+    "{n} hunt here doesn’t count for this character.": { one: "{n} polowanie tutaj nie liczy się dla tej postaci.", few: "{n} polowania tutaj nie liczą się dla tej postaci.", many: "{n} polowań tutaj nie liczy się dla tej postaci.", other: "{n} polowania tutaj nie liczy się dla tej postaci." },
+    "Doesn’t count: this spot is for level {level} and up.": "Nie liczy się: ten spot jest od poziomu {level}.",
+    "Doesn’t count: logged as {voc}.": "Nie liczy się: zapisane jako {voc}.",
+    "Your hunts here were logged as another vocation, and those are off for this character (Characters).": "Twoje polowania tutaj zapisano jako inna profesja, a takie są wyłączone dla tej postaci (Postacie)."
   };
 
   // src/data/i18n/index.js
@@ -4128,6 +4156,145 @@
     return { use, shadow };
   }
 
+  // src/core/spots.js
+  var LEVEL_BAND = [-100, 150];
+  function spotIndex({ reference, sessions, catalog, spotMeta, userSpots, skip }) {
+    const spots = {}, byKey = {}, list = [];
+    const blank = (id, name) => {
+      const sp = {
+        id,
+        name,
+        aliases: [],
+        entries: [],
+        sessions: [],
+        skipped: [],
+        names: {},
+        creatures: {},
+        vocations: [],
+        teams: [],
+        lo: Infinity,
+        hi: 0,
+        own: false,
+        userMade: false,
+        parentId: null,
+        note: null,
+        meta: (spotMeta || {})[id] || {}
+      };
+      spots[id] = sp;
+      list.push(sp);
+      return sp;
+    };
+    const addTo = (arr, v) => {
+      if (v && arr.indexOf(v) < 0) arr.push(v);
+    };
+    reference.forEach((e) => {
+      if (!e || !e.spot) return;
+      const id = slugify(e.spot), sp = spots[id] || blank(id, e.spot);
+      sp.entries.push(e);
+      byKey[norm(e.spot)] = id;
+      (e.aliases || []).forEach((a) => {
+        addTo(sp.aliases, a);
+      });
+      addTo(sp.vocations, e.vocation);
+      addTo(sp.teams, e.team);
+      (e.creatures || []).forEach((c) => {
+        if (c && c.slug) sp.creatures[c.slug] = 1;
+      });
+      sp.lo = Math.min(sp.lo, e.levelMin > 0 ? e.levelMin : 0);
+      sp.hi = Math.max(sp.hi, e.levelMax > 0 ? e.levelMax : Infinity);
+    });
+    list.forEach((sp) => {
+      sp.aliases.forEach((a) => {
+        const k = norm(a);
+        if (k && !byKey[k]) byKey[k] = sp.id;
+      });
+    });
+    const users = userSpots || {};
+    Object.keys(users).forEach((id) => {
+      const u = users[id], sp = spots[id] || blank(id, u.name);
+      Object.assign(sp, { own: true, userMade: true, parentId: u.parentId || null, note: u.note || null });
+      const k = norm(u.name);
+      if (k && !byKey[k]) byKey[k] = id;
+    });
+    sessions.forEach((x) => {
+      const raw = (x.spot || "Unnamed spot").trim(), k = norm(raw);
+      let id = x.spotId && spots[x.spotId] ? x.spotId : byKey[k];
+      if (!id) {
+        id = byKey[k] = slugify(raw) || "unnamed-spot";
+        if (!spots[id]) blank(id, raw).own = true;
+      }
+      const sp = spots[id], why = skip ? skip(x, sp) : "";
+      sp.names[raw] = (sp.names[raw] || 0) + 1;
+      if (why) {
+        sp.skipped.push({ x, why });
+        return;
+      }
+      sp.sessions.push(x);
+      (x.kills || []).forEach((kl) => {
+        if (kl.slug && catalog.bySlug[kl.slug]) sp.creatures[kl.slug] = 1;
+      });
+    });
+    list.forEach((sp) => {
+      sp.levelMin = sp.lo > 0 && isFinite(sp.lo) ? sp.lo : null;
+      sp.levelMax = sp.hi > 0 && isFinite(sp.hi) ? sp.hi : null;
+      delete sp.lo;
+      delete sp.hi;
+      if (sp.own && !sp.userMade) Object.keys(sp.names).forEach((n) => {
+        if (sp.names[n] > (sp.names[sp.name] || 0)) sp.name = n;
+      });
+    });
+    return { spots, list, idOf: (name) => byKey[norm((name || "").trim())] || null };
+  }
+  function spotNumbers(sp, ctx) {
+    const own = sp.sessions.length ? spotRates(sp.sessions, ctx.catalog, () => sp.id, xpField(ctx.xpMode))[sp.id] : null;
+    if (own) return { src: "own", kph: own.kph, xph: own.xph, pph: own.pph, hours: own.hours, kills: own.kills, entry: null };
+    if (!ctx.refOn) return null;
+    const opts = { xpMode: ctx.xpMode, xpBoost: ctx.xpBoost, catalog: ctx.catalog }, k = norm(sp.name);
+    let e = ctx.picks.by[k], n = null;
+    if (e && norm(e.spot) === k) n = refNums(e, ctx.calib, false, opts);
+    else if (ctx.otherOn) {
+      e = null;
+      Object.keys(ctx.picks.other).forEach((v) => {
+        const x = ctx.picks.other[v].by[k];
+        if (!x || norm(x.spot) !== k) return;
+        if (!e || (!!ctx.calibOther[v] !== !!ctx.calibOther[e.vocation] ? !!ctx.calibOther[v] : refBeats(x, e, ctx.vocation))) e = x;
+      });
+      if (e) n = refNums(e, ctx.calibOther[e.vocation], true, opts);
+    }
+    return n ? { src: n.src, kph: n.kph, xph: n.xph, pph: n.pph, profitStale: n.profitStale, hours: 0, kills: 0, entry: e } : null;
+  }
+  function lensCheck(sp, lens, ctx) {
+    if (sp.sessions.length) return "";
+    lens = lens || {};
+    if ((sp.skipped || []).some((s) => s.why === "voc" ? lens.allVocations : lens.anyLevel)) return "";
+    const lvl = Number(ctx.level) || 0, voc = ctx.vocation;
+    const es = sp.entries.filter((e) => e.vocation === voc || e.vocation === "any" || lens.allVocations || ctx.otherOn);
+    if (!es.length) return "voc";
+    if (lens.anyLevel || !lvl) return "";
+    const lo = lvl + LEVEL_BAND[0], hi = lvl + LEVEL_BAND[1];
+    return es.some((e) => !(e.levelMin > hi) && !(e.levelMax > 0 && e.levelMax < lo)) ? "" : "level";
+  }
+  function spotMinLevel(sp, vocation) {
+    const mine = sp.entries.filter((e) => e.vocation === vocation || e.vocation === "any");
+    const mins = (mine.length ? mine : sp.entries).map((e) => e.levelMin).filter((v) => v > 0);
+    return mins.length ? Math.min.apply(null, mins) : null;
+  }
+  function huntCheck(x, sp, ctx) {
+    const lvl = Number(ctx.level) || 0;
+    if (!ctx.otherVocation && (x.vocation || ctx.loggedAs || ctx.vocation) !== ctx.vocation) return "voc";
+    const min = lvl ? spotMinLevel(sp, ctx.vocation) : null;
+    return min && lvl < min ? "level" : "";
+  }
+  function splitHunts(index, ctx) {
+    const why = /* @__PURE__ */ new Map();
+    spotIndex(Object.assign({}, index, { skip: (x, sp) => {
+      const w2 = huntCheck(x, sp, ctx);
+      if (w2) why.set(x, w2);
+      return w2;
+    } }));
+    return { use: index.sessions.filter((x) => !why.has(x)), why };
+  }
+
   // src/app/weekly.js
   function weeklyState(p, sessions, catalog, at) {
     p = p || {};
@@ -4193,8 +4360,10 @@
 
   // src/app/compute.js
   function compute(state, now) {
-    const { catalog, reference, sessions, entries, advanced, difficulty } = state, p = state.profile || {};
+    const { catalog, reference, entries, advanced, difficulty } = state, p = state.profile || {};
     const vocation = p.vocation || VOCATIONS[0], sources = readSources(p), refOn = sources.reference && reference.length > 0, otherOn = refOn && sources.otherVocation;
+    const hunts = splitHunts({ reference, sessions: state.sessions, catalog, userSpots: state.userSpots }, Object.assign({ vocation, level: p.level }, readHuntSources(p)));
+    const sessions = hunts.use;
     const raid = raidRate(sessions, catalog);
     const picks = pickReference(reference, { vocation, level: p.level, enabled: refOn, older: sources.older });
     const cal = calibrate(sessions, picks, catalog);
@@ -4242,6 +4411,7 @@
     const res = scoreList(catalog.poolOf(difficulty), (c) => metrics(c, effective(entries[c.slug], derived[c.slug]), ctx(diffFor(c))), weights);
     const tiers = tierScores(res.scores);
     return {
+      hunts,
       raidP: raid.p,
       raidInfo: raid.info,
       picks,
@@ -4436,119 +4606,6 @@
     return { current, rows, best: others.length ? others[0].diff : null, free: !!active };
   }
 
-  // src/core/spots.js
-  var LEVEL_BAND = [-100, 150];
-  function spotIndex({ reference, sessions, catalog, spotMeta, userSpots }) {
-    const spots = {}, byKey = {}, list = [];
-    const blank = (id, name) => {
-      const sp = {
-        id,
-        name,
-        aliases: [],
-        entries: [],
-        sessions: [],
-        names: {},
-        creatures: {},
-        vocations: [],
-        teams: [],
-        lo: Infinity,
-        hi: 0,
-        own: false,
-        userMade: false,
-        parentId: null,
-        note: null,
-        meta: (spotMeta || {})[id] || {}
-      };
-      spots[id] = sp;
-      list.push(sp);
-      return sp;
-    };
-    const addTo = (arr, v) => {
-      if (v && arr.indexOf(v) < 0) arr.push(v);
-    };
-    reference.forEach((e) => {
-      if (!e || !e.spot) return;
-      const id = slugify(e.spot), sp = spots[id] || blank(id, e.spot);
-      sp.entries.push(e);
-      byKey[norm(e.spot)] = id;
-      (e.aliases || []).forEach((a) => {
-        addTo(sp.aliases, a);
-      });
-      addTo(sp.vocations, e.vocation);
-      addTo(sp.teams, e.team);
-      (e.creatures || []).forEach((c) => {
-        if (c && c.slug) sp.creatures[c.slug] = 1;
-      });
-      sp.lo = Math.min(sp.lo, e.levelMin > 0 ? e.levelMin : 0);
-      sp.hi = Math.max(sp.hi, e.levelMax > 0 ? e.levelMax : Infinity);
-    });
-    list.forEach((sp) => {
-      sp.aliases.forEach((a) => {
-        const k = norm(a);
-        if (k && !byKey[k]) byKey[k] = sp.id;
-      });
-    });
-    const users = userSpots || {};
-    Object.keys(users).forEach((id) => {
-      const u = users[id], sp = spots[id] || blank(id, u.name);
-      Object.assign(sp, { own: true, userMade: true, parentId: u.parentId || null, note: u.note || null });
-      const k = norm(u.name);
-      if (k && !byKey[k]) byKey[k] = id;
-    });
-    sessions.forEach((x) => {
-      const raw = (x.spot || "Unnamed spot").trim(), k = norm(raw);
-      let id = x.spotId && spots[x.spotId] ? x.spotId : byKey[k];
-      if (!id) {
-        id = byKey[k] = slugify(raw) || "unnamed-spot";
-        if (!spots[id]) blank(id, raw).own = true;
-      }
-      const sp = spots[id];
-      sp.sessions.push(x);
-      sp.names[raw] = (sp.names[raw] || 0) + 1;
-      (x.kills || []).forEach((kl) => {
-        if (kl.slug && catalog.bySlug[kl.slug]) sp.creatures[kl.slug] = 1;
-      });
-    });
-    list.forEach((sp) => {
-      sp.levelMin = sp.lo > 0 && isFinite(sp.lo) ? sp.lo : null;
-      sp.levelMax = sp.hi > 0 && isFinite(sp.hi) ? sp.hi : null;
-      delete sp.lo;
-      delete sp.hi;
-      if (sp.own && !sp.userMade) Object.keys(sp.names).forEach((n) => {
-        if (sp.names[n] > (sp.names[sp.name] || 0)) sp.name = n;
-      });
-    });
-    return { spots, list, idOf: (name) => byKey[norm((name || "").trim())] || null };
-  }
-  function spotNumbers(sp, ctx) {
-    const own = sp.sessions.length ? spotRates(sp.sessions, ctx.catalog, () => sp.id, xpField(ctx.xpMode))[sp.id] : null;
-    if (own) return { src: "own", kph: own.kph, xph: own.xph, pph: own.pph, hours: own.hours, kills: own.kills, entry: null };
-    if (!ctx.refOn) return null;
-    const opts = { xpMode: ctx.xpMode, xpBoost: ctx.xpBoost, catalog: ctx.catalog }, k = norm(sp.name);
-    let e = ctx.picks.by[k], n = null;
-    if (e && norm(e.spot) === k) n = refNums(e, ctx.calib, false, opts);
-    else if (ctx.otherOn) {
-      e = null;
-      Object.keys(ctx.picks.other).forEach((v) => {
-        const x = ctx.picks.other[v].by[k];
-        if (!x || norm(x.spot) !== k) return;
-        if (!e || (!!ctx.calibOther[v] !== !!ctx.calibOther[e.vocation] ? !!ctx.calibOther[v] : refBeats(x, e, ctx.vocation))) e = x;
-      });
-      if (e) n = refNums(e, ctx.calibOther[e.vocation], true, opts);
-    }
-    return n ? { src: n.src, kph: n.kph, xph: n.xph, pph: n.pph, profitStale: n.profitStale, hours: 0, kills: 0, entry: e } : null;
-  }
-  function lensCheck(sp, lens, ctx) {
-    if (sp.sessions.length) return "";
-    lens = lens || {};
-    const lvl = Number(ctx.level) || 0, voc = ctx.vocation;
-    const es = sp.entries.filter((e) => e.vocation === voc || e.vocation === "any" || lens.allVocations || ctx.otherOn);
-    if (!es.length) return "voc";
-    if (lens.anyLevel || !lvl) return "";
-    const lo = lvl + LEVEL_BAND[0], hi = lvl + LEVEL_BAND[1];
-    return es.some((e) => !(e.levelMin > hi) && !(e.levelMax > 0 && e.levelMax < lo)) ? "" : "level";
-  }
-
   // src/core/explain.js
   function aVoc(v) {
     return (/^[AEIOU]/.test(v) ? "an " : "a ") + v;
@@ -4560,6 +4617,8 @@
   }
   function noNumsWhy(sp, ctx) {
     const t2 = ctx.t || EN, lvl = Number(ctx.level) || 0, voc = ctx.vocation;
+    if (!sp.sessions.length && (sp.skipped || []).length && !sp.entries.length)
+      return t2("Your hunts here were logged as another vocation, and those are off for this character (Characters).");
     if (sp.sessions.length && !sp.entries.length) return t2("Only sessions with breaks are logged here, so there’s no clean kill rate yet.");
     if (!ctx.refOn) return t2("Reference hunts are off for this character (Characters).");
     const mins = sp.entries.map((e) => e.levelMin || 0);
@@ -4987,7 +5046,14 @@
       return { boosted: t3.boostedDay === serverDay(now) ? t3.boosted : null, prey: t3.prey || [], event: t3.event || 0 };
     };
     const todayFactor2 = (kph, td) => todayFactor(kph, td, { catalog, expTable: state.expTable, t: t2 });
-    const spotIndex2 = () => spotIndex({ reference: state.reference, sessions: state.sessions, catalog, spotMeta: state.spotMeta, userSpots: state.userSpots });
+    const spotIndex2 = () => spotIndex({
+      reference: state.reference,
+      sessions: state.sessions,
+      catalog,
+      spotMeta: state.spotMeta,
+      userSpots: state.userSpots,
+      skip: (x) => d.hunts.why.get(x) || ""
+    });
     const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost });
     const heldTask2 = (h2, diff) => heldTask(h2, diff, { catalog, chalRates: chalRates() });
     const spotValue2 = (sp, o) => {
@@ -5203,8 +5269,10 @@
       });
     }
     function updateCharacter(patch) {
-      const pid = state.pid;
-      if (!act || !pid || !state.profiles[pid]) return;
+      const pid = state.pid, cur2 = state.profiles[pid];
+      if (!act || !pid || !cur2) return;
+      const was = cur2.vocation || VOCATIONS[0];
+      if (patch.vocation && patch.vocation !== was && !readHuntSources(cur2).loggedAs && state.sessions.some((x) => !x.vocation)) patch = Object.assign({ untaggedVocation: was }, patch);
       state.profiles = Object.assign({}, state.profiles, { [pid]: Object.assign({}, state.profiles[pid], patch) });
       pending[pid] = Object.assign({}, pending[pid] || {}, patch);
       act.updateProfile(pid, patch, () => {
@@ -5382,6 +5450,14 @@
       },
       setSources(s) {
         updateCharacter(sourcesPatch(s));
+      },
+      // Whether the character's hunts logged as another vocation count, and which vocation its hunts saved without one
+      // were logged as.
+      setOtherVocationHunts(on) {
+        updateCharacter({ otherVocationHunts: !!on });
+      },
+      setLoggedAs(vocation) {
+        if (VOCATIONS.indexOf(vocation) !== -1) updateCharacter({ untaggedVocation: vocation });
       },
       // Goal mix: weights 0-5 each, or a preset by id.
       setWeights(w2) {
@@ -5670,6 +5746,7 @@
           balance: preview.balance != null ? preview.balance : null,
           kills: preview.kills.map((k) => k.slug ? { slug: k.slug, name: k.name, count: k.count } : { name: k.name, count: k.count }),
           level: Number(p.level) || null,
+          vocation: p.vocation || VOCATIONS[0],
           createdAt: iso()
         };
         const raids = {};
@@ -6114,7 +6191,7 @@
   }
   function charactersPageView(state, model) {
     const p = state.profiles[state.pid] || null, sources = readSources(p || {}), settings = readSettings(p || {}, state.planner && state.planner.state);
-    const d = model && model.derived;
+    const d = model && model.derived, hs = readHuntSources(p || {}), untagged = (state.sessions || []).filter((x) => !x.vocation).length;
     return {
       canWrite: state.canWrite && state.status === "ready",
       pills: state.order.map((id) => {
@@ -6129,6 +6206,16 @@
         presets: [["mine", _("Mine only")], ["reference", _("+ Reference")], ["everything", _("Everything")]].map(([value, label]) => ({ value, label: t(label), switches: SOURCE_PRESETS[value] })),
         calibration: p ? calibrationText({ sources, calib: d && d.calib, calibOther: d && d.calibOther }) : ""
       },
+      // The character's own hunts: whether those logged as another vocation count, and (while some hunts were saved
+      // without a vocation) which vocation those were logged as.
+      hunts: { otherVocation: hs.otherVocation, untagged: p && untagged ? {
+        loggedAs: hs.loggedAs || p.vocation || VOCATIONS[0],
+        note: t.n(
+          untagged,
+          "{n} older hunt doesn’t say which vocation logged it. Only hunts logged as this character’s vocation count, unless the switch above is on.",
+          "{n} older hunts don’t say which vocation logged them. Only hunts logged as this character’s vocation count, unless the switch above is on."
+        )
+      } : null },
       settings: { world: settings.world || "", takenMinutes: settings.takenMinutes, takenOptions: TAKEN_MINUTES.map((m) => ({ value: m, label: t(MINUTES_LABEL[m]) })) },
       advanced: state.advanced,
       theme: state.theme,
@@ -6436,7 +6523,10 @@
       gold: !!tags[s] && tags[s].kind !== "weekly"
     }));
     const hrs = sp.sessions.reduce((a, x) => a + (Number(x.hours) || 0), 0);
-    const hunts = !sp.sessions.length ? t("None yet.") : nums && nums.src === "own" ? t.n(sp.sessions.length, "{n} hunt, {time}.", "{n} hunts, {time}.", { time: fmtHours(hrs) }) : t.n(sp.sessions.length, "{n} hunt, {time}, all with breaks: no clean rate.", "{n} hunts, {time}, all with breaks: no clean rate.", { time: fmtHours(hrs) });
+    const hs = readHuntSources(p), minLevel = spotMinLevel(sp, vocation);
+    const skipText = (k) => k.why === "level" ? t("Doesn’t count: this spot is for level {level} and up.", { level: minLevel }) : t("Doesn’t count: logged as {voc}.", { voc: k.x.vocation || hs.loggedAs || vocation });
+    const notCounted = sp.skipped.length ? t.n(sp.skipped.length, "{n} hunt here doesn’t count for this character.", "{n} hunts here don’t count for this character.") : "";
+    const hunts = !sp.sessions.length ? notCounted || t("None yet.") : (nums && nums.src === "own" ? t.n(sp.sessions.length, "{n} hunt, {time}.", "{n} hunts, {time}.", { time: fmtHours(hrs) }) : t.n(sp.sessions.length, "{n} hunt, {time}, all with breaks: no clean rate.", "{n} hunts, {time}, all with breaks: no clean rate.", { time: fmtHours(hrs) })) + (notCounted ? " " + notCounted : "");
     const refNums2 = nums && nums.src === "own" ? model.spotNums(Object.assign({}, sp, { sessions: [] })) : nums;
     const e = refNums2 && refNums2.entry || null;
     const open = ui.open || {};
@@ -6497,7 +6587,8 @@
     };
     const raidsOf = (x) => x.raidsBy && typeof x.raidsBy === "object" ? x.raidsBy : {};
     const when = (x) => String(x.start || x.end || "");
-    const sessions = sp.sessions.filter((x) => x.id).slice().sort((a, b) => when(b).localeCompare(when(a))).map((x) => {
+    const notCounting = new Map(sp.skipped.map((k) => [k.x, skipText(k)]));
+    const sessions = sp.sessions.concat(sp.skipped.map((k) => k.x)).filter((x) => x.id).sort((a, b) => when(b).localeCompare(when(a))).map((x) => {
       const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, raids = raidsOf(x);
       const clock = (s) => /T\d\d:\d\d/.test(s || "") ? String(s).slice(11, 16) : null, from = clock(x.start), to = clock(x.end);
       const caption = [from && to ? from + "–" + to : null, x.level ? t("level {level}", { level: x.level }) : null, x.breaks ? t("with breaks") : null].filter(Boolean).join(" · ");
@@ -6508,6 +6599,7 @@
         exp: t("{amount} exp/h", { amount: H && xp != null ? fmtBig(xp / H) : "–" }),
         profit: t("{amount} profit/h", { amount: H && x.balance != null ? fmtBig(x.balance / H) : "–" }),
         breaks: !!x.breaks,
+        skipped: notCounting.get(x) || null,
         armed: ui.armed === x.id,
         raidsBy: raids,
         details: details(
@@ -6523,7 +6615,7 @@
       };
     });
     const variations = idx.list.filter((v) => v.parentId === id);
-    const ns = sp.sessions.length, nv = variations.length;
+    const ns = sp.sessions.length, nv = variations.length, nAll = ns + sp.skipped.length;
     return {
       id,
       name: sp.name,
@@ -6543,7 +6635,7 @@
       own: advanced && sp.userMade ? {
         name: sp.name,
         armed: ui.armed === "spot",
-        deleteText: (ns ? t.n(ns, "Deletes this spot and its {n} hunt", "Deletes this spot and its {n} hunts") : t("Deletes this spot")) + (nv ? "; " + t.n(nv, "its {n} variation stays as a spot of its own", "its {n} variations stay as spots of their own") : "") + "."
+        deleteText: (nAll ? t.n(nAll, "Deletes this spot and its {n} hunt", "Deletes this spot and its {n} hunts") : t("Deletes this spot")) + (nv ? "; " + t.n(nv, "its {n} variation stays as a spot of its own", "its {n} variations stay as spots of their own") : "") + "."
       } : null
     };
   }
@@ -6925,7 +7017,12 @@
         h(
           "div",
           { class: "hp-card flush" },
-          settingRow(t("Your logged hunts"), t("Always used first."), h("span", { class: "hp-caption" }, t("Always on"))),
+          settingRow(t("Your logged hunts"), t("Always used first, at spots your level reaches."), h("span", { class: "hp-caption" }, t("Always on"))),
+          settingRow(
+            t("Your hunts as other vocations"),
+            t("Hunts this character logged as another vocation."),
+            switchCtl({ id: "src-own-other", label: t("Your hunts as other vocations"), on: view.hunts.otherVocation, disabled: ro, onToggle: on.setOtherVocationHunts })
+          ),
           settingRow(
             t("Reference hunts"),
             t("For spots you haven’t logged."),
@@ -6943,6 +7040,19 @@
           )
         ),
         view.sources.preset === "custom" ? h("p", { class: "hp-p hp-caption" }, t("Custom: these switches don’t match a preset.")) : null,
+        view.hunts.untagged ? h(
+          "div",
+          { class: "hp-stack" },
+          selectField({
+            id: "src-logged-as",
+            label: t("Older hunts were logged as"),
+            value: view.hunts.untagged.loggedAs,
+            options: view.vocations.map((v) => ({ value: v, label: v })),
+            disabled: ro,
+            onPick: on.setLoggedAs
+          }),
+          h("p", { class: "hp-p hp-caption" }, view.hunts.untagged.note)
+        ) : null,
         h("p", { class: "hp-p hp-small hp-muted" }, view.sources.calibration)
       ) : null,
       c ? section(
@@ -7750,7 +7860,14 @@
           h(
             "div",
             { class: "hp-line" },
-            h("span", null, h("b", null, x.date + " · " + x.length), h("br"), h("span", { class: "hp-small hp-muted" }, x.exp + " · " + x.profit + (x.breaks ? " · " + t("with breaks") : "")))
+            h(
+              "span",
+              null,
+              h("b", null, x.date + " · " + x.length),
+              h("br"),
+              h("span", { class: "hp-small hp-muted" }, x.exp + " · " + x.profit + (x.breaks ? " · " + t("with breaks") : "")),
+              x.skipped ? [h("br"), h("span", { class: "hp-small" }, x.skipped)] : null
+            )
           ),
           h(
             "div",
@@ -8155,6 +8272,8 @@
           },
           update: a.updateCharacter,
           setSources: a.setSources,
+          setOtherVocationHunts: a.setOtherVocationHunts,
+          setLoggedAs: a.setLoggedAs,
           setWorld: a.setWorld,
           setTakenMinutes: a.setTakenMinutes,
           setAdvanced: a.setAdvanced,
