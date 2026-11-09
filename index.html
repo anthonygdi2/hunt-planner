@@ -285,7 +285,7 @@
   .hp-stack { display: flex; flex-direction: column; gap: 4px; }
   .hp-sep { border-top: 1px solid var(--line); padding-top: var(--s3); }
   .hp-empty { border: 1px dashed var(--line2); border-radius: var(--r-card); padding: 14px; color: var(--muted); font-size: 14px; line-height: 20px; }
-  .hp-tap { min-height: 44px; align-self: flex-start; }
+  .hp-tap { min-height: 44px; min-width: 44px; align-self: flex-start; }
   .hp-session-actions { display: flex; flex-wrap: wrap; gap: var(--s4); }
   .hp-details { display: flex; flex-direction: column; gap: var(--s2); }
   .hp-details .hp-table th[scope="row"] { font-weight: 400; }
@@ -1480,26 +1480,26 @@
   var poolsOf = (c) => DIFFICULTIES.filter((d) => c.m & POOL_BIT[d]);
   var topPool = (c) => c.m & POOL_BIT.master ? "master" : c.m & POOL_BIT.expert ? "expert" : c.m & POOL_BIT.adept ? "adept" : "beginner";
   function makeCatalog(creatures) {
-    const list = [], bySlug = {}, byName = {};
+    const list = [], bySlug = {}, byName2 = {};
     creatures.forEach((d) => {
       const c = { name: d.n, key: norm(d.n), slug: slugify(d.n), cls: d.c, m: d.m, w: d.w, r: d.r, tier: d.t };
       list.push(c);
       bySlug[c.slug] = c;
-      byName[c.key] = c;
+      byName2[c.key] = c;
       if (d.w) {
         const alt = norm(d.w.replace(/\s*\(.*\)$/, ""));
-        if (!byName[alt]) byName[alt] = c;
+        if (!byName2[alt]) byName2[alt] = c;
       }
     });
     return {
       list,
       bySlug,
-      byName,
+      byName: byName2,
       inPool: (slug, diff) => creatureInPool(bySlug[slug], diff),
       poolOf: (diff) => list.filter((c) => creatureInPool(c, diff)),
       killKey: (k) => k.slug && bySlug[k.slug] ? k.slug : "n:" + norm(k.name || ""),
       nameKey: (name) => {
-        const c = byName[norm(name || "")];
+        const c = byName2[norm(name || "")];
         return c ? c.slug : "n:" + norm(name || "");
       }
     };
@@ -1576,7 +1576,15 @@
   var creaturePath = (slug) => CREATURES + "/" + slug;
   var spotsPath = (pid) => profilePath(pid) + "/spots";
   var spotPath = (pid, id) => spotsPath(pid) + "/" + id;
+  var HUNTS = "hunts";
+  var SPOTS = "spots";
+  var huntPath = (id) => HUNTS + "/" + id;
+  var sharedSpotPath = (id) => SPOTS + "/" + id;
+  var META = "meta";
+  var HUNTS_META_ID = "hunts";
+  var huntsMetaPath = META + "/" + HUNTS_META_ID;
   var validCharacterId = (id) => /^[A-Za-z0-9_.~:@+-]+$/.test(id);
+  var validHuntId = validCharacterId;
   var validSpotId = (id) => /^[a-z0-9-]+$/.test(id);
   function readSources(p) {
     const s = p && p.sources;
@@ -1593,9 +1601,11 @@
     return hit || "custom";
   }
   var sourcesPatch = (s) => ({ sources: { reference: !!s.reference, otherVocation: !!s.otherVocation, older: !!s.older }, refOff: !s.reference, refOtherOff: !s.otherVocation });
+  var LEVEL_WINDOWS = [0, 10, 20, 35];
+  var DEFAULT_LEVEL_WINDOW = 20;
   var readHuntSources = (p) => ({
-    loggedAs: p && VOCATIONS.indexOf(p.untaggedVocation) !== -1 ? p.untaggedVocation : null,
-    otherVocation: !!(p && p.otherVocationHunts === true)
+    otherVocation: !!(p && p.otherVocationHunts === true),
+    window: p && LEVEL_WINDOWS.indexOf(p.levelWindow) !== -1 ? p.levelWindow : DEFAULT_LEVEL_WINDOW
   });
   var GOAL_FIELDS = ["xp", "profit", "charm", "bounty"];
   function readGoal(p) {
@@ -1673,13 +1683,33 @@
     return out;
   }
   var readSession = (id, v) => v && v.hours > 0 && Array.isArray(v.kills) ? Object.assign({ id }, v) : null;
-  function readSessions(docs) {
+  function readHunt(id, v) {
+    const x = readSession(id, v);
+    if (!x) return null;
+    const lvl = Math.floor(Number(x.level)), by = v.by && typeof v.by === "object" ? v.by : {};
+    x.vocation = VOCATIONS.indexOf(x.vocation) !== -1 ? x.vocation : null;
+    x.level = lvl > 0 && lvl < 1e4 ? lvl : null;
+    x.by = { pid: typeof by.pid === "string" && by.pid ? by.pid : null, name: typeof by.name === "string" && by.name.trim() ? by.name.trim().slice(0, 40) : null };
+    return x;
+  }
+  function readHunts(docs) {
     const out = [];
     docs.forEach((d) => {
-      const x = readSession(d.id, d.data());
+      const x = readHunt(d.id, d.data());
       if (x) out.push(x);
     });
     return out;
+  }
+  function readHuntsMeta(v) {
+    const map = (o) => {
+      const out = {};
+      Object.keys(o && typeof o === "object" ? o : {}).forEach((k) => {
+        const x = o[k];
+        if (x === null || typeof x === "string") out[k] = x;
+      });
+      return out;
+    };
+    return { version: Number(v && v.version) || 0, at: v && typeof v.at === "string" ? v.at : null, sessions: map(v && v.sessions), spots: map(v && v.spots) };
   }
   var readCreatureDoc = (v) => v && v.minLevel && typeof v.minLevel === "object" ? { name: v.name, minLevel: v.minLevel } : null;
   function readCreatureDocs(docs) {
@@ -1856,7 +1886,8 @@
 
   // src/store/backup.js
   var BACKUP_APP = "bounty-task-tier-list";
-  var BACKUP_VERSION = 2;
+  var BACKUP_VERSION = 3;
+  var READ_LIMIT = 1e3;
   function plannerRestoreWrites(id, pl) {
     const out = [];
     if (!pl || typeof pl !== "object") return out;
@@ -1869,6 +1900,7 @@
     });
     return out;
   }
+  var obj = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
   function backupWrites(bk) {
     if (!bk || bk.app !== BACKUP_APP || !bk.characters) throw new Error("bad");
     const writes = [];
@@ -1885,18 +1917,36 @@
       plannerRestoreWrites(id, c.planner).forEach((w2) => {
         writes.push(w2);
       });
-      Object.keys(c.spots && typeof c.spots === "object" ? c.spots : {}).forEach((k) => {
+      Object.keys(obj(c.spots)).forEach((k) => {
         if (validSpotId(k) && readUserSpot(c.spots[k])) writes.push([spotPath(id, k), c.spots[k]]);
       });
     });
     Object.keys(bk.creatures || {}).forEach((k) => {
       writes.push([creaturePath(k), bk.creatures[k]]);
     });
-    if (!writes.length) throw new Error("empty");
+    Object.keys(obj(bk.spots)).forEach((k) => {
+      if (validSpotId(k) && readUserSpot(bk.spots[k])) writes.push([sharedSpotPath(k), bk.spots[k]]);
+    });
+    if (!writes.length && !Object.keys(obj(bk.hunts)).length) throw new Error("empty");
     return writes;
   }
+  function backupHuntsMeta(bk) {
+    if (!bk || !(bk.version >= 3)) return null;
+    if (bk.huntsMeta && typeof bk.huntsMeta === "object") return bk.huntsMeta;
+    const sessions = {}, spots = {};
+    Object.keys(obj(bk.characters)).forEach((pid) => {
+      const c = obj(bk.characters[pid]);
+      Object.keys(obj(c.sessions)).forEach((id) => {
+        sessions[pid + ":" + id] = null;
+      });
+      Object.keys(obj(c.spots)).forEach((id) => {
+        spots[pid + ":" + id] = null;
+      });
+    });
+    return { version: 1, sessions, spots };
+  }
   function plannerBackup(repo, id) {
-    return Promise.all([repo.get(plannerPath(id), 10), repo.get(marksPath(id), 1e3), repo.get(occupancyPath(id), 1e3)]).then((res) => {
+    return Promise.all([repo.get(plannerPath(id), 10), repo.get(marksPath(id), READ_LIMIT), repo.get(occupancyPath(id), READ_LIMIT)]).then((res) => {
       const st = res[0].filter((d) => d.id === "state")[0], marks = {}, occ = {};
       res[1].forEach((d) => {
         marks[d.id] = d.data();
@@ -1907,28 +1957,132 @@
       return st || Object.keys(marks).length || Object.keys(occ).length ? { state: st ? st.data() : null, marks, occupancy: occ } : null;
     });
   }
+  var byId = (docs) => {
+    const out = {};
+    docs.forEach((d) => {
+      out[d.id] = d.data();
+    });
+    return out;
+  };
   function buildBackup(repo, { ids, profiles, creatures, exportedAt }) {
-    const out = { app: BACKUP_APP, version: BACKUP_VERSION, exportedAt, creatures, characters: {} };
-    return Promise.all(ids.map((id) => Promise.all([repo.get(entriesPath(id), 1e3), repo.get(sessionsPath(id), 1e3), plannerBackup(repo, id), repo.get(spotsPath(id), 1e3)]).then((res) => {
-      const entries = {}, sess = {}, spots = {};
-      res[0].forEach((d) => {
-        entries[d.id] = d.data();
-      });
-      res[1].forEach((d) => {
-        sess[d.id] = d.data();
-      });
-      res[3].forEach((d) => {
-        spots[d.id] = d.data();
-      });
-      out.characters[id] = { profile: profiles[id], entries, sessions: sess };
+    const out = { app: BACKUP_APP, version: BACKUP_VERSION, exportedAt, creatures, characters: {}, hunts: {}, spots: {} };
+    const shared = Promise.all([repo.get(HUNTS, READ_LIMIT), repo.get(SPOTS, READ_LIMIT), repo.get(META, 10)]).then((res) => {
+      out.hunts = byId(res[0]);
+      out.spots = byId(res[1]);
+      const m = res[2].filter((d) => d.id === HUNTS_META_ID)[0];
+      if (m) out.huntsMeta = m.data();
+    });
+    return Promise.all([shared].concat(ids.map((id) => Promise.all([repo.get(entriesPath(id), READ_LIMIT), repo.get(sessionsPath(id), READ_LIMIT), plannerBackup(repo, id), repo.get(spotsPath(id), READ_LIMIT)]).then((res) => {
+      const spots = byId(res[3]);
+      out.characters[id] = { profile: profiles[id], entries: byId(res[0]), sessions: byId(res[1]) };
       if (res[2]) out.characters[id].planner = res[2];
       if (Object.keys(spots).length) out.characters[id].spots = spots;
-    }))).then(() => out);
+    })))).then(() => out);
   }
   function restoreWrites(repo, writes, onWrite) {
     return writes.reduce((p, w2) => p.then(() => repo.setDirect(w2[0], w2[1]).then(() => {
       if (onWrite) onWrite();
     })), Promise.resolve());
+  }
+
+  // src/store/migrate.js
+  var HUNTS_MIGRATION = 1;
+  function huntKey(x) {
+    if (!x || !x.start || !x.end) return null;
+    const xp = x.rawXp != null ? x.rawXp : x.xp;
+    return String(x.start) + "|" + String(x.end) + "|" + (xp != null ? String(xp) : "");
+  }
+  function sameHunt(a, b) {
+    const ka = huntKey(a), kb = huntKey(b);
+    if (ka || kb) return ka === kb;
+    const core = (x) => JSON.stringify([x.hours, x.rawXp, x.xp, x.kills]);
+    return core(a) === core(b);
+  }
+  var spotName = (s) => String(s && s.name || "").trim().toLowerCase();
+  var pidSlug = (pid) => String(pid).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "c";
+  function freeId(taken, id, prefix, same) {
+    let n = 0, cand = id;
+    while (taken[cand] && !same(taken[cand])) {
+      n++;
+      cand = prefix + "-" + id + (n > 1 ? "-" + n : "");
+    }
+    return cand;
+  }
+  function migrateHunts({ profiles, sessions, spots, hunts, sharedSpots, meta, at }) {
+    const m = readHuntsMeta(meta), done = Object.assign({}, m.sessions), doneSpots = Object.assign({}, m.spots);
+    const allHunts = Object.assign({}, hunts || {}), allSpots = Object.assign({}, sharedSpots || {});
+    const before = /* @__PURE__ */ new Map(), outHunts = {}, outSpots = {};
+    Object.keys(allHunts).sort().forEach((id) => {
+      const k = huntKey(allHunts[id]);
+      if (k && !before.has(k)) before.set(k, id);
+    });
+    Object.keys(profiles || {}).sort().forEach((pid) => {
+      const p = profiles[pid] || {}, mySpots = (spots || {})[pid] || {}, mine = (sessions || {})[pid] || {}, idMap = {}, fresh = [];
+      Object.keys(mySpots).sort().forEach((id) => {
+        const key = pid + ":" + id, s = readUserSpot(mySpots[id]);
+        if (key in doneSpots) {
+          idMap[id] = doneSpots[key];
+          return;
+        }
+        if (!validSpotId(id) || !s) return;
+        const nid = freeId(allSpots, id, pidSlug(pid), (x) => spotName(x) === spotName(s));
+        idMap[id] = doneSpots[key] = nid;
+        if (!allSpots[nid]) fresh.push([nid, Object.assign({}, mySpots[id])]);
+      });
+      fresh.forEach(([nid, doc]) => {
+        if (doc.parentId && idMap[doc.parentId]) doc.parentId = idMap[doc.parentId];
+        allSpots[nid] = outSpots[nid] = doc;
+      });
+      const vocation = [p.untaggedVocation, p.vocation].filter((v) => VOCATIONS.indexOf(v) !== -1)[0] || VOCATIONS[0];
+      const level = Number(p.level) > 0 ? Math.floor(Number(p.level)) : null, name = typeof p.name === "string" && p.name.trim() ? p.name.trim().slice(0, 40) : null;
+      Object.keys(mine).sort().forEach((id) => {
+        const key = pid + ":" + id;
+        if (key in done) return;
+        if (!validHuntId(id) || !readSession(id, mine[id])) {
+          done[key] = null;
+          return;
+        }
+        const x = mine[id], body = Object.assign({}, x, {
+          vocation: VOCATIONS.indexOf(x.vocation) !== -1 ? x.vocation : vocation,
+          level: Number(x.level) > 0 ? x.level : level,
+          by: { pid, name }
+        });
+        delete body.id;
+        if (body.spotId && idMap[body.spotId]) body.spotId = idMap[body.spotId];
+        const k = huntKey(body);
+        if (k && before.has(k)) {
+          done[key] = before.get(k);
+          return;
+        }
+        const nid = freeId(allHunts, id, pid, (y) => sameHunt(y, body));
+        done[key] = nid;
+        if (!allHunts[nid]) allHunts[nid] = outHunts[nid] = body;
+      });
+    });
+    const changed = m.version < HUNTS_MIGRATION || Object.keys(done).length !== Object.keys(m.sessions).length || Object.keys(doneSpots).length !== Object.keys(m.spots).length;
+    return { hunts: outHunts, spots: outSpots, meta: { version: Math.max(m.version, HUNTS_MIGRATION), at: changed ? at : m.at || at, sessions: done, spots: doneSpots }, changed };
+  }
+  function mergeHunts(stored, incoming) {
+    const keys = /* @__PURE__ */ new Set(), out = {};
+    Object.keys(stored || {}).forEach((id) => {
+      const k = huntKey(stored[id]);
+      if (k) keys.add(k);
+    });
+    Object.keys(incoming && typeof incoming === "object" ? incoming : {}).sort().forEach((id) => {
+      const x = incoming[id];
+      if (!validHuntId(id) || !readSession(id, x)) return;
+      const k = huntKey(x);
+      if (!(stored || {})[id] && k && keys.has(k)) return;
+      if (k) keys.add(k);
+      const body = Object.assign({}, x);
+      delete body.id;
+      out[id] = body;
+    });
+    return out;
+  }
+  function mergeHuntsMeta(stored, incoming, at) {
+    const a = readHuntsMeta(stored), b = readHuntsMeta(incoming);
+    return { version: Math.max(a.version, b.version), at: a.at || b.at || at, sessions: Object.assign({}, b.sessions, a.sessions), spots: Object.assign({}, b.spots, a.spots) };
   }
 
   // src/app/actions.js
@@ -1944,6 +2098,38 @@
       clear(marksPath(pid));
       clear(occupancyPath(pid));
     };
+    const byId2 = (docs) => {
+      const out = {};
+      docs.forEach((d) => {
+        out[d.id] = d.data();
+      });
+      return out;
+    };
+    const huntsMeta = () => repo.get(META, 10).then((docs) => {
+      const d = docs.filter((x) => x.id === HUNTS_META_ID)[0];
+      return d ? d.data() : null;
+    });
+    function migrate(at) {
+      return repo.get(PROFILES, 100).then((pdocs) => {
+        const profiles = byId2(pdocs), pids = Object.keys(profiles);
+        return Promise.all([repo.get(HUNTS, READ_LIMIT), repo.get(SPOTS, READ_LIMIT), huntsMeta()].concat(pids.map((pid) => Promise.all([repo.get(sessionsPath(pid), READ_LIMIT), repo.get(spotsPath(pid), READ_LIMIT)])))).then((res) => {
+          const sessions = {}, spots = {};
+          pids.forEach((pid, i) => {
+            sessions[pid] = byId2(res[3 + i][0]);
+            spots[pid] = byId2(res[3 + i][1]);
+          });
+          const m = migrateHunts({ profiles, sessions, spots, hunts: byId2(res[0]), sharedSpots: byId2(res[1]), meta: res[2], at });
+          if (!m.changed) return { hunts: {}, spots: {}, written: Promise.resolve(true) };
+          let ok = true;
+          const fail = () => {
+            ok = false;
+          };
+          const writes = Object.keys(m.spots).map((id) => repo.set(sharedSpotPath(id), m.spots[id], fail)).concat(Object.keys(m.hunts).map((id) => repo.set(huntPath(id), m.hunts[id], fail)));
+          const written = Promise.all(writes).then(() => ok ? repo.set(huntsMetaPath, m.meta, fail) : null).then(() => ok);
+          return { hunts: m.hunts, spots: m.spots, written };
+        });
+      });
+    }
     return {
       // Characters. createProfile returns the new character's id at once; onSaved runs once it's written.
       createProfile(body, onSaved, onFail) {
@@ -1954,15 +2140,12 @@
       updateProfile(pid, patch, onSaved, onFail) {
         return repo.write(profilePath(pid), (ref) => ref.update(patch).then(onSaved), onFail);
       },
-      // A character and everything under it: entries (their slugs), sessions (their ids), planner documents, profile.
-      deleteCharacter(pid, entrySlugs, sessionIds) {
+      // A character and what's only its own: entries (their slugs), planner documents, profile. The shared hunts and
+      // spots stay, and so do its old hunt and spot documents (already copied into them; Compatibility rule).
+      deleteCharacter(pid, entrySlugs) {
         entrySlugs.forEach((s) => {
           repo.remove(entryPath(pid, s));
         });
-        sessionIds.forEach((id) => {
-          repo.remove(sessionPath(pid, id));
-        });
-        clear(spotsPath(pid));
         forgetPlanner(pid);
         repo.remove(profilePath(pid));
       },
@@ -1975,25 +2158,25 @@
       setCreatureSettings(slug, body, onFail) {
         return body ? repo.set(creaturePath(slug), body, onFail) : repo.remove(creaturePath(slug), onFail);
       },
-      // Sessions. The id for a new one comes first, so the screen can show it before it's written; the stored document
-      // never carries its own id.
-      newSessionId(pid) {
-        return repo.newId(sessionsPath(pid));
+      // Shared hunts. The id for a new one comes first, so the screen can show it before it's written; the stored
+      // document never carries its own id.
+      newHuntId() {
+        return repo.newId(HUNTS);
       },
-      saveSession(pid, id, body, onFail) {
+      saveHunt(id, body, onFail) {
         const b = Object.assign({}, body);
         delete b.id;
-        return repo.set(sessionPath(pid, id), b, onFail);
+        return repo.set(huntPath(id), b, onFail);
       },
-      deleteSession(pid, id, onFail) {
-        return repo.remove(sessionPath(pid, id), onFail);
+      deleteHunt(id, onFail) {
+        return repo.remove(huntPath(id), onFail);
       },
-      // The character's own spots.
-      saveSpot(pid, id, body, onFail) {
-        return repo.set(spotPath(pid, id), body, onFail);
+      // Shared spots.
+      saveSpot(id, body, onFail) {
+        return repo.set(sharedSpotPath(id), body, onFail);
       },
-      deleteSpot(pid, id, onFail) {
-        return repo.remove(spotPath(pid, id), onFail);
+      deleteSpot(id, onFail) {
+        return repo.remove(sharedSpotPath(id), onFail);
       },
       // Planner documents.
       savePlannerState(pid, body, onFail) {
@@ -2003,13 +2186,21 @@
         repo.set(marksPath(pid) + "/" + spotId, mark);
         if (occ) repo.set(occupancyPath(pid) + "/" + spotId, occ);
       },
+      migrate,
       // Backups: the file's contents for these characters, and restoring one (throws Error("bad") or Error("empty") for a
-      // file it can't use; otherwise resolves when every document is written).
+      // file it can't use; otherwise resolves when every document is written). Its hunts join the stored ones
+      // (mergeHunts); then the migration copies any old hunts it brought (version 1 and 2 files).
       exportBackup(args) {
         return buildBackup(repo, args);
       },
-      restoreBackup(bk, onWrite) {
-        return restoreWrites(repo, backupWrites(bk), onWrite);
+      restoreBackup(bk, at, onWrite) {
+        const writes = backupWrites(bk), meta = backupHuntsMeta(bk);
+        return Promise.all([repo.get(HUNTS, READ_LIMIT), meta ? huntsMeta() : null]).then((res) => {
+          const hunts = mergeHunts(byId2(res[0]), bk.hunts);
+          const all = writes.concat(Object.keys(hunts).map((id) => [huntPath(id), hunts[id]]));
+          if (meta) all.push([huntsMetaPath, mergeHuntsMeta(res[1], meta, at)]);
+          return restoreWrites(repo, all, onWrite);
+        }).then(() => migrate(at)).then((m) => m.written);
       }
     };
   }
@@ -2039,18 +2230,18 @@
       profiles: (fn, onError) => repo.watch(PROFILES, 100, fn, onError),
       // Shared creature settings: slug → {name, minLevel}.
       creatures: (fn, onError) => repo.watch(CREATURES, 1e3, (docs) => fn(readCreatureDocs(docs)), onError),
-      // A character's entries (slug → record) and sessions (with ids).
+      // Every logged hunt (with ids) and the spots made for them, shared by all characters.
+      hunts: (fn, onError) => repo.watch(HUNTS, READ_LIMIT, (docs) => fn(readHunts(docs)), onError),
+      spots: (fn, onError) => repo.watch(SPOTS, READ_LIMIT, (docs) => fn(readUserSpots(docs)), onError),
+      // A character's entries (slug → record).
       entries: (pid, fn, onError) => repo.watch(entriesPath(pid), 1e3, (docs) => fn(readRecords(docs)), onError),
-      sessions: (pid, fn, onError) => repo.watch(sessionsPath(pid), 1e3, (docs) => fn(readSessions(docs)), onError),
       // A character's planner state, Taken/Free marks and occupancy counts.
       plannerState: (pid, fn, onError) => repo.watch(plannerPath(pid), 10, (docs) => {
         const d = docs.filter((x) => x.id === "state")[0];
         fn(readPlState(d && d.data(), known));
       }, onError),
       marks: (pid, fn, onError) => repo.watch(marksPath(pid), 1e3, (docs) => fn(readMarks(docs)), onError),
-      occupancy: (pid, fn, onError) => repo.watch(occupancyPath(pid), 1e3, (docs) => fn(readOccs(docs)), onError),
-      // The character's own spots: id → {name, parentId, note, createdAt}.
-      spots: (pid, fn, onError) => repo.watch(spotsPath(pid), 1e3, (docs) => fn(readUserSpots(docs)), onError)
+      occupancy: (pid, fn, onError) => repo.watch(occupancyPath(pid), 1e3, (docs) => fn(readOccs(docs)), onError)
     };
   }
 
@@ -2312,7 +2503,6 @@
     "{amount} exp/h": "{amount} exp/h",
     "{amount} profit/h": "{amount} ganancia/h",
     "No hunts logged here.": "No hay cazas registradas aquí.",
-    "Deletes this spot and its {n} hunt": { one: "Borra este spot y su {n} caza", many: "Borra este spot y sus {n} cazas", other: "Borra este spot y sus {n} cazas" },
     "Deletes this spot": "Borra este spot",
     "its {n} variation stays as a spot of its own": { one: "su {n} variante queda como spot propio", many: "sus {n} variantes quedan como spots propios", other: "sus {n} variantes quedan como spots propios" },
     "Easy": "Easy",
@@ -2468,10 +2658,8 @@
     "Level": "Nivel",
     "Talisman bestiary bonus (%)": "Bonus de bestiary del Talisman (%)",
     "Delete this character…": "Borrar este personaje…",
-    "Tap again to delete {name} and everything saved for it": "Toca otra vez para borrar {name} y todo lo guardado",
     "Numbers from": "Números de",
     "Your logged hunts": "Tus cazas registradas",
-    "Always used first, at spots your level reaches.": "Siempre se usan primero, en los spots que alcanza tu nivel.",
     "Always on": "Siempre activas",
     "Reference hunts": "Cazas de referencia",
     "For spots you haven’t logged.": "Para spots que no has registrado.",
@@ -2739,13 +2927,41 @@
     "Points": "Puntos",
     "(current)": "(actual)",
     "Your hunts as other vocations": "Tus cazas con otras vocaciones",
-    "Hunts this character logged as another vocation.": "Cazas que este personaje registró con otra vocación.",
-    "Older hunts were logged as": "Las cazas antiguas se registraron como",
-    "{n} older hunt doesn’t say which vocation logged it. Only hunts logged as this character’s vocation count, unless the switch above is on.": { one: "{n} caza antigua no dice con qué vocación se registró. Solo cuentan las cazas con la vocación de este personaje, salvo que actives el interruptor de arriba.", many: "{n} cazas antiguas no dicen con qué vocación se registraron. Solo cuentan las cazas con la vocación de este personaje, salvo que actives el interruptor de arriba.", other: "{n} cazas antiguas no dicen con qué vocación se registraron. Solo cuentan las cazas con la vocación de este personaje, salvo que actives el interruptor de arriba." },
     "{n} hunt here doesn’t count for this character.": { one: "{n} caza aquí no cuenta para este personaje.", many: "{n} cazas aquí no cuentan para este personaje.", other: "{n} cazas aquí no cuentan para este personaje." },
     "Doesn’t count: this spot is for level {level} and up.": "No cuenta: este spot es para nivel {level} o más.",
     "Doesn’t count: logged as {voc}.": "No cuenta: registrada como {voc}.",
-    "Your hunts here were logged as another vocation, and those are off for this character (Characters).": "Tus cazas aquí se registraron con otra vocación, y esas están desactivadas para este personaje (Personajes)."
+    "Your hunts here were logged as another vocation, and those are off for this character (Characters).": "Tus cazas aquí se registraron con otra vocación, y esas están desactivadas para este personaje (Personajes).",
+    // shared hunts (Log, Characters, spot page)
+    "{lo}–{hi} (±{pct}%)": "{lo}–{hi} (±{pct}%)",
+    "Within {pct}% of level {level} ({lo}–{hi})": "A un {pct}% del nivel {level} ({lo}–{hi})",
+    "Within {pct}% of its level": "A un {pct}% de su nivel",
+    "Yours · {n} hunt · {who}": { one: "Tuyo · {n} caza · {who}", many: "Tuyo · {n} cazas · {who}", other: "Tuyo · {n} cazas · {who}" },
+    "Unnamed spot": "Spot sin nombre",
+    "{shown} of {n} saved hunt": { one: "{shown} de {n} caza guardada", many: "{shown} de {n} cazas guardadas", other: "{shown} de {n} cazas guardadas" },
+    "No hunts saved yet.": "Aún no hay cazas guardadas.",
+    "No saved hunts match these filters.": "Ninguna caza guardada coincide con estos filtros.",
+    "by {name}": "de {name}",
+    "Edit the hunt of {date} at {spot}": "Editar la caza del {date} en {spot}",
+    "You saved this hunt already: {date} at {spot}, by {name}.": "Ya guardaste esta caza: {date} en {spot}, de {name}.",
+    "a deleted character": "un personaje borrado",
+    "Doesn’t count: logged at level {level}, more than {pct}% from this character’s.": "No cuenta: registrada en nivel {level}, a más de un {pct}% del de este personaje.",
+    "Logged as {who} by {names}.": "Registradas como {who} por {names}.",
+    "Deletes this spot and its {n} hunt, whichever character logged it": { one: "Borra este spot y su {n} caza, la registrara el personaje que la registrara", many: "Borra este spot y sus {n} cazas, las registrara el personaje que las registrara", other: "Borra este spot y sus {n} cazas, las registrara el personaje que las registrara" },
+    "Tap again to delete {name}. Its logged hunts stay for your other characters.": "Toca otra vez para borrar {name}. Sus cazas registradas se quedan para tus otros personajes.",
+    "Hunts any of your characters logged as this vocation near this level, at spots it reaches. Always used first.": "Cazas que cualquiera de tus personajes registró con esta vocación cerca de este nivel, en spots a su alcance. Siempre se usan primero.",
+    "Hunts logged as another vocation count too.": "También cuentan las cazas registradas con otra vocación.",
+    "Your hunts count when logged": "Tus cazas cuentan si se registraron",
+    "Saved hunts": "Cazas guardadas",
+    "Shared by all your characters: each hunt counts for those of its vocation near its level.": "Compartidas por todos tus personajes: cada caza cuenta para los de su vocación cerca de su nivel.",
+    "Close": "Cerrar",
+    "Edit": "Editar",
+    "Type a level, or leave it empty.": "Escribe un nivel o déjalo vacío.",
+    "Cancel": "Cancelar",
+    "Save changes": "Guardar cambios",
+    "Delete this hunt": "Borrar esta caza",
+    "Tap again to delete this hunt for every character": "Toca otra vez para borrar esta caza para todos los personajes",
+    "Save anyway": "Guardar de todos modos",
+    "Open the existing one": "Abrir la que ya existe"
   };
 
   // src/data/i18n/pt.js
@@ -2894,7 +3110,6 @@
     "{amount} exp/h": "{amount} exp/h",
     "{amount} profit/h": "{amount} lucro/h",
     "No hunts logged here.": "Nenhuma hunt registrada aqui.",
-    "Deletes this spot and its {n} hunt": { one: "Apaga este spot e sua {n} hunt", many: "Apaga este spot e suas {n} hunts", other: "Apaga este spot e suas {n} hunts" },
     "Deletes this spot": "Apaga este spot",
     "its {n} variation stays as a spot of its own": { one: "sua {n} variação fica como spot próprio", many: "suas {n} variações ficam como spots próprios", other: "suas {n} variações ficam como spots próprios" },
     "Easy": "Easy",
@@ -3050,10 +3265,8 @@
     "Level": "Level",
     "Talisman bestiary bonus (%)": "Bônus de bestiary do Talisman (%)",
     "Delete this character…": "Apagar este personagem…",
-    "Tap again to delete {name} and everything saved for it": "Toque de novo para apagar {name} e tudo que foi salvo dele",
     "Numbers from": "Números de",
     "Your logged hunts": "Suas hunts registradas",
-    "Always used first, at spots your level reaches.": "Sempre usadas primeiro, nos spots que o seu level alcança.",
     "Always on": "Sempre ligadas",
     "Reference hunts": "Hunts de referência",
     "For spots you haven’t logged.": "Para spots que você não registrou.",
@@ -3321,13 +3534,41 @@
     "Points": "Pontos",
     "(current)": "(atual)",
     "Your hunts as other vocations": "Suas hunts com outras vocações",
-    "Hunts this character logged as another vocation.": "Hunts que este personagem registrou com outra vocação.",
-    "Older hunts were logged as": "As hunts antigas foram registradas como",
-    "{n} older hunt doesn’t say which vocation logged it. Only hunts logged as this character’s vocation count, unless the switch above is on.": { one: "{n} hunt antiga não diz com qual vocação foi registrada. Só contam as hunts com a vocação deste personagem, a não ser que o botão acima esteja ligado.", many: "{n} hunts antigas não dizem com qual vocação foram registradas. Só contam as hunts com a vocação deste personagem, a não ser que o botão acima esteja ligado.", other: "{n} hunts antigas não dizem com qual vocação foram registradas. Só contam as hunts com a vocação deste personagem, a não ser que o botão acima esteja ligado." },
     "{n} hunt here doesn’t count for this character.": { one: "{n} hunt aqui não conta para este personagem.", many: "{n} hunts aqui não contam para este personagem.", other: "{n} hunts aqui não contam para este personagem." },
     "Doesn’t count: this spot is for level {level} and up.": "Não conta: este spot é para level {level} ou mais.",
     "Doesn’t count: logged as {voc}.": "Não conta: registrada como {voc}.",
-    "Your hunts here were logged as another vocation, and those are off for this character (Characters).": "Suas hunts aqui foram registradas com outra vocação, e elas estão desligadas para este personagem (Personagens)."
+    "Your hunts here were logged as another vocation, and those are off for this character (Characters).": "Suas hunts aqui foram registradas com outra vocação, e elas estão desligadas para este personagem (Personagens).",
+    // shared hunts (Log, Characters, spot page)
+    "{lo}–{hi} (±{pct}%)": "{lo}–{hi} (±{pct}%)",
+    "Within {pct}% of level {level} ({lo}–{hi})": "Até {pct}% do level {level} ({lo}–{hi})",
+    "Within {pct}% of its level": "Até {pct}% do level dele",
+    "Yours · {n} hunt · {who}": { one: "Sua · {n} hunt · {who}", many: "Suas · {n} hunts · {who}", other: "Suas · {n} hunts · {who}" },
+    "Unnamed spot": "Spot sem nome",
+    "{shown} of {n} saved hunt": { one: "{shown} de {n} hunt salva", many: "{shown} de {n} hunts salvas", other: "{shown} de {n} hunts salvas" },
+    "No hunts saved yet.": "Nenhuma hunt salva ainda.",
+    "No saved hunts match these filters.": "Nenhuma hunt salva corresponde a estes filtros.",
+    "by {name}": "por {name}",
+    "Edit the hunt of {date} at {spot}": "Editar a hunt de {date} em {spot}",
+    "You saved this hunt already: {date} at {spot}, by {name}.": "Você já salvou esta hunt: {date} em {spot}, por {name}.",
+    "a deleted character": "um personagem apagado",
+    "Doesn’t count: logged at level {level}, more than {pct}% from this character’s.": "Não conta: registrada no level {level}, a mais de {pct}% do level deste personagem.",
+    "Logged as {who} by {names}.": "Registradas como {who} por {names}.",
+    "Deletes this spot and its {n} hunt, whichever character logged it": { one: "Apaga este spot e a {n} hunt dele, seja qual for o personagem que a registrou", many: "Apaga este spot e as {n} hunts dele, seja qual for o personagem que as registrou", other: "Apaga este spot e as {n} hunts dele, seja qual for o personagem que as registrou" },
+    "Tap again to delete {name}. Its logged hunts stay for your other characters.": "Toque de novo para apagar {name}. As hunts registradas ficam para seus outros personagens.",
+    "Hunts any of your characters logged as this vocation near this level, at spots it reaches. Always used first.": "Hunts que qualquer um dos seus personagens registrou com esta vocação perto deste level, em spots ao alcance dele. Sempre usadas primeiro.",
+    "Hunts logged as another vocation count too.": "Hunts registradas com outra vocação também contam.",
+    "Your hunts count when logged": "Suas hunts contam quando registradas",
+    "Saved hunts": "Hunts salvas",
+    "Shared by all your characters: each hunt counts for those of its vocation near its level.": "Compartilhadas por todos os seus personagens: cada hunt conta para os da vocação dela perto do level dela.",
+    "Close": "Fechar",
+    "Edit": "Editar",
+    "Type a level, or leave it empty.": "Digite um level ou deixe vazio.",
+    "Cancel": "Cancelar",
+    "Save changes": "Salvar alterações",
+    "Delete this hunt": "Apagar esta hunt",
+    "Tap again to delete this hunt for every character": "Toque de novo para apagar esta hunt para todos os personagens",
+    "Save anyway": "Salvar mesmo assim",
+    "Open the existing one": "Abrir a que já existe"
   };
 
   // src/data/i18n/pl.js
@@ -3476,7 +3717,6 @@
     "{amount} exp/h": "{amount} exp/h",
     "{amount} profit/h": "{amount} zysku/h",
     "No hunts logged here.": "Brak zapisanych polowań tutaj.",
-    "Deletes this spot and its {n} hunt": { one: "Usuwa ten spot i jego {n} polowanie", few: "Usuwa ten spot i jego {n} polowania", many: "Usuwa ten spot i jego {n} polowań", other: "Usuwa ten spot i jego {n} polowania" },
     "Deletes this spot": "Usuwa ten spot",
     "its {n} variation stays as a spot of its own": { one: "jego {n} wariant zostaje jako osobny spot", few: "jego {n} warianty zostają jako osobne spoty", many: "jego {n} wariantów zostaje jako osobne spoty", other: "jego {n} wariantu zostaje jako osobne spoty" },
     "Easy": "Easy",
@@ -3632,10 +3872,8 @@
     "Level": "Poziom",
     "Talisman bestiary bonus (%)": "Bonus bestiary z Talismanu (%)",
     "Delete this character…": "Usuń tę postać…",
-    "Tap again to delete {name} and everything saved for it": "Dotknij ponownie, aby usunąć {name} i wszystko, co zapisano",
     "Numbers from": "Liczby z",
     "Your logged hunts": "Twoje zapisane polowania",
-    "Always used first, at spots your level reaches.": "Zawsze używane najpierw, na spotach dostępnych na twoim poziomie.",
     "Always on": "Zawsze włączone",
     "Reference hunts": "Polowania referencyjne",
     "For spots you haven’t logged.": "Dla spotów, których nie zapisałeś.",
@@ -3903,13 +4141,41 @@
     "Points": "Punkty",
     "(current)": "(obecny)",
     "Your hunts as other vocations": "Twoje polowania innymi profesjami",
-    "Hunts this character logged as another vocation.": "Polowania zapisane przez tę postać jako inna profesja.",
-    "Older hunts were logged as": "Starsze polowania zapisano jako",
-    "{n} older hunt doesn’t say which vocation logged it. Only hunts logged as this character’s vocation count, unless the switch above is on.": { one: "{n} starsze polowanie nie mówi, jaką profesją je zapisano. Liczą się tylko polowania profesją tej postaci, chyba że przełącznik wyżej jest włączony.", few: "{n} starsze polowania nie mówią, jaką profesją je zapisano. Liczą się tylko polowania profesją tej postaci, chyba że przełącznik wyżej jest włączony.", many: "{n} starszych polowań nie mówi, jaką profesją je zapisano. Liczą się tylko polowania profesją tej postaci, chyba że przełącznik wyżej jest włączony.", other: "{n} starszego polowania nie mówi, jaką profesją je zapisano. Liczą się tylko polowania profesją tej postaci, chyba że przełącznik wyżej jest włączony." },
     "{n} hunt here doesn’t count for this character.": { one: "{n} polowanie tutaj nie liczy się dla tej postaci.", few: "{n} polowania tutaj nie liczą się dla tej postaci.", many: "{n} polowań tutaj nie liczy się dla tej postaci.", other: "{n} polowania tutaj nie liczy się dla tej postaci." },
     "Doesn’t count: this spot is for level {level} and up.": "Nie liczy się: ten spot jest od poziomu {level}.",
     "Doesn’t count: logged as {voc}.": "Nie liczy się: zapisane jako {voc}.",
-    "Your hunts here were logged as another vocation, and those are off for this character (Characters).": "Twoje polowania tutaj zapisano jako inna profesja, a takie są wyłączone dla tej postaci (Postacie)."
+    "Your hunts here were logged as another vocation, and those are off for this character (Characters).": "Twoje polowania tutaj zapisano jako inna profesja, a takie są wyłączone dla tej postaci (Postacie).",
+    // shared hunts (Log, Characters, spot page)
+    "{lo}–{hi} (±{pct}%)": "{lo}–{hi} (±{pct}%)",
+    "Within {pct}% of level {level} ({lo}–{hi})": "Do {pct}% od poziomu {level} ({lo}–{hi})",
+    "Within {pct}% of its level": "Do {pct}% od jej poziomu",
+    "Yours · {n} hunt · {who}": { one: "Twoje · {n} polowanie · {who}", few: "Twoje · {n} polowania · {who}", many: "Twoje · {n} polowań · {who}", other: "Twoje · {n} polowania · {who}" },
+    "Unnamed spot": "Spot bez nazwy",
+    "{shown} of {n} saved hunt": { one: "{shown} z {n} zapisanego polowania", few: "{shown} z {n} zapisanych polowań", many: "{shown} z {n} zapisanych polowań", other: "{shown} z {n} zapisanych polowań" },
+    "No hunts saved yet.": "Nie zapisano jeszcze żadnych polowań.",
+    "No saved hunts match these filters.": "Żadne zapisane polowanie nie pasuje do tych filtrów.",
+    "by {name}": "od {name}",
+    "Edit the hunt of {date} at {spot}": "Edytuj polowanie z {date} na {spot}",
+    "You saved this hunt already: {date} at {spot}, by {name}.": "To polowanie jest już zapisane: {date} na {spot}, od {name}.",
+    "a deleted character": "usunięta postać",
+    "Doesn’t count: logged at level {level}, more than {pct}% from this character’s.": "Nie liczy się: zapisane na poziomie {level}, ponad {pct}% od poziomu tej postaci.",
+    "Logged as {who} by {names}.": "Zapisane jako {who} przez: {names}.",
+    "Deletes this spot and its {n} hunt, whichever character logged it": { one: "Usuwa ten spot i jego {n} polowanie, niezależnie od tego, która postać je zapisała", few: "Usuwa ten spot i jego {n} polowania, niezależnie od tego, która postać je zapisała", many: "Usuwa ten spot i jego {n} polowań, niezależnie od tego, która postać je zapisała", other: "Usuwa ten spot i jego {n} polowania, niezależnie od tego, która postać je zapisała" },
+    "Tap again to delete {name}. Its logged hunts stay for your other characters.": "Dotknij ponownie, aby usunąć {name}. Jej zapisane polowania zostają dla twoich innych postaci.",
+    "Hunts any of your characters logged as this vocation near this level, at spots it reaches. Always used first.": "Polowania, które dowolna z twoich postaci zapisała jako ta profesja blisko tego poziomu, na spotach w jej zasięgu. Zawsze używane najpierw.",
+    "Hunts logged as another vocation count too.": "Polowania zapisane jako inna profesja też się liczą.",
+    "Your hunts count when logged": "Twoje polowania liczą się, gdy zapisane",
+    "Saved hunts": "Zapisane polowania",
+    "Shared by all your characters: each hunt counts for those of its vocation near its level.": "Wspólne dla wszystkich twoich postaci: każde polowanie liczy się dla postaci jego profesji blisko jego poziomu.",
+    "Close": "Zamknij",
+    "Edit": "Edytuj",
+    "Type a level, or leave it empty.": "Wpisz poziom albo zostaw puste.",
+    "Cancel": "Anuluj",
+    "Save changes": "Zapisz zmiany",
+    "Delete this hunt": "Usuń to polowanie",
+    "Tap again to delete this hunt for every character": "Dotknij ponownie, aby usunąć to polowanie dla każdej postaci",
+    "Save anyway": "Zapisz mimo to",
+    "Open the existing one": "Otwórz istniejące"
   };
 
   // src/data/i18n/index.js
@@ -4279,16 +4545,19 @@
     const mins = (mine.length ? mine : sp.entries).map((e) => e.levelMin).filter((v) => v > 0);
     return mins.length ? Math.min.apply(null, mins) : null;
   }
-  function huntCheck(x, sp, ctx) {
-    const lvl = Number(ctx.level) || 0;
-    if (!ctx.otherVocation && (x.vocation || ctx.loggedAs || ctx.vocation) !== ctx.vocation) return "voc";
-    const min = lvl ? spotMinLevel(sp, ctx.vocation) : null;
-    return min && lvl < min ? "level" : "";
+  function huntCheck(x, sp, ctx, lens) {
+    const lvl = Number(ctx.level) || 0, at = Number(x.level) || 0, w2 = Number(ctx.window) || 0;
+    lens = lens || {};
+    if (!ctx.otherVocation && !lens.allVocations && x.vocation && x.vocation !== ctx.vocation) return "voc";
+    if (lens.anyLevel || !lvl) return "";
+    const min = spotMinLevel(sp, ctx.vocation);
+    if (min && lvl < min) return "level";
+    return w2 > 0 && at && Math.abs(at - lvl) * 100 > lvl * w2 ? "window" : "";
   }
-  function splitHunts(index, ctx) {
+  function splitHunts(index, ctx, lens) {
     const why = /* @__PURE__ */ new Map();
     spotIndex(Object.assign({}, index, { skip: (x, sp) => {
-      const w2 = huntCheck(x, sp, ctx);
+      const w2 = huntCheck(x, sp, ctx, lens);
       if (w2) why.set(x, w2);
       return w2;
     } }));
@@ -4359,10 +4628,12 @@
   }
 
   // src/app/compute.js
+  var ownHunts = (sessions, pid) => pid ? sessions.filter((x) => !x.by || !x.by.pid || x.by.pid === pid) : sessions;
   function compute(state, now) {
     const { catalog, reference, entries, advanced, difficulty } = state, p = state.profile || {};
     const vocation = p.vocation || VOCATIONS[0], sources = readSources(p), refOn = sources.reference && reference.length > 0, otherOn = refOn && sources.otherVocation;
-    const hunts = splitHunts({ reference, sessions: state.sessions, catalog, userSpots: state.userSpots }, Object.assign({ vocation, level: p.level }, readHuntSources(p)));
+    const huntCtx = Object.assign({ vocation, level: p.level }, readHuntSources(p));
+    const hunts = splitHunts({ reference, sessions: state.sessions, catalog, userSpots: state.userSpots }, huntCtx);
     const sessions = hunts.use;
     const raid = raidRate(sessions, catalog);
     const picks = pickReference(reference, { vocation, level: p.level, enabled: refOn, older: sources.older });
@@ -4390,7 +4661,7 @@
       spotEco[a.e.spot] = { xph: a.n.xph, pph: a.n.pph };
       refSpotSrc[a.e.spot] = a.n.src;
     });
-    const weeklyNow = advanced ? openWeeklyTasks(weeklyState(p, sessions, catalog, new Date(now)), catalog) : [];
+    const weeklyNow = advanced ? openWeeklyTasks(weeklyState(p, ownHunts(sessions, state.pid), catalog, new Date(now)), catalog) : [];
     const weights = scoringWeights(readGoal(p)), chalRates = p.chalRates && typeof p.chalRates === "object" ? p.chalRates : {};
     const weeklyXph = weeklyNow.length ? (spot, hours, slug, kills) => weeklyBonus(weeklyNow, spot && spotKph[spot], hours, slug, kills) : null;
     const ctx = (diff) => ({ diff, chalRates, bestiaryBonus: p.bestiaryBonus, raidP: raid.p, spotKph, entries, catalog, weeklyXph });
@@ -4412,6 +4683,7 @@
     const tiers = tierScores(res.scores);
     return {
       hunts,
+      huntCtx,
       raidP: raid.p,
       raidInfo: raid.info,
       picks,
@@ -5031,7 +5303,7 @@
       const b = bounty();
       return b.mode === "active" ? [] : b.offers.map((o) => Object.assign({ name: o.slug && catalog.bySlug[o.slug] ? catalog.bySlug[o.slug].name : "" }, o));
     };
-    const weekly = () => weeklyState(p, state.sessions, catalog, at);
+    const weekly = () => weeklyState(p, ownHunts(state.sessions, state.pid), catalog, at);
     const weeklyRows2 = () => weeklyTaskRows(weekly(), catalog);
     const openWeeklies = () => openWeeklyTasks(weekly(), catalog);
     const weeklyBonus2 = (spot, hours, selfSlug, selfKills) => weeklyBonus(d.weeklyNow, spot && d.spotKph[spot], hours, selfSlug, selfKills);
@@ -5046,14 +5318,19 @@
       return { boosted: t3.boostedDay === serverDay(now) ? t3.boosted : null, prey: t3.prey || [], event: t3.event || 0 };
     };
     const todayFactor2 = (kph, td) => todayFactor(kph, td, { catalog, expTable: state.expTable, t: t2 });
-    const spotIndex2 = () => spotIndex({
-      reference: state.reference,
-      sessions: state.sessions,
-      catalog,
-      spotMeta: state.spotMeta,
-      userSpots: state.userSpots,
-      skip: (x) => d.hunts.why.get(x) || ""
-    });
+    const indexes = {};
+    const spotIndex2 = (lens) => {
+      const key = lens ? (lens.allVocations ? "v" : "") + (lens.anyLevel ? "l" : "") : "";
+      if (!indexes[key]) indexes[key] = spotIndex({
+        reference: state.reference,
+        sessions: state.sessions,
+        catalog,
+        spotMeta: state.spotMeta,
+        userSpots: state.userSpots,
+        skip: key ? (x, sp) => huntCheck(x, sp, d.huntCtx, lens) : (x) => d.hunts.why.get(x) || ""
+      });
+      return indexes[key];
+    };
     const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost });
     const heldTask2 = (h2, diff) => heldTask(h2, diff, { catalog, chalRates: chalRates() });
     const spotValue2 = (sp, o) => {
@@ -5184,10 +5461,11 @@
       profiles: {},
       order: [],
       pid: prefs.get(PREF.profile) || null,
+      // hunts and userSpots are shared by every character (hunts/, spots/); the rest is the active character's.
       creatures: {},
-      entries: {},
-      sessions: [],
+      hunts: [],
       userSpots: {},
+      entries: {},
       planner: { state: plDefaults(), marks: {}, occupancy: {} },
       advanced: prefs.get(PREF.advanced) === "1",
       theme: readTheme(prefs.get(PREF.theme)),
@@ -5196,6 +5474,19 @@
     setLang(state.lang);
     const listeners = /* @__PURE__ */ new Set(), pending = {}, pendingNew = {}, planCache = makePlanCache();
     let repo = null, act = null, watch = null, charUnsub = [], plPending = 0, cachedModel = null, diffModels = {};
+    const stored = { hunts: [], spots: {} };
+    let copies = { hunts: {}, spots: {} }, profilesIn = false, migrated = false;
+    const showShared = () => {
+      const have = new Set(stored.hunts.map((x) => x.id)), extra = [];
+      Object.keys(copies.hunts).forEach((id) => {
+        if (!have.has(id)) {
+          const x = readHunt(id, copies.hunts[id]);
+          if (x) extra.push(x);
+        }
+      });
+      state.hunts = stored.hunts.concat(extra);
+      state.userSpots = Object.assign({}, copies.spots, stored.spots);
+    };
     const changed = () => {
       cachedModel = null;
       diffModels = {};
@@ -5207,8 +5498,6 @@
       charUnsub.forEach((u) => u());
       charUnsub = [];
       state.entries = {};
-      state.sessions = [];
-      state.userSpots = {};
       state.planner = { state: plDefaults(), marks: {}, occupancy: {} };
       if (!pid || !watch) return;
       const mine = (fn) => (v) => {
@@ -5219,9 +5508,6 @@
       };
       charUnsub.push(watch.entries(pid, mine((v) => {
         state.entries = v;
-      })));
-      charUnsub.push(watch.sessions(pid, mine((v) => {
-        state.sessions = v;
       })));
       charUnsub.push(watch.plannerState(pid, (v) => {
         if (state.pid === pid && !plPending) {
@@ -5235,9 +5521,6 @@
       charUnsub.push(watch.occupancy(pid, mine((v) => {
         state.planner = Object.assign({}, state.planner, { occupancy: v });
       })));
-      charUnsub.push(watch.spots(pid, mine((v) => {
-        state.userSpots = v;
-      })));
     }
     function connect(db) {
       repo = makeRepo(db, { onDenied: () => {
@@ -5247,8 +5530,41 @@
       act = makeActions(repo);
       watch = makeWatchers(repo, { known });
       state.local = !!db.local;
+      const lost = () => {
+        state.notice = t("Saved data stopped updating. Reload the page to reconnect.");
+        changed();
+      };
       watch.creatures((c) => {
         state.creatures = c;
+        changed();
+      });
+      watch.hunts((v) => {
+        stored.hunts = v;
+        showShared();
+        changed();
+      }, lost);
+      watch.spots((v) => {
+        stored.spots = v;
+        showShared();
+        changed();
+      }, lost);
+      const ready = () => {
+        if (profilesIn && migrated) state.status = "ready";
+      };
+      act.migrate(iso()).then((m) => {
+        copies = { hunts: m.hunts, spots: m.spots };
+        showShared();
+        m.written.then((ok) => {
+          if (ok) {
+            copies = { hunts: {}, spots: {} };
+            showShared();
+            changed();
+          }
+        });
+      }).catch(() => {
+      }).then(() => {
+        migrated = true;
+        ready();
         changed();
       });
       let watching = null;
@@ -5256,23 +5572,19 @@
         const m = mergeProfiles(docs, { pending, pendingNew, current: state.profiles });
         state.profiles = m.profiles;
         state.order = m.order;
-        state.status = "ready";
+        profilesIn = true;
+        ready();
         if (!state.profiles[state.pid]) state.pid = m.order[0] || null;
         if (watching !== state.pid) {
           watching = state.pid;
           watchCharacter(state.pid);
         }
         changed();
-      }, () => {
-        state.notice = t("Saved data stopped updating. Reload the page to reconnect.");
-        changed();
-      });
+      }, lost);
     }
     function updateCharacter(patch) {
       const pid = state.pid, cur2 = state.profiles[pid];
       if (!act || !pid || !cur2) return;
-      const was = cur2.vocation || VOCATIONS[0];
-      if (patch.vocation && patch.vocation !== was && !readHuntSources(cur2).loggedAs && state.sessions.some((x) => !x.vocation)) patch = Object.assign({ untaggedVocation: was }, patch);
       state.profiles = Object.assign({}, state.profiles, { [pid]: Object.assign({}, state.profiles[pid], patch) });
       pending[pid] = Object.assign({}, pending[pid] || {}, patch);
       act.updateProfile(pid, patch, () => {
@@ -5432,11 +5744,11 @@
         changed();
       },
       updateCharacter,
-      // Deletes the active character and everything under it.
+      // Deletes the active character and what's only its own; the hunts it logged stay, shared with the others.
       deleteCharacter() {
         const gone = state.pid;
         if (!act || !gone) return;
-        act.deleteCharacter(gone, Object.keys(state.entries), state.sessions.map((x) => x.id));
+        act.deleteCharacter(gone, Object.keys(state.entries));
         const profiles = Object.assign({}, state.profiles);
         delete profiles[gone];
         state.profiles = profiles;
@@ -5451,13 +5763,14 @@
       setSources(s) {
         updateCharacter(sourcesPatch(s));
       },
-      // Whether the character's hunts logged as another vocation count, and which vocation its hunts saved without one
-      // were logged as.
+      // Which of the shared hunts count for the character: those logged as another vocation too, and how near its level
+      // (percent; 0 is any level).
       setOtherVocationHunts(on) {
         updateCharacter({ otherVocationHunts: !!on });
       },
-      setLoggedAs(vocation) {
-        if (VOCATIONS.indexOf(vocation) !== -1) updateCharacter({ untaggedVocation: vocation });
+      setLevelWindow(w2) {
+        w2 = Number(w2);
+        if (LEVEL_WINDOWS.indexOf(w2) !== -1) updateCharacter({ levelWindow: w2 });
       },
       // Goal mix: weights 0-5 each, or a preset by id.
       setWeights(w2) {
@@ -5509,7 +5822,7 @@
           return Promise.reject(new Error("bad"));
         }
         try {
-          return act.restoreBackup(bk).then(() => Object.keys(bk.characters).length);
+          return act.restoreBackup(bk, iso()).then(() => Object.keys(bk.characters).length);
         } catch (e) {
           return Promise.reject(e);
         }
@@ -5714,8 +6027,9 @@
         saveWeekly({ weekStart: weekKey(new Date(now())), exp: null, tasks: [], any: { killsLeft: null, done: false } });
       },
       // Logging a clean hunt. preview: parseSession's result. spot: {id} (a known spot) or {name, parentId, note} (a new
-      // spot, or a variation of parentId). raidsBy: Echo Raids per creature (advanced). Saves the session at that spot (and
-      // the new spot first); Hunting now ends. Returns the session's id, or null when there's nothing to save.
+      // spot, or a variation of parentId). raidsBy: Echo Raids per creature (advanced). Saves the hunt to the shared
+      // hunts at that spot (and the new spot first), with the character's vocation and level and who logged it; Hunting
+      // now ends. Returns the hunt's id, or null when there's nothing to save.
       saveHunt({ preview, spot, raidsBy }) {
         const pid = state.pid, p = profile();
         if (!act || !pid || !p || !preview || !preview.hours || !preview.kills || !preview.kills.length) return null;
@@ -5726,7 +6040,7 @@
           spotId = newSpotId(name);
           const doc = { name, parentId: spot.parentId || null, note: String(spot.note || "").trim().slice(0, 200) || null, createdAt: iso() };
           state.userSpots = Object.assign({}, state.userSpots, { [spotId]: doc });
-          act.saveSpot(pid, spotId, doc);
+          act.saveSpot(spotId, doc);
         } else {
           const sp = model().spotIndex().spots[spotId];
           name = sp ? sp.name : spotId;
@@ -5747,6 +6061,7 @@
           kills: preview.kills.map((k) => k.slug ? { slug: k.slug, name: k.name, count: k.count } : { name: k.name, count: k.count }),
           level: Number(p.level) || null,
           vocation: p.vocation || VOCATIONS[0],
+          by: { pid, name: p.name ? String(p.name).trim().slice(0, 40) : null },
           createdAt: iso()
         };
         const raids = {};
@@ -5755,10 +6070,10 @@
           if (n >= 0 && n < 1e3) raids[k] = n;
         });
         if (Object.keys(raids).length) body.raidsBy = raids;
-        const id = act.newSessionId(pid);
-        state.sessions = state.sessions.concat([Object.assign({ id }, body)]);
-        act.saveSession(pid, id, body, () => {
-          state.sessions = state.sessions.filter((x) => x.id !== id);
+        const id = act.newHuntId();
+        state.hunts = state.hunts.concat([readHunt(id, body)]);
+        act.saveHunt(id, body, () => {
+          state.hunts = state.hunts.filter((x) => x.id !== id);
           state.notice = t("Couldn’t save the hunt. Try again in a moment.");
           changed();
         });
@@ -5767,18 +6082,44 @@
         return id;
       },
       deleteSession(id) {
-        const pid = state.pid;
-        if (!act || !pid) return;
-        state.sessions = state.sessions.filter((x) => x.id !== id);
-        act.deleteSession(pid, id, () => {
+        if (!act) return;
+        state.hunts = state.hunts.filter((x) => x.id !== id);
+        act.deleteHunt(id, () => {
           state.notice = t("Couldn’t delete that hunt.");
+          changed();
+        });
+        changed();
+      },
+      // A saved hunt's vocation, level (a number, or "" for none) and spot (a spot id), as corrected on the Log screen.
+      editHunt(id, patch) {
+        const x = state.hunts.filter((y) => y.id === id)[0];
+        if (!act || !x) return;
+        const body = Object.assign({}, x);
+        delete body.id;
+        if ("vocation" in patch && VOCATIONS.indexOf(patch.vocation) !== -1) body.vocation = patch.vocation;
+        if ("level" in patch) {
+          const n = parseInt(patch.level, 10);
+          body.level = n > 0 && n < 1e4 ? n : null;
+        }
+        if ("spotId" in patch && patch.spotId) {
+          const sp = model().spotIndex().spots[patch.spotId];
+          if (sp) {
+            body.spotId = sp.id;
+            body.spot = sp.name;
+          }
+        }
+        const prev = state.hunts;
+        state.hunts = state.hunts.map((y) => y.id === id ? readHunt(id, body) : y);
+        act.saveHunt(id, body, () => {
+          state.hunts = prev;
+          state.notice = t("Couldn’t save that change. Try again in a moment.");
           changed();
         });
         changed();
       },
       // Echo Raid counts per creature on a logged hunt (advanced).
       setSessionRaids(id, raidsBy) {
-        const pid = state.pid, x = state.sessions.filter((y) => y.id === id)[0];
+        const x = state.hunts.filter((y) => y.id === id)[0];
         if (!act || !x) return;
         const raids = {};
         Object.keys(raidsBy || {}).forEach((k) => {
@@ -5788,36 +6129,34 @@
         const body = Object.assign({}, x, { raidsBy: raids });
         delete body.id;
         delete body.raids;
-        state.sessions = state.sessions.map((y) => y.id === id ? Object.assign({ id }, body) : y);
-        act.saveSession(pid, id, body);
+        state.hunts = state.hunts.map((y) => y.id === id ? Object.assign({ id }, body) : y);
+        act.saveHunt(id, body);
         changed();
       },
-      // The character's own spots: rename, or delete with the hunts logged there.
+      // The spots made for logged hunts (shared): rename, or delete with the hunts logged there, by any character.
       renameSpot(id, name) {
-        const pid = state.pid, sp = state.userSpots[id];
+        const sp = state.userSpots[id];
         name = String(name || "").trim().slice(0, 60);
         if (!act || !sp || !name) return;
         const doc = Object.assign({}, sp, { name });
         state.userSpots = Object.assign({}, state.userSpots, { [id]: doc });
-        act.saveSpot(pid, id, doc);
+        act.saveSpot(id, doc);
         changed();
       },
       deleteSpot(id) {
-        const pid = state.pid;
         if (!act || !state.userSpots[id]) return;
-        const gone = state.sessions.filter((x) => x.spotId === id).map((x) => x.id);
-        gone.forEach((x) => act.deleteSession(pid, x));
-        state.sessions = state.sessions.filter((x) => x.spotId !== id);
+        state.hunts.filter((x) => x.spotId === id).forEach((x) => act.deleteHunt(x.id));
+        state.hunts = state.hunts.filter((x) => x.spotId !== id);
         const spots = Object.assign({}, state.userSpots);
         delete spots[id];
         Object.keys(spots).forEach((k) => {
           if (spots[k].parentId === id) {
             spots[k] = Object.assign({}, spots[k], { parentId: null });
-            act.saveSpot(pid, k, spots[k]);
+            act.saveSpot(k, spots[k]);
           }
         });
         state.userSpots = spots;
-        act.deleteSpot(pid, id);
+        act.deleteSpot(id);
         changed();
       },
       // Planner documents.
@@ -5840,7 +6179,8 @@
       catalog,
       reference: data.reference,
       profile: profile() || {},
-      sessions: state.sessions,
+      pid: state.pid,
+      sessions: state.hunts,
       entries: state.entries,
       advanced: state.advanced,
       difficulty,
@@ -6189,9 +6529,12 @@
     if (!calib) return t("Not adjusted to you yet: log a clean hunt at a spot with a reference hunt.");
     return sources.otherVocation && others.length ? t.n(calib.spots.length, "Adjusted to you from {n} logged spot (other vocations too: {others}).", "Adjusted to you from {n} logged spots (other vocations too: {others}).", { others: others.join(", ") }) : t.n(calib.spots.length, "Adjusted to you from {n} logged spot.", "Adjusted to you from {n} logged spots.");
   }
+  function windowOptions(level) {
+    return LEVEL_WINDOWS.map((w2) => ({ value: w2, label: !w2 ? t("Any level") : Number(level) > 0 ? t("Within {pct}% of level {level} ({lo}–{hi})", { pct: w2, level, lo: Math.ceil(level * (100 - w2) / 100), hi: Math.floor(level * (100 + w2) / 100) }) : t("Within {pct}% of its level", { pct: w2 }) }));
+  }
   function charactersPageView(state, model) {
     const p = state.profiles[state.pid] || null, sources = readSources(p || {}), settings = readSettings(p || {}, state.planner && state.planner.state);
-    const d = model && model.derived, hs = readHuntSources(p || {}), untagged = (state.sessions || []).filter((x) => !x.vocation).length;
+    const d = model && model.derived, hs = readHuntSources(p || {});
     return {
       canWrite: state.canWrite && state.status === "ready",
       pills: state.order.map((id) => {
@@ -6206,16 +6549,9 @@
         presets: [["mine", _("Mine only")], ["reference", _("+ Reference")], ["everything", _("Everything")]].map(([value, label]) => ({ value, label: t(label), switches: SOURCE_PRESETS[value] })),
         calibration: p ? calibrationText({ sources, calib: d && d.calib, calibOther: d && d.calibOther }) : ""
       },
-      // The character's own hunts: whether those logged as another vocation count, and (while some hunts were saved
-      // without a vocation) which vocation those were logged as.
-      hunts: { otherVocation: hs.otherVocation, untagged: p && untagged ? {
-        loggedAs: hs.loggedAs || p.vocation || VOCATIONS[0],
-        note: t.n(
-          untagged,
-          "{n} older hunt doesn’t say which vocation logged it. Only hunts logged as this character’s vocation count, unless the switch above is on.",
-          "{n} older hunts don’t say which vocation logged them. Only hunts logged as this character’s vocation count, unless the switch above is on."
-        )
-      } : null },
+      // Which of the hunts every character shares count for this one: those logged as another vocation, and how near
+      // its level.
+      hunts: { otherVocation: hs.otherVocation, window: hs.window, windows: windowOptions(p && p.level) },
       settings: { world: settings.world || "", takenMinutes: settings.takenMinutes, takenOptions: TAKEN_MINUTES.map((m) => ({ value: m, label: t(MINUTES_LABEL[m]) })) },
       advanced: state.advanced,
       theme: state.theme,
@@ -6230,9 +6566,27 @@
   var HOURS = [[null, _("No limit")], [0.5, "30 min"], [1, "1 h"], [1.5, "1.5 h"], [2, "2 h"], [3, "3 h"], [4, "4 h"]];
   var PREY_KINDS = [["xp", _("Exp")], ["loot", _("Loot")], ["damage", _("Damage")], ["defense", _("Defense")]];
   var SOURCE_LABELS = { mine: _("Mine only"), reference: _("+ Reference"), everything: _("Everything"), custom: _("Custom") };
-  function sourceBadges(o, sessions) {
+  function huntsWho(list) {
+    const by = {}, order = [];
+    (list || []).forEach((x) => {
+      const v = VOC_SHORT[x.vocation] || "", lvl = Number(x.level) || 0;
+      if (!by[v]) {
+        by[v] = { lo: Infinity, hi: 0 };
+        order.push(v);
+      }
+      if (lvl) {
+        by[v].lo = Math.min(by[v].lo, lvl);
+        by[v].hi = Math.max(by[v].hi, lvl);
+      }
+    });
+    return order.map((v) => {
+      const r = by[v];
+      return [v, r.hi ? r.lo === r.hi ? String(r.lo) : r.lo + "–" + r.hi : ""].filter(Boolean).join(" ");
+    }).filter(Boolean).join(", ");
+  }
+  function sourceBadges(o, sessions, who) {
     const out = [], e = o.entry || {};
-    if (o.src === "own") out.push({ kind: "yours", text: t.n(sessions || 0, "Yours · {n} hunt", "Yours · {n} hunts") });
+    if (o.src === "own") out.push({ kind: "yours", text: who ? t.n(sessions || 0, "Yours · {n} hunt · {who}", "Yours · {n} hunts · {who}", { who }) : t.n(sessions || 0, "Yours · {n} hunt", "Yours · {n} hunts") });
     else if (o.src === "refAdj") out.push({ kind: "refAdj", text: t("Reference, adjusted to you") });
     else if (o.src === "ref") out.push({ kind: "ref", text: t("Reference") });
     else if (o.src === "other" || o.src === "otherAdj") out.push({ kind: "other", text: t("Other vocation") });
@@ -6244,7 +6598,7 @@
     const p = state.profiles[state.pid] || {}, pl = state.planner || {}, st = pl.state || {};
     const base = planView(state, model, catalog, compare), settings = readSettings(p, st), sources = readSources(p), hunting = readHunting(st);
     const name = (slug) => slug && catalog.bySlug[slug] ? catalog.bySlug[slug].name : "";
-    const idx = model.spotIndex(), spotName = (id) => idx.spots[id] ? idx.spots[id].name : id, sessionsAt = (id) => idx.spots[id] ? idx.spots[id].sessions.length : 0;
+    const idx = model.spotIndex(), spotName2 = (id) => idx.spots[id] ? idx.spots[id].name : id, huntsAt = (id) => idx.spots[id] ? idx.spots[id].sessions : [];
     const ch = model.planChain(model.plannerCtx({ marks: pl.marks }));
     const bountyLine = (s) => !s.offer || !s.option.held ? null : s.offer.held ? t("Counts for your bounty: {creature}", { creature: s.offer.name }) : t("For offer {letter}: {creature}. Pick it once the spot is free.", { letter: "ABC"[s.offer.i], creature: s.offer.name });
     const card = (s) => {
@@ -6256,7 +6610,7 @@
         bounty: bountyLine(s),
         exp: fmtBig(o.m.xp),
         profit: o.m.profit != null ? fmtBig(o.m.profit) : "–",
-        badges: sourceBadges(o, sessionsAt(o.id)),
+        badges: sourceBadges(o, huntsAt(o.id).length, huntsWho(huntsAt(o.id))),
         why: s.why,
         offer: s.offer && !s.offer.held ? { i: s.offer.i, letter: "ABC"[s.offer.i], name: s.offer.name } : null
       };
@@ -6277,12 +6631,12 @@
     const refNote = first && (first.badges[0] || {}).kind !== "yours" && (first.badges[0] || {}).kind !== "refAdj" ? t("Top players’ numbers: expect less until you log a hunt.") : null;
     const taken = Object.keys(pl.marks || {}).filter((id) => pl.marks[id].state === "taken" && markActive(pl.marks[id], now, settings.takenMinutes)).map((id) => {
       const age = Math.round(markAge(pl.marks[id], now)), left = Math.max(1, Math.ceil(settings.takenMinutes - markAge(pl.marks[id], now)));
-      return { id, name: spotName(id), meta: (age < 1 ? t("Marked just now") : t("Marked {min} min ago", { min: age })) + " · " + t("clears in {min} min", { min: left }) };
+      return { id, name: spotName2(id), meta: (age < 1 ? t("Marked just now") : t("Marked {min} min ago", { min: age })) + " · " + t("clears in {min} min", { min: left }) };
     });
     let huntingView = null;
     if (hunting) {
       const opt = ch.options.filter((o) => o.id === hunting.spotId)[0], off = opt && opt.offer && !opt.offer.held ? opt.offer : null;
-      huntingView = { spotId: hunting.spotId, name: spotName(hunting.spotId), pick: off ? { i: off.i, letter: "ABC"[off.i], name: off.name } : null };
+      huntingView = { spotId: hunting.spotId, name: spotName2(hunting.spotId), pick: off ? { i: off.i, letter: "ABC"[off.i], name: off.name } : null };
     }
     const wk = model.weekly(), rows = model.weeklyRows().filter((r) => r.name), done = rows.filter((r) => r.done);
     const anyTask = wk.current && wk.any && (wk.any.killsLeft != null || wk.any.done) ? { left: wk.any.killsLeft, done: wk.any.done } : null;
@@ -6374,20 +6728,72 @@
       } : null
     };
   }
-  function logView(draft, model, catalog, advanced) {
+  function logView(draft, model, catalog, advanced, state) {
+    state = state || {};
     const p = draft.text ? parseSession(draft.text, catalog) : null, problem = draft.text ? sessionProblems(p, translator()) : "";
-    const idx = model.spotIndex(), byName = (a, b) => a.name.localeCompare(b.name);
-    const parents = idx.list.filter((s) => !s.parentId).slice().sort(byName);
+    const idx = model.spotIndex(), byName2 = (a, b) => a.name.localeCompare(b.name);
+    const parents = idx.list.filter((s) => !s.parentId).slice().sort(byName2);
     const spots = [];
     parents.forEach((s) => {
       spots.push({ value: s.id, label: s.userMade ? t("{spot} (yours)", { spot: s.name }) : s.name });
-      idx.list.filter((v) => v.parentId === s.id).sort(byName).forEach((v) => spots.push({ value: v.id, label: t("{spot} (yours)", { spot: s.name + " · " + v.name }) }));
+      idx.list.filter((v) => v.parentId === s.id).sort(byName2).forEach((v) => spots.push({ value: v.id, label: t("{spot} (yours)", { spot: s.name + " · " + v.name }) }));
     });
     const ok = p && !problem;
     const exp = ok ? ((p.rawXp != null ? p.rawXp : p.xp) || 0) / p.hours : null, profit = ok && p.balance != null ? p.balance / p.hours : null;
     const nameTaken = draft.where === "new" && draft.name && idx.idOf(draft.name) && !(idx.spots[idx.idOf(draft.name)] || {}).userMade;
     const where = draft.where === "new" ? "new" : "known", spotId = draft.spotId && idx.spots[draft.spotId] ? draft.spotId : (spots[0] || {}).value || null;
     const kills = ok ? p.kills.slice().sort((a, b) => b.count - a.count) : [];
+    const all = state.hunts || [], when = (x) => String(x.start || x.end || "");
+    const spotOf = (x) => x.spotId && idx.spots[x.spotId] ? x.spotId : idx.idOf(x.spot);
+    const spotLabel = (x) => {
+      const id = spotOf(x), sp = id && idx.spots[id], parent = sp && sp.parentId && idx.spots[sp.parentId];
+      return sp ? (parent ? parent.name + " · " : "") + sp.name : x.spot || t("Unnamed spot");
+    };
+    const dayOf = (x) => when(x) ? fmtDay(when(x).slice(0, 10)) : t("Undated");
+    const key = ok ? huntKey(p) : null, dupe = key ? all.filter((x) => huntKey(x) === key)[0] || null : null;
+    const me = (state.profiles || {})[state.pid] || {}, hs = readHuntSources(me), myVoc = me.vocation || VOCATIONS[0], lvl = Number(me.level) || 0;
+    const fVoc = draft.filterVoc || (hs.otherVocation ? "all" : myVoc), fLevel = lvl ? draft.filterLevel != null ? String(draft.filterLevel) : String(hs.window || "any") : "any";
+    const w2 = fLevel === "any" ? 0 : Number(fLevel) || 0;
+    const shown = all.filter((x) => (fVoc === "all" || !x.vocation || x.vocation === fVoc) && (!w2 || !x.level || Math.abs(x.level - lvl) * 100 <= lvl * w2)).sort((a, b) => when(b).localeCompare(when(a)));
+    const limit = draft.limit > 0 ? draft.limit : 20;
+    const rows = shown.slice(0, limit), editing = draft.edit && all.filter((x) => x.id === draft.edit)[0];
+    if (editing && rows.indexOf(editing) === -1) rows.unshift(editing);
+    const ed = draft.editDraft || {};
+    const saved = {
+      filters: {
+        vocation: fVoc,
+        vocations: [{ value: "all", label: t("All vocations") }].concat(VOCATIONS.map((v) => ({ value: v, label: v }))),
+        level: fLevel,
+        levels: [{ value: "any", label: t("Any level") }].concat(lvl ? LEVEL_WINDOWS.filter(Boolean).map((x) => ({
+          value: String(x),
+          label: t("{lo}–{hi} (±{pct}%)", { pct: x, lo: Math.ceil(lvl * (100 - x) / 100), hi: Math.floor(lvl * (100 + x) / 100) })
+        })) : [])
+      },
+      count: all.length ? t.n(all.length, "{shown} of {n} saved hunt", "{shown} of {n} saved hunts", { shown: shown.length }) : "",
+      empty: !all.length ? t("No hunts saved yet.") : !shown.length ? t("No saved hunts match these filters.") : "",
+      more: Math.max(0, shown.length - limit),
+      rows: rows.map((x) => {
+        const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, open = !!editing && editing === x;
+        const level = ed.level != null ? ed.level : x.level != null ? String(x.level) : "", lvlOk = level === "" || /^\d+$/.test(String(level)) && Number(level) > 0 && Number(level) < 1e4;
+        return {
+          id: x.id,
+          title: dayOf(x) + " · " + spotLabel(x),
+          sub: [huntAt(x), t("by {name}", { name: byName(state, x.by) }), t("{amount} exp/h", { amount: H && xp != null ? fmtBig(xp / H) : "–" })].filter(Boolean).join(" · "),
+          label: t("Edit the hunt of {date} at {spot}", { date: dayOf(x), spot: spotLabel(x) }),
+          open,
+          editor: open ? {
+            vocation: ed.vocation || x.vocation || myVoc,
+            vocations: VOCATIONS.map((v) => ({ value: v, label: v })),
+            level,
+            levelOk: lvlOk,
+            spotId: ed.spotId || spotOf(x) || "",
+            spots: (spotOf(x) ? [] : [{ value: "", label: x.spot || t("Unnamed spot") }]).concat(spots),
+            armed: draft.armed === x.id,
+            canSave: lvlOk
+          } : null
+        };
+      })
+    };
     return {
       text: draft.text || "",
       problem,
@@ -6405,7 +6811,9 @@
       profit: profit != null ? fmtBig(profit) : "–",
       kph: kills.map((k) => ({ name: k.name, perHour: Math.round(k.count / p.hours) + "/h" })),
       raids: advanced && ok ? kills.map((k) => ({ name: k.name, value: (draft.raids || {})[k.name] || "" })) : null,
-      canSave: !!ok && (where === "known" ? !!spotId : !!(draft.name && draft.name.trim()) && !nameTaken)
+      canSave: !!ok && (where === "known" ? !!spotId : !!(draft.name && draft.name.trim()) && !nameTaken),
+      duplicate: dupe ? { id: dupe.id, asked: !!draft.dupe, text: t("You saved this hunt already: {date} at {spot}, by {name}.", { date: dayOf(dupe), spot: spotLabel(dupe), name: byName(state, dupe.by) }) } : null,
+      saved
     };
   }
   var SORTS = [["score", _("Score")], ["exp", _("Exp/h")], ["profit", _("Profit/h")]];
@@ -6419,19 +6827,19 @@
   ];
   var badgeLegend = () => LEGEND.map(([kind, name, text]) => ({ kind, name: t(name), text: t(text) }));
   var spotsMemo = /* @__PURE__ */ new WeakMap();
-  function spotOptions(model, lens) {
-    const key = (lens.allVocations ? "v" : "") + (lens.anyLevel ? "l" : "");
+  function spotOptions(model, lens, keepHunts) {
+    const wide = (lens.allVocations ? "v" : "") + (lens.anyLevel ? "l" : ""), key = wide + (keepHunts ? "k" : "");
     let m = spotsMemo.get(model);
     if (!m) {
       m = {};
       spotsMemo.set(model, m);
     }
     if (!m[key]) {
-      const po = model.planOptions(model.plannerCtx({ lens })), byId = {};
+      const po = model.planOptions(model.plannerCtx({ lens, index: model.spotIndex(wide && !keepHunts ? lens : null) })), byId2 = {};
       po.options.forEach((o) => {
-        byId[o.id] = o;
+        byId2[o.id] = o;
       });
-      m[key] = { idx: po.idx, byId };
+      m[key] = { idx: po.idx, byId: byId2 };
     }
     return m[key];
   }
@@ -6462,12 +6870,12 @@
   var takenText = (min) => t("Taken · clears in {min} min", { min });
   function spotsView(state, model, catalog, ui, now) {
     const lens = { allVocations: !!ui.allVocations, anyLevel: !!ui.anyLevel }, sort = ui.sort || "score";
-    const { idx, byId } = spotOptions(model, lens), taken = takenLeft(state, now), tags = creatureTags(model), q = norm(ui.query || "");
+    const { idx, byId: byId2 } = spotOptions(model, lens), taken = takenLeft(state, now), tags = creatureTags(model), q = norm(ui.query || "");
     const name = (slug) => catalog.bySlug[slug] ? catalog.bySlug[slug].name : slug;
     const matches = (sp) => !q || norm(sp.name).indexOf(q) !== -1 || sp.aliases.some((a) => norm(a).indexOf(q) !== -1) || Object.keys(sp.creatures).some((s) => norm(name(s)).indexOf(q) !== -1);
     const all = idx.list.filter((sp) => !model.lensCheck(sp, lens) && !(ui.hideTaken && taken[sp.id]) && matches(sp));
     const key = (sp) => {
-      const o = byId[sp.id];
+      const o = byId2[sp.id];
       return !o ? null : sort === "exp" ? o.m.xp : sort === "profit" ? o.m.profit : o.v;
     };
     all.sort((a, b) => {
@@ -6476,7 +6884,7 @@
     });
     const limit = ui.limit > 0 ? ui.limit : 50;
     const rows = all.slice(0, limit).map((sp) => {
-      const o = byId[sp.id], parent = sp.parentId && idx.spots[sp.parentId];
+      const o = byId2[sp.id], parent = sp.parentId && idx.spots[sp.parentId];
       const cr = byKph(o && o.kph, sp.creatures).slice(0, 5).map((s) => name(s) + (tags[s] ? " (" + tagText(tags[s]) + ")" : ""));
       return {
         id: sp.id,
@@ -6486,7 +6894,7 @@
         numbers: o ? perHourPair(o) : null,
         none: o ? null : teamOnly(sp) ? t("Only duo or team hunts recorded here") : t("Not enough data for your vocation"),
         creatures: cr.join(", "),
-        badges: o ? sourceBadges(o, sp.sessions.length) : [],
+        badges: o ? sourceBadges(o, sp.sessions.length, huntsWho(sp.sessions)) : [],
         taken: taken[sp.id] ? takenText(taken[sp.id]) : null
       };
     });
@@ -6504,10 +6912,16 @@
   }
   var fmtMonth = (iso) => (/* @__PURE__ */ new Date(String(iso).slice(0, 10) + "T12:00:00Z")).toLocaleDateString(locale(), { month: "short", year: "numeric", timeZone: "UTC" });
   var levelRange = (e) => e.levelMin ? e.levelMax ? t("level {min}–{max}", { min: e.levelMin, max: e.levelMax }) : t("level {min}+", { min: e.levelMin }) : e.levelMax ? t("up to level {max}", { max: e.levelMax }) : t("any level");
+  function byName(state, by) {
+    const p = by && by.pid && state.profiles && state.profiles[by.pid];
+    return p ? displayName(p) : by && by.name ? by.name : t("a deleted character");
+  }
+  var joinNames = (names) => names.filter((n, i) => names.indexOf(n) === i).join(", ");
+  var huntAt = (x) => x.vocation || x.level ? [VOC_SHORT[x.vocation] || x.vocation, x.level ? t("level {level}", { level: x.level }) : null].filter(Boolean).join(" ") : null;
   function spotView(state, model, catalog, id, ui, now, advanced) {
     ui = ui || {};
     let opts = spotOptions(model, ui.lens || {});
-    if (!opts.byId[id]) opts = spotOptions(model, { allVocations: true, anyLevel: true });
+    if (!opts.byId[id]) opts = spotOptions(model, { allVocations: true, anyLevel: true }, true);
     const idx = opts.idx, sp = idx.spots[id];
     if (!sp) return null;
     const p = state.profiles[state.pid] || {}, o = opts.byId[id] || null, nums = model.spotNums(sp), d = model.derived;
@@ -6524,9 +6938,11 @@
     }));
     const hrs = sp.sessions.reduce((a, x) => a + (Number(x.hours) || 0), 0);
     const hs = readHuntSources(p), minLevel = spotMinLevel(sp, vocation);
-    const skipText = (k) => k.why === "level" ? t("Doesn’t count: this spot is for level {level} and up.", { level: minLevel }) : t("Doesn’t count: logged as {voc}.", { voc: k.x.vocation || hs.loggedAs || vocation });
+    const skipText = (k) => k.why === "level" ? t("Doesn’t count: this spot is for level {level} and up.", { level: minLevel }) : k.why === "window" ? t("Doesn’t count: logged at level {level}, more than {pct}% from this character’s.", { level: k.x.level, pct: hs.window }) : t("Doesn’t count: logged as {voc}.", { voc: k.x.vocation || vocation });
     const notCounted = sp.skipped.length ? t.n(sp.skipped.length, "{n} hunt here doesn’t count for this character.", "{n} hunts here don’t count for this character.") : "";
-    const hunts = !sp.sessions.length ? notCounted || t("None yet.") : (nums && nums.src === "own" ? t.n(sp.sessions.length, "{n} hunt, {time}.", "{n} hunts, {time}.", { time: fmtHours(hrs) }) : t.n(sp.sessions.length, "{n} hunt, {time}, all with breaks: no clean rate.", "{n} hunts, {time}, all with breaks: no clean rate.", { time: fmtHours(hrs) })) + (notCounted ? " " + notCounted : "");
+    const loggers = joinNames(sp.sessions.map((x) => byName(state, x.by)));
+    const whose = sp.sessions.length ? " " + t("Logged as {who} by {names}.", { who: huntsWho(sp.sessions), names: loggers }) : "";
+    const hunts = !sp.sessions.length ? notCounted || t("None yet.") : (nums && nums.src === "own" ? t.n(sp.sessions.length, "{n} hunt, {time}.", "{n} hunts, {time}.", { time: fmtHours(hrs) }) : t.n(sp.sessions.length, "{n} hunt, {time}, all with breaks: no clean rate.", "{n} hunts, {time}, all with breaks: no clean rate.", { time: fmtHours(hrs) })) + whose + (notCounted ? " " + notCounted : "");
     const refNums2 = nums && nums.src === "own" ? model.spotNums(Object.assign({}, sp, { sessions: [] })) : nums;
     const e = refNums2 && refNums2.entry || null;
     const open = ui.open || {};
@@ -6591,7 +7007,7 @@
     const sessions = sp.sessions.concat(sp.skipped.map((k) => k.x)).filter((x) => x.id).sort((a, b) => when(b).localeCompare(when(a))).map((x) => {
       const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, raids = raidsOf(x);
       const clock = (s) => /T\d\d:\d\d/.test(s || "") ? String(s).slice(11, 16) : null, from = clock(x.start), to = clock(x.end);
-      const caption = [from && to ? from + "–" + to : null, x.level ? t("level {level}", { level: x.level }) : null, x.breaks ? t("with breaks") : null].filter(Boolean).join(" · ");
+      const caption = [from && to ? from + "–" + to : null, huntAt(x), t("by {name}", { name: byName(state, x.by) }), x.breaks ? t("with breaks") : null].filter(Boolean).join(" · ");
       return {
         id: x.id,
         date: when(x) ? fmtDay(when(x).slice(0, 10)) : t("Undated"),
@@ -6624,7 +7040,7 @@
       scoreLine,
       exp: o ? fmtBig(o.m.xp) : nums ? fmtBig(nums.xph) : "–",
       profit: o ? o.m.profit != null ? fmtBig(o.m.profit) : "–" : nums && nums.pph != null ? fmtBig(nums.pph) : "–",
-      badges: o ? sourceBadges(o, ns) : nums ? sourceBadges(nums, ns) : [],
+      badges: o ? sourceBadges(o, ns, huntsWho(sp.sessions)) : nums ? sourceBadges(nums, ns, huntsWho(sp.sessions)) : [],
       taken: taken[id] ? takenText(taken[id]) : null,
       creatures,
       sources: { hunts, reference, skipped },
@@ -6635,7 +7051,7 @@
       own: advanced && sp.userMade ? {
         name: sp.name,
         armed: ui.armed === "spot",
-        deleteText: (nAll ? t.n(nAll, "Deletes this spot and its {n} hunt", "Deletes this spot and its {n} hunts") : t("Deletes this spot")) + (nv ? "; " + t.n(nv, "its {n} variation stays as a spot of its own", "its {n} variations stay as spots of their own") : "") + "."
+        deleteText: (nAll ? t.n(nAll, "Deletes this spot and its {n} hunt, whichever character logged it", "Deletes this spot and its {n} hunts, whichever character logged them") : t("Deletes this spot")) + (nv ? "; " + t.n(nv, "its {n} variation stays as a spot of its own", "its {n} variations stay as spots of their own") : "") + "."
       } : null
     };
   }
@@ -6996,7 +7412,7 @@
           confirmButton({
             id: "ch-delete",
             label: t("Delete this character…"),
-            confirmLabel: t("Tap again to delete {name} and everything saved for it", { name: c.displayName }),
+            confirmLabel: t("Tap again to delete {name}. Its logged hunts stay for your other characters.", { name: c.displayName }),
             armed: ui.armed,
             disabled: ro,
             onArm: () => on.arm(true),
@@ -7017,10 +7433,14 @@
         h(
           "div",
           { class: "hp-card flush" },
-          settingRow(t("Your logged hunts"), t("Always used first, at spots your level reaches."), h("span", { class: "hp-caption" }, t("Always on"))),
+          settingRow(
+            t("Your logged hunts"),
+            t("Hunts any of your characters logged as this vocation near this level, at spots it reaches. Always used first."),
+            h("span", { class: "hp-caption" }, t("Always on"))
+          ),
           settingRow(
             t("Your hunts as other vocations"),
-            t("Hunts this character logged as another vocation."),
+            t("Hunts logged as another vocation count too."),
             switchCtl({ id: "src-own-other", label: t("Your hunts as other vocations"), on: view.hunts.otherVocation, disabled: ro, onToggle: on.setOtherVocationHunts })
           ),
           settingRow(
@@ -7040,19 +7460,14 @@
           )
         ),
         view.sources.preset === "custom" ? h("p", { class: "hp-p hp-caption" }, t("Custom: these switches don’t match a preset.")) : null,
-        view.hunts.untagged ? h(
-          "div",
-          { class: "hp-stack" },
-          selectField({
-            id: "src-logged-as",
-            label: t("Older hunts were logged as"),
-            value: view.hunts.untagged.loggedAs,
-            options: view.vocations.map((v) => ({ value: v, label: v })),
-            disabled: ro,
-            onPick: on.setLoggedAs
-          }),
-          h("p", { class: "hp-p hp-caption" }, view.hunts.untagged.note)
-        ) : null,
+        selectField({
+          id: "src-window",
+          label: t("Your hunts count when logged"),
+          value: view.hunts.window,
+          options: view.hunts.windows,
+          disabled: ro,
+          onPick: (v) => on.setLevelWindow(Number(v))
+        }),
         h("p", { class: "hp-p hp-small hp-muted" }, view.sources.calibration)
       ) : null,
       c ? section(
@@ -7612,6 +8027,80 @@
   }
 
   // src/ui/screens/log.js
+  function savedHunts(s, on) {
+    const field2 = (id, label, value, onCommit, opts) => h(
+      "label",
+      { class: "hp-field" },
+      label,
+      h("input", Object.assign({ id, class: "hp-input", value, autocomplete: "off", onChange: (e) => onCommit(e.target.value) }, opts || {}))
+    );
+    return h(
+      "section",
+      { class: "hp-section", "aria-labelledby": "saved-h" },
+      h("h2", { id: "saved-h", class: "hp-eyebrow" }, t("Saved hunts")),
+      h("p", { class: "hp-p hp-small hp-muted" }, t("Shared by all your characters: each hunt counts for those of its vocation near its level.")),
+      h(
+        "div",
+        { class: "hp-grid2" },
+        selectField({ id: "saved-f-voc", label: t("Vocation"), value: s.filters.vocation, options: s.filters.vocations, onPick: on.filterVoc }),
+        selectField({ id: "saved-f-level", label: t("Level"), value: s.filters.level, options: s.filters.levels, onPick: on.filterLevel })
+      ),
+      s.count ? h("p", { id: "saved-count", class: "hp-p hp-caption", role: "status" }, s.count) : null,
+      s.empty ? h("p", { class: "hp-p hp-small hp-muted" }, s.empty) : null,
+      s.rows.map((r) => h(
+        "div",
+        { id: "saved-" + r.id, class: "hp-card hp-session" },
+        h(
+          "div",
+          { class: "hp-line" },
+          h("span", null, h("b", null, r.title), h("br"), h("span", { class: "hp-small hp-muted" }, r.sub))
+        ),
+        h(
+          "div",
+          { class: "hp-session-actions" },
+          h("button", {
+            id: "saved-" + r.id + "-edit",
+            type: "button",
+            class: "hp-linkbtn hp-tap",
+            "aria-expanded": r.open ? "true" : "false",
+            "aria-label": r.label,
+            onClick: () => on.edit(r.id)
+          }, r.open ? t("Close") : t("Edit"))
+        ),
+        r.editor ? h(
+          "div",
+          { class: "hp-stack" },
+          h(
+            "div",
+            { class: "hp-grid2" },
+            selectField({ id: "saved-" + r.id + "-voc", label: t("Vocation"), value: r.editor.vocation, options: r.editor.vocations, onPick: (x) => on.editField("vocation", x) }),
+            field2("saved-" + r.id + "-level", t("Level"), r.editor.level, (x) => on.editField("level", x.trim()), {
+              inputmode: "numeric",
+              maxlength: 4,
+              "aria-invalid": r.editor.levelOk ? null : "true"
+            })
+          ),
+          r.editor.levelOk ? null : h("span", { class: "hp-caption", role: "alert" }, t("Type a level, or leave it empty.")),
+          selectField({ id: "saved-" + r.id + "-spot", label: t("Spot"), value: r.editor.spotId, options: r.editor.spots, onPick: (x) => on.editField("spotId", x) }),
+          h(
+            "div",
+            { class: "hp-grid2" },
+            h("button", { id: "saved-" + r.id + "-cancel", type: "button", class: "hp-btn", onClick: on.editCancel }, t("Cancel")),
+            h("button", { id: "saved-" + r.id + "-save", type: "button", class: "hp-btn solid", disabled: !r.editor.canSave, onClick: () => on.editSave(r) }, t("Save changes"))
+          ),
+          confirmButton({
+            id: "saved-" + r.id + "-delete",
+            label: t("Delete this hunt"),
+            confirmLabel: t("Tap again to delete this hunt for every character"),
+            armed: r.editor.armed,
+            onArm: () => on.arm(r.id),
+            onConfirm: () => on.deleteHunt(r.id)
+          })
+        ) : null
+      )),
+      s.more ? h("button", { id: "saved-more", type: "button", class: "hp-btn", onClick: on.more }, t("Show {n} more", { n: s.more })) : null
+    );
+  }
   function render5(view, ui, on) {
     const field2 = (id, label, value, onCommit, opts) => h(
       "label",
@@ -7619,6 +8108,7 @@
       label,
       h("input", Object.assign({ id, class: "hp-input", value, autocomplete: "off", onChange: (e) => onCommit(e.target.value) }, opts || {}))
     );
+    const dup = view.duplicate;
     return h(
       "div",
       { class: "hp-section hp-narrow" },
@@ -7669,13 +8159,25 @@
         ),
         h("div", { class: "hp-card" }, h("b", null, t("Kills per hour")), h("ul", { class: "hp-list" }, view.kph.map((k) => h("li", null, h("span", null, k.name), h("span", null, k.perHour))))),
         view.raids ? h("div", { class: "hp-card" }, h("b", null, t("Echo Raids (advanced)")), view.raids.map((r, i) => field2("log-raid-" + i, t("{creature} raids", { creature: r.name }), r.value, (v) => on.raid(r.name, v), { inputmode: "numeric" }))) : null,
+        dup && dup.asked ? h(
+          "div",
+          { id: "log-dupe", class: "hp-pick", role: "alert" },
+          h("b", null, dup.text),
+          h(
+            "div",
+            { class: "hp-grid2" },
+            h("button", { id: "log-save-anyway", type: "button", class: "hp-btn", disabled: !view.canSave, onClick: on.saveAnyway }, t("Save anyway")),
+            h("button", { id: "log-open-existing", type: "button", class: "hp-btn", onClick: on.openExisting }, t("Open the existing one"))
+          )
+        ) : null,
         h(
           "div",
           { class: "hp-grid2" },
           h("button", { id: "log-skip", type: "button", class: "hp-btn", onClick: on.discard }, t("Don’t save")),
-          h("button", { id: "log-save", type: "button", class: "hp-btn primary", disabled: !view.canSave, onClick: on.save }, t("Save hunt"))
+          h("button", { id: "log-save", type: "button", class: "hp-btn primary", disabled: !view.canSave || !!(dup && dup.asked), onClick: on.save }, t("Save hunt"))
         )
-      ) : null
+      ) : null,
+      savedHunts(view.saved, on)
     );
   }
 
@@ -8169,7 +8671,7 @@
   var ROUTES = TABS.map((t2) => t2[0]).concat(["characters", "log", "spot", "creature"]);
   var PAGES = ["characters", "log"];
   function mount(root, app2, host2) {
-    const ui = { adding: false, firstRun: { vocation: null, level: "" }, characters: { armed: false, status: "" }, plan: { open: null, why: {} }, weekly: { armed: false }, spots: { query: "", sort: "score", allVocations: false, anyLevel: false, hideTaken: false, limit: 0 }, spot: { armed: null, open: {} }, creatures: { difficulty: null, mode: "tiers", query: "", lists: false, add: {} }, creature: { notes: null }, log: { text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan" } };
+    const ui = { adding: false, firstRun: { vocation: null, level: "" }, characters: { armed: false, status: "" }, plan: { open: null, why: {} }, weekly: { armed: false }, spots: { query: "", sort: "score", allVocations: false, anyLevel: false, hideTaken: false, limit: 0 }, spot: { armed: null, open: {} }, creatures: { difficulty: null, mode: "tiers", query: "", lists: false, add: {} }, creature: { notes: null }, log: blankLog() };
     const path = () => String(host2.hash() || "").replace(/^#\/?/, "");
     const route = () => {
       const r = path().split("/")[0];
@@ -8273,7 +8775,7 @@
           update: a.updateCharacter,
           setSources: a.setSources,
           setOtherVocationHunts: a.setOtherVocationHunts,
-          setLoggedAs: a.setLoggedAs,
+          setLevelWindow: a.setLevelWindow,
           setWorld: a.setWorld,
           setTakenMinutes: a.setTakenMinutes,
           setAdvanced: a.setAdvanced,
@@ -8361,14 +8863,24 @@
         });
       }
       if (r === "log") {
-        const L = ui.log, M = app2.model(), v = logView(L, M, app2.catalog, s.advanced), a = app2.actions;
+        const L = ui.log, M = app2.model(), v = logView(L, M, app2.catalog, s.advanced, s), a = app2.actions;
         const leave = () => {
           ui.log = blankLog();
           go(L.back || "plan");
         };
+        const closeEditor = () => {
+          L.edit = null;
+          L.editDraft = {};
+          L.armed = null;
+        };
+        const save = () => {
+          a.saveHunt({ preview: v.preview, spot: v.where === "known" ? { id: v.spotId } : { name: L.name, parentId: L.parentId || null, note: L.note }, raidsBy: L.raids });
+          leave();
+        };
         return render5(v, L, {
           text: (t2) => {
             L.text = t2;
+            L.dupe = false;
             draw();
           },
           where: (w2) => {
@@ -8395,10 +8907,30 @@
             L.raids[k] = n;
             draw();
           },
+          // A hunt saved before asks first: Save anyway, or Open the existing one (in the saved hunts' editor).
           save: () => {
             if (!v.canSave) return;
-            a.saveHunt({ preview: v.preview, spot: v.where === "known" ? { id: v.spotId } : { name: L.name, parentId: L.parentId || null, note: L.note }, raidsBy: L.raids });
-            leave();
+            if (v.duplicate && !L.dupe) {
+              L.dupe = true;
+              draw();
+              return;
+            }
+            save();
+          },
+          saveAnyway: () => {
+            if (v.canSave) save();
+          },
+          openExisting: () => {
+            if (!v.duplicate) return;
+            L.dupe = false;
+            closeEditor();
+            L.edit = v.duplicate.id;
+            draw();
+            const el = root.ownerDocument.getElementById("saved-" + L.edit + "-voc");
+            if (el) {
+              el.focus();
+              if (el.scrollIntoView) el.scrollIntoView({ block: "center" });
+            }
           },
           discard: leave,
           back: () => {
@@ -8410,6 +8942,48 @@
           keep: () => {
             L.leaving = false;
             draw();
+          },
+          filterVoc: (x) => {
+            L.filterVoc = x;
+            L.limit = 0;
+            draw();
+          },
+          filterLevel: (x) => {
+            L.filterLevel = x;
+            L.limit = 0;
+            draw();
+          },
+          more: () => {
+            L.limit = (L.limit || 20) + 20;
+            draw();
+          },
+          edit: (id) => {
+            const open = L.edit === id;
+            closeEditor();
+            if (!open) L.edit = id;
+            draw();
+          },
+          editField: (k, x) => {
+            L.editDraft = Object.assign({}, L.editDraft, { [k]: x });
+            draw();
+          },
+          editSave: (row) => {
+            if (!row.editor || !row.editor.canSave) return;
+            a.editHunt(row.id, { vocation: row.editor.vocation, level: row.editor.level, spotId: row.editor.spotId });
+            closeEditor();
+            draw();
+          },
+          editCancel: () => {
+            closeEditor();
+            draw();
+          },
+          arm: (id) => {
+            L.armed = id;
+            draw();
+          },
+          deleteHunt: (id) => {
+            closeEditor();
+            a.deleteSession(id);
           }
         });
       }
@@ -8557,7 +9131,26 @@
       ui.spot = { armed: null, open: {} };
       go("spot/" + encodeURIComponent(id));
     }
-    const blankLog = () => ({ text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan" });
+    function blankLog() {
+      return {
+        text: "",
+        where: "known",
+        spotId: null,
+        name: "",
+        parentId: "",
+        note: "",
+        raids: {},
+        leaving: false,
+        back: "plan",
+        dupe: false,
+        filterVoc: null,
+        filterLevel: null,
+        limit: 0,
+        edit: null,
+        editDraft: {},
+        armed: null
+      };
+    }
     function openLog(preset, back) {
       ui.log = Object.assign(blankLog(), preset, { back: back || "plan" });
       go("log");
