@@ -2,7 +2,7 @@
 // on top of it (numbers per creature, the reroll model, weekly tasks, the planner). Everything is a function of the
 // state, the derived values and `now`, so the same model backs the screens, the view models and the golden capture.
 import { VOCATIONS, SLOTS, DIFFICULTIES } from "../data/rules.js";
-import { compute } from "./compute.js";
+import { compute, ownHunts } from "./compute.js";
 import { readSources, readSettings, readGoal, readBounty } from "../store/schema.js";
 import { norm } from "../core/text.js";
 import { effective } from "../core/numbers.js";
@@ -12,7 +12,7 @@ import { compareDifficulties } from "../core/difficulty.js";
 import { scoringWeights } from "../core/score.js";
 import { weeklyBonus as coreWeeklyBonus, serverDay } from "../core/weekly.js";
 import { weeklyState, weeklyTaskRows, openWeeklyTasks } from "./weekly.js";
-import { spotIndex as coreSpotIndex, spotNumbers, lensCheck as coreLensCheck } from "../core/spots.js";
+import { spotIndex as coreSpotIndex, spotNumbers, lensCheck as coreLensCheck, huntCheck } from "../core/spots.js";
 import { noNumsWhy as coreNoNumsWhy } from "../core/explain.js";
 import { heldTask as coreHeldTask, spotValue as coreSpotValue, scaleSpots, spotScores as coreSpotScores, planOffers as corePlanOffers,
   planOptions as corePlanOptions, planChain as corePlanChain, todayFactor as coreTodayFactor } from "../core/plan.js";
@@ -94,7 +94,7 @@ export function makeModel(state, derived, now, opts) {
   };
 
   // Weekly kill tasks.
-  const weekly = () => weeklyState(p, state.sessions, catalog, at);
+  const weekly = () => weeklyState(p, ownHunts(state.sessions, state.pid), catalog, at);
   const weeklyRows = () => weeklyTaskRows(weekly(), catalog);
   const openWeeklies = () => openWeeklyTasks(weekly(), catalog);
   const weeklyBonus = (spot, hours, selfSlug, selfKills) => coreWeeklyBonus(d.weeklyNow, spot && d.spotKph[spot], hours, selfSlug, selfKills);
@@ -114,8 +114,15 @@ export function makeModel(state, derived, now, opts) {
     return { boosted: t.boostedDay === serverDay(now) ? t.boosted : null, prey: t.prey || [], event: t.event || 0 };
   };
   const todayFactor = (kph, td) => coreTodayFactor(kph, td, { catalog, expTable: state.expTable, t });
-  const spotIndex = () => coreSpotIndex({ reference: state.reference, sessions: state.sessions, catalog, spotMeta: state.spotMeta, userSpots: state.userSpots,
-    skip: (x) => d.hunts.why.get(x) || "" });
+  // Every spot with the hunts that count for the character. lens (the Spots list's All vocations and Any level) widens
+  // which of them count there as it widens the reference spots shown (core huntCheck), for that list's numbers only.
+  const indexes = {};
+  const spotIndex = (lens) => {
+    const key = lens ? (lens.allVocations ? "v" : "") + (lens.anyLevel ? "l" : "") : "";
+    if (!indexes[key]) indexes[key] = coreSpotIndex({ reference: state.reference, sessions: state.sessions, catalog, spotMeta: state.spotMeta, userSpots: state.userSpots,
+      skip: key ? (x, sp) => huntCheck(x, sp, d.huntCtx, lens) : (x) => d.hunts.why.get(x) || "" });
+    return indexes[key];
+  };
   const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost });
   const heldTask = (h, diff) => coreHeldTask(h, diff, { catalog, chalRates: chalRates() });
   const spotValue = (sp, o) => {

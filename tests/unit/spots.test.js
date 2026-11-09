@@ -83,22 +83,37 @@ test("the character's own spots and variations join the index; sessions with a s
   assert.equal(idx.idOf("bastion lure"), "my-bastion-lure");
 });
 
-test("which logged hunts count: the vocation they were logged as, and the spot's recommended level", () => {
+test("which shared hunts count: their vocation, the spot's recommended level, and the level window", () => {
   const idx = spotIndex({ reference: REF, sessions: [], catalog });
   const bastion = idx.spots["cobra-bastion"], deep = idx.spots["deep-place"];
   assert.equal(spotMinLevel(bastion, EK), 250, "its own vocation's entry");
   assert.equal(spotMinLevel(bastion, "Royal Paladin"), 300);
   assert.equal(spotMinLevel(bastion, "Elder Druid"), 250, "no entry for the vocation: the lowest of any");
   assert.equal(spotMinLevel(idx.spots["my-cave"] || { entries: [] }, EK), null, "no reference, no level");
-  const rp = { vocation: "Royal Paladin", level: 45, loggedAs: null, otherVocation: false };
+  const rp = { vocation: "Royal Paladin", level: 45, otherVocation: false, window: 20 };
   assert.equal(huntCheck({ vocation: EK }, bastion, rp), "voc");
-  assert.equal(huntCheck({}, bastion, rp), "level", "no vocation saved: the character's own, then the level");
-  assert.equal(huntCheck({}, bastion, Object.assign({}, rp, { loggedAs: EK })), "voc", "saved without a vocation, logged as another");
+  assert.equal(huntCheck({}, bastion, rp), "level", "no vocation saved: counts as the character's, then the level");
   assert.equal(huntCheck({ vocation: EK }, bastion, Object.assign({}, rp, { otherVocation: true })), "level", "other vocations on: the level still applies");
   assert.equal(huntCheck({ vocation: EK }, bastion, Object.assign({}, rp, { otherVocation: true, level: 300 })), "");
   assert.equal(huntCheck({ vocation: "Royal Paladin" }, deep, Object.assign({}, rp, { level: 899 })), "level");
   assert.equal(huntCheck({}, { entries: [] }, rp), "", "a spot without a reference has no level to miss");
   assert.equal(huntCheck({}, bastion, Object.assign({}, rp, { level: null })), "", "no level: no cut-off");
+  // The window: within 20% of the character's level by default, any level with 0, and hunts without a level pass.
+  const ek = { vocation: EK, level: 633, otherVocation: false, window: 20 }, bare = { entries: [] };
+  assert.equal(huntCheck({ vocation: EK, level: 608 }, bare, ek), "");
+  assert.equal(huntCheck({ vocation: EK, level: 507 }, bare, ek), "", "633 − 20% is 506.4");
+  assert.equal(huntCheck({ vocation: EK, level: 506 }, bare, ek), "window");
+  assert.equal(huntCheck({ vocation: EK, level: 759 }, bare, ek), "", "633 + 20% is 759.6");
+  assert.equal(huntCheck({ vocation: EK, level: 760 }, bare, ek), "window");
+  assert.equal(huntCheck({ vocation: EK, level: 300 }, bare, Object.assign({}, ek, { window: 0 })), "", "any level");
+  assert.equal(huntCheck({ vocation: EK, level: 580 }, bare, Object.assign({}, ek, { window: 10 })), "");
+  assert.equal(huntCheck({ vocation: EK, level: 560 }, bare, Object.assign({}, ek, { window: 10 })), "window");
+  assert.equal(huntCheck({ vocation: EK }, bare, ek), "", "no level saved: no window");
+  // The Spots lens widens them as it does the reference spots: All vocations, Any level.
+  assert.equal(huntCheck({ vocation: "Royal Paladin", level: 620 }, bare, ek, { allVocations: true }), "");
+  assert.equal(huntCheck({ vocation: "Royal Paladin", level: 45 }, bare, ek, { allVocations: true }), "window", "other vocations' hunts still need the level");
+  assert.equal(huntCheck({ vocation: EK, level: 45 }, bastion, Object.assign({}, ek, { level: 100 }), { anyLevel: true }), "", "both level rules go");
+  assert.equal(huntCheck({ vocation: "Royal Paladin", level: 45 }, bare, ek, { anyLevel: true }), "voc");
 
   // Split at the spots they belong to: skipped hunts still make their spot, listed apart, with no creatures.
   const sessions = [

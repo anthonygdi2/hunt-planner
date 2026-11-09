@@ -198,6 +198,13 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   const store = fixtureStore();
   const p = load({ store, prefs: { "btl.profile": "ek" }, now: Date.parse("2026-10-21T18:00:00Z") });
   await until(() => p.$("#step1-title"), "the first step");
+  // Connecting copied every character's hunts and spots into the shared ones, once, leaving the old documents.
+  await until(() => store["meta/hunts"], "the migration's record");
+  assert.equal(Object.keys(store).filter((k) => k.startsWith("hunts/")).length, 11);
+  assert.deepEqual([store["hunts/e1"].vocation, store["hunts/e1"].level, store["hunts/e1"].by], ["Elite Knight", 615, { pid: "ek", name: "Test Knight" }]);
+  assert.deepEqual([store["hunts/r1"].vocation, store["hunts/r1"].by.pid], ["Royal Paladin", "rp"]);
+  assert.equal(store["spots/my-knight-den"].name, "Knight Den");
+  assert.ok(store["profiles/ek/sessions/e1"] && store["profiles/ek/spots/my-knight-den"], "the old documents stay");
   // The planner state arrives in its own snapshot, after the profile.
   await until(() => /Cobra Assassin · 4 tokens/.test(p.$("#chip-bounty").textContent), "the held offer as the active bounty, tokens from reroll.left");
   assert.match(p.$("#chip-goal").textContent, /Exp/, "weights 10/0/0/0 migrate to the Exp preset");
@@ -221,13 +228,37 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   const at = store["profiles/ek/planner/state"].hunting.spotId;
   await p.type("#log-parent", at);
   await p.click("#log-save");
-  await until(() => store["profiles/ek/spots/my-bastion-two-box"], "the new spot");
-  assert.equal(store["profiles/ek/spots/my-bastion-two-box"].parentId, at);
-  const logged = Object.keys(store).filter((k) => k.startsWith("profiles/ek/sessions/") && store[k].spotId === "my-bastion-two-box");
+  await until(() => store["spots/my-bastion-two-box"], "the new spot");
+  assert.equal(store["spots/my-bastion-two-box"].parentId, at);
+  const logged = Object.keys(store).filter((k) => k.startsWith("hunts/") && store[k].spotId === "my-bastion-two-box");
   assert.equal(logged.length, 1);
-  assert.equal(store[logged[0]].task, "cobra-assassin", "the active bounty's creature was killed: the session's task");
+  const hunt = store[logged[0]], huntId = logged[0].slice("hunts/".length);
+  assert.equal(hunt.task, "cobra-assassin", "the active bounty's creature was killed: the hunt's task");
+  assert.deepEqual([hunt.vocation, hunt.level, hunt.by], ["Elite Knight", 615, { pid: "ek", name: "Test Knight" }], "shared: who logged it, as what, at what level");
+  assert.equal(Object.keys(store).filter((k) => k.startsWith("profiles/ek/sessions/")).length, 8, "new hunts go only to the shared list");
   assert.equal(p.w.location.hash, "#/plan");
   await until(() => store["profiles/ek/planner/state"].hunting === null, "Hunting now cleared by the log");
+  // The same hunt again: Save asks first; Open the existing one opens it in the saved hunts' editor, to correct it.
+  await p.go("log");
+  await p.type("#log-text", ["Session data: From 2026-10-21, 16:00:00 to 2026-10-21, 17:00:00", "Session: 01:00h", "Raw XP Gain: 3,000,000",
+    "Balance: 100,000", "Killed Monsters:", "  450x cobra assassin"].join("\n"), "input");
+  assert.equal(p.$("#saved-f-voc").value, "Elite Knight", "the saved hunts open on the character's lens");
+  assert.equal(p.$("#saved-f-level").value, "20");
+  assert.match(p.$("#saved-count").textContent, /^\d+ of 12 saved hunts$/);
+  await p.click("#log-save");
+  assert.match(p.$("#log-dupe").textContent, /You saved this hunt already: Oct 21 at [^·]+ · Bastion two-box, by Test Knight\./);
+  assert.equal(Object.keys(store).filter((k) => k.startsWith("hunts/")).length, 12, "nothing saved yet");
+  await p.click("#log-open-existing");
+  assert.equal(p.$("#saved-" + huntId + "-edit").getAttribute("aria-expanded"), "true");
+  assert.equal(p.$("#saved-" + huntId + "-spot").value, "my-bastion-two-box");
+  await p.type("#saved-" + huntId + "-level", "600");
+  await p.type("#saved-" + huntId + "-spot", "my-knight-den");
+  await p.click("#saved-" + huntId + "-save");
+  await until(() => store["hunts/" + huntId].level === 600, "the corrected hunt");
+  assert.deepEqual([store["hunts/" + huntId].spotId, store["hunts/" + huntId].spot, store["hunts/" + huntId].vocation], ["my-knight-den", "Knight Den", "Elite Knight"]);
+  await p.click(".hp-back");
+  await p.click("#log-discard");
+  assert.equal(Object.keys(store).filter((k) => k.startsWith("hunts/")).length, 12);
   // The Bounty editor compares the four difficulties on the real data.
   await p.click("#chip-bounty");
   assert.ok(p.$("#bounty-advice"), "the difficulty comparison");
@@ -252,25 +283,25 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   await p.click("#wk-any-done");
   await until(() => store["profiles/ek"].weeklyTasks.any.done === true, "Any Creature done");
   assert.deepEqual(store["profiles/ek"].weeklyTasks.tasks[3], { slug: "dragon-lord", name: null, killsLeft: 200, done: true }, "the other tasks stay");
-  // A new hunt saves its vocation. Switched to a level 45 paladin, the hunts saved without one are remembered as the
-  // knight's and stop counting, until hunts as other vocations are on (and then only at spots level 45 reaches).
-  assert.equal(store[logged[0]].vocation, "Elite Knight");
+  // Every hunt has its vocation, so switching the character to a level 45 paladin needs no question: the knight's hunts
+  // stop counting for it, until hunts as other vocations are on (and then only near its level).
   await p.go("characters");
   assert.equal(p.$("#src-own-other").getAttribute("aria-checked"), "false");
-  assert.equal(p.$("#src-logged-as").value, "Elite Knight", "older hunts read as the character's vocation");
+  assert.equal(p.$("#src-logged-as"), null);
   await p.type("#ch-voc", "Royal Paladin");
   await p.type("#ch-level", "45");
   await until(() => store["profiles/ek"].level === 45, "the level write");
-  assert.equal(store["profiles/ek"].untaggedVocation, "Elite Knight", "the old vocation, for the hunts saved without one");
-  assert.equal(p.$("#src-logged-as").value, "Elite Knight");
+  assert.equal(store["profiles/ek"].untaggedVocation, undefined, "nothing to remember");
   await p.go("spot/" + at);
   assert.match(p.d.body.textContent, /hunts? here (doesn’t|don’t) count for this character/);
   assert.match(p.d.body.textContent, /Doesn’t count: logged as Elite Knight\./);
   await p.go("characters");
   await p.click("#src-own-other");
   await until(() => store["profiles/ek"].otherVocationHunts === true, "the switch write");
-  await p.type("#src-logged-as", "Royal Paladin");
-  await until(() => store["profiles/ek"].untaggedVocation === "Royal Paladin", "the logged-as write");
+  await p.type("#src-window", "35");
+  await until(() => store["profiles/ek"].levelWindow === 35, "the window write");
+  await p.go("spot/" + at);
+  assert.match(p.d.body.textContent, /Doesn’t count: logged at level 615, more than 35% from this character’s\./);
   assert.deepEqual(p.errors, []);
   p.w.close();
 });
@@ -305,25 +336,27 @@ test("Spots and a spot page over the golden fixture: search, a variation, Taken,
   assert.deepEqual([...p.$("#hunt-e7-details").querySelectorAll("tr")].map((r) => [...r.children].map((c) => c.textContent)),
     [["Amount", "Total", "Per hour"], ["Raw exp", "5.2kk", "5.2kk"], ["Exp with bonuses", "7.8kk", "7.8kk"], ["Loot", "2.4kk", "2.4kk"], ["Supplies", "1.5kk", "1.5kk"],
       ["Balance", "900k", "900k"], ["Creature", "Kills", "Kills/h"], ["Cobra Assassin", "520", "520/h"], ["Cobra Scout", "90", "90/h"]]);
-  assert.match(p.$("#hunt-e7-details").textContent, /^18:00–19:00 · level 615/);
+  assert.match(p.$("#hunt-e7-details").textContent, /^18:00–19:00 · EK level 615 · by Test Knight/);
+  assert.match(p.d.body.textContent, /Your hunts here1 hunt, 1 h\. Logged as EK 615 by Test Knight\./);
   await p.click("#spot-taken");
   await until(() => (store["profiles/ek/marks/my-bastion-lure"] || {}).state === "taken", "the Taken mark");
   assert.ok(p.$("#spot-free"));
   await p.type("#ses-raid-e7-0", "2");
-  await until(() => (store["profiles/ek/sessions/e7"].raidsBy || {})["Cobra Assassin"] === 2, "the raid count");
+  await until(() => ((store["hunts/e7"] || {}).raidsBy || {})["Cobra Assassin"] === 2, "the raid count");
   await p.click("#ses-del-e7");
   assert.match(p.d.body.textContent, /Delete this hunt\?/);
   await p.click("#ses-yes-e7");
-  await until(() => !store["profiles/ek/sessions/e7"], "the hunt deleted");
+  await until(() => !store["hunts/e7"], "the hunt deleted");
+  assert.ok(store["profiles/ek/sessions/e7"], "its old copy stays, and isn't copied again");
   assert.match(p.d.body.textContent, /No hunts logged here/);
   await p.type("#spot-name", "Bastion two-box lure");
-  await until(() => store["profiles/ek/spots/my-bastion-lure"].name === "Bastion two-box lure", "the rename");
+  await until(() => store["spots/my-bastion-lure"].name === "Bastion two-box lure", "the rename");
   await p.click("#spot-delete");
   assert.match(p.$("#spot-delete").textContent, /Tap again/);
   await p.click("#spot-delete");
-  await until(() => !store["profiles/ek/spots/my-bastion-lure"], "the spot deleted");
+  await until(() => !store["spots/my-bastion-lure"], "the spot deleted");
   assert.equal(p.w.location.hash, "#/spots");
-  assert.equal(store["profiles/ek/spots/my-knight-den"].name, "Knight Den", "other spots stay");
+  assert.equal(store["spots/my-knight-den"].name, "Knight Den", "other spots stay");
   assert.deepEqual(p.errors, []);
   p.w.close();
 });

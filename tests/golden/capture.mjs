@@ -5,7 +5,8 @@ import { makeCatalog } from "../../src/core/catalog.js";
 import { slugify } from "../../src/core/text.js";
 import { rewardPerKill } from "../../src/core/rewards.js";
 import { weightedValue } from "../../src/core/score.js";
-import { readRecords, readSessions, readCreatureDocs, readPlState, readMarks, readOccs, readUserSpots } from "../../src/store/schema.js";
+import { readRecords, readHunts, readCreatureDocs, readPlState, readMarks, readOccs, readUserSpots } from "../../src/store/schema.js";
+import { migrateHunts } from "../../src/store/migrate.js";
 import { makeModel, makePlanCache } from "../../src/app/model.js";
 
 // The goal mixer's presets (F2), each captured as the character's goal.
@@ -21,11 +22,20 @@ const calibOut = (c) => c && Object.assign(pick(c, ["kill", "exp", "offset", "nK
 // Documents in path order, as the page's db returns them.
 const docs = (o) => Object.keys(o || {}).sort().map((id) => ({ id, data: () => JSON.parse(JSON.stringify(o[id])) }));
 
+// The fixture's hunts and spots as the app reads them since they're shared: every character's, through the migration
+// (store/migrate.js), in path order.
+export function sharedHunts(fixture) {
+  const profiles = {}, sessions = {}, spots = {};
+  Object.keys(fixture.characters).forEach((id) => { const c = fixture.characters[id]; profiles[id] = c.profile; sessions[id] = c.sessions || {}; spots[id] = c.spots || {}; });
+  const m = migrateHunts({ profiles, sessions, spots, hunts: {}, sharedSpots: {}, meta: null, at: "2026-11-08T00:00:00.000Z" });
+  return { hunts: readHunts(docs(m.hunts)), spots: readUserSpots(docs(m.spots)) };
+}
+
 // One character's state as the app reads it.
-function characterState(c, catalog, data, creatureDocs, advanced) {
+function characterState(id, c, shared, catalog, data, creatureDocs, advanced) {
   const known = (slug) => !!catalog.bySlug[slug], pl = c.planner || {};
-  return { catalog, reference: data.reference, profile: JSON.parse(JSON.stringify(c.profile)), sessions: readSessions(docs(c.sessions)), entries: readRecords(docs(c.entries)),
-    advanced, creatures: creatureDocs, spotMeta: {}, expTable: data.creatureExp, userSpots: readUserSpots(docs(c.spots)),
+  return { catalog, reference: data.reference, profile: JSON.parse(JSON.stringify(c.profile)), pid: id, sessions: shared.hunts, entries: readRecords(docs(c.entries)),
+    advanced, creatures: creatureDocs, spotMeta: {}, expTable: data.creatureExp, userSpots: shared.spots,
     planner: { state: readPlState(pl.state, known), marks: readMarks(docs(pl.marks)), occupancy: readOccs(docs(pl.occupancy)) } };
 }
 
@@ -109,9 +119,9 @@ function spotValues(M, state, diff) {
 // normalized.
 export function capture(data, fixture, advanced, now) {
   const catalog = makeCatalog(data.creatures), creatureDocs = readCreatureDocs(docs(fixture.creatures)), cache = makePlanCache();
-  const out = { characters: {} };
+  const out = { characters: {} }, shared = sharedHunts(fixture);
   for (const id of ["ek", "rp"]) {
-    const base = characterState(fixture.characters[id], catalog, data, creatureDocs, advanced), saved = base.profile.goal;
+    const base = characterState(id, fixture.characters[id], shared, catalog, data, creatureDocs, advanced), saved = base.profile.goal;
     const model = (difficulty, goal) => {
       const state = Object.assign({}, base, { difficulty, profile: Object.assign({}, base.profile, { goal }) });
       return { M: makeModel(state, null, now, { planCache: cache }), state };

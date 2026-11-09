@@ -2,7 +2,8 @@
 // fields marked "later" arrive with the Phase F model changes in docs/ARCHITECTURE.md.
 
 /**
- * A logged hunt (store document profiles/{pid}/sessions/{id}, or parseSession's result before saving).
+ * A logged hunt (store document hunts/{id}, shared by all characters; profiles/{pid}/sessions/{id} before November 2026;
+ * or parseSession’s result before saving).
  * @typedef {Object} Session
  * @property {string} [id]
  * @property {string} [spot] the spot name as logged
@@ -20,6 +21,9 @@
  * @property {string|null} [task] the bounty creature's slug during the session
  * @property {Object<string, number>} [raidsBy] Echo Raids per creature slug
  * @property {number} [raids] older sessions: a raids total
+ * @property {string|null} [vocation] the vocation it was logged as (shared hunts, hunts/{id})
+ * @property {number|null} [level] the level it was logged at
+ * @property {{pid: string|null, name: string|null}} [by] the character that logged it (display only)
  */
 
 /**

@@ -61624,6 +61624,7 @@
         "weekly": [],
         "xph": 1080715.13374
        },
+       "paladin-test-cave": null,
        "peninsula-tomb": {
         "entry": "peninsula-tomb-ms-2026-07",
         "held": null,
@@ -67318,7 +67319,8 @@
        "sessions": 1,
        "teams": [],
        "vocations": []
-      }
+      },
+      {"aliases":[],"creatures":[],"entries":[],"id":"paladin-test-cave","levelMax":null,"levelMin":null,"name":"Paladin Test Cave","own":true,"sessions":0,"teams":[],"vocations":[]}
      ],
      "spotRates": {
       "Ancient Scarabs (MoSL -4)": {"kph":{"ancient-scarab":408.413609556,"bonebeast":276.839020258,"scarab":309.542530893},"pph":79048.574663,"xph":502268.754564},
@@ -95607,6 +95609,8 @@
        "mutated-humans-yalahar": null,
        "mutated-rats-alchemist-quarter": null,
        "mutated-tigers-yalahar": null,
+       "my-bastion-lure": null,
+       "my-knight-den": null,
        "nagas": null,
        "nibelor-crystal-spiders": null,
        "nightmare-isles": null,
@@ -96022,6 +96026,7 @@
        "sunken-quarter": null,
        "sunken-quarter-quaras": null,
        "temple-of-the-sun-and-sea": null,
+       "test-hideout": null,
        "tortoises-laguna-islands-2": null,
        "true-asuras": null,
        "undead-dragon-seal": null,
@@ -100252,6 +100257,9 @@
        "teams": ["solo"],
        "vocations": ["Elite Knight"]
       },
+      {"aliases":[],"creatures":[],"entries":[],"id":"my-bastion-lure","levelMax":null,"levelMin":null,"name":"Bastion lure","own":true,"sessions":0,"teams":[],"vocations":[]},
+      {"aliases":[],"creatures":[],"entries":[],"id":"my-knight-den","levelMax":null,"levelMin":null,"name":"Knight Den","own":true,"sessions":0,"teams":[],"vocations":[]},
+      {"aliases":[],"creatures":[],"entries":[],"id":"test-hideout","levelMax":null,"levelMin":null,"name":"Test Hideout","own":true,"sessions":0,"teams":[],"vocations":[]},
       {
        "aliases": [],
        "creatures": ["crusader","headwalker"],

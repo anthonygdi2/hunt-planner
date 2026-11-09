@@ -19,8 +19,18 @@ export const occupancyPath = (pid) => profilePath(pid) + "/occupancy";
 export const creaturePath = (slug) => CREATURES + "/" + slug;
 export const spotsPath = (pid) => profilePath(pid) + "/spots";
 export const spotPath = (pid, id) => spotsPath(pid) + "/" + id;
-// Document ids a backup may restore: character ids, and spot ids for marks and occupancy.
+// Shared by every character in the storage (since November 2026): logged hunts, the spots made for them, and the
+// record of the migration that copied them out of each character (store/migrate.js).
+export const HUNTS = "hunts";
+export const SPOTS = "spots";
+export const huntPath = (id) => HUNTS + "/" + id;
+export const sharedSpotPath = (id) => SPOTS + "/" + id;
+export const META = "meta";
+export const HUNTS_META_ID = "hunts";
+export const huntsMetaPath = META + "/" + HUNTS_META_ID;
+// Document ids a backup may restore: character and hunt ids, and spot ids for spots, marks and occupancy.
 export const validCharacterId = (id) => /^[A-Za-z0-9_.~:@+-]+$/.test(id);
+export const validHuntId = validCharacterId;
 export const validSpotId = (id) => /^[a-z0-9-]+$/.test(id);
 
 // ---------- profiles/{pid}: sources and settings ----------
@@ -44,11 +54,14 @@ export function sourcesPreset(s) {
 // The profile fields that store sources: the current shape, plus the old flags kept in step so an older build still
 // reads them.
 export const sourcesPatch = (s) => ({ sources: { reference: !!s.reference, otherVocation: !!s.otherVocation, older: !!s.older }, refOff: !s.reference, refOtherOff: !s.otherVocation });
-// Which of the character's own hunts count (core huntCheck): {loggedAs (`untaggedVocation`: the vocation its hunts
-// saved without one were logged as; null means its current vocation), otherVocation (`otherVocationHunts`: hunts
-// logged as another vocation count too; off unless set)}.
-export const readHuntSources = (p) => ({ loggedAs: p && VOCATIONS.indexOf(p.untaggedVocation) !== -1 ? p.untaggedVocation : null,
-  otherVocation: !!(p && p.otherVocationHunts === true) });
+// Which of the shared hunts count for a character (core huntCheck): {otherVocation (`otherVocationHunts`: hunts logged
+// as another vocation count too; off unless set), window (`levelWindow`: hunts count only within this many percent of
+// the character's level; 0 is any level; 20 unless set)}. The older `untaggedVocation` (the vocation a character's
+// hunts saved without one were logged as) is read only by the migration to shared hunts, and stays in the profile.
+export const LEVEL_WINDOWS = [0, 10, 20, 35];
+export const DEFAULT_LEVEL_WINDOW = 20;
+export const readHuntSources = (p) => ({ otherVocation: !!(p && p.otherVocationHunts === true),
+  window: p && LEVEL_WINDOWS.indexOf(p.levelWindow) !== -1 ? p.levelWindow : DEFAULT_LEVEL_WINDOW });
 
 // The goal weights, whole numbers 0-5: stored as `goal` since the redesign. Older profiles have `weights` on a 0-10
 // scale, read as w > 0 ? max(1, round(w / 2)) : 0 (ARCHITECTURE.md, State model). Neither: Exp.
@@ -127,6 +140,29 @@ export function readSessions(docs) {
   const out = [];
   docs.forEach((d) => { const x = readSession(d.id, d.data()); if (x) out.push(x); });
   return out;
+}
+
+// ---------- shared hunts: hunts/{id} ----------
+// A session (readSession) with the vocation and level it was logged at (null when unknown) and by {pid, name} (the
+// character that logged it, for display only); null for anything that isn't a session.
+export function readHunt(id, v) {
+  const x = readSession(id, v);
+  if (!x) return null;
+  const lvl = Math.floor(Number(x.level)), by = v.by && typeof v.by === "object" ? v.by : {};
+  x.vocation = VOCATIONS.indexOf(x.vocation) !== -1 ? x.vocation : null;
+  x.level = lvl > 0 && lvl < 10000 ? lvl : null;
+  x.by = { pid: typeof by.pid === "string" && by.pid ? by.pid : null, name: typeof by.name === "string" && by.name.trim() ? by.name.trim().slice(0, 40) : null };
+  return x;
+}
+export function readHunts(docs) {
+  const out = [];
+  docs.forEach((d) => { const x = readHunt(d.id, d.data()); if (x) out.push(x); });
+  return out;
+}
+// The migration's record (meta/hunts): {version, at, sessions {"pid:id": hunt id or null}, spots {"pid:id": spot id}}.
+export function readHuntsMeta(v) {
+  const map = (o) => { const out = {}; Object.keys(o && typeof o === "object" ? o : {}).forEach((k) => { const x = o[k]; if (x === null || typeof x === "string") out[k] = x; }); return out; };
+  return { version: Number(v && v.version) || 0, at: v && typeof v.at === "string" ? v.at : null, sessions: map(v && v.sessions), spots: map(v && v.spots) };
 }
 
 // ---------- shared creature settings: creatures/{slug} ----------

@@ -64,8 +64,18 @@ test("marks and occupancy", () => {
   assert.deepEqual(S.readOccs(docs({ a: null })), { a: { counts: {} } });
 });
 
-test("which own hunts count: the vocation older hunts were logged as, and other vocations' hunts", () => {
-  assert.deepEqual(S.readHuntSources(undefined), { loggedAs: null, otherVocation: false });
-  assert.deepEqual(S.readHuntSources({ untaggedVocation: "Elite Knight", otherVocationHunts: true }), { loggedAs: "Elite Knight", otherVocation: true });
-  assert.deepEqual(S.readHuntSources({ untaggedVocation: "Knight", otherVocationHunts: "yes" }), { loggedAs: null, otherVocation: false }, "unknown values read as unset");
+test("which shared hunts count: other vocations' hunts, and the level window", () => {
+  assert.deepEqual(S.readHuntSources(undefined), { otherVocation: false, window: 20 });
+  assert.deepEqual(S.readHuntSources({ untaggedVocation: "Elite Knight", otherVocationHunts: true, levelWindow: 0 }), { otherVocation: true, window: 0 });
+  assert.deepEqual(S.readHuntSources({ otherVocationHunts: "yes", levelWindow: 15 }), { otherVocation: false, window: 20 }, "unknown values read as unset");
+});
+
+test("shared hunts: vocation, level and who logged it, read leniently", () => {
+  assert.deepEqual(S.readHunt("h1", { hours: 1, kills: [], vocation: "Elite Knight", level: "615", by: { pid: "a", name: " Main " } }),
+    { id: "h1", hours: 1, kills: [], vocation: "Elite Knight", level: 615, by: { pid: "a", name: "Main" } });
+  assert.deepEqual(S.readHunt("h2", { hours: 1, kills: [], vocation: "Knight", level: -3 }), { id: "h2", hours: 1, kills: [], vocation: null, level: null, by: { pid: null, name: null } });
+  assert.equal(S.readHunt("h3", { hours: 0, kills: [] }), null);
+  assert.deepEqual(S.readHuntsMeta({ version: 1, at: "t", sessions: { "a:s1": "s1", "a:s2": null, "a:x": 3 }, spots: null }),
+    { version: 1, at: "t", sessions: { "a:s1": "s1", "a:s2": null }, spots: {} });
+  assert.deepEqual(S.readHuntsMeta(null), { version: 0, at: null, sessions: {}, spots: {} });
 });

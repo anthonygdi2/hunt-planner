@@ -11,7 +11,7 @@ const ext = (href, text) => h("a", { href, target: "_blank", rel: "noopener nore
 const THEME_LABELS = { system: _("System"), dark: _("Dark"), light: _("Light") };
 
 // view: app/views.js charactersPageView. ui: this page's own state {armed (delete), status (backup/restore line)}.
-// on: {back(), switchCharacter(id), add(), update(patch), setSources(s), setOtherVocationHunts(b), setLoggedAs(v), setWorld(w), setTakenMinutes(m), setAdvanced(b),
+// on: {back(), switchCharacter(id), add(), update(patch), setSources(s), setOtherVocationHunts(b), setLevelWindow(w), setWorld(w), setTakenMinutes(m), setAdvanced(b),
 //      setTheme(t), setLang(l), deleteCharacter(), arm(b), download(), restore()}.
 export function render(view, ui, on) {
   const ro = !view.canWrite, c = view.character, sw = view.sources.switches;
@@ -32,14 +32,15 @@ export function render(view, ui, on) {
           field({ id: "ch-level", label: t("Level"), value: c.level, inputmode: "numeric", disabled: ro, onCommit: (v) => { const n = parseInt(v, 10); if (n > 0 && n < 10000) on.update({ level: n }); } })),
         field({ id: "ch-bonus", label: t("Talisman bestiary bonus (%)"), value: c.bestiaryBonus, inputmode: "numeric", disabled: ro,
           onCommit: (v) => { const n = Number(v); if (n >= 0 && n <= 100) on.update({ bestiaryBonus: n }); } }),
-        confirmButton({ id: "ch-delete", label: t("Delete this character…"), confirmLabel: t("Tap again to delete {name} and everything saved for it", { name: c.displayName }), armed: ui.armed,
+        confirmButton({ id: "ch-delete", label: t("Delete this character…"), confirmLabel: t("Tap again to delete {name}. Its logged hunts stay for your other characters.", { name: c.displayName }), armed: ui.armed,
           disabled: ro, onArm: () => on.arm(true), onConfirm: on.deleteCharacter })) : null),
     c ? section("src-h", t("Numbers from"),
       segmented({ label: t("Numbers from"), options: view.sources.presets, value: view.sources.preset, disabled: ro,
         onPick: (k) => on.setSources(view.sources.presets.filter((p) => p.value === k)[0].switches) }),
       h("div", { class: "hp-card flush" },
-        settingRow(t("Your logged hunts"), t("Always used first, at spots your level reaches."), h("span", { class: "hp-caption" }, t("Always on"))),
-        settingRow(t("Your hunts as other vocations"), t("Hunts this character logged as another vocation."),
+        settingRow(t("Your logged hunts"), t("Hunts any of your characters logged as this vocation near this level, at spots it reaches. Always used first."),
+          h("span", { class: "hp-caption" }, t("Always on"))),
+        settingRow(t("Your hunts as other vocations"), t("Hunts logged as another vocation count too."),
           switchCtl({ id: "src-own-other", label: t("Your hunts as other vocations"), on: view.hunts.otherVocation, disabled: ro, onToggle: on.setOtherVocationHunts })),
         settingRow(t("Reference hunts"), t("For spots you haven’t logged."),
           switchCtl({ id: "src-ref", label: t("Reference hunts"), on: sw.reference, disabled: ro, onToggle: flip("reference") })),
@@ -48,10 +49,8 @@ export function render(view, ui, on) {
         settingRow(t("Older hunts"), t("From before the last rebalance."),
           switchCtl({ id: "src-older", label: t("Older hunts"), on: sw.older, disabled: ro, onToggle: flip("older") }))),
       view.sources.preset === "custom" ? h("p", { class: "hp-p hp-caption" }, t("Custom: these switches don’t match a preset.")) : null,
-      view.hunts.untagged ? h("div", { class: "hp-stack" },
-        selectField({ id: "src-logged-as", label: t("Older hunts were logged as"), value: view.hunts.untagged.loggedAs, options: view.vocations.map((v) => ({ value: v, label: v })),
-          disabled: ro, onPick: on.setLoggedAs }),
-        h("p", { class: "hp-p hp-caption" }, view.hunts.untagged.note)) : null,
+      selectField({ id: "src-window", label: t("Your hunts count when logged"), value: view.hunts.window, options: view.hunts.windows, disabled: ro,
+        onPick: (v) => on.setLevelWindow(Number(v)) }),
       h("p", { class: "hp-p hp-small hp-muted" }, view.sources.calibration)) : null,
     c ? section("tk-h", t("Spots and world"),
       h("div", { class: "hp-grid2" },

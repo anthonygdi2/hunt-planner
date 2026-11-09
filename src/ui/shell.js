@@ -23,7 +23,7 @@ const PAGES = ["characters", "log"];
 // app: app/app.js createApp(). host: {hash(), go(route), onHashChange(fn), download(name, text) → Promise<message>,
 // pickFile() → Promise<text>}.
 export function mount(root, app, host) {
-  const ui = { adding: false, firstRun: { vocation: null, level: "" }, characters: { armed: false, status: "" }, plan: { open: null, why: {} }, weekly: { armed: false }, spots: { query: "", sort: "score", allVocations: false, anyLevel: false, hideTaken: false, limit: 0 }, spot: { armed: null, open: {} }, creatures: { difficulty: null, mode: "tiers", query: "", lists: false, add: {} }, creature: { notes: null }, log: { text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan" } };
+  const ui = { adding: false, firstRun: { vocation: null, level: "" }, characters: { armed: false, status: "" }, plan: { open: null, why: {} }, weekly: { armed: false }, spots: { query: "", sort: "score", allVocations: false, anyLevel: false, hideTaken: false, limit: 0 }, spot: { armed: null, open: {} }, creatures: { difficulty: null, mode: "tiers", query: "", lists: false, add: {} }, creature: { notes: null }, log: blankLog() };
   // The route's name ("spot/<id>" is "spot") and its argument (the spot id).
   const path = () => String(host.hash() || "").replace(/^#\/?/, "");
   const route = () => { const r = path().split("/")[0]; return ROUTES.indexOf(r) !== -1 ? r : "plan"; };
@@ -75,7 +75,7 @@ export function mount(root, app, host) {
       const a = app.actions, c = ui.characters;
       return characters.render(charactersPageView(s, app.model()), c, {
         back: () => go("plan"), switchCharacter: (id) => { c.armed = false; a.switchCharacter(id); }, add: () => { c.armed = false; ui.firstRun = { vocation: null, level: "" }; ui.adding = true; draw(); },
-        update: a.updateCharacter, setSources: a.setSources, setOtherVocationHunts: a.setOtherVocationHunts, setLoggedAs: a.setLoggedAs, setWorld: a.setWorld, setTakenMinutes: a.setTakenMinutes, setAdvanced: a.setAdvanced, setTheme: a.setTheme, setLang: a.setLang,
+        update: a.updateCharacter, setSources: a.setSources, setOtherVocationHunts: a.setOtherVocationHunts, setLevelWindow: a.setLevelWindow, setWorld: a.setWorld, setTakenMinutes: a.setTakenMinutes, setAdvanced: a.setAdvanced, setTheme: a.setTheme, setLang: a.setLang,
         arm: (b) => { c.armed = b; draw(); }, deleteCharacter: () => { c.armed = false; a.deleteCharacter(); },
         download: () => a.exportBackup().then((bk) => host.download("hunt-planner-backup-" + bk.exportedAt.slice(0, 10) + ".json", JSON.stringify(bk, null, 2)))
           .then((msg) => { c.status = msg || t("Backup saved."); draw(); }, () => { c.status = t("Couldn’t create the backup. Try again in a moment."); draw(); }),
@@ -100,13 +100,25 @@ export function mount(root, app, host) {
       });
     }
     if (r === "log") {
-      const L = ui.log, M = app.model(), v = logView(L, M, app.catalog, s.advanced), a = app.actions;
+      const L = ui.log, M = app.model(), v = logView(L, M, app.catalog, s.advanced, s), a = app.actions;
       const leave = () => { ui.log = blankLog(); go(L.back || "plan"); };
+      const closeEditor = () => { L.edit = null; L.editDraft = {}; L.armed = null; };
+      const save = () => { a.saveHunt({ preview: v.preview, spot: v.where === "known" ? { id: v.spotId } : { name: L.name, parentId: L.parentId || null, note: L.note }, raidsBy: L.raids }); leave(); };
       return logScreen.render(v, L, {
-        text: (t) => { L.text = t; draw(); }, where: (w) => { L.where = w; draw(); }, spot: (id) => { L.spotId = id; draw(); }, name: (n) => { L.name = n; draw(); },
+        text: (t) => { L.text = t; L.dupe = false; draw(); }, where: (w) => { L.where = w; draw(); }, spot: (id) => { L.spotId = id; draw(); }, name: (n) => { L.name = n; draw(); },
         parent: (id) => { L.parentId = id; draw(); }, note: (n) => { L.note = n; draw(); }, raid: (k, n) => { L.raids[k] = n; draw(); },
-        save: () => { if (!v.canSave) return; a.saveHunt({ preview: v.preview, spot: v.where === "known" ? { id: v.spotId } : { name: L.name, parentId: L.parentId || null, note: L.note }, raidsBy: L.raids }); leave(); },
+        // A hunt saved before asks first: Save anyway, or Open the existing one (in the saved hunts' editor).
+        save: () => { if (!v.canSave) return; if (v.duplicate && !L.dupe) { L.dupe = true; draw(); return; } save(); },
+        saveAnyway: () => { if (v.canSave) save(); },
+        openExisting: () => { if (!v.duplicate) return; L.dupe = false; closeEditor(); L.edit = v.duplicate.id; draw();
+          const el = root.ownerDocument.getElementById("saved-" + L.edit + "-voc"); if (el) { el.focus(); if (el.scrollIntoView) el.scrollIntoView({ block: "center" }); } },
         discard: leave, back: () => { if (L.text.trim()) { L.leaving = true; draw(); } else leave(); }, keep: () => { L.leaving = false; draw(); },
+        filterVoc: (x) => { L.filterVoc = x; L.limit = 0; draw(); }, filterLevel: (x) => { L.filterLevel = x; L.limit = 0; draw(); }, more: () => { L.limit = (L.limit || 20) + 20; draw(); },
+        edit: (id) => { const open = L.edit === id; closeEditor(); if (!open) L.edit = id; draw(); },
+        editField: (k, x) => { L.editDraft = Object.assign({}, L.editDraft, { [k]: x }); draw(); },
+        editSave: (row) => { if (!row.editor || !row.editor.canSave) return; a.editHunt(row.id, { vocation: row.editor.vocation, level: row.editor.level, spotId: row.editor.spotId }); closeEditor(); draw(); },
+        editCancel: () => { closeEditor(); draw(); },
+        arm: (id) => { L.armed = id; draw(); }, deleteHunt: (id) => { closeEditor(); a.deleteSession(id); },
       });
     }
     if (r === "spots") {
@@ -161,7 +173,10 @@ export function mount(root, app, host) {
   function openCreature(slug) { ui.creature = { notes: null }; go("creature/" + slug); }
   // A spot's page.
   function openSpot(id) { ui.spot = { armed: null, open: {} }; go("spot/" + encodeURIComponent(id)); }
-  const blankLog = () => ({ text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan" });
+  function blankLog() {
+    return { text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan", dupe: false,
+      filterVoc: null, filterLevel: null, limit: 0, edit: null, editDraft: {}, armed: null };
+  }
   // Opens Log a clean hunt with some fields preset, returning to `back` afterwards.
   function openLog(preset, back) { ui.log = Object.assign(blankLog(), preset, { back: back || "plan" }); go("log"); }
 

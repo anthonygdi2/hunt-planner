@@ -76,7 +76,8 @@ test("backup: round trip through a db", async () => {
   assert.deepEqual(bk.characters.ek.entries, { rat: { rating: "S" } });
   assert.deepEqual(bk.characters.ek.sessions, { s1: { hours: 1, kills: [] } });
   assert.deepEqual(bk.characters.ek.planner, { state: { diff: "expert" }, marks: { "cobra-bastion": { state: "free", at: "t" } }, occupancy: { "cobra-bastion": { counts: { "a|1": [1, 0] } } } });
-  assert.equal(bk.version, 2);
+  assert.equal(bk.version, 3);
+  assert.deepEqual([bk.hunts, bk.spots, "huntsMeta" in bk], [{}, {}, false], "the shared hunts and spots, none yet");
   assert.equal("spots" in bk.characters.ek, false, "no spots, no key");
   // A character's own spots go into the backup and come back on restore; a version 1 file (no spots) still restores.
   await restoreWrites(repo, backupWrites(Object.assign({}, BACKUP, { version: 2, characters: { ek: Object.assign({}, BACKUP.characters.ek, {
@@ -97,21 +98,25 @@ test("actions: the app's write paths", async () => {
   assert.equal(saved, 1);
   await act.updateProfile(id, { level: 600 });
   await act.setEntry(id, "rat", { rating: "A" });
-  const sid = act.newSessionId(id);
-  await act.saveSession(id, sid, { id: sid, hours: 1, kills: [] });
+  const sid = act.newHuntId();
+  await act.saveHunt(sid, { id: sid, hours: 1, kills: [], by: { pid: id } });
+  await act.saveSpot("my-den", { name: "Den" });
   await act.setCreatureSettings("rat", { name: "Rat", minLevel: { "Elite Knight": 8 } });
   await act.savePlannerState(id, { diff: "master" });
   act.setMark(id, "cobra-bastion", { state: "taken", at: "t" }, { counts: { "a|1": [0, 1] } });
   await settle();
-  const all = await dump(db, ["profiles", "profiles/" + id + "/entries", "profiles/" + id + "/sessions", "creatures", "profiles/" + id + "/planner", "profiles/" + id + "/marks", "profiles/" + id + "/occupancy"]);
+  const cols = ["profiles", "profiles/" + id + "/entries", "hunts", "spots", "creatures", "profiles/" + id + "/planner", "profiles/" + id + "/marks", "profiles/" + id + "/occupancy"];
+  const all = await dump(db, cols);
   assert.deepEqual(all["profiles/" + id], { name: "New", level: 600 });
-  assert.deepEqual(all["profiles/" + id + "/sessions/" + sid], { hours: 1, kills: [] }, "the stored session has no id field");
-  assert.equal(Object.keys(all).length, 7);
-  await act.setEntry(id, "rat", null);
-  await act.deleteSession(id, sid);
-  act.deleteCharacter(id, [], []);
+  assert.deepEqual(all["hunts/" + sid], { hours: 1, kills: [], by: { pid: id } }, "the stored hunt has no id field");
+  assert.equal(Object.keys(all).length, 8);
+  await act.setEntry(id, "rat", { rating: "B" });
+  act.deleteCharacter(id, ["rat"]);
   await act.setCreatureSettings("rat", null);
   await settle(10);
-  assert.deepEqual(await dump(db, ["profiles", "profiles/" + id + "/entries", "profiles/" + id + "/sessions", "creatures", "profiles/" + id + "/planner", "profiles/" + id + "/marks", "profiles/" + id + "/occupancy"]), {});
+  assert.deepEqual(Object.keys(await dump(db, cols)), ["hunts/" + sid, "spots/my-den"], "deleting a character leaves the shared hunts and spots");
+  await act.deleteHunt(sid);
+  await act.deleteSpot("my-den");
+  assert.deepEqual(await dump(db, cols), {});
   assert.throws(() => act.restoreBackup({}), /bad/);
 });

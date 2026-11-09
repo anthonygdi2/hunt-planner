@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { mergeProfiles, makeWatchers } from "../../src/app/state.js";
 import { compute } from "../../src/app/compute.js";
+import { makeModel } from "../../src/app/model.js";
 import { makeRepo } from "../../src/store/repo.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 import { memDb, settle } from "./helpers.js";
@@ -22,7 +23,8 @@ test("watchers deliver normalized documents", async () => {
   const repo = makeRepo(memDb()), w = makeWatchers(repo, { known: (s) => s === "rat" });
   const got = {};
   w.entries("a", (r) => { got.entries = r; });
-  w.sessions("a", (x) => { got.sessions = x; });
+  w.hunts((x) => { got.hunts = x; });
+  w.spots((x) => { got.spots = x; });
   w.creatures((c) => { got.creatures = c; });
   w.plannerState("a", (s) => { got.plan = s; });
   w.marks("a", (m) => { got.marks = m; });
@@ -32,8 +34,9 @@ test("watchers deliver normalized documents", async () => {
   await repo.set("profiles/a", { name: "A" });
   await repo.set("profiles/a/entries/rat", { rating: "S", junk: 1 });
   await repo.set("profiles/a/entries/empty", { name: "x" });
-  await repo.set("profiles/a/sessions/s1", { hours: 1, kills: [] });
-  await repo.set("profiles/a/sessions/bad", { hours: 0 });
+  await repo.set("hunts/s1", { hours: 1, kills: [], vocation: "Elite Knight", level: 615, by: { pid: "a", name: "A" } });
+  await repo.set("hunts/bad", { hours: 0 });
+  await repo.set("spots/my-den", { name: "Den" });
   await repo.set("creatures/rat", { name: "Rat", minLevel: { "Elite Knight": 8 } });
   await repo.set("profiles/a/planner/state", { diff: "adept", held: { slug: "bear" } });
   await repo.set("profiles/a/marks/cave", { state: "free", at: "t" });
@@ -41,7 +44,8 @@ test("watchers deliver normalized documents", async () => {
   await settle();
   assert.deepEqual(profiles, ["a"]);
   assert.deepEqual(got.entries, { rat: { rating: "S" } });
-  assert.deepEqual(got.sessions, [{ id: "s1", hours: 1, kills: [] }]);
+  assert.deepEqual(got.hunts, [{ id: "s1", hours: 1, kills: [], vocation: "Elite Knight", level: 615, by: { pid: "a", name: "A" } }]);
+  assert.deepEqual(got.spots, { "my-den": { name: "Den", parentId: null, note: null, createdAt: null } });
   assert.deepEqual(got.creatures, { rat: { name: "Rat", minLevel: { "Elite Knight": 8 } } });
   assert.equal(got.plan.diff, "adept");
   assert.equal(got.plan.held, null, "unknown creature dropped");
@@ -70,25 +74,49 @@ test("compute on a small state", () => {
   assert.equal(off.derived["cobra-scout"], undefined);
 });
 
-test("compute counts only the hunts that apply to the character", () => {
+test("compute counts only the shared hunts that apply to the character", () => {
   const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }, { n: "Cobra Scout", c: "M", m: 6 }]);
   const reference = [{ id: "bastion", spot: "Cobra Bastion", vocation: "Elite Knight", levelMin: 500, rawXph: 4e6, creatures: [{ slug: "cobra-assassin", kph: 300 }], source: { date: "2026-09-01", postRebalance: true } }];
+  const EK = "Elite Knight", RP = "Royal Paladin";
   const sessions = [
-    { id: "ek", spot: "Cobra Bastion", hours: 1, rawXp: 3e6, kills: [{ slug: "cobra-assassin", count: 400 }] },
-    { id: "cave", spot: "Scout Cave", hours: 1, rawXp: 1e6, kills: [{ slug: "cobra-scout", count: 200 }] },
-    { id: "rp", spot: "Scout Cave", hours: 1, rawXp: 2e5, vocation: "Royal Paladin", kills: [{ slug: "cobra-scout", count: 100 }] },
+    { id: "ek", spot: "Cobra Bastion", hours: 1, rawXp: 3e6, vocation: EK, level: 610, by: { pid: "a" }, kills: [{ slug: "cobra-assassin", count: 400 }] },
+    { id: "cave", spot: "Scout Cave", hours: 1, rawXp: 1e6, vocation: EK, level: 620, by: { pid: "a" }, kills: [{ slug: "cobra-scout", count: 200 }] },
+    { id: "rp", spot: "Scout Cave", hours: 1, rawXp: 2e5, vocation: RP, level: 45, by: { pid: "a" }, kills: [{ slug: "cobra-scout", count: 100 }] },
   ];
-  const run = (profile) => compute({ catalog, reference, profile: Object.assign({ vocation: "Royal Paladin", level: 45 }, profile), sessions, entries: {}, advanced: false, difficulty: "all" }, 0);
-  // A knight's untagged hunts on a character switched to paladin: they still read as the paladin's until told.
+  const run = (profile, pid) => compute({ catalog, reference, pid: pid || "a", profile: Object.assign({ vocation: RP, level: 45 }, profile), sessions, entries: {}, advanced: false, difficulty: "all" }, 0);
   let d = run({});
-  assert.deepEqual(d.hunts.use.map((x) => x.id), ["cave", "rp"], "the level-500 spot is cut off at level 45");
-  assert.equal(d.derived["cobra-assassin"], undefined);
-  d = run({ untaggedVocation: "Elite Knight" });
-  assert.deepEqual(d.hunts.use.map((x) => x.id), ["rp"]);
-  assert.equal(d.derived["cobra-scout"].best.kph, 100, "only the paladin's hunt");
-  d = run({ untaggedVocation: "Elite Knight", otherVocationHunts: true });
-  assert.deepEqual(d.hunts.use.map((x) => x.id), ["cave", "rp"], "other vocations on: the level still applies");
-  d = run({ untaggedVocation: "Elite Knight", otherVocationHunts: true, level: 500 });
-  assert.equal(d.hunts.use.length, 3);
+  assert.deepEqual(d.hunts.use.map((x) => x.id), ["rp"], "only the paladin's hunt");
+  assert.equal(d.derived["cobra-scout"].best.kph, 100);
+  assert.deepEqual([...d.hunts.why].map(([x, w]) => x.id + ":" + w), ["ek:voc", "cave:voc"]);
+  d = run({ otherVocationHunts: true });
+  assert.deepEqual(d.hunts.use.map((x) => x.id), ["rp"], "other vocations on: the level rules still apply");
+  assert.deepEqual([...d.hunts.why].map(([x, w]) => x.id + ":" + w), ["ek:level", "cave:window"]);
+  d = run({ otherVocationHunts: true, levelWindow: 0 });
+  assert.deepEqual(d.hunts.use.map((x) => x.id), ["cave", "rp"], "any level: only the spot's minimum level is left");
+  // A new knight sees the hunts another character logged as a knight, and is calibrated from them.
+  d = run({ vocation: EK, level: 633 }, "b");
+  assert.deepEqual(d.hunts.use.map((x) => x.id), ["ek", "cave"]);
   assert.equal(d.derived["cobra-assassin"].best.spot, "Cobra Bastion");
+  assert.ok(d.calib && d.calib.spots.length === 1, "calibrated from the other knight's hunt at the reference spot");
+  assert.equal(d.huntCtx.window, 20);
+  d = run({ vocation: EK, level: 480 }, "b");
+  assert.deepEqual([...d.hunts.why].map(([x, w]) => x.id + ":" + w), ["ek:level", "cave:window", "rp:voc"], "level 480: the level-500 spot is cut off, 620 is outside ±20%");
+  d = run({ vocation: EK, level: 480, levelWindow: 35 }, "b");
+  assert.deepEqual(d.hunts.use.map((x) => x.id), ["cave"], "±35% reaches 648");
+});
+
+test("the Spots lens widens which shared hunts count there, as it widens the reference spots", () => {
+  const catalog = makeCatalog([{ n: "Cobra Scout", c: "M", m: 6 }]);
+  const sessions = [
+    { id: "ek", spot: "Scout Cave", hours: 1, rawXp: 1e6, vocation: "Elite Knight", level: 45, by: { pid: "a" }, kills: [{ slug: "cobra-scout", count: 200 }] },
+    { id: "old", spot: "Scout Hill", hours: 1, rawXp: 2e5, vocation: "Royal Paladin", level: 300, by: { pid: "a" }, kills: [{ slug: "cobra-scout", count: 100 }] },
+  ];
+  const M = makeModel({ catalog, reference: [], pid: "b", profile: { vocation: "Royal Paladin", level: 45 }, sessions, entries: {}, advanced: false, difficulty: "all", planner: {} }, null, 0);
+  const counted = (lens) => M.spotIndex(lens).list.filter((sp) => sp.sessions.length).map((sp) => sp.id);
+  assert.deepEqual(counted(), []);
+  assert.deepEqual(counted({ allVocations: true }), ["scout-cave"]);
+  assert.deepEqual(counted({ anyLevel: true }), ["scout-hill"]);
+  assert.deepEqual(counted({ allVocations: true, anyLevel: true }), ["scout-cave", "scout-hill"]);
+  assert.equal(M.spotIndex(), M.spotIndex(null), "one index per lens");
+  assert.deepEqual(M.derived.hunts.use, [], "the character's own numbers don't change");
 });

@@ -11,7 +11,7 @@ import { makeCatalog } from "../core/catalog.js";
 import { PRESETS, readWeights } from "../core/score.js";
 import { makeRepo } from "../store/repo.js";
 import { PREF } from "../store/prefs.js";
-import { plDefaults, readHuntSources, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, WEEKLY_SLOTS, readHunting } from "../store/schema.js";
+import { plDefaults, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, WEEKLY_SLOTS, readHunting, readHunt, LEVEL_WINDOWS } from "../store/schema.js";
 import { makeActions } from "./actions.js";
 import { makeWatchers, mergeProfiles } from "./state.js";
 import { makeModel, makePlanCache } from "./model.js";
@@ -26,12 +26,23 @@ export function createApp({ data, prefs, now, browserLang }) {
     status: "loading", // "loading" until the profiles arrive, then "ready"
     local: false, canWrite: true, notice: "",
     profiles: {}, order: [], pid: prefs.get(PREF.profile) || null,
-    creatures: {}, entries: {}, sessions: [], userSpots: {}, planner: { state: plDefaults(), marks: {}, occupancy: {} },
+    // hunts and userSpots are shared by every character (hunts/, spots/); the rest is the active character's.
+    creatures: {}, hunts: [], userSpots: {}, entries: {}, planner: { state: plDefaults(), marks: {}, occupancy: {} },
     advanced: prefs.get(PREF.advanced) === "1", theme: readTheme(prefs.get(PREF.theme)), lang: pickLang(prefs.get(PREF.lang), browserLang),
   };
   setLang(state.lang);
   const listeners = new Set(), pending = {}, pendingNew = {}, planCache = makePlanCache();
   let repo = null, act = null, watch = null, charUnsub = [], plPending = 0, cachedModel = null, diffModels = {};
+  // The shared hunts and spots as stored, and the migration's copies until they're stored (or for good, when this
+  // viewer can't write them).
+  const stored = { hunts: [], spots: {} };
+  let copies = { hunts: {}, spots: {} }, profilesIn = false, migrated = false;
+  const showShared = () => {
+    const have = new Set(stored.hunts.map((x) => x.id)), extra = [];
+    Object.keys(copies.hunts).forEach((id) => { if (!have.has(id)) { const x = readHunt(id, copies.hunts[id]); if (x) extra.push(x); } });
+    state.hunts = stored.hunts.concat(extra);
+    state.userSpots = Object.assign({}, copies.spots, stored.spots);
+  };
   const changed = () => { cachedModel = null; diffModels = {}; listeners.forEach((fn) => fn()); };
   const iso = () => new Date(now()).toISOString();
   const profile = () => state.profiles[state.pid] || null;
@@ -39,16 +50,14 @@ export function createApp({ data, prefs, now, browserLang }) {
   function watchCharacter(pid) {
     charUnsub.forEach((u) => u());
     charUnsub = [];
-    state.entries = {}; state.sessions = []; state.userSpots = {}; state.planner = { state: plDefaults(), marks: {}, occupancy: {} };
+    state.entries = {}; state.planner = { state: plDefaults(), marks: {}, occupancy: {} };
     if (!pid || !watch) return;
     const mine = (fn) => (v) => { if (state.pid === pid) { fn(v); changed(); } };
     charUnsub.push(watch.entries(pid, mine((v) => { state.entries = v; })));
-    charUnsub.push(watch.sessions(pid, mine((v) => { state.sessions = v; })));
     // While our own planner writes are in flight, a snapshot can be older than the state.
     charUnsub.push(watch.plannerState(pid, (v) => { if (state.pid === pid && !plPending) { state.planner = Object.assign({}, state.planner, { state: v }); changed(); } }));
     charUnsub.push(watch.marks(pid, mine((v) => { state.planner = Object.assign({}, state.planner, { marks: v }); })));
     charUnsub.push(watch.occupancy(pid, mine((v) => { state.planner = Object.assign({}, state.planner, { occupancy: v }); })));
-    charUnsub.push(watch.spots(pid, mine((v) => { state.userSpots = v; })));
   }
 
   // Starts reading and writing through a db (store/db.js).
@@ -57,25 +66,33 @@ export function createApp({ data, prefs, now, browserLang }) {
     act = makeActions(repo);
     watch = makeWatchers(repo, { known });
     state.local = !!db.local;
+    const lost = () => { state.notice = t("Saved data stopped updating. Reload the page to reconnect."); changed(); };
     watch.creatures((c) => { state.creatures = c; changed(); });
+    watch.hunts((v) => { stored.hunts = v; showShared(); changed(); }, lost);
+    watch.spots((v) => { stored.spots = v; showShared(); changed(); }, lost);
+    // Hunts saved under each character before they were shared are copied into the shared ones first (once each;
+    // store/migrate.js). The app is ready once that's read and the profiles are in.
+    const ready = () => { if (profilesIn && migrated) state.status = "ready"; };
+    act.migrate(iso()).then((m) => {
+      copies = { hunts: m.hunts, spots: m.spots };
+      showShared();
+      m.written.then((ok) => { if (ok) { copies = { hunts: {}, spots: {} }; showShared(); changed(); } });
+    }).catch(() => {}).then(() => { migrated = true; ready(); changed(); });
     let watching = null;
     watch.profiles((docs) => {
       const m = mergeProfiles(docs, { pending, pendingNew, current: state.profiles });
-      state.profiles = m.profiles; state.order = m.order; state.status = "ready";
+      state.profiles = m.profiles; state.order = m.order; profilesIn = true; ready();
       if (!state.profiles[state.pid]) state.pid = m.order[0] || null;
       if (watching !== state.pid) { watching = state.pid; watchCharacter(state.pid); }
       changed();
-    }, () => { state.notice = t("Saved data stopped updating. Reload the page to reconnect."); changed(); });
+    }, lost);
   }
 
   // A patch to the active character's profile: shown at once, written in the background; on failure the unsaved
-  // keys are dropped and a notice says so. A new vocation first records the old one as what the hunts saved without a
-  // vocation were logged as (untaggedVocation), unless that's set already.
+  // keys are dropped and a notice says so.
   function updateCharacter(patch) {
     const pid = state.pid, cur = state.profiles[pid];
     if (!act || !pid || !cur) return;
-    const was = cur.vocation || VOCATIONS[0];
-    if (patch.vocation && patch.vocation !== was && !readHuntSources(cur).loggedAs && state.sessions.some((x) => !x.vocation)) patch = Object.assign({ untaggedVocation: was }, patch);
     state.profiles = Object.assign({}, state.profiles, { [pid]: Object.assign({}, state.profiles[pid], patch) });
     pending[pid] = Object.assign({}, pending[pid] || {}, patch);
     act.updateProfile(pid, patch, () => {
@@ -213,11 +230,11 @@ export function createApp({ data, prefs, now, browserLang }) {
       changed();
     },
     updateCharacter,
-    // Deletes the active character and everything under it.
+    // Deletes the active character and what's only its own; the hunts it logged stay, shared with the others.
     deleteCharacter() {
       const gone = state.pid;
       if (!act || !gone) return;
-      act.deleteCharacter(gone, Object.keys(state.entries), state.sessions.map((x) => x.id));
+      act.deleteCharacter(gone, Object.keys(state.entries));
       const profiles = Object.assign({}, state.profiles);
       delete profiles[gone];
       state.profiles = profiles;
@@ -226,10 +243,10 @@ export function createApp({ data, prefs, now, browserLang }) {
       if (state.order[0]) actions.switchCharacter(state.order[0]); else { watchCharacter(null); changed(); }
     },
     setSources(s) { updateCharacter(sourcesPatch(s)); },
-    // Whether the character's hunts logged as another vocation count, and which vocation its hunts saved without one
-    // were logged as.
+    // Which of the shared hunts count for the character: those logged as another vocation too, and how near its level
+    // (percent; 0 is any level).
     setOtherVocationHunts(on) { updateCharacter({ otherVocationHunts: !!on }); },
-    setLoggedAs(vocation) { if (VOCATIONS.indexOf(vocation) !== -1) updateCharacter({ untaggedVocation: vocation }); },
+    setLevelWindow(w) { w = Number(w); if (LEVEL_WINDOWS.indexOf(w) !== -1) updateCharacter({ levelWindow: w }); },
     // Goal mix: weights 0-5 each, or a preset by id.
     setWeights(w) { updateCharacter(goalPatch(readWeights(w))); },
     applyPreset(id) { if (PRESETS[id]) updateCharacter(goalPatch(PRESETS[id])); },
@@ -250,7 +267,7 @@ export function createApp({ data, prefs, now, browserLang }) {
     restoreBackup(text) {
       let bk;
       try { bk = JSON.parse(text); } catch (e) { return Promise.reject(new Error("bad")); }
-      try { return act.restoreBackup(bk).then(() => Object.keys(bk.characters).length); } catch (e) { return Promise.reject(e); }
+      try { return act.restoreBackup(bk, iso()).then(() => Object.keys(bk.characters).length); } catch (e) { return Promise.reject(e); }
     },
     // Creatures: Avoid (the entry's rating X), the in-game lists, bestiary and Echo Warden done, notes, and in Advanced
     // typed numbers, a pinned spot and the level the creature is usable from (shared, per vocation).
@@ -380,8 +397,9 @@ export function createApp({ data, prefs, now, browserLang }) {
     // A new week: the rows clear (difficulty and slots stay).
     startNewWeek() { saveWeekly({ weekStart: weekKey(new Date(now())), exp: null, tasks: [], any: { killsLeft: null, done: false } }); },
     // Logging a clean hunt. preview: parseSession's result. spot: {id} (a known spot) or {name, parentId, note} (a new
-    // spot, or a variation of parentId). raidsBy: Echo Raids per creature (advanced). Saves the session at that spot (and
-    // the new spot first); Hunting now ends. Returns the session's id, or null when there's nothing to save.
+    // spot, or a variation of parentId). raidsBy: Echo Raids per creature (advanced). Saves the hunt to the shared
+    // hunts at that spot (and the new spot first), with the character's vocation and level and who logged it; Hunting
+    // now ends. Returns the hunt's id, or null when there's nothing to save.
     saveHunt({ preview, spot, raidsBy }) {
       const pid = state.pid, p = profile();
       if (!act || !pid || !p || !preview || !preview.hours || !preview.kills || !preview.kills.length) return null;
@@ -392,7 +410,7 @@ export function createApp({ data, prefs, now, browserLang }) {
         spotId = newSpotId(name);
         const doc = { name, parentId: spot.parentId || null, note: String(spot.note || "").trim().slice(0, 200) || null, createdAt: iso() };
         state.userSpots = Object.assign({}, state.userSpots, { [spotId]: doc });
-        act.saveSpot(pid, spotId, doc);
+        act.saveSpot(spotId, doc);
       } else {
         const sp = model().spotIndex().spots[spotId];
         name = sp ? sp.name : spotId;
@@ -401,57 +419,72 @@ export function createApp({ data, prefs, now, browserLang }) {
       const body = { spot: name, spotId, task, start: preview.start || null, end: preview.end || iso().slice(0, 19), hours: Math.round(preview.hours * 10000) / 10000,
         rawXp: preview.rawXp != null ? preview.rawXp : null, xp: preview.xp != null ? preview.xp : null, loot: preview.loot != null ? preview.loot : null,
         supplies: preview.supplies != null ? preview.supplies : null, balance: preview.balance != null ? preview.balance : null,
-        kills: preview.kills.map((k) => (k.slug ? { slug: k.slug, name: k.name, count: k.count } : { name: k.name, count: k.count })), level: Number(p.level) || null, vocation: p.vocation || VOCATIONS[0], createdAt: iso() };
+        kills: preview.kills.map((k) => (k.slug ? { slug: k.slug, name: k.name, count: k.count } : { name: k.name, count: k.count })), level: Number(p.level) || null, vocation: p.vocation || VOCATIONS[0],
+        by: { pid, name: p.name ? String(p.name).trim().slice(0, 40) : null }, createdAt: iso() };
       const raids = {};
       Object.keys(raidsBy || {}).forEach((k) => { const n = parseInt(raidsBy[k], 10); if (n >= 0 && n < 1000) raids[k] = n; });
       if (Object.keys(raids).length) body.raidsBy = raids;
-      const id = act.newSessionId(pid);
-      state.sessions = state.sessions.concat([Object.assign({ id }, body)]);
-      act.saveSession(pid, id, body, () => { state.sessions = state.sessions.filter((x) => x.id !== id); state.notice = t("Couldn’t save the hunt. Try again in a moment."); changed(); });
+      const id = act.newHuntId();
+      state.hunts = state.hunts.concat([readHunt(id, body)]);
+      act.saveHunt(id, body, () => { state.hunts = state.hunts.filter((x) => x.id !== id); state.notice = t("Couldn’t save the hunt. Try again in a moment."); changed(); });
       if (readHunting(state.planner.state)) actions.savePlanner({ hunting: null }); else changed();
       return id;
     },
     deleteSession(id) {
-      const pid = state.pid;
-      if (!act || !pid) return;
-      state.sessions = state.sessions.filter((x) => x.id !== id);
-      act.deleteSession(pid, id, () => { state.notice = t("Couldn’t delete that hunt."); changed(); });
+      if (!act) return;
+      state.hunts = state.hunts.filter((x) => x.id !== id);
+      act.deleteHunt(id, () => { state.notice = t("Couldn’t delete that hunt."); changed(); });
+      changed();
+    },
+    // A saved hunt's vocation, level (a number, or "" for none) and spot (a spot id), as corrected on the Log screen.
+    editHunt(id, patch) {
+      const x = state.hunts.filter((y) => y.id === id)[0];
+      if (!act || !x) return;
+      const body = Object.assign({}, x);
+      delete body.id;
+      if ("vocation" in patch && VOCATIONS.indexOf(patch.vocation) !== -1) body.vocation = patch.vocation;
+      if ("level" in patch) { const n = parseInt(patch.level, 10); body.level = n > 0 && n < 10000 ? n : null; }
+      if ("spotId" in patch && patch.spotId) {
+        const sp = model().spotIndex().spots[patch.spotId];
+        if (sp) { body.spotId = sp.id; body.spot = sp.name; }
+      }
+      const prev = state.hunts;
+      state.hunts = state.hunts.map((y) => (y.id === id ? readHunt(id, body) : y));
+      act.saveHunt(id, body, () => { state.hunts = prev; state.notice = t("Couldn’t save that change. Try again in a moment."); changed(); });
       changed();
     },
     // Echo Raid counts per creature on a logged hunt (advanced).
     setSessionRaids(id, raidsBy) {
-      const pid = state.pid, x = state.sessions.filter((y) => y.id === id)[0];
+      const x = state.hunts.filter((y) => y.id === id)[0];
       if (!act || !x) return;
       const raids = {};
       Object.keys(raidsBy || {}).forEach((k) => { const n = parseInt(raidsBy[k], 10); if (n >= 0 && n < 1000) raids[k] = n; });
       const body = Object.assign({}, x, { raidsBy: raids });
       delete body.id; delete body.raids;
-      state.sessions = state.sessions.map((y) => (y.id === id ? Object.assign({ id }, body) : y));
-      act.saveSession(pid, id, body);
+      state.hunts = state.hunts.map((y) => (y.id === id ? Object.assign({ id }, body) : y));
+      act.saveHunt(id, body);
       changed();
     },
-    // The character's own spots: rename, or delete with the hunts logged there.
+    // The spots made for logged hunts (shared): rename, or delete with the hunts logged there, by any character.
     renameSpot(id, name) {
-      const pid = state.pid, sp = state.userSpots[id];
+      const sp = state.userSpots[id];
       name = String(name || "").trim().slice(0, 60);
       if (!act || !sp || !name) return;
       const doc = Object.assign({}, sp, { name });
       state.userSpots = Object.assign({}, state.userSpots, { [id]: doc });
-      act.saveSpot(pid, id, doc);
+      act.saveSpot(id, doc);
       changed();
     },
     deleteSpot(id) {
-      const pid = state.pid;
       if (!act || !state.userSpots[id]) return;
-      const gone = state.sessions.filter((x) => x.spotId === id).map((x) => x.id);
-      gone.forEach((x) => act.deleteSession(pid, x));
+      state.hunts.filter((x) => x.spotId === id).forEach((x) => act.deleteHunt(x.id));
       // Its variations stay, as spots of their own.
-      state.sessions = state.sessions.filter((x) => x.spotId !== id);
+      state.hunts = state.hunts.filter((x) => x.spotId !== id);
       const spots = Object.assign({}, state.userSpots);
       delete spots[id];
-      Object.keys(spots).forEach((k) => { if (spots[k].parentId === id) { spots[k] = Object.assign({}, spots[k], { parentId: null }); act.saveSpot(pid, k, spots[k]); } });
+      Object.keys(spots).forEach((k) => { if (spots[k].parentId === id) { spots[k] = Object.assign({}, spots[k], { parentId: null }); act.saveSpot(k, spots[k]); } });
       state.userSpots = spots;
-      act.deleteSpot(pid, id);
+      act.deleteSpot(id);
       changed();
     },
     // Planner documents.
@@ -468,7 +501,7 @@ export function createApp({ data, prefs, now, browserLang }) {
 
   // The active character's model (app/model.js), rebuilt after each change; its tiers are for Master tasks. modelFor
   // gives one whose tiers are for another difficulty (or "all"), for the Creatures screen.
-  const modelState = (difficulty) => ({ t: translator(), catalog, reference: data.reference, profile: profile() || {}, sessions: state.sessions, entries: state.entries, advanced: state.advanced,
+  const modelState = (difficulty) => ({ t: translator(), catalog, reference: data.reference, profile: profile() || {}, pid: state.pid, sessions: state.hunts, entries: state.entries, advanced: state.advanced,
     difficulty, creatures: state.creatures, planner: state.planner, spotMeta: {}, expTable: data.expTable, userSpots: state.userSpots });
   function model() {
     if (!cachedModel) cachedModel = makeModel(modelState("master"), null, now(), { planCache });

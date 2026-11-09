@@ -12,19 +12,25 @@ import { metrics } from "../core/metrics.js";
 import { pickSpot, effective } from "../core/numbers.js";
 import { scoringWeights, scoreList, tierScores } from "../core/score.js";
 
+// A character's own hunts among the shared ones: those it logged (by.pid), all of them without a pid.
+export const ownHunts = (sessions, pid) => (pid ? sessions.filter((x) => !x.by || !x.by.pid || x.by.pid === pid) : sessions);
+
 // state: {catalog (makeCatalog), reference (REFERENCE), profile (the active character's profile document, {} for
-// none), sessions (its sessions), userSpots (its own spots), entries (slug → entry), advanced (advanced mode: weekly
-// tasks count), difficulty ("all" or a task difficulty: the tier list's)}. now: ms.
-// Returns {hunts (splitHunts: the sessions that count, and why the rest don't), raidP, raidInfo, picks, calib, calibOther, xpBoost, spotKph, spotEco, refActive, refSpotSrc, weeklyNow,
+// none), pid (its id), sessions (every logged hunt in the storage, shared by all characters, store readHunts),
+// userSpots (the spots made for them), entries (slug → entry), advanced (advanced mode: weekly tasks count),
+// difficulty ("all" or a task difficulty: the tier list's)}. now: ms.
+// Returns {hunts (splitHunts: the hunts that count for the character, and why the rest don't), huntCtx (huntCheck's
+// ctx for it), raidP, raidInfo, picks, calib, calibOther, xpBoost, spotKph, spotEco, refActive, refSpotSrc, weeklyNow,
 // derived (slug → pickSpot result, fromRef for reference picks), refShadow, metrics, scores (relative), tiers, ctx}.
 // ctx(diff) is the metrics context for a difficulty, for callers that need more metrics on the same state.
 export function compute(state, now) {
   const { catalog, reference, entries, advanced, difficulty } = state, p = state.profile || {};
   const vocation = p.vocation || VOCATIONS[0], sources = readSources(p), refOn = sources.reference && reference.length > 0, otherOn = refOn && sources.otherVocation;
 
-  // Only the hunts that count for the character feed its numbers: logged as its vocation (unless hunts as other
-  // vocations are on), at spots its level reaches.
-  const hunts = splitHunts({ reference, sessions: state.sessions, catalog, userSpots: state.userSpots }, Object.assign({ vocation, level: p.level }, readHuntSources(p)));
+  // Only the hunts that count for the character feed its numbers, whichever character logged them: logged as its
+  // vocation (unless hunts as other vocations are on), near its level, at spots its level reaches.
+  const huntCtx = Object.assign({ vocation, level: p.level }, readHuntSources(p));
+  const hunts = splitHunts({ reference, sessions: state.sessions, catalog, userSpots: state.userSpots }, huntCtx);
   const sessions = hunts.use;
 
   const raid = raidRate(sessions, catalog);
@@ -44,7 +50,7 @@ export function compute(state, now) {
   });
 
   // Open weekly tasks count only in advanced mode.
-  const weeklyNow = advanced ? openWeeklyTasks(weeklyState(p, sessions, catalog, new Date(now)), catalog) : [];
+  const weeklyNow = advanced ? openWeeklyTasks(weeklyState(p, ownHunts(sessions, state.pid), catalog, new Date(now)), catalog) : [];
 
   const weights = scoringWeights(readGoal(p)), chalRates = p.chalRates && typeof p.chalRates === "object" ? p.chalRates : {};
   const weeklyXph = weeklyNow.length ? (spot, hours, slug, kills) => weeklyBonus(weeklyNow, spot && spotKph[spot], hours, slug, kills) : null;
@@ -65,6 +71,6 @@ export function compute(state, now) {
   const res = scoreList(catalog.poolOf(difficulty), (c) => metrics(c, effective(entries[c.slug], derived[c.slug]), ctx(diffFor(c))), weights);
   const tiers = tierScores(res.scores);
 
-  return { hunts, raidP: raid.p, raidInfo: raid.info, picks, calib: cal.calib, calibOther: cal.calibOther, xpBoost: cal.xpBoost, spotKph, spotEco, refActive,
+  return { hunts, huntCtx, raidP: raid.p, raidInfo: raid.info, picks, calib: cal.calib, calibOther: cal.calibOther, xpBoost: cal.xpBoost, spotKph, spotEco, refActive,
     refSpotSrc, weeklyNow, derived, refShadow: ref.shadow, metrics: res.metrics, scores: tiers.rel, tiers: tiers.tier, ctx };
 }

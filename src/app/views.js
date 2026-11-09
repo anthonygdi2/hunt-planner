@@ -3,7 +3,8 @@
 // translated where they're shown.
 
 import { VOCATIONS, PREY, PREY_SLOTS, EXP_EVENTS, SLOTS } from "../data/rules.js";
-import { readSources, readHuntSources, sourcesPreset, SOURCE_PRESETS, readSettings, TAKEN_MINUTES, THEMES, readGoal, readHunting } from "../store/schema.js";
+import { readSources, readHuntSources, sourcesPreset, SOURCE_PRESETS, readSettings, TAKEN_MINUTES, THEMES, readGoal, readHunting, LEVEL_WINDOWS } from "../store/schema.js";
+import { huntKey } from "../store/migrate.js";
 import { GOAL_KEYS, PRESET_IDS, presetOf } from "../core/score.js";
 import { fmtBig, fmtHours, fmtSmall, fmtField, pct, norm } from "../core/text.js";
 import { creatureInPool, poolsOf, topPool } from "../core/catalog.js";
@@ -142,11 +143,18 @@ export function calibrationText({ sources, calib, calibOther }) {
     : t.n(calib.spots.length, "Adjusted to you from {n} logged spot.", "Adjusted to you from {n} logged spots.");
 }
 
+// The level windows for a character's hunts: [{value (percent; 0 is any level), label}].
+function windowOptions(level) {
+  return LEVEL_WINDOWS.map((w) => ({ value: w, label: !w ? t("Any level") : Number(level) > 0
+    ? t("Within {pct}% of level {level} ({lo}–{hi})", { pct: w, level, lo: Math.ceil(level * (100 - w) / 100), hi: Math.floor(level * (100 + w) / 100) })
+    : t("Within {pct}% of its level", { pct: w }) }));
+}
+
 // Characters and settings (full page). app: {state, profile()}; model: the active character's model, for the
 // calibration line (or null before there is one).
 export function charactersPageView(state, model) {
   const p = state.profiles[state.pid] || null, sources = readSources(p || {}), settings = readSettings(p || {}, state.planner && state.planner.state);
-  const d = model && model.derived, hs = readHuntSources(p || {}), untagged = (state.sessions || []).filter((x) => !x.vocation).length;
+  const d = model && model.derived, hs = readHuntSources(p || {});
   return {
     canWrite: state.canWrite && state.status === "ready",
     pills: state.order.map((id) => { const x = state.profiles[id] || {}; return { id, label: displayName(x) + (x.level && x.name ? " · " + x.level : ""), pressed: id === state.pid }; }),
@@ -155,11 +163,9 @@ export function charactersPageView(state, model) {
     sources: { preset: sourcesPreset(sources), switches: sources,
       presets: [["mine", _("Mine only")], ["reference", _("+ Reference")], ["everything", _("Everything")]].map(([value, label]) => ({ value, label: t(label), switches: SOURCE_PRESETS[value] })),
       calibration: p ? calibrationText({ sources, calib: d && d.calib, calibOther: d && d.calibOther }) : "" },
-    // The character's own hunts: whether those logged as another vocation count, and (while some hunts were saved
-    // without a vocation) which vocation those were logged as.
-    hunts: { otherVocation: hs.otherVocation, untagged: p && untagged ? { loggedAs: hs.loggedAs || p.vocation || VOCATIONS[0],
-      note: t.n(untagged, "{n} older hunt doesn’t say which vocation logged it. Only hunts logged as this character’s vocation count, unless the switch above is on.",
-        "{n} older hunts don’t say which vocation logged them. Only hunts logged as this character’s vocation count, unless the switch above is on.") } : null },
+    // Which of the hunts every character shares count for this one: those logged as another vocation, and how near
+    // its level.
+    hunts: { otherVocation: hs.otherVocation, window: hs.window, windows: windowOptions(p && p.level) },
     settings: { world: settings.world || "", takenMinutes: settings.takenMinutes, takenOptions: TAKEN_MINUTES.map((m) => ({ value: m, label: t(MINUTES_LABEL[m]) })) },
     advanced: state.advanced, theme: state.theme, themes: THEMES, lang: state.lang, langs: langOptions(),
     langNote: state.lang && state.lang !== "en" ? t("Translations are new: if something reads wrong, please report it.") : "",
@@ -174,10 +180,22 @@ const HOURS = [[null, _("No limit")], [0.5, "30 min"], [1, "1 h"], [1.5, "1.5 h"
 const PREY_KINDS = [["xp", _("Exp")], ["loot", _("Loot")], ["damage", _("Damage")], ["defense", _("Defense")]];
 const SOURCE_LABELS = { mine: _("Mine only"), reference: _("+ Reference"), everything: _("Everything"), custom: _("Custom") };
 
-// The badges for a spot's numbers: where they come from, how old, how thin. sessions: hunts logged there.
-export function sourceBadges(o, sessions) {
+// Whose hunts these are, by vocation and level: "EK 615–631", "EK 615–631, RP 45".
+export function huntsWho(list) {
+  const by = {}, order = [];
+  (list || []).forEach((x) => {
+    const v = VOC_SHORT[x.vocation] || "", lvl = Number(x.level) || 0;
+    if (!by[v]) { by[v] = { lo: Infinity, hi: 0 }; order.push(v); }
+    if (lvl) { by[v].lo = Math.min(by[v].lo, lvl); by[v].hi = Math.max(by[v].hi, lvl); }
+  });
+  return order.map((v) => { const r = by[v]; return [v, r.hi ? (r.lo === r.hi ? String(r.lo) : r.lo + "–" + r.hi) : ""].filter(Boolean).join(" "); }).filter(Boolean).join(", ");
+}
+
+// The badges for a spot's numbers: where they come from, how old, how thin. sessions: the number of hunts logged
+// there; who: whose they are (huntsWho).
+export function sourceBadges(o, sessions, who) {
   const out = [], e = o.entry || {};
-  if (o.src === "own") out.push({ kind: "yours", text: t.n(sessions || 0, "Yours · {n} hunt", "Yours · {n} hunts") });
+  if (o.src === "own") out.push({ kind: "yours", text: who ? t.n(sessions || 0, "Yours · {n} hunt · {who}", "Yours · {n} hunts · {who}", { who }) : t.n(sessions || 0, "Yours · {n} hunt", "Yours · {n} hunts") });
   else if (o.src === "refAdj") out.push({ kind: "refAdj", text: t("Reference, adjusted to you") });
   else if (o.src === "ref") out.push({ kind: "ref", text: t("Reference") });
   else if (o.src === "other" || o.src === "otherAdj") out.push({ kind: "other", text: t("Other vocation") });
@@ -191,7 +209,7 @@ export function planScreenView(state, model, catalog, now, compare) {
   const p = state.profiles[state.pid] || {}, pl = state.planner || {}, st = pl.state || {};
   const base = planView(state, model, catalog, compare), settings = readSettings(p, st), sources = readSources(p), hunting = readHunting(st);
   const name = (slug) => (slug && catalog.bySlug[slug] ? catalog.bySlug[slug].name : "");
-  const idx = model.spotIndex(), spotName = (id) => (idx.spots[id] ? idx.spots[id].name : id), sessionsAt = (id) => (idx.spots[id] ? idx.spots[id].sessions.length : 0);
+  const idx = model.spotIndex(), spotName = (id) => (idx.spots[id] ? idx.spots[id].name : id), huntsAt = (id) => (idx.spots[id] ? idx.spots[id].sessions : []);
 
   // The chain.
   const ch = model.planChain(model.plannerCtx({ marks: pl.marks }));
@@ -199,7 +217,7 @@ export function planScreenView(state, model, catalog, now, compare) {
   const bountyLine = (s) => (!s.offer || !s.option.held ? null : s.offer.held ? t("Counts for your bounty: {creature}", { creature: s.offer.name })
     : t("For offer {letter}: {creature}. Pick it once the spot is free.", { letter: "ABC"[s.offer.i], creature: s.offer.name }));
   const card = (s) => { const o = s.option; return { id: o.id, title: s.text, name: o.name, bounty: bountyLine(s), exp: fmtBig(o.m.xp), profit: o.m.profit != null ? fmtBig(o.m.profit) : "–",
-    badges: sourceBadges(o, sessionsAt(o.id)), why: s.why, offer: s.offer && !s.offer.held ? { i: s.offer.i, letter: "ABC"[s.offer.i], name: s.offer.name } : null }; };
+    badges: sourceBadges(o, huntsAt(o.id).length, huntsWho(huntsAt(o.id))), why: s.why, offer: s.offer && !s.offer.held ? { i: s.offer.i, letter: "ABC"[s.offer.i], name: s.offer.name } : null }; };
   const go = ch.steps.filter((s) => s.kind === "go").map(card), last = ch.steps[ch.steps.length - 1], b = model.bounty();
   const end = last.kind === "reroll" ? { kind: "reroll", title: last.label,
     line: (last.dropsBounty ? t("Drops your bounty.") + " " : "") + t.n(last.tokens, "{n} token left.", "{n} tokens left."), why: last.why }
@@ -278,23 +296,66 @@ export function weeklyView(w, rows, catalog, now, level) {
   };
 }
 
-// ---------- Log a clean hunt (F6) ----------
-// draft: the page's own state {text, where "known" | "new", spotId, name, parentId, note, raids {name: n}}; model and
-// catalog for the spots and numbers; advanced: show raid counts.
-export function logView(draft, model, catalog, advanced) {
+// ---------- Log a clean hunt (F6) and the saved hunts ----------
+// draft: the page's own state {text, where "known" | "new", spotId, name, parentId, note, raids {name: n}, dupe (Save
+// was pressed on a hunt saved before), filterVoc ("all" or a vocation; null: the character's lens), filterLevel ("any"
+// or a window in percent; null: the character's), limit, edit (a saved hunt's id, open in its editor), editDraft
+// {vocation, level, spotId}, armed (a saved hunt's id awaiting the second tap on Delete)}; model and catalog for the
+// spots and numbers; advanced: show raid counts; state: the app state (the saved hunts, the characters).
+export function logView(draft, model, catalog, advanced, state) {
+  state = state || {};
   const p = draft.text ? parseSession(draft.text, catalog) : null, problem = draft.text ? sessionProblems(p, translator()) : "";
-  const idx = model.spotIndex(), byName = (a, b) => a.name.localeCompare(b.name);
-  const parents = idx.list.filter((s) => !s.parentId).slice().sort(byName);
+  const idx = model.spotIndex(), byName2 = (a, b) => a.name.localeCompare(b.name);
+  const parents = idx.list.filter((s) => !s.parentId).slice().sort(byName2);
   const spots = [];
   parents.forEach((s) => {
     spots.push({ value: s.id, label: s.userMade ? t("{spot} (yours)", { spot: s.name }) : s.name });
-    idx.list.filter((v) => v.parentId === s.id).sort(byName).forEach((v) => spots.push({ value: v.id, label: t("{spot} (yours)", { spot: s.name + " · " + v.name }) }));
+    idx.list.filter((v) => v.parentId === s.id).sort(byName2).forEach((v) => spots.push({ value: v.id, label: t("{spot} (yours)", { spot: s.name + " · " + v.name }) }));
   });
   const ok = p && !problem;
   const exp = ok ? ((p.rawXp != null ? p.rawXp : p.xp) || 0) / p.hours : null, profit = ok && p.balance != null ? p.balance / p.hours : null;
   const nameTaken = draft.where === "new" && draft.name && idx.idOf(draft.name) && !(idx.spots[idx.idOf(draft.name)] || {}).userMade;
   const where = draft.where === "new" ? "new" : "known", spotId = draft.spotId && idx.spots[draft.spotId] ? draft.spotId : (spots[0] || {}).value || null;
   const kills = ok ? p.kills.slice().sort((a, b) => b.count - a.count) : [];
+  const all = state.hunts || [], when = (x) => String(x.start || x.end || "");
+  const spotOf = (x) => (x.spotId && idx.spots[x.spotId] ? x.spotId : idx.idOf(x.spot));
+  const spotLabel = (x) => { const id = spotOf(x), sp = id && idx.spots[id], parent = sp && sp.parentId && idx.spots[sp.parentId]; return sp ? (parent ? parent.name + " · " : "") + sp.name : x.spot || t("Unnamed spot"); };
+  const dayOf = (x) => (when(x) ? fmtDay(when(x).slice(0, 10)) : t("Undated"));
+
+  // The same hunt saved before (same start, end and exp).
+  const key = ok ? huntKey(p) : null, dupe = key ? all.filter((x) => huntKey(x) === key)[0] || null : null;
+
+  // The saved hunts, every character's, newest first, through the vocation and level filters (by default the
+  // character's own lens: its vocation, or all with hunts as other vocations on, and its level window).
+  const me = (state.profiles || {})[state.pid] || {}, hs = readHuntSources(me), myVoc = me.vocation || VOCATIONS[0], lvl = Number(me.level) || 0;
+  const fVoc = draft.filterVoc || (hs.otherVocation ? "all" : myVoc), fLevel = lvl ? (draft.filterLevel != null ? String(draft.filterLevel) : String(hs.window || "any")) : "any";
+  const w = fLevel === "any" ? 0 : Number(fLevel) || 0;
+  const shown = all.filter((x) => (fVoc === "all" || !x.vocation || x.vocation === fVoc) && (!w || !x.level || Math.abs(x.level - lvl) * 100 <= lvl * w))
+    .sort((a, b) => when(b).localeCompare(when(a)));
+  const limit = draft.limit > 0 ? draft.limit : 20;
+  const rows = shown.slice(0, limit), editing = draft.edit && all.filter((x) => x.id === draft.edit)[0];
+  if (editing && rows.indexOf(editing) === -1) rows.unshift(editing);
+  const ed = draft.editDraft || {};
+  const saved = {
+    filters: {
+      vocation: fVoc, vocations: [{ value: "all", label: t("All vocations") }].concat(VOCATIONS.map((v) => ({ value: v, label: v }))),
+      level: fLevel, levels: [{ value: "any", label: t("Any level") }].concat(lvl ? LEVEL_WINDOWS.filter(Boolean).map((x) => ({ value: String(x),
+        label: t("{lo}–{hi} (±{pct}%)", { pct: x, lo: Math.ceil(lvl * (100 - x) / 100), hi: Math.floor(lvl * (100 + x) / 100) }) })) : []),
+    },
+    count: all.length ? t.n(all.length, "{shown} of {n} saved hunt", "{shown} of {n} saved hunts", { shown: shown.length }) : "",
+    empty: !all.length ? t("No hunts saved yet.") : !shown.length ? t("No saved hunts match these filters.") : "",
+    more: Math.max(0, shown.length - limit),
+    rows: rows.map((x) => {
+      const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, open = !!editing && editing === x;
+      const level = ed.level != null ? ed.level : x.level != null ? String(x.level) : "", lvlOk = level === "" || (/^\d+$/.test(String(level)) && Number(level) > 0 && Number(level) < 10000);
+      return { id: x.id, title: dayOf(x) + " · " + spotLabel(x),
+        sub: [huntAt(x), t("by {name}", { name: byName(state, x.by) }), t("{amount} exp/h", { amount: H && xp != null ? fmtBig(xp / H) : "–" })].filter(Boolean).join(" · "),
+        label: t("Edit the hunt of {date} at {spot}", { date: dayOf(x), spot: spotLabel(x) }), open,
+        editor: open ? { vocation: ed.vocation || x.vocation || myVoc, vocations: VOCATIONS.map((v) => ({ value: v, label: v })), level, levelOk: lvlOk,
+          spotId: ed.spotId || spotOf(x) || "", spots: (spotOf(x) ? [] : [{ value: "", label: x.spot || t("Unnamed spot") }]).concat(spots),
+          armed: draft.armed === x.id, canSave: lvlOk } : null };
+    }),
+  };
   return {
     text: draft.text || "", problem,
     read: ok ? t.n(p.kills.length, "Read it: {time}, {n} creature type.", "Read it: {time}, {n} creature types.", { time: fmtHours(p.hours) }) : "",
@@ -305,6 +366,8 @@ export function logView(draft, model, catalog, advanced) {
     kph: kills.map((k) => ({ name: k.name, perHour: Math.round(k.count / p.hours) + "/h" })),
     raids: advanced && ok ? kills.map((k) => ({ name: k.name, value: (draft.raids || {})[k.name] || "" })) : null,
     canSave: !!ok && (where === "known" ? !!spotId : !!(draft.name && draft.name.trim()) && !nameTaken),
+    duplicate: dupe ? { id: dupe.id, asked: !!draft.dupe, text: t("You saved this hunt already: {date} at {spot}, by {name}.", { date: dayOf(dupe), spot: spotLabel(dupe), name: byName(state, dupe.by) }) } : null,
+    saved,
   };
 }
 
@@ -321,14 +384,15 @@ const LEGEND = [
 // What the source badges mean, in the current language.
 export const badgeLegend = () => LEGEND.map(([kind, name, text]) => ({ kind, name: t(name), text: t(text) }));
 // Every spot's value as the plan sees it (bounty and weekly counted in), once per model and lens: planOptions is the
-// slow part, and the model is rebuilt on every state change.
+// slow part, and the model is rebuilt on every state change. The lens widens which hunts count as it widens the
+// reference spots shown (model.spotIndex), unless keepHunts (a spot page outside the lens: shown, nothing more counted).
 const spotsMemo = new WeakMap();
-function spotOptions(model, lens) {
-  const key = (lens.allVocations ? "v" : "") + (lens.anyLevel ? "l" : "");
+function spotOptions(model, lens, keepHunts) {
+  const wide = (lens.allVocations ? "v" : "") + (lens.anyLevel ? "l" : ""), key = wide + (keepHunts ? "k" : "");
   let m = spotsMemo.get(model);
   if (!m) { m = {}; spotsMemo.set(model, m); }
   if (!m[key]) {
-    const po = model.planOptions(model.plannerCtx({ lens })), byId = {};
+    const po = model.planOptions(model.plannerCtx({ lens, index: model.spotIndex(wide && !keepHunts ? lens : null) })), byId = {};
     po.options.forEach((o) => { byId[o.id] = o; });
     m[key] = { idx: po.idx, byId };
   }
@@ -378,7 +442,7 @@ export function spotsView(state, model, catalog, ui, now) {
     return { id: sp.id, name: sp.name, sub: parent ? t("Your variation of {spot}", { spot: parent.name }) : sp.userMade ? t("Your spot") : null,
       score: o && o.score != null ? String(o.score) : null, numbers: o ? perHourPair(o) : null,
       none: o ? null : teamOnly(sp) ? t("Only duo or team hunts recorded here") : t("Not enough data for your vocation"),
-      creatures: cr.join(", "), badges: o ? sourceBadges(o, sp.sessions.length) : [],
+      creatures: cr.join(", "), badges: o ? sourceBadges(o, sp.sessions.length, huntsWho(sp.sessions)) : [],
       taken: taken[sp.id] ? takenText(taken[sp.id]) : null };
   });
   return {
@@ -395,12 +459,21 @@ const fmtMonth = (iso) => new Date(String(iso).slice(0, 10) + "T12:00:00Z").toLo
 const levelRange = (e) => (e.levelMin ? (e.levelMax ? t("level {min}–{max}", { min: e.levelMin, max: e.levelMax }) : t("level {min}+", { min: e.levelMin }))
   : e.levelMax ? t("up to level {max}", { max: e.levelMax }) : t("any level"));
 
+// The character that logged a hunt (by {pid, name}): its name now, else the name it had, else "a deleted character".
+export function byName(state, by) {
+  const p = by && by.pid && state.profiles && state.profiles[by.pid];
+  return p ? displayName(p) : by && by.name ? by.name : t("a deleted character");
+}
+const joinNames = (names) => names.filter((n, i) => names.indexOf(n) === i).join(", ");
+// The vocation and level a hunt was logged at: "EK level 615".
+const huntAt = (x) => (x.vocation || x.level ? [VOC_SHORT[x.vocation] || x.vocation, x.level ? t("level {level}", { level: x.level }) : null].filter(Boolean).join(" ") : null);
+
 // One spot's page. id: the spot; ui: {lens (the Spots list's), armed (a session id, or "spot", awaiting a second
 // tap)}; now (ms); advanced: Advanced mode. Null when there's no such spot.
 export function spotView(state, model, catalog, id, ui, now, advanced) {
   ui = ui || {};
   let opts = spotOptions(model, ui.lens || {});
-  if (!opts.byId[id]) opts = spotOptions(model, { allVocations: true, anyLevel: true });
+  if (!opts.byId[id]) opts = spotOptions(model, { allVocations: true, anyLevel: true }, true);
   const idx = opts.idx, sp = idx.spots[id];
   if (!sp) return null;
   const p = state.profiles[state.pid] || {}, o = opts.byId[id] || null, nums = model.spotNums(sp), d = model.derived;
@@ -418,10 +491,13 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
   const hrs = sp.sessions.reduce((a, x) => a + (Number(x.hours) || 0), 0);
   const hs = readHuntSources(p), minLevel = spotMinLevel(sp, vocation);
   const skipText = (k) => (k.why === "level" ? t("Doesn’t count: this spot is for level {level} and up.", { level: minLevel })
-    : t("Doesn’t count: logged as {voc}.", { voc: k.x.vocation || hs.loggedAs || vocation }));
+    : k.why === "window" ? t("Doesn’t count: logged at level {level}, more than {pct}% from this character’s.", { level: k.x.level, pct: hs.window })
+    : t("Doesn’t count: logged as {voc}.", { voc: k.x.vocation || vocation }));
   const notCounted = sp.skipped.length ? t.n(sp.skipped.length, "{n} hunt here doesn’t count for this character.", "{n} hunts here don’t count for this character.") : "";
+  const loggers = joinNames(sp.sessions.map((x) => byName(state, x.by)));
+  const whose = sp.sessions.length ? " " + t("Logged as {who} by {names}.", { who: huntsWho(sp.sessions), names: loggers }) : "";
   const hunts = !sp.sessions.length ? notCounted || t("None yet.") : (nums && nums.src === "own" ? t.n(sp.sessions.length, "{n} hunt, {time}.", "{n} hunts, {time}.", { time: fmtHours(hrs) })
-    : t.n(sp.sessions.length, "{n} hunt, {time}, all with breaks: no clean rate.", "{n} hunts, {time}, all with breaks: no clean rate.", { time: fmtHours(hrs) })) + (notCounted ? " " + notCounted : "");
+    : t.n(sp.sessions.length, "{n} hunt, {time}, all with breaks: no clean rate.", "{n} hunts, {time}, all with breaks: no clean rate.", { time: fmtHours(hrs) })) + whose + (notCounted ? " " + notCounted : "");
   const refNums = nums && nums.src === "own" ? model.spotNums(Object.assign({}, sp, { sessions: [] })) : nums;
   const e = (refNums && refNums.entry) || null;
   // A hunt's details, opened inline: amounts in total and per hour, then each creature's kills and kills/h (kills/h
@@ -475,7 +551,7 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
   const sessions = sp.sessions.concat(sp.skipped.map((k) => k.x)).filter((x) => x.id).sort((a, b) => when(b).localeCompare(when(a))).map((x) => {
     const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, raids = raidsOf(x);
     const clock = (s) => (/T\d\d:\d\d/.test(s || "") ? String(s).slice(11, 16) : null), from = clock(x.start), to = clock(x.end);
-    const caption = [from && to ? from + "–" + to : null, x.level ? t("level {level}", { level: x.level }) : null, x.breaks ? t("with breaks") : null].filter(Boolean).join(" · ");
+    const caption = [from && to ? from + "–" + to : null, huntAt(x), t("by {name}", { name: byName(state, x.by) }), x.breaks ? t("with breaks") : null].filter(Boolean).join(" · ");
     return { id: x.id, date: when(x) ? fmtDay(when(x).slice(0, 10)) : t("Undated"), length: H ? fmtHours(H) : "–",
       exp: t("{amount} exp/h", { amount: H && xp != null ? fmtBig(xp / H) : "–" }), profit: t("{amount} profit/h", { amount: H && x.balance != null ? fmtBig(x.balance / H) : "–" }),
       breaks: !!x.breaks, skipped: notCounting.get(x) || null, armed: ui.armed === x.id, raidsBy: raids,
@@ -490,13 +566,13 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
     id, name: sp.name, sub: parent ? t("Your variation of {spot}", { spot: parent.name }) : sp.userMade ? t("Your spot") : null, parentId: parent ? parent.id : null,
     scoreLine, exp: o ? fmtBig(o.m.xp) : nums ? fmtBig(nums.xph) : "–",
     profit: o ? (o.m.profit != null ? fmtBig(o.m.profit) : "–") : nums && nums.pph != null ? fmtBig(nums.pph) : "–",
-    badges: o ? sourceBadges(o, ns) : nums ? sourceBadges(nums, ns) : [],
+    badges: o ? sourceBadges(o, ns, huntsWho(sp.sessions)) : nums ? sourceBadges(nums, ns, huntsWho(sp.sessions)) : [],
     taken: taken[id] ? takenText(taken[id]) : null,
     creatures, sources: { hunts, reference, skipped },
     variations: sp.parentId ? null : variations.map(varRow), canVary: !sp.parentId,
     sessions, emptySessions: t("No hunts logged here."),
     own: advanced && sp.userMade ? { name: sp.name, armed: ui.armed === "spot",
-      deleteText: (nAll ? t.n(nAll, "Deletes this spot and its {n} hunt", "Deletes this spot and its {n} hunts") : t("Deletes this spot")) +
+      deleteText: (nAll ? t.n(nAll, "Deletes this spot and its {n} hunt, whichever character logged it", "Deletes this spot and its {n} hunts, whichever character logged them") : t("Deletes this spot")) +
         (nv ? "; " + t.n(nv, "its {n} variation stays as a spot of its own", "its {n} variations stay as spots of their own") : "") + "." } : null,
   };
 }

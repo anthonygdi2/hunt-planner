@@ -78,7 +78,7 @@ test("characters page: each control calls its action", () => {
     ["update", { name: "Knighty" }], ["update", { level: 616 }], ["setTakenMinutes", 120], ["arm", true], ["download"]]);
   // Armed: the same button deletes.
   $ = mount(characters.render(charactersPageView(STATE, null), { armed: true, status: "Backup saved." }, on));
-  assert.match($("#ch-delete").textContent, /Tap again to delete Main EK/);
+  assert.equal($("#ch-delete").textContent, "Tap again to delete Main EK. Its logged hunts stay for your other characters.", "deleting keeps the hunts, and says so");
   $("#ch-delete").click();
   assert.deepEqual(s.calls.at(-1), ["deleteCharacter"]);
   assert.match(document.body.textContent, /Backup saved\./);
@@ -88,24 +88,25 @@ test("characters page: each control calls its action", () => {
   assert.equal(document.querySelector("#src-ref").disabled, true);
 });
 
-test("characters page: your hunts as other vocations, and the vocation older hunts were logged as", () => {
+test("characters page: your hunts as other vocations, and the level window", () => {
   const s = spy(), on = new Proxy({}, { get: (t, k) => s.fn(k) });
   let $ = mount(characters.render(charactersPageView(STATE, null), { armed: false, status: "" }, on));
   assert.equal($("#src-own-other").getAttribute("aria-checked"), "false", "off unless set");
-  assert.equal($("#src-logged-as"), null, "no older hunts: no question");
-  assert.match(document.body.textContent, /Always used first, at spots your level reaches./);
-  const state = Object.assign({}, STATE, { sessions: [{ id: "x", vocation: "Elite Knight" }, { id: "y" }, { id: "z" }],
-    profiles: Object.assign({}, STATE.profiles, { a: Object.assign({}, STATE.profiles.a, { vocation: "Royal Paladin", level: 45, untaggedVocation: "Elite Knight", otherVocationHunts: true }) }) });
+  assert.equal($("#src-logged-as"), null, "the older “logged as” question is gone");
+  assert.match(document.body.textContent, /Hunts any of your characters logged as this vocation near this level/);
+  assert.equal($("#src-window").value, "20", "±20% unless set");
+  assert.deepEqual([...$("#src-window").options].map((o) => o.textContent),
+    ["Any level", "Within 10% of level 615 (554–676)", "Within 20% of level 615 (492–738)", "Within 35% of level 615 (400–830)"]);
+  const state = Object.assign({}, STATE, { profiles: Object.assign({}, STATE.profiles, { a: Object.assign({}, STATE.profiles.a, { otherVocationHunts: true, levelWindow: 0 }) }) });
   $ = mount(characters.render(charactersPageView(state, null), { armed: false, status: "" }, on));
   assert.equal($("#src-own-other").getAttribute("aria-checked"), "true");
-  assert.equal($("#src-logged-as").value, "Elite Knight");
-  assert.match(document.body.textContent, /2 older hunts don’t say which vocation logged them\./);
+  assert.equal($("#src-window").value, "0");
   $("#src-own-other").click();
-  $("#src-logged-as").value = "Royal Paladin"; $("#src-logged-as").dispatchEvent(new dom.window.Event("change"));
-  assert.deepEqual(s.calls, [["setOtherVocationHunts", false], ["setLoggedAs", "Royal Paladin"]]);
+  $("#src-window").value = "35"; $("#src-window").dispatchEvent(new dom.window.Event("change"));
+  assert.deepEqual(s.calls, [["setOtherVocationHunts", false], ["setLevelWindow", 35]]);
   mount(characters.render(charactersPageView(Object.assign({}, state, { canWrite: false }), null), { armed: false, status: "" }, on));
   assert.equal(document.querySelector("#src-own-other").disabled, true);
-  assert.equal(document.querySelector("#src-logged-as").disabled, true);
+  assert.equal(document.querySelector("#src-window").disabled, true);
 });
 
 test("plan: the Goal chip opens the goal mixer; presets and weights call their actions", async () => {
@@ -305,7 +306,8 @@ test("log: paste, where, and save call their actions", async () => {
   const view = { text: "x", problem: "", read: "Read it: 1 h 2 min, 2 creature types.", preview: { hours: 1 }, where: "new", spotId: "a",
     spots: [{ value: "a", label: "A" }], parents: [{ value: "", label: "None, it’s a new spot" }, { value: "a", label: "A" }], name: "", parentId: "", note: "",
     nameHint: "", creaturesLine: "Creatures come from your paste: Rat.", exp: "5kk", profit: "300k", kph: [{ name: "Rat", perHour: "400/h" }],
-    saveText: "Adds the spot.", raids: [{ name: "Rat", value: "" }], canSave: false };
+    saveText: "Adds the spot.", raids: [{ name: "Rat", value: "" }], canSave: false, duplicate: null,
+    saved: { filters: { vocation: "all", vocations: [{ value: "all", label: "All vocations" }], level: "any", levels: [{ value: "any", label: "Any level" }] }, count: "", empty: "No hunts saved yet.", more: 0, rows: [] } };
   const s = spy(), on = {};
   ["text", "where", "spot", "name", "parent", "note", "raid", "save", "discard", "back", "keep"].forEach((k) => { on[k] = s.fn(k); });
   let $ = mount(log.render(view, { leaving: false }, on));
@@ -322,6 +324,74 @@ test("log: paste, where, and save call their actions", async () => {
   assert.match(document.body.textContent, /Discard this hunt\?/);
   $("#log-save").click(); $("#log-keep").click();
   assert.deepEqual(s.calls.slice(-2), [["save"], ["keep"]]);
+});
+
+test("log: a hunt saved before asks first: Save anyway or Open the existing one", async () => {
+  const log = await import("../../src/ui/screens/log.js");
+  const s = spy(), on = new Proxy({}, { get: (t, k) => s.fn(k) });
+  const saved = { filters: { vocation: "all", vocations: [], level: "any", levels: [] }, count: "", empty: "", more: 0, rows: [] };
+  const view = { text: "x", problem: "", read: "", preview: { hours: 1 }, where: "known", spotId: "a", spots: [{ value: "a", label: "A" }], parents: [], name: "", parentId: "", note: "",
+    nameHint: "", exp: "5kk", profit: "300k", kph: [], raids: null, canSave: true, saved,
+    duplicate: { id: "h1", asked: false, text: "You saved this hunt already: Oct 31 at Flimsies Venore -1 & -2, by Main." } };
+  let $ = mount(log.render(view, { leaving: false }, on));
+  assert.equal($("#log-dupe"), null, "nothing until Save is pressed");
+  $("#log-save").click();
+  view.duplicate.asked = true;
+  $ = mount(log.render(view, { leaving: false }, on));
+  assert.equal($("#log-dupe").getAttribute("role"), "alert");
+  assert.match($("#log-dupe").textContent, /You saved this hunt already: Oct 31 at Flimsies Venore -1 & -2, by Main\./);
+  assert.equal($("#log-save").disabled, true, "the warning's buttons decide");
+  $("#log-save-anyway").click();
+  $("#log-open-existing").click();
+  assert.deepEqual(s.calls, [["save"], ["saveAnyway"], ["openExisting"]]);
+});
+
+test("log: the saved hunts, their vocation and level filters, and the editor", async () => {
+  const log = await import("../../src/ui/screens/log.js");
+  const s = spy(), on = new Proxy({}, { get: (t, k) => s.fn(k) });
+  const VOCS = ["Elite Knight", "Royal Paladin"].map((v) => ({ value: v, label: v }));
+  const row = (id, open) => ({ id, title: "Oct 31 · Flimsies Venore -1 & -2", sub: "EK level 615 · by Main · 4.3kk exp/h", label: "Edit the hunt of Oct 31 at Flimsies Venore -1 & -2", open,
+    editor: open ? { vocation: "Elite Knight", vocations: VOCS, level: "615", levelOk: true, spotId: "b", spots: [{ value: "a", label: "Flimsies Venore -1 & -2" }, { value: "b", label: "Flimsies Port Hope -1 & -2" }],
+      armed: false, canSave: true } : null });
+  const view = { text: "", problem: "", read: "", preview: null, duplicate: null,
+    saved: { filters: { vocation: "Elite Knight", vocations: [{ value: "all", label: "All vocations" }].concat(VOCS), level: "20",
+      levels: [{ value: "any", label: "Any level" }, { value: "20", label: "492–738 (±20%)" }] },
+      count: "2 of 3 saved hunts", empty: "", more: 1, rows: [row("h1", false), row("h2", false)] } };
+  let $ = mount(log.render(view, { leaving: false }, on));
+  assert.equal($("#saved-f-voc").value, "Elite Knight", "the character's lens by default");
+  assert.equal($("#saved-f-level").value, "20");
+  assert.equal($("#saved-count").textContent, "2 of 3 saved hunts");
+  assert.match($("#saved-h1").textContent, /Oct 31 · Flimsies Venore -1 & -2EK level 615 · by Main · 4\.3kk exp\/h/);
+  assert.equal($("#saved-h1-edit").getAttribute("aria-expanded"), "false");
+  assert.equal($("#saved-h1-edit").getAttribute("aria-label"), "Edit the hunt of Oct 31 at Flimsies Venore -1 & -2");
+  $("#saved-f-voc").value = "all"; $("#saved-f-voc").dispatchEvent(new dom.window.Event("change"));
+  $("#saved-f-level").value = "any"; $("#saved-f-level").dispatchEvent(new dom.window.Event("change"));
+  $("#saved-h2-edit").click();
+  $("#saved-more").click();
+  assert.deepEqual(s.calls, [["filterVoc", "all"], ["filterLevel", "any"], ["edit", "h2"], ["more"]]);
+  // The editor: vocation, level and spot, saved together; Delete asks again.
+  view.saved.rows[1] = row("h2", true);
+  s.calls.length = 0;
+  $ = mount(log.render(view, { leaving: false }, on));
+  assert.equal($("#saved-h2-edit").getAttribute("aria-expanded"), "true");
+  assert.equal($("#saved-h2-spot").value, "b");
+  $("#saved-h2-voc").value = "Royal Paladin"; $("#saved-h2-voc").dispatchEvent(new dom.window.Event("change"));
+  $("#saved-h2-level").value = " 45 "; $("#saved-h2-level").dispatchEvent(new dom.window.Event("change"));
+  $("#saved-h2-spot").value = "a"; $("#saved-h2-spot").dispatchEvent(new dom.window.Event("change"));
+  $("#saved-h2-save").click();
+  $("#saved-h2-cancel").click();
+  $("#saved-h2-delete").click();
+  assert.deepEqual(s.calls.slice(0, 3), [["editField", "vocation", "Royal Paladin"], ["editField", "level", "45"], ["editField", "spotId", "a"]]);
+  assert.deepEqual(s.calls.slice(3).map((c) => c[0]), ["editSave", "editCancel", "arm"]);
+  assert.equal(s.calls[3][1].id, "h2");
+  view.saved.rows[1].editor.armed = true;
+  view.saved.rows[1].editor.levelOk = false; view.saved.rows[1].editor.canSave = false;
+  $ = mount(log.render(view, { leaving: false }, on));
+  assert.equal($("#saved-h2-delete").textContent, "Tap again to delete this hunt for every character");
+  assert.equal($("#saved-h2-save").disabled, true);
+  assert.equal($("#saved-h2-level").getAttribute("aria-invalid"), "true");
+  $("#saved-h2-delete").click();
+  assert.deepEqual(s.calls.at(-1), ["deleteHunt", "h2"]);
 });
 
 test("spots: search, sort, toggles, rows, more, and the badges legend", async () => {

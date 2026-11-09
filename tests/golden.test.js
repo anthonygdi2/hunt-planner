@@ -133,14 +133,15 @@ function stringify(v, ind) {
 async function captureCompute() {
   const { compute } = await import("../src/app/compute.js");
   const { makeCatalog } = await import("../src/core/catalog.js");
-  const S = await import("../src/store/schema.js");
+  const { sharedHunts } = await import("./golden/capture.mjs");
   const bk = readJson("fixture.json"), catalog = makeCatalog(frozen.creatures), reference = readJson("reference-fixture.json");
   const docs = (o) => Object.keys(o || {}).sort().map((id) => ({ id, data: () => JSON.parse(JSON.stringify(o[id])) }));
   const ids = (list) => list.map((e) => e.id || e.spot);
-  const out = { characters: {} };
+  const S = await import("../src/store/schema.js");
+  const out = { characters: {} }, shared = sharedHunts(bk);
   for (const id of Object.keys(bk.characters).sort()) {
     const c = bk.characters[id], ch = out.characters[id] = {};
-    const base = { catalog, reference, profile: c.profile, sessions: S.readSessions(docs(c.sessions)), entries: S.readRecords(docs(c.entries)) };
+    const base = { catalog, reference, profile: c.profile, pid: id, sessions: shared.hunts, userSpots: shared.spots, entries: S.readRecords(docs(c.entries)) };
     for (const advanced of [false, true]) for (const difficulty of DIFFS) {
       const d = compute(Object.assign({}, base, { advanced, difficulty }), NOW), derived = {}, shadow = {}, ms = {};
       Object.keys(d.derived).forEach((s) => {

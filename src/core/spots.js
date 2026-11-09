@@ -113,20 +113,26 @@ export function spotMinLevel(sp, vocation) {
   return mins.length ? Math.min.apply(null, mins) : null;
 }
 
-// Whether a logged hunt counts for the character: "" when it does, "voc" when it was logged as another vocation (and
-// ctx.otherVocation is off), "level" when the character is below the spot's recommended level (spotMinLevel for its
-// vocation). A hunt saved without a vocation was logged as ctx.loggedAs. ctx: {vocation, level, loggedAs, otherVocation}.
-export function huntCheck(x, sp, ctx) {
-  const lvl = Number(ctx.level) || 0;
-  if (!ctx.otherVocation && (x.vocation || ctx.loggedAs || ctx.vocation) !== ctx.vocation) return "voc";
-  const min = lvl ? spotMinLevel(sp, ctx.vocation) : null;
-  return min && lvl < min ? "level" : "";
+// Whether a logged hunt (from the hunts every character shares) counts for the character: "" when it does, "voc" when
+// it was logged as another vocation (and ctx.otherVocation is off), "level" when the character is below the spot's
+// recommended level (spotMinLevel for its vocation), "window" when it was logged more than ctx.window percent away from
+// the character's level (0 or none: any level). A hunt without a vocation or level passes those checks, and so does
+// any hunt for a character without a level. lens widens it as the Spots list's switches do: allVocations counts other
+// vocations' hunts, anyLevel drops both level rules. ctx: {vocation, level, otherVocation, window}.
+export function huntCheck(x, sp, ctx, lens) {
+  const lvl = Number(ctx.level) || 0, at = Number(x.level) || 0, w = Number(ctx.window) || 0;
+  lens = lens || {};
+  if (!ctx.otherVocation && !lens.allVocations && x.vocation && x.vocation !== ctx.vocation) return "voc";
+  if (lens.anyLevel || !lvl) return "";
+  const min = spotMinLevel(sp, ctx.vocation);
+  if (min && lvl < min) return "level";
+  return w > 0 && at && Math.abs(at - lvl) * 100 > lvl * w ? "window" : "";
 }
 
-// The character's hunts split by huntCheck at the spots spotIndex puts them in: {use (the hunts that count, in their
-// order), why (Map: skipped hunt → "voc" | "level")}. index: spotIndex's arguments; ctx: huntCheck's.
-export function splitHunts(index, ctx) {
+// The hunts split by huntCheck at the spots spotIndex puts them in: {use (the hunts that count, in their order), why
+// (Map: skipped hunt → "voc" | "level" | "window")}. index: spotIndex's arguments; ctx and lens: huntCheck's.
+export function splitHunts(index, ctx, lens) {
   const why = new Map();
-  spotIndex(Object.assign({}, index, { skip: (x, sp) => { const w = huntCheck(x, sp, ctx); if (w) why.set(x, w); return w; } }));
+  spotIndex(Object.assign({}, index, { skip: (x, sp) => { const w = huntCheck(x, sp, ctx, lens); if (w) why.set(x, w); return w; } }));
   return { use: index.sessions.filter((x) => !why.has(x)), why };
 }

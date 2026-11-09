@@ -4319,6 +4319,7 @@
         "weekly": [{"exp":2640424.92804,"key":"choking-fear","kills":null,"kph":387.564766839,"left":180}],
         "xph": 4377202.07254
        },
+       "paladin-test-cave": null,
        "roshamuul-west": {
         "entry": "rosha-west-rp",
         "held": null,
@@ -4560,7 +4561,8 @@
        "sessions": 1,
        "teams": [],
        "vocations": []
-      }
+      },
+      {"aliases":[],"creatures":[],"entries":[],"id":"paladin-test-cave","levelMax":null,"levelMin":null,"name":"Paladin Test Cave","own":true,"sessions":0,"teams":[],"vocations":[]}
      ],
      "spotRates": {
       "Asura Mirror": {"kph":{"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},"pph":null,"xph":4619929.37804},
@@ -6646,6 +6648,8 @@
        "duo-test-spot": null,
        "feru-way": null,
        "high-test-spot": null,
+       "my-bastion-lure": null,
+       "my-knight-den": null,
        "nightmare-isles": null,
        "paladin-test-cave": {
         "entry": null,
@@ -6679,6 +6683,7 @@
         "weekly": [],
         "xph": 3450000
        },
+       "test-hideout": null,
        "warzone-2": null
       }
      }
@@ -6831,6 +6836,9 @@
        "teams": ["solo"],
        "vocations": ["any"]
       },
+      {"aliases":[],"creatures":[],"entries":[],"id":"my-bastion-lure","levelMax":null,"levelMin":null,"name":"Bastion lure","own":true,"sessions":0,"teams":[],"vocations":[]},
+      {"aliases":[],"creatures":[],"entries":[],"id":"my-knight-den","levelMax":null,"levelMin":null,"name":"Knight Den","own":true,"sessions":0,"teams":[],"vocations":[]},
+      {"aliases":[],"creatures":[],"entries":[],"id":"test-hideout","levelMax":null,"levelMin":null,"name":"Test Hideout","own":true,"sessions":0,"teams":[],"vocations":[]},
       {
        "aliases": [],
        "creatures": ["crusader","headwalker"],

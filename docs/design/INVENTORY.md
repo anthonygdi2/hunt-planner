@@ -14,7 +14,7 @@ This is the UI spec: build against it. Where it conflicts with `docs/ARCHITECTUR
 - **Header (every screen):** app name, character switcher (name, vocation, level), settings button → Characters and settings.
 - **Navigation:** Plan, Spots, Creatures, Weekly. Bottom tab bar on phone, header links on desktop.
 - **Words:** "Bounty" (never board), "bounty offers" (the three choices), "active bounty" (the one picked), "pick" (not hold), "reroll token", "Taken / Free", "clean hunt", **[Decision]** "kills left".
-- **Data** is saved in this browser per character; backup and restore in Characters.
+- **Data** is saved in this browser: hunts and spots shared by all characters, the rest per character; backup and restore in Characters.
 
 ## 1. Plan (home)
 
@@ -93,7 +93,8 @@ Reached from Hunting now, a spot page, a variation button, or Spots → "Log a c
 **You can**
 - **Known spot**: choose the spot (preset to where you tapped Free, or the spot page you came from). Variations appear in the list.
 - **New spot**: name (required), Variation of (optional, an existing spot), route or tactic note (optional). Creatures come from the paste.
-- **Save hunt** or **Don't save**. Paste again.
+- **Save hunt** or **Don't save**. Paste again. A hunt saved before (same start, end and exp) asks inline: **Save anyway** / **Open the existing one**.
+- **Saved hunts** (below): every character's hunts, newest first, with Vocation and Level filters (the character's lens by default); each row shows date, spot, vocation and level, who logged it and exp/h. **Edit** opens an inline editor for its vocation, level and spot, with Delete (inline confirm).
 
 **Rules**
 - Saving updates only spot numbers ("Yours · n hunts") and the reference adjustment. Bounty, tokens and weekly are never touched.
@@ -108,7 +109,7 @@ Reached from Hunting now, a spot page, a variation button, or Spots → "Log a c
 
 ## 6. Spot page
 
-**Shows:** name, score for this character and goal, exp/h, profit/h, source badge. Creatures here with kills/h, marked "Your bounty", "Bounty offer B" or "Weekly task". Where the numbers come from: your hunts, the reference as recorded and as adjusted, sources skipped and why. Your variations (name, score, numbers, note, hunts). Your sessions (date, length, exp/h, profit/h; a hunt that doesn't count for this character says why: logged as another vocation, or below the spot's level).
+**Shows:** name, score for this character and goal, exp/h, profit/h, source badge. Creatures here with kills/h, marked "Your bounty", "Bounty offer B" or "Weekly task". Where the numbers come from: your hunts, the reference as recorded and as adjusted, sources skipped and why. Your variations (name, score, numbers, note, hunts). Your sessions (date, length, exp/h, profit/h; its details show the vocation and level it was logged at and which character logged it; a hunt that doesn’t count for this character says why: logged as another vocation, below the spot’s level, or too far from the character’s level).
 
 **You can:** **Mark taken** / Free again; **Log a clean hunt** here; **Log a hunt as a new variation** (opens Log with New spot and this spot as parent); open a variation; open a creature; delete one of your sessions (inline confirm). Advanced mode: type your own numbers for this spot; **[Decision]** rename or delete a spot you created; edit a session's Echo Raid counts.
 
@@ -126,9 +127,9 @@ Reached from Hunting now, a spot page, a variation button, or Spots → "Log a c
 
 ## 9. Characters and settings (full page)
 
-**Shows:** character pills; this character's name, vocation, level, Talisman bestiary bonus. Numbers from: preset plus switches for reference hunts, other vocations, older hunts, and your hunts as other vocations (outside the presets); while some hunts have no saved vocation, which vocation they were logged as; calibration status in plain words. World; how long a Taken mark lasts. Advanced mode. Theme. Backup. Credits.
+**Shows:** character pills; this character's name, vocation, level, Talisman bestiary bonus. Numbers from: preset plus switches for reference hunts, other vocations, older hunts, and your hunts as other vocations (outside the presets); how near the character's level a hunt must be to count (Any, ±10%, ±20%, ±35%); calibration status in plain words. World; how long a Taken mark lasts. Advanced mode. Theme. Backup. Credits.
 
-**You can:** switch, add or delete a character (inline confirm); choose Mine only / + Reference / Everything, or flip each switch (the preset shows "Custom" when switches don't match one); set world and Taken length (30 min, 45 min default, 1 h, 2 h); turn on Advanced mode; Theme System / Dark / Light; Download backup, Restore. **[Decision]** Advanced mode adds: Raw or boosted exp, hunting hours per day (reroll model), logging boards for Silver/Gold odds, full score breakdown in Why?
+**You can:** switch, add or delete a character (inline confirm, which says the hunts it logged stay); choose Mine only / + Reference / Everything, or flip each switch (the preset shows "Custom" when switches don't match one); set world and Taken length (30 min, 45 min default, 1 h, 2 h); turn on Advanced mode; Theme System / Dark / Light; Download backup, Restore. **[Decision]** Advanced mode adds: Raw or boosted exp, hunting hours per day (reroll model), logging boards for Silver/Gold odds, full score breakdown in Why?
 
 ## Data changes (from the design, with decisions applied)
 
@@ -138,7 +139,7 @@ See `docs/ARCHITECTURE.md`, "State model", for the authoritative version and mig
 - **Goal weights** {xp, profit, charm, bounty}, each 0–5; preset name is derived, not stored.
 - **Taken marks** {spot, markedAt}; expire after the Taken length setting (default 45 min).
 - **Hunting now:** the spot tapped Free (cleared by Back to plan, Taken or a log).
-- **User spots** {id, name, parentSpot?, note?, creatures from paste, sessions}. Treated as spots everywhere, with no reference.
+- **User spots** {id, name, parentSpot?, note?, creatures from paste, sessions}. Treated as spots everywhere, with no reference. Shared by all characters, like the hunts (November 2026).
 - **Weekly:** up to 9 kill tasks {creature, killsLeft, done}; slots 6 | 9; week start; difficulty.
 - **Source switches** {reference, otherVocation, older}; preset derived.
 - **Settings:** Taken length, theme (system | dark | light).
