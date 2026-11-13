@@ -36,7 +36,10 @@ test("spot rates: kills/h from clean time, exp and profit per kill from every se
   const r = spotRates(sessions, catalog, sessionSpot, "rawXp");
   assert.deepEqual(Object.keys(r), ["A"], "B has no clean time, C no length");
   // Clean: 100 kills in 1 h. All: 200 kills, 4000 exp, 600 balance.
-  assert.deepEqual(r.A, { kph: { "cobra-scout": 160 / 200 * 100, "cobra-assassin": 40 / 200 * 100 }, xph: 4000 / 200 * 100, pph: 600 / 200 * 100, hours: 1, kills: 100 });
+  assert.deepEqual(r.A, { kph: { "cobra-scout": 160 / 200 * 100, "cobra-assassin": 40 / 200 * 100 }, xph: 4000 / 200 * 100, pph: 600 / 200 * 100, lph: null, hours: 1, kills: 100 });
+  // Loot/h from the sessions that logged loot: 900 loot over 100 kills, at 100 kills/h.
+  sessions[1].loot = 900;
+  assert.equal(spotRates(sessions, catalog, sessionSpot, "rawXp").A.lph, 900 / 100 * 100);
   assert.deepEqual(Object.keys(spotRates(sessions, catalog, () => "all", "rawXp")), ["all"]);
 });
 

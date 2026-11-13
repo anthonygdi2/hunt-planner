@@ -73,6 +73,8 @@ test("scaling a reference spot", () => {
   assert.equal(n.total, 1000 * 1.1);
   assert.equal(n.xph, 6e6 * 1.2);
   assert.equal(n.pph, 1e6 * 1.1 + 50000);
+  assert.equal(n.lph, null, "no loot/h without the entry's lootph");
+  assert.equal(refNums(Object.assign({ lootph: 2e6 }, PRISON), c, false, { xpMode: "raw", xpBoost: 1.5, catalog }).lph, 2e6 * 1.1, "loot/h scales with kills");
   assert.equal(refNums(PRISON, c, false, { xpMode: "xp", xpBoost: 1.5, catalog }).xph, 6e6 * 1.2 * 1.5);
   const raw = refNums(Object.assign({}, PRISON, { xph: 9e6 }), null, true, { xpMode: "xp", xpBoost: 1.5, catalog });
   assert.equal(raw.src, "other");

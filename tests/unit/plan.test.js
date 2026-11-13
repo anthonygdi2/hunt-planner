@@ -10,11 +10,14 @@ const NUMS = { src: "own", kph: { "cobra-assassin": 300, "cobra-scout": 200 }, x
 const SP = { id: "bastion", name: "Cobra Bastion", meta: {} };
 
 test("today's bonuses weigh each creature by its share of the spot's exp", () => {
-  assert.deepEqual(todayFactor(NUMS.kph, null, ctx), { mult: 1, notes: [] });
+  assert.deepEqual(todayFactor(NUMS.kph, null, ctx), { mult: 1, notes: [], loot: 1, lootNotes: [] });
   // Exp shares: 300 × 1000 vs 200 × 500 → 3/4 and 1/4. Boosted assassin: 3/4 × 2 + 1/4.
   const t = todayFactor(NUMS.kph, { boosted: "cobra-assassin", prey: [{ slug: "cobra-scout", kind: "xp", pct: 40 }, { slug: "cobra-scout", kind: "loot", pct: 40 }], event: 50 }, ctx);
   assert.ok(Math.abs(t.mult - (0.75 * 2 + 0.25 * 1.4) * 1.5) < 1e-12);
   assert.deepEqual(t.notes, ["Cobra Assassin is boosted (double exp)", "Cobra Scout prey +40% exp", "+50% exp event"]);
+  // The loot Prey: the scout's quarter of the loot × 1.4; the boost and the event don't touch it.
+  assert.ok(Math.abs(t.loot - (0.75 + 0.25 * 1.4)) < 1e-12);
+  assert.deepEqual(t.lootNotes, ["Cobra Scout prey +40% loot"]);
   // A creature with unknown exp: kill shares instead.
   assert.ok(Math.abs(todayFactor({ "cobra-assassin": 300, rat: 100 }, { boosted: "rat" }, ctx).mult - (0.75 + 0.25 * 2)) < 1e-12);
 });
@@ -50,6 +53,27 @@ test("a spot's value per hour", () => {
   // Any Creature: all 500 kills/h count.
   const any = spotValue(SP, NUMS, { diff: "master", weekly: [{ key: "any", name: "Any Creature", rem: 5000, exp: 1e6 }] }, ctx);
   assert.equal(any.parts.weekly, 1e6 * 500 / 5000);
+});
+
+test("a loot Prey adds to a spot's profit", () => {
+  const today = { prey: [{ slug: "cobra-scout", kind: "loot", pct: 40 }] }, near = (a, b) => assert.ok(Math.abs(a - b) < 1e-6, a + " vs " + b);
+  // Loot 400k/h, the scout a quarter of it (by exp): +40% of 100k on top of the 100k profit.
+  const v = spotValue(SP, Object.assign({ lph: 4e5 }, NUMS), { diff: "master", today }, ctx);
+  near(v.lootBonus, 4e5 * 0.25 * 0.4);
+  near(v.m.profit, 1e5 + 4e4);
+  assert.equal(v.pph, 1e5, "the spot's own profit/h stays as logged");
+  assert.deepEqual(v.today, ["Cobra Scout prey +40% loot"]);
+  assert.equal(v.parts.today, 0, "no exp from it");
+  // A session with travel: the bonus only for the hunting hours.
+  const s = spotValue(SP, Object.assign({ lph: 4e5 }, NUMS), { diff: "master", today, hours: 2, travel: { bastion: 30 } }, ctx);
+  near(s.m.profit, (1e5 + 4e4) * 1.5 / 2);
+  // Without the spot's loot/h, or its profit, the Prey isn't counted or named; nor at a spot without the creature.
+  const none = spotValue(SP, NUMS, { diff: "master", today }, ctx);
+  assert.deepEqual([none.m.profit, none.lootBonus, none.today], [1e5, 0, []]);
+  assert.equal(spotValue(SP, Object.assign({}, NUMS, { lph: 4e5, pph: null }), { diff: "master", today }, ctx).m.profit, null);
+  const other = spotValue(SP, Object.assign({ lph: 4e5 }, NUMS), { diff: "master", today: { prey: [{ slug: "rat", kind: "loot", pct: 40 }] } }, ctx);
+  assert.deepEqual([other.m.profit, other.today], [1e5, []]);
+  assert.equal(spotValue(SP, Object.assign({ lph: 4e5 }, NUMS), { diff: "master" }, ctx).m.profit, 1e5, "no boosts: unchanged");
 });
 
 test("scaling spots", () => {

@@ -26,7 +26,8 @@ export function raidRate(sessions, catalog) {
 
 // Per spot (sessions grouped by keyOf(session)): each creature's kills/h (its share of all kills × the clean kill
 // rate, keyed by catalog.killKey), and exp/h (the `mode` field) and profit/h per kill scaled the same way, plus clean
-// hours and kills. Spots with no clean time are left out.
+// hours and kills, and loot/h (lph) the same way over the sessions that logged their loot (null when none did). Spots
+// with no clean time are left out.
 export function spotRates(sessions, catalog, keyOf, mode) {
   const acc = {}, out = {};
   sessions.forEach((x) => {
@@ -35,8 +36,9 @@ export function spotRates(sessions, catalog, keyOf, mode) {
     let tot = 0;
     x.kills.forEach((k) => { tot += k.count || 0; });
     if (!tot) return;
-    const s = keyOf(x), a = acc[s] || (acc[s] = { kills: {}, total: 0, xp: 0, bal: 0, cTotal: 0, cHours: 0 });
+    const s = keyOf(x), a = acc[s] || (acc[s] = { kills: {}, total: 0, xp: 0, bal: 0, loot: 0, lootTotal: 0, cTotal: 0, cHours: 0 });
     a.total += tot; a.xp += (x[mode] != null ? x[mode] : (x.rawXp || 0)); a.bal += x.balance || 0;
+    if (x.loot != null) { a.loot += x.loot; a.lootTotal += tot; }
     x.kills.forEach((k) => { const key = catalog.killKey(k); a.kills[key] = (a.kills[key] || 0) + (k.count || 0); });
     if (!x.breaks) { a.cTotal += tot; a.cHours += h; }
   });
@@ -45,7 +47,8 @@ export function spotRates(sessions, catalog, keyOf, mode) {
     if (!(a.cHours > 0)) return;
     const spk = a.cTotal / a.cHours, kph = {};
     Object.keys(a.kills).forEach((slug) => { kph[slug] = a.kills[slug] / a.total * spk; });
-    out[s] = { kph, xph: a.xp / a.total * spk, pph: a.bal / a.total * spk, hours: a.cHours, kills: a.cTotal };
+    out[s] = { kph, xph: a.xp / a.total * spk, pph: a.bal / a.total * spk, lph: a.lootTotal ? a.loot / a.lootTotal * spk : null,
+      hours: a.cHours, kills: a.cTotal };
   });
   return out;
 }

@@ -51,6 +51,7 @@ REFERENCE = [{
   levelMin: 400, levelMax: 900,       // recommended range
   team: "solo",
   rawXph: 5200000, xph: 7800000, profitph: 300000,
+  lootph: 900000,                     // optional: loot/h when the analyser's loot was read (today's loot bonuses apply to it)
   creatures: [{ slug: "cobra-assassin", kph: 480 }, ...],
   source: { who: "Kusnier", url: "...", date: "2026-08-14", postRebalance: true },
   profitStale: false,                 // optional: true marks profit as dated even after the rebalance

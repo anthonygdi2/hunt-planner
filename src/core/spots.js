@@ -68,10 +68,10 @@ export function spotIndex({ reference, sessions, catalog, spotMeta, userSpots, s
 // The character's numbers for a whole spot: its own clean sessions there first, else the reference entry the tier list
 // would use (its vocation or "any", then another vocation's), calibrated the same way. Null without either.
 // ctx: {catalog, xpMode, refOn, otherOn, picks, calib, calibOther, vocation, xpBoost}.
-// Returns {src, kph {slug}, xph, pph, profitStale?, hours, kills, entry}.
+// Returns {src, kph {slug}, xph, pph, lph (loot/h, null when unknown), profitStale?, hours, kills, entry}.
 export function spotNumbers(sp, ctx) {
   const own = sp.sessions.length ? spotRates(sp.sessions, ctx.catalog, () => sp.id, xpField(ctx.xpMode))[sp.id] : null;
-  if (own) return { src: "own", kph: own.kph, xph: own.xph, pph: own.pph, hours: own.hours, kills: own.kills, entry: null };
+  if (own) return { src: "own", kph: own.kph, xph: own.xph, pph: own.pph, lph: own.lph, hours: own.hours, kills: own.kills, entry: null };
   if (!ctx.refOn) return null;
   const opts = { xpMode: ctx.xpMode, xpBoost: ctx.xpBoost, catalog: ctx.catalog }, k = norm(sp.name);
   let e = ctx.picks.by[k], n = null;
@@ -86,7 +86,7 @@ export function spotNumbers(sp, ctx) {
     });
     if (e) n = refNums(e, ctx.calibOther[e.vocation], true, opts);
   }
-  return n ? { src: n.src, kph: n.kph, xph: n.xph, pph: n.pph, profitStale: n.profitStale, hours: 0, kills: 0, entry: e } : null;
+  return n ? { src: n.src, kph: n.kph, xph: n.xph, pph: n.pph, lph: n.lph, profitStale: n.profitStale, hours: 0, kills: 0, entry: e } : null;
 }
 
 // Whether a spot fits the character: "" when it's in the lens, else "voc" or "level". Logged spots always fit, and so

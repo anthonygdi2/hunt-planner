@@ -6,6 +6,7 @@
 //   node tools/reference/generate.js --exp    rewrite src/data/creature-exp.json (the planner's PL_EXP) from wiki-exp.json
 // Rules (see docs/REFERENCE_DB_PLAN.md): session length = XP gain / XP per hour (raw if read, else boosted; the
 // analyser's "0:15h" is rounded down, so it's only a sanity check); kills/h = kills / length; profit/h = balance / length;
+// loot/h = loot / length (when the loot was read; today's loot bonuses apply to it, not to the balance);
 // creatures with fewer than MIN_KILLS kills are left out; every creature must exist in DATA; postRebalance is true for
 // videos published on or after REBALANCE.
 "use strict";
@@ -54,6 +55,7 @@ function derive(r, known) {
   Object.assign(entry, { team: r.team || "solo", hours: +hours.toFixed(4), rawXph: a.rawXph });
   if (a.xph) entry.xph = a.xph;
   entry.profitph = Math.round(a.balance / hours);
+  if (a.loot != null) entry.lootph = Math.round(a.loot / hours);
   entry.creatures = creatures;
   entry.source = { who: r.who || "Kusnier", url, date: r.published, postRebalance: r.published >= REBALANCE };
   if (r.profitStale) entry.profitStale = true;
