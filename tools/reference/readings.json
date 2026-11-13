@@ -22172,5 +22172,340 @@
     "aliases": [
       "Banuta bottom floor"
     ]
+  },
+  {
+    "id": "lizard-city-rp-2026-11",
+    "video": "xm5BdGMCfcw",
+    "t": 12,
+    "published": "2026-11-13",
+    "spot": "Lizard City",
+    "vocation": "Royal Paladin",
+    "levelMin": 120,
+    "team": "solo",
+    "charLevel": 126,
+    "analyser": {
+      "session": "0:15h",
+      "rawXpGain": 424576,
+      "rawXph": 1652816,
+      "xpGain": 939940,
+      "xph": 3659058,
+      "loot": 282483,
+      "supplies": 39494,
+      "balance": 242989
+    },
+    "kills": {
+      "lizard dragon priest": 48,
+      "lizard high guard": 187,
+      "lizard legionnaire": 75,
+      "lizard zaogun": 3
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. 2 names are cut off on screen. Kills x TibiaWiki exp is 2,466 short of raw XP.",
+    "notes": "His slide: 1.6kk/h raw, 700k/h."
+  },
+  {
+    "id": "deeplings-library-rp-2026-11",
+    "video": "H42m1sSaX3A",
+    "t": 12,
+    "published": "2026-11-12",
+    "spot": "Deeplings Library",
+    "vocation": "Royal Paladin",
+    "levelMin": 120,
+    "team": "solo",
+    "charLevel": 125,
+    "analyser": {
+      "session": "0:15h",
+      "rawXpGain": 429440,
+      "rawXph": 1695751,
+      "xpGain": 966240,
+      "xph": 3815439,
+      "loot": 383252,
+      "supplies": 106014,
+      "balance": 277238
+    },
+    "kills": {
+      "deepling guard": 60,
+      "deepling master librarian": 10,
+      "deepling scout": 39,
+      "deepling spellsinger": 115,
+      "deepling tyrant": 3,
+      "deepling warrior": 98,
+      "jellyfish": 10
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. 2 names are cut off on screen. The kill list fills the window. It also lists 5 sharks (not in DATA), left out of the kills. Kills x TibiaWiki exp is 3,600 short of raw XP.",
+    "notes": "His slide: 1.6kk/h raw, 800k/h."
+  },
+  {
+    "id": "oramond-west-rp-2026-11",
+    "video": "BpkytrbYYdw",
+    "t": 12,
+    "published": "2026-11-08",
+    "spot": "Oramond West",
+    "vocation": "Royal Paladin",
+    "levelMin": 120,
+    "team": "solo",
+    "charLevel": 125,
+    "analyser": {
+      "session": "0:15h",
+      "rawXpGain": 609237,
+      "rawXph": 2391759,
+      "xpGain": 1370728,
+      "xph": 5381242,
+      "loot": 150523,
+      "supplies": 98376,
+      "balance": 52147
+    },
+    "kills": {
+      "blood beast": 111,
+      "devourer": 72,
+      "glooth blob": 129,
+      "quara constrictor scout": 71,
+      "quara hydromancer scout": 88,
+      "quara pincher scout": 85,
+      "quara predator scout": 81,
+      "rot elemental": 151
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. 4 names are cut off on screen; read as the Scout quaras. The kill list fills the window. The slide's Raw Experience reads \"2.3 kk/h (1.7~ no raid)\"; this analyser includes the quara raid. Kills x TibiaWiki exp is 327 short of raw XP.",
+    "notes": "His slide: 2.3kk/h raw, 200k/h."
+  },
+  {
+    "id": "glooth-bandits-rp-2026-11",
+    "video": "9qWOwSucfB8",
+    "t": 12,
+    "published": "2026-11-06",
+    "spot": "Glooth Bandits",
+    "vocation": "Royal Paladin",
+    "levelMin": 90,
+    "team": "solo",
+    "charLevel": 118,
+    "analyser": {
+      "session": "0:15h",
+      "rawXpGain": 464506,
+      "rawXph": 1799207,
+      "xpGain": 696759,
+      "xph": 2698811,
+      "loot": 154085,
+      "supplies": 64683,
+      "balance": 89402
+    },
+    "kills": {
+      "glooth bandit": 125,
+      "glooth brigand": 113
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. Kills x TibiaWiki exp is 194 over raw XP.",
+    "notes": "His slide: 1.7kk/h raw, 300k/h."
+  },
+  {
+    "id": "exotic-cave-rp-2026-11",
+    "video": "EiWvjwUnKAY",
+    "t": 12,
+    "published": "2026-11-05",
+    "spot": "Exotic Cave",
+    "vocation": "Royal Paladin",
+    "levelMin": 90,
+    "team": "solo",
+    "charLevel": 115,
+    "analyser": {
+      "session": "0:15h",
+      "rawXpGain": 397960,
+      "rawXph": 1579110,
+      "xpGain": 895414,
+      "xph": 3553014,
+      "loot": 130288,
+      "supplies": 50699,
+      "balance": 79589
+    },
+    "kills": {
+      "exotic bat": 211,
+      "exotic cave spider": 104
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. 1 name is cut off on screen. Kills x TibiaWiki exp is 840 over raw XP.",
+    "notes": "His slide: 1.5kk/h raw, 300k/h."
+  },
+  {
+    "id": "edron-heroes-old-fortress-rp-2026-11",
+    "video": "xom7grd0g8Y",
+    "t": 8,
+    "published": "2026-11-03",
+    "spot": "Edron Heroes (Old Fortress)",
+    "aliases": [
+      "Edron Heroes",
+      "Old Fortress"
+    ],
+    "vocation": "Royal Paladin",
+    "levelMin": 90,
+    "team": "solo",
+    "charLevel": 111,
+    "analyser": {
+      "session": "0:15h",
+      "rawXpGain": 441785,
+      "rawXph": 1763039,
+      "xpGain": 441785,
+      "xph": 1763039,
+      "loot": 67585,
+      "supplies": 62664,
+      "balance": 4921
+    },
+    "kills": {
+      "blood priest": 8,
+      "bonebeast": 3,
+      "hero": 125,
+      "lich": 5,
+      "necromancer": 2,
+      "renegade knight": 62,
+      "undead gladiator": 17,
+      "vicious squire": 151,
+      "vile grandmaster": 36
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. The results slide is read at 0:08. XP Gain equals Raw XP Gain on this analyser. The kill list fills the window, and its last row, vile grandmaster, is cut in half by the window's bottom edge: the count's top half reads 36 (35 would also fit raw XP to within 0.2%). Kills x TibiaWiki exp is 715 over raw XP.",
+    "notes": "His slide: 1.7kk/h raw, 50k/h."
+  },
+  {
+    "id": "ravenous-lava-lurkers-rp-2026-11",
+    "video": "Y4UXa3iNXYw",
+    "t": 12,
+    "published": "2026-11-02",
+    "spot": "Ravenous Lava Lurkers",
+    "aliases": [
+      "Lava Lurkers"
+    ],
+    "vocation": "Royal Paladin",
+    "levelMin": 100,
+    "team": "solo",
+    "charLevel": 110,
+    "analyser": {
+      "session": "0:15h",
+      "rawXpGain": 561600,
+      "rawXph": 2152150,
+      "xpGain": 561600,
+      "xph": 2152150,
+      "loot": 0,
+      "supplies": 68389,
+      "balance": -68389
+    },
+    "kills": {
+      "ravenous lava lurker": 140
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. No loot; the slide's loot is negative (-50 k/h). 1 name is cut off on screen. The slide shows two Hunt Analysers; this is the first, whose XP Gain equals its Raw XP Gain. The second (0:15h, raw 568,000 and 2,255,641/h, XP 1,192,800 and 4,736,847/h, 0 loot, 14,775 supplies) killed 142 ravenous lava lurker. An item icon covers part of each analyser's Healing/h. Kills x TibiaWiki exp is 1,600 short of raw XP.",
+    "notes": "His slide: 2.1kk/h raw, -50k/h."
+  },
+  {
+    "id": "carlin-cults-rp-2026-11",
+    "video": "bZCmzAvz5t4",
+    "t": 12,
+    "published": "2026-11-01",
+    "spot": "Carlin Cults",
+    "vocation": "Royal Paladin",
+    "levelMin": 90,
+    "team": "solo",
+    "charLevel": 110,
+    "analyser": {
+      "session": "0:14h",
+      "rawXpGain": 371350,
+      "rawXph": 1493256,
+      "xpGain": 509175,
+      "xph": 2047471,
+      "loot": 50330,
+      "supplies": 33850,
+      "balance": 16480
+    },
+    "kills": {
+      "cult believer": 129,
+      "cult enforcer": 40,
+      "renegade knight": 76,
+      "vicious squire": 83,
+      "vile grandmaster": 37
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. A 14-minute session. Kills x TibiaWiki exp is 300 short of raw XP.",
+    "notes": "His slide: 1.45kk/h raw, 50k/h."
+  },
+  {
+    "id": "lizard-chosens-rp-2026-10",
+    "video": "d9SrppG3CO0",
+    "t": 12,
+    "published": "2026-10-30",
+    "spot": "Lizard Chosens",
+    "vocation": "Royal Paladin",
+    "levelMin": 90,
+    "team": "solo",
+    "charLevel": 102,
+    "analyser": {
+      "session": "0:15h",
+      "rawXpGain": 362802,
+      "rawXph": 1439841,
+      "xpGain": 544203,
+      "xph": 2159761,
+      "loot": 103052,
+      "supplies": 25654,
+      "balance": 77398
+    },
+    "kills": {
+      "lizard chosen": 143
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. Kills x TibiaWiki exp is 1,012 short of raw XP.",
+    "notes": "His slide: 1.4kk/h raw, 250k/h."
+  },
+  {
+    "id": "sunken-quarter-quaras-rp-2026-10",
+    "video": "bVXhVAcKDJc",
+    "t": 12,
+    "published": "2026-10-27",
+    "spot": "Sunken Quarter Quaras",
+    "aliases": [
+      "Sunken Quarter"
+    ],
+    "vocation": "Royal Paladin",
+    "levelMin": 90,
+    "team": "solo",
+    "charLevel": 102,
+    "analyser": {
+      "session": "0:10h",
+      "rawXpGain": 242355,
+      "rawXph": 1444294,
+      "xpGain": 363532,
+      "xph": 2166438,
+      "loot": 94995,
+      "supplies": 26147,
+      "balance": 68848
+    },
+    "kills": {
+      "quara constrictor": 4,
+      "quara hydromancer": 33,
+      "quara pincher": 68,
+      "quara predator": 58
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. A 10-minute session. 1 name is cut off on screen. Kills x TibiaWiki exp is 185 short of raw XP.",
+    "notes": "His slide: 1.4kk/h raw, 150k/h."
+  },
+  {
+    "id": "edron-werecreatures-1-rp-2026-10",
+    "video": "7_tnsflRatA",
+    "t": 12,
+    "published": "2026-10-26",
+    "spot": "Edron Werecreatures -1",
+    "aliases": [
+      "Edron Were -1"
+    ],
+    "vocation": "Royal Paladin",
+    "levelMin": 90,
+    "team": "solo",
+    "charLevel": 100,
+    "analyser": {
+      "session": "0:15h",
+      "rawXpGain": 396588,
+      "rawXph": 1568516,
+      "xpGain": 594882,
+      "xph": 2352774,
+      "loot": 157832,
+      "supplies": 38961,
+      "balance": 118871
+    },
+    "kills": {
+      "werebadger": 67,
+      "werebear": 19,
+      "wereboar": 57,
+      "werefox": 84
+    },
+    "remark": "Slide: no preys, charms, bounty or animus. Kills x TibiaWiki exp is 1,088 short of raw XP.",
+    "notes": "His slide: 1.55kk/h raw, 400k/h."
   }
 ]

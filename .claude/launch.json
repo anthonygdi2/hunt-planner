@@ -1,0 +1,47 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "planner-src",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8765",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "src"
+      ],
+      "port": 8765
+    },
+    {
+      "name": "planner-build",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8766",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "C:\\Users\\azim1\\AppData\\Local\\Temp\\claude\\C--repos-bounty-planner\\8dfcdf52-e294-43aa-b817-8fca83ca2e32\\scratchpad\\build"
+      ],
+      "port": 8766
+    },
+    {
+      "name": "dist",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8767",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "dist"
+      ],
+      "port": 8767
+    }
+  ]
+}
