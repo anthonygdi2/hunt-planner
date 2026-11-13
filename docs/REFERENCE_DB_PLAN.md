@@ -1,6 +1,6 @@
 # Reference hunt database: plan
 
-Status: Phase 1 (reference layer) built October 24, 2026. Phase 2 seed tooling built the same day (readings file, generator, video list refresh); 722 seed entries from 488 videos. Last updated October 24, 2026.
+Status: Phase 1 (reference layer) built October 24, 2026. Phase 2 seed tooling built the same day (readings file, generator, video list refresh); 733 seed entries from 499 videos. Last updated October 24, 2026.
 
 ## Problem
 
