@@ -27,6 +27,10 @@ export const TASK = deepFreeze({
 // Silver doubles and Gold quadruples both the exp reward and the bounty points; the reward shown in game already
 // includes the bonus (TibiaWiki Task Board).
 export const KIND_MULT = deepFreeze({ normal: 1, silver: 2, gold: 4 });
+// The chance of a Silver or a Gold offer, in percent per offer. Not published anywhere: the maintainer's starting guess
+// (November 13, 2026), used until the player types their own odds or takes the shares of the boards they log
+// (Advanced mode).
+export const OFFER_ODDS = deepFreeze({ silver: 10, gold: 2 });
 
 // Exp paid per required kill, before Silver or Gold. Master (Hard creatures) is exactly 1,875: ten logged offers at
 // levels 612-613, no level effect seen. Expert 510, Adept 97.5 and Beginner 15 follow the open-source Canary server

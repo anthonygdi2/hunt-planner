@@ -1,12 +1,12 @@
 // The reroll model: what a fresh Task board is worth with s tokens left, and whether to take an offer or reroll.
 // Values are goal scores per hour (score.js weightedValue against the pool's best metrics); a task's value is earned
 // over its hours, and future hours are discounted by RHO per hour.
-import { TASK, TOKEN_CAP, SLOTS, KIND_MULT } from "../data/rules.js";
+import { TASK, TOKEN_CAP, SLOTS, KIND_MULT, OFFER_ODDS } from "../data/rules.js";
 import { GOAL_KEYS, weightedValue } from "./score.js";
 
 // Discount rate per hour of hunting: how much less a task finished later is worth.
 export const RHO = 1 / 40;
-// Silver/Gold odds are only used once this many boards have been logged for a difficulty.
+// Logged offers give odds worth using once there are this many.
 export const MIN_BOARD_OBS = 10;
 const MULTS = [KIND_MULT.normal, KIND_MULT.silver, KIND_MULT.gold];
 
@@ -20,17 +20,31 @@ export function readReroll(r) {
   return { left, hpd, unknown: r.unknown === "below" || r.unknown === "average" ? r.unknown : "poor", hasLeft: r.left != null };
 }
 
+// The chance of each kind of offer [normal, silver, gold] from odds {silver, gold} in percent (OFFER_ODDS when missing).
+export function kindOdds(odds) {
+  const o = odds || OFFER_ODDS, s = o.silver / 100, g = o.gold / 100;
+  return [Math.max(0, 1 - s - g), s, g];
+}
+
+// The logged offers summed up: log {diff: [{kind}]} → {n, silver, gold} (offers, and each kind's share in percent,
+// null with none logged), over every difficulty: one set of odds serves them all.
+export function loggedOdds(log) {
+  let n = 0, s = 0, g = 0;
+  Object.keys(log || {}).forEach((d) => (log[d] || []).forEach((o) => { n++; if (o.kind === "silver") s++; else if (o.kind === "gold") g++; }));
+  return { n, silver: n ? s / n * 100 : null, gold: n ? g / n * 100 : null };
+}
+
 // Three kill counts standing in for an offer's unknown size: the middle of each third of the range.
 export function killLevels(diff) { const t = TASK[diff], d = t.maxKills - t.minKills; return [t.minKills + d / 6, t.minKills + d / 2, t.minKills + 5 * d / 6]; }
 
 // The distribution of offers on a board for this difficulty.
 // ctx: weights (read weights); pool [{it (creature with a slug), e (its numbers), blocked (avoided or above level)}];
 // preferred, unwanted (slugs); metricsFor(it, e, kills?, mult?) → metrics at this difficulty; unknown (readReroll's);
-// rewardObs [{kind}] (logged boards). Returns null with no goal; else {keys, w, max, rows [{it, e, m, w, blocked?,
-// v1?}], known (creatures with a value), diff} and, when any is known, best, medKph, fallback, nObs, kinds
-// [normal, silver, gold odds], levels and pts [{p, v, T}] (probability, value, task hours).
+// odds {silver, gold} (percent per offer; OFFER_ODDS when missing). Returns null with no goal; else {keys, w, max, rows
+// [{it, e, m, w, blocked?, v1?}], known (creatures with a value), diff} and, when any is known, best, medKph, fallback,
+// kinds [normal, silver, gold odds], levels and pts [{p, v, T}] (probability, value, task hours).
 // scale: each goal key's best metric to score against instead of this pool's own (commonMax), so pools compare.
-export function poolModel(diff, { weights: w, pool, preferred, unwanted, metricsFor, unknown, rewardObs, scale }) {
+export function poolModel(diff, { weights: w, pool, preferred, unwanted, metricsFor, unknown, odds, scale }) {
   const keys = GOAL_KEYS.filter((g) => w[g] > 0);
   if (!keys.length) return null;
   const unw = {}, pref = {}, blocked = [];
@@ -62,11 +76,7 @@ export function poolModel(diff, { weights: w, pool, preferred, unwanted, metrics
   model.best = known[known.length - 1];
   model.medKph = kphs.length ? kphs[Math.floor(kphs.length / 2)] : null;
   model.fallback = unknown === "poor" ? 0 : known[Math.round((unknown === "average" ? 0.5 : 0.25) * (known.length - 1))];
-  const obs = rewardObs || [];
-  let ns = 0, ng = 0;
-  obs.forEach((o) => { if (o.kind === "silver") ns++; else if (o.kind === "gold") ng++; });
-  model.nObs = obs.length;
-  model.kinds = obs.length >= MIN_BOARD_OBS ? [1 - (ns + ng) / obs.length, ns / obs.length, ng / obs.length] : [1, 0, 0];
+  model.kinds = kindOdds(odds);
   model.levels = killLevels(diff);
   let W = 0, unkW = 0;
   const pts = [];
@@ -102,15 +112,19 @@ export function takeValue(h, s, v, q) { return v * q.A + q.dT * contValue(h, s, 
 export function planKey(model, hpd) { return hpd + "|" + model.pts.map((p) => p.p.toFixed(6) + ":" + p.v.toFixed(6) + ":" + (p.T || 0).toFixed(4)).join(","); }
 
 // Value of facing a fresh board with s tokens (h[s], s = 0..TOKEN_CAP): take the best of 3 offers (its value earned
-// over the task's hours, plus tokens gained), or spend a token to redraw. Value iteration until it settles.
+// over the task's hours, plus tokens gained), or spend a token to redraw. Value iteration until it settles: each sweep
+// shrinks the change by about g (the discount over a task), so every JUMP sweeps it jumps ahead by the change × g/(1−g)
+// (where the sweeps were heading), and it stops once the change is too small to move the result by more than
+// 1e-5 of the scale (change / (1 − g)). Silver and Gold triple the offers to weigh, so without the jumps it was slow.
+const JUMP = 10;
 export function solvePlan(model, hpd) {
   const pts = model.pts.map((p) => { const q = taskShape(p.T, hpd); q.p = p.p; q.v = p.v; return q; });
   const n = pts.length, qv = new Array(n), idx = [];
-  let h = [];
+  let h = [], prevDm = 0;
   for (let z = 0; z <= TOKEN_CAP; z++) h.push(0);
   for (let i0 = 0; i0 < n; i0++) idx.push(i0);
   const scale = Math.max(1e-9, model.best / RHO);
-  for (let iter = 0; iter < 2000; iter++) {
+  for (let iter = 1; iter <= 2000; iter++) {
     const nh = [];
     let dm = 0;
     for (let s = 0; s <= TOKEN_CAP; s++) {
@@ -121,8 +135,11 @@ export function solvePlan(model, hpd) {
       for (let j = 0; j < n; j++) { c += pts[idx[j]].p; let c3 = Math.min(1, c); c3 = c3 * c3 * c3; if (c3 > prev) e += (c3 - prev) * Math.max(qv[idx[j]], R); prev = c3; }
       nh.push(e); dm = Math.max(dm, Math.abs(e - h[s]));
     }
+    const g = prevDm > 0 ? dm / prevDm : 1, jump = iter % JUMP === 0 && g > 0 && g < 0.999;
+    if (!jump && dm < 1e-5 * scale * Math.max(0.01, 1 - Math.min(g, 0.99))) { h = nh; break; }
+    if (jump) { const f = g / (1 - g); for (let s = 0; s <= TOKEN_CAP; s++) nh[s] += (nh[s] - h[s]) * f; }
+    prevDm = jump ? 0 : dm;
     h = nh;
-    if (dm < 1e-5 * scale) break;
   }
   return { h, pts, hpd };
 }

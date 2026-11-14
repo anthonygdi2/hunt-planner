@@ -1,9 +1,9 @@
 // The app's model of one character at one moment: compute()'s result plus the functions screens and view models need
 // on top of it (numbers per creature, the reroll model, weekly tasks, the planner). Everything is a function of the
 // state, the derived values and `now`, so the same model backs the screens, the view models and the golden capture.
-import { VOCATIONS, SLOTS, DIFFICULTIES } from "../data/rules.js";
+import { VOCATIONS, SLOTS, DIFFICULTIES, OFFER_ODDS } from "../data/rules.js";
 import { compute, ownHunts } from "./compute.js";
-import { readSources, readSettings, readGoal, readBounty } from "../store/schema.js";
+import { readSources, readSettings, readGoal, readBounty, readOfferOdds, readOfferLog } from "../store/schema.js";
 import { norm } from "../core/text.js";
 import { effective } from "../core/numbers.js";
 import { metrics } from "../core/metrics.js";
@@ -55,11 +55,20 @@ export function makeModel(state, derived, now, opts) {
   };
   // Reroll settings: tokens from the bounty; hours per day and the unknown-creature assumption from the profile.
   const rerollSettings = () => { const b = bounty(); return readReroll(Object.assign({}, p.reroll, { left: b.tokens })); };
+  // Silver and Gold: the character's own odds, else the guess (typed: whether they're its own); the logged offers.
+  const offerOdds = () => { const o = readOfferOdds(p.offerOdds); return { odds: o || OFFER_ODDS, typed: !!o }; };
+  const offerLog = () => readOfferLog(p.rewardObs);
+  // Whether the board's three offers are the last three logged for its difficulty (a board is logged once).
+  const boardLogged = () => {
+    const b = bounty(), last = (offerLog()[b.difficulty] || []).slice(-3);
+    if (b.mode !== "offers" || last.length < 3 || b.offers.some((o) => !o.slug)) return false;
+    return b.offers.every((o, i) => norm(last[i].name || "") === norm(catalog.bySlug[o.slug].name));
+  };
   const poolModels = {};
   const poolArgs = (diff) => {
     const sl = slots();
     return { weights: weights(), preferred: sl.preferred, unwanted: sl.unwanted, unknown: rerollSettings().unknown,
-      rewardObs: (p.rewardObs || {})[diff] || [],
+      odds: offerOdds().odds,
       pool: catalog.poolOf(diff).map((c) => ({ it: c, e: eff(c), blocked: ratingOf(c) === "X" || lockedFor(c) })),
       metricsFor: (it, e, kills, mult) => metricsFor(it, e, diff, kills, mult) };
   };
@@ -160,7 +169,7 @@ export function makeModel(state, derived, now, opts) {
   const plannerCtx = (extra) => Object.assign({ hours: plState.fixedHours, tokensUnknown: !rerollSettings().hasLeft, diff: bounty().difficulty, held: held(), today: today(),
     travel: plState.travel, occupancy: pl.occupancy, world: settings.world }, extra || {});
 
-  return { derived: d, now, sources, settings, bounty, weights, chalRates, slots, minLevelFor, lockedFor, ratingOf, eff, metricsFor, boardDiff, rerollSettings, poolModel, rerollPlan, difficultyCompare,
+  return { derived: d, now, sources, settings, bounty, weights, chalRates, slots, minLevelFor, lockedFor, ratingOf, eff, metricsFor, boardDiff, rerollSettings, offerOdds, offerLog, boardLogged, poolModel, rerollPlan, difficultyCompare,
     boardOffers, weekly, weeklyRows, openWeeklies, weeklyBonus, held, today, todayFactor, spotIndex, spotNums, heldTask, spotValue, plScale, spotScores,
     planOffers, lensCheck, noNumsWhy, planOptions, planChain, plannerCtx };
 }

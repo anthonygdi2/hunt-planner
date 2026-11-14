@@ -290,6 +290,27 @@ export function readBounty(plState, profile, ctx) {
     zeroChecked: null };
 }
 
+// ---------- Silver and Gold: the profile's offerOdds and rewardObs ----------
+// The character's own odds {silver, gold} (percent per offer), or null when not set (the plan then uses OFFER_ODDS).
+// Each from 0 to 100, together at most 100.
+export function readOfferOdds(v) {
+  if (!v || typeof v !== "object" || v.silver == null || v.gold == null) return null;
+  const s = Number(v.silver), g = Number(v.gold);
+  return s >= 0 && g >= 0 && s + g <= 100 ? { silver: s, gold: g } : null;
+}
+// The logged offers per difficulty {diff: [{name, kills, kind, level, at}]} (the classic page wrote the same shape),
+// keeping the entries with a known difficulty and kind.
+export function readOfferLog(v) {
+  const out = {};
+  if (!v || typeof v !== "object") return out;
+  Object.keys(TASK).forEach((d) => {
+    if (!Array.isArray(v[d])) return;
+    const list = v[d].filter((o) => o && typeof o === "object" && OFFER_KINDS.indexOf(o.kind) !== -1);
+    if (list.length) out[d] = list;
+  });
+  return out;
+}
+
 // ---------- marks and occupancy: profiles/{pid}/marks/{spotId}, profiles/{pid}/occupancy/{spotId} ----------
 // {state "taken" | "free", at, world} or null.
 export function readMark(v) {

@@ -18,6 +18,7 @@ import { parseSession, sessionProblems } from "../core/session.js";
 import { weekKey, serverDay, weeklyDifficulties } from "../core/weekly.js";
 import { markAge, markActive } from "../core/occupancy.js";
 import { isChallengingMaster } from "../core/rewards.js";
+import { loggedOdds, MIN_BOARD_OBS } from "../core/reroll.js";
 import { t, _, translator, locale } from "./lang.js";
 import { LANGS } from "../core/i18n.js";
 
@@ -97,8 +98,27 @@ export function difficultyAdvice(cmp) {
   };
 }
 
+// Silver and Gold odds (Advanced mode): what the plan uses, the logged offers, and logging this board.
+// o: model.offerOdds() {odds, typed}; log: model.offerLog(); logged: model.boardLogged(); b: the bounty.
+const pct1 = (x) => String(Math.round(x * 10) / 10);
+export function oddsView(o, log, logged, b) {
+  const L = loggedOdds(log), filled = b.offers.every((x) => x.slug), same = L.n && pct1(L.silver) === pct1(o.odds.silver) && pct1(L.gold) === pct1(o.odds.gold);
+  const vals = { silver: pct1(o.odds.silver), gold: pct1(o.odds.gold) };
+  return {
+    silver: vals.silver, gold: vals.gold, typed: o.typed,
+    line: o.typed ? t("The plan uses your odds: Silver {silver}%, Gold {gold}% per offer.", vals)
+      : t("The plan uses a guess: Silver {silver}%, Gold {gold}% per offer. The real odds aren’t published.", vals),
+    logged: (L.n ? t.n(L.n, "{n} offer logged: Silver {silver}%, Gold {gold}%.", "{n} offers logged: Silver {silver}%, Gold {gold}%.", { silver: pct1(L.silver), gold: pct1(L.gold) })
+      : t("No boards logged yet.")) + (L.n < MIN_BOARD_OBS ? " " + t("Your shares can be used once {n} offers are logged.", { n: MIN_BOARD_OBS }) : ""),
+    canUse: L.n >= MIN_BOARD_OBS && !(o.typed && same),
+    board: !(b.mode === "active" && b.active) ? { canLog: filled && !logged,
+      text: logged ? t("This board is logged.") : !filled ? t("Fill in all three offers to log this board.") : t("Log each new board once, as it comes up.") } : null,
+  };
+}
+
 // slots: the model's {preferred, unwanted} lists (slugs), or none. cmp: model.difficultyCompare(), when wanted.
-export function bountyView(b, catalog, slots, cmp) {
+// odds: oddsView(…) in Advanced mode, else none.
+export function bountyView(b, catalog, slots, cmp, odds) {
   const sl = slots || { preferred: [], unwanted: [] };
   const mark = (slug) => (!slug ? null : sl.preferred.indexOf(slug) !== -1 ? { kind: "pref", text: "★ " + t("Preferred") }
     : sl.unwanted.indexOf(slug) !== -1 ? { kind: "unw", text: "⊘ " + t("Unwanted") } : null);
@@ -122,6 +142,7 @@ export function bountyView(b, catalog, slots, cmp) {
       showExp: isChallengingMaster(b.difficulty, c(b.active.slug)) } : null,
     note: t("Pick in game only once the spot is free: the other offers disappear."),
     suggestions: catalog.poolOf(b.difficulty).map((x) => x.name),
+    odds: odds || null,
   };
 }
 
@@ -129,7 +150,8 @@ export function bountyView(b, catalog, slots, cmp) {
 // compare: work out the difficulty comparison (it's slow, so only while the Bounty editor is open).
 export function planView(state, model, catalog, compare) {
   const p = state.profiles[state.pid] || {};
-  return { goal: goalMixView(readGoal(p)), bounty: model && catalog ? bountyView(model.bounty(), catalog, model.slots(), compare ? model.difficultyCompare() : null) : null };
+  const odds = model && state.advanced ? oddsView(model.offerOdds(), model.offerLog(), model.boardLogged(), model.bounty()) : null;
+  return { goal: goalMixView(readGoal(p)), bounty: model && catalog ? bountyView(model.bounty(), catalog, model.slots(), compare ? model.difficultyCompare() : null, odds) : null };
 }
 
 const MINUTES_LABEL = { 30: _("30 minutes"), 45: _("45 minutes"), 60: _("1 hour"), 120: _("2 hours") };

@@ -133,6 +133,57 @@ test("plan: the Goal chip opens the goal mixer; presets and weights call their a
   assert.equal(planView({ pid: "x", profiles: { x: { weights: { xp: 10 } } } }).goal.chip.value, "Exp", "old 0-10 weights migrate");
 });
 
+test("plan: Silver and Gold odds and Log this board (Advanced mode)", async () => {
+  const { bountyView, oddsView } = await import("../../src/app/views.js");
+  const { makeCatalog } = await import("../../src/core/catalog.js");
+  const plan = await import("../../src/ui/screens/plan.js");
+  const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }, { n: "Gorerilla", c: "C", m: 8 }]);
+  const blank = { slug: null, kills: null, kind: "normal", exp: null }, full = { slug: "cobra-assassin", kills: 450, kind: "normal", exp: null };
+  const board = (offers) => ({ difficulty: "master", tokens: 4, mode: "offers", active: null, offers });
+  const goal = { chip: { label: "Goal", value: "Exp", set: true } };
+  const s = spy(), bounty = {};
+  ["logBoard", "odds", "useLoggedOdds", "useGuessOdds"].forEach((k) => { bounty[k] = s.fn(k); });
+  const guess = { odds: { silver: 10, gold: 2 }, typed: false };
+  // Basic mode: none of it.
+  let $ = mount(plan.render({ goal, bounty: bountyView(board([full, blank, blank]), catalog) }, { open: "bounty" }, { toggle() {}, bounty }));
+  assert.equal($("#bounty-odds"), null);
+  assert.equal($("#bounty-log"), null);
+  // The guess, nothing logged, a board not filled in.
+  let o = oddsView(guess, {}, false, board([full, blank, blank]));
+  assert.deepEqual([o.silver, o.gold, o.typed, o.canUse], ["10", "2", false, false]);
+  assert.equal(o.logged, "No boards logged yet. Your shares can be used once 10 offers are logged.");
+  $ = mount(plan.render({ goal, bounty: bountyView(board([full, blank, blank]), catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
+  assert.equal($("#odds-line").textContent, "The plan uses a guess: Silver 10%, Gold 2% per offer. The real odds aren’t published.");
+  assert.equal($("#odds-silver").value, "10");
+  assert.equal($("#bounty-log").disabled, true);
+  assert.equal($("#odds-use"), null);
+  assert.equal($("#odds-guess"), null);
+  $("#odds-silver").value = "12.5"; $("#odds-silver").dispatchEvent(new dom.window.Event("change"));
+  $("#odds-gold").value = "3"; $("#odds-gold").dispatchEvent(new dom.window.Event("change"));
+  assert.deepEqual(s.calls.splice(0), [["odds", { silver: "12.5" }], ["odds", { gold: "3" }]]);
+  // Typed odds, twelve offers logged, a full board not logged yet.
+  const log = { master: Array.from({ length: 12 }, (_, i) => ({ kind: i < 3 ? "silver" : i < 4 ? "gold" : "normal" })) };
+  const filled = board([full, Object.assign({}, full, { slug: "gorerilla" }), full]);
+  o = oddsView({ odds: { silver: 12.5, gold: 3 }, typed: true }, log, false, filled);
+  assert.equal(o.line, "The plan uses your odds: Silver 12.5%, Gold 3% per offer.");
+  assert.equal(o.logged, "12 offers logged: Silver 25%, Gold 8.3%.");
+  $ = mount(plan.render({ goal, bounty: bountyView(filled, catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
+  assert.equal($("#bounty-log").disabled, false);
+  assert.equal($("#bounty-log-note").textContent, "Log each new board once, as it comes up.");
+  $("#bounty-log").click(); $("#odds-use").click(); $("#odds-guess").click();
+  assert.deepEqual(s.calls.splice(0), [["logBoard"], ["useLoggedOdds"], ["useGuessOdds"]]);
+  // Logged already; the shares already in use: no Use button.
+  o = oddsView({ odds: { silver: 25, gold: 8.3 }, typed: true }, log, true, filled);
+  assert.deepEqual([o.canUse, o.board.canLog, o.board.text], [false, false, "This board is logged."]);
+  // An active bounty: odds, but no board to log.
+  const active = { difficulty: "master", tokens: 4, mode: "active", offers: [blank, blank, blank], active: { slug: "cobra-assassin", kills: 450, killsLeft: 400, kind: "normal", exp: null } };
+  o = oddsView(guess, {}, false, active);
+  assert.equal(o.board, null);
+  $ = mount(plan.render({ goal, bounty: bountyView(active, catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
+  assert.ok($("#bounty-odds"));
+  assert.equal($("#bounty-log"), null);
+});
+
 test("plan: the Bounty editor while choosing offers and once one is picked", async () => {
   const { bountyView } = await import("../../src/app/views.js");
   const { makeCatalog } = await import("../../src/core/catalog.js");

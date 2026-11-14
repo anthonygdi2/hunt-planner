@@ -52,9 +52,25 @@ function difficultyAdvice(a) {
       h("p", { class: "hp-p hp-caption" }, a.note)));
 }
 
-// The Bounty editor: difficulty and tokens, then the three offers while choosing, or the active bounty.
+// Silver and Gold odds (Advanced mode): what the plan uses, the two odds, the logged offers, and the buttons to take
+// their shares or go back to the guess. v: bountyView's odds.
+function oddsSection(v, on) {
+  return h("div", { id: "bounty-odds", class: "hp-offer", role: "group", "aria-label": t("Silver and Gold odds") },
+    h("b", null, t("Silver and Gold odds")),
+    h("p", { id: "odds-line", class: "hp-p hp-small" }, v.line),
+    h("div", { class: "hp-grid2" },
+      textInput("odds-silver", t("Silver (%)"), v.silver, (x) => on.odds({ silver: x }), { inputmode: "decimal" }),
+      textInput("odds-gold", t("Gold (%)"), v.gold, (x) => on.odds({ gold: x }), { inputmode: "decimal" })),
+    h("p", { id: "odds-logged", class: "hp-p hp-small hp-muted" }, v.logged),
+    v.canUse || v.typed ? h("div", { class: "hp-grid2" },
+      v.canUse ? h("button", { id: "odds-use", type: "button", class: "hp-btn", onClick: on.useLoggedOdds }, t("Use my logged shares")) : null,
+      v.typed ? h("button", { id: "odds-guess", type: "button", class: "hp-btn", onClick: on.useGuessOdds }, t("Use the guess")) : null) : null);
+}
+
+// The Bounty editor: difficulty and tokens, then the three offers while choosing, or the active bounty; in Advanced
+// mode, Log this board and the Silver and Gold odds.
 // view: app/views.js bountyView. on: {difficulty(d), tokens(n), offer(i, patch), pick(i), active(patch), finished(), rerolled(), lists(),
-// done()}.
+// logBoard(), odds(patch), useLoggedOdds(), useGuessOdds(), done()}.
 export function bountyEditor(view, on) {
   const KINDS = kinds();
   const offerCard = (o) => h("div", { class: "hp-offer", role: "group", "aria-label": t("Offer {letter}", { letter: o.letter }) },
@@ -90,7 +106,11 @@ export function bountyEditor(view, on) {
       h("button", { id: "bounty-lists", type: "button", class: "hp-linkbtn", onClick: on.lists }, t("Edit lists"))),
     h("datalist", { id: "bounty-names" }, view.suggestions.map((n) => h("option", { value: n }))),
     view.mode === "active" ? activeCard : [view.offers.map(offerCard),
+      view.odds && view.odds.board ? h("div", { class: "hp-field" },
+        h("button", { id: "bounty-log", type: "button", class: "hp-btn", disabled: !view.odds.board.canLog, onClick: on.logBoard }, t("Log this board")),
+        h("span", { id: "bounty-log-note", class: "hp-caption", "aria-live": "polite" }, view.odds.board.text)) : null,
       h("button", { id: "bounty-rerolled", type: "button", class: "hp-btn dashed", onClick: on.rerolled }, t("Rerolled (−1, clears the offers)"))],
+    view.odds ? oddsSection(view.odds, on) : null,
     h("div", { class: "hp-editor-foot" }, h("span", { class: "hp-caption" }, view.mode === "active" ? "" : view.note),
       h("button", { id: "bounty-done", type: "button", class: "hp-btn solid", onClick: on.done }, t("Done"))));
 }
