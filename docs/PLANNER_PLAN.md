@@ -156,7 +156,7 @@ Testing the beta before merge: build the `planner` branch locally and open the b
 
 - Does rerolling a held offer lose its kill progress? Assumed yes.
 - Does the daily token stack if unclaimed for several days, or is an unclaimed day lost?
-- Boosted creature, Prey and event effects: settled for exp (M5, TibiaWiki October 2026: boosted creature double exp; Prey bonus experience 13% to 40% in steps of 3; Double Experience +100% and world bonuses +10% to +50%; Prey and events apply on top of the boost). Still open: double loot and Prey improved loot (needs each creature’s share of a spot’s loot), faster respawn, and whether Prey stacks with other exp bonuses by adding or multiplying (multiplying is assumed).
+- Boosted creature, Prey and event effects: settled for exp (M5, TibiaWiki October 2026: boosted creature double exp; Prey bonus experience 13% to 40% in steps of 3; Double Experience +100% and world bonuses +10% to +50%; Prey and events apply on top of the boost). Prey improved loot is counted since November 2026 (a chance of a second full set of loot; each creature’s share of a spot’s loot is taken as its exp share; `PROJECT_CONTEXT.md`). Still open: the boosted creature’s double loot (the same code, waiting on a golden update), faster respawn, and whether Prey stacks with other exp bonuses by adding or multiplying (multiplying is assumed).
 - Default level band for the lens (for example −100 to +150 levels).
 - Taken-mark expiry: 45 minutes to start; tune from use.
 - Travel minutes: each character can enter its own per spot (M5). `SPOT_META` defaults stay empty until there’s a source; travel depends on the home depot anyway.

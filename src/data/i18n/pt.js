@@ -258,6 +258,7 @@ export default {
   // plan.js
   "{creature} is boosted (double exp)": "{creature} está boosted (exp dobrada)",
   "{creature} prey +{pct}% exp": "{creature} prey +{pct}% exp",
+  "{creature} prey +{pct}% loot": "{creature} prey +{pct}% loot",
   "+{pct}% exp event": "+{pct}% evento de exp",
   "Claim {creature}’s task reward": "Pegue a recompensa da task de {creature}",
   "No kills left. Claiming it pays the reward, {points} bounty points and a reroll token; then choose from new offers.": "Não restam kills. Pegar a recompensa dá {points} pontos de bounty e um token de reroll; depois escolha entre novas ofertas.",

@@ -19,21 +19,26 @@ export const CHECK_HOURS = 2;
 
 // How much today's bonuses raise a spot's hunting exp: each creature's share of the spot's exp (kills/h × base exp from
 // ctx.expTable, or kill shares when a creature's exp is unknown) times its own bonus (Boosted Creature, exp Prey), then
-// any exp event. today: {boosted (slug), prey [{slug, kind, pct}], event (percent)} or null. Returns {mult, notes}.
+// any exp event. A loot Prey raises the spot's loot the same way: the creature's share of the loot (taken as its share
+// of the exp, an estimate: there's no loot value per creature) times 1 + its percent. today: {boosted (slug), prey
+// [{slug, kind, pct}], event (percent)} or null. Returns {mult, notes, loot (the loot multiplier), lootNotes}.
 export function todayFactor(kph, today, ctx) {
-  const out = { mult: 1, notes: [] }, t = ctx.t || EN;
+  const out = { mult: 1, notes: [], loot: 1, lootNotes: [] }, t = ctx.t || EN;
   if (!today) return out;
   const keys = Object.keys(kph), exp = ctx.expTable, byExp = keys.every((k) => exp[k] > 0), w = {};
-  let tot = 0, per = 0;
+  let tot = 0, per = 0, loot = 0;
   keys.forEach((k) => { w[k] = kph[k] * (byExp ? exp[k] : 1); tot += w[k]; });
   keys.forEach((k) => {
     let m = 1;
     const name = ctx.catalog.bySlug[k] ? ctx.catalog.bySlug[k].name : k;
     if (today.boosted === k) { m *= BOOSTED_EXP_MULT; out.notes.push(t("{creature} is boosted (double exp)", { creature: name })); }
     (today.prey || []).forEach((p) => { if (p.slug === k && p.kind === "xp" && p.pct > 0) { m *= 1 + p.pct / 100; out.notes.push(t("{creature} prey +{pct}% exp", { creature: name, pct: p.pct })); } });
+    let lm = 1;
+    (today.prey || []).forEach((p) => { if (p.slug === k && p.kind === "loot" && p.pct > 0) { lm *= 1 + p.pct / 100; out.lootNotes.push(t("{creature} prey +{pct}% loot", { creature: name, pct: p.pct })); } });
     per += tot ? w[k] / tot * m : 0;
+    loot += tot ? w[k] / tot * lm : 0;
   });
-  if (tot) out.mult = per;
+  if (tot) { out.mult = per; out.loot = loot; }
   if (today.event > 0) { out.mult *= 1 + today.event / 100; out.notes.push(t("+{pct}% exp event", { pct: today.event })); }
   return out;
 }
@@ -50,7 +55,8 @@ export function heldTask(held, diff, ctx) {
 // What a session of opts.hours at this spot is worth per hour, holding opts.held: the spot's own exp/h, profit/h and
 // charm/h, plus each remaining kill's share of the held task's reward and bounty points and of each open weekly's
 // reward (reward / kills left, as the weekly model does), capped at what the session can finish. Travel eats into the
-// hunting time but not the session: value = what the hunting hours earn / session hours. With no session length
+// hunting time but not the session: value = what the hunting hours earn / session hours. Today's loot bonuses add to
+// the profit (lootBonus: the spot's loot/h × what they raise it by) when the spot's loot/h is known. With no session length
 // (the default): hourly rates, every remaining kill worth reward / kills left with no cap, and no travel.
 // nums: spotNumbers(sp). opts: {hours, held, diff, today, travel (spot id → the character's minutes), weekly (open
 // weeklies)}. ctx: {catalog, chalRates, entries, bestiaryBonus, raidP, expTable}.
@@ -63,6 +69,10 @@ export function spotValue(sp, nums, opts, ctx) {
   const v = { id: sp.id, name: sp.name, src: nums.src, entry: nums.entry, profitStale: !!nums.profitStale, hours: rate ? null : H, huntHours: rate ? null : Hh,
     travelMin: travel, kph: nums.kph, xph: nums.xph, pph: nums.pph, held: null, weekly: [], today: tf.notes,
     parts: { hunt: nums.xph * Hh / H, today: nums.xph * (tf.mult - 1) * Hh / H, held: 0, weekly: 0 } };
+  // Loot bonuses raise the loot, not the supplies, so they need the spot's loot/h; without it they aren't counted or named.
+  const lootOn = nums.pph != null && nums.lph > 0 && tf.loot > 1;
+  v.lootBonus = lootOn ? nums.lph * (tf.loot - 1) * Hh / H : 0;
+  if (lootOn) v.today = tf.notes.concat(tf.lootNotes);
   let bounty = 0;
   if (held && held.left > 0 && nums.kph[held.slug] > 0) {
     const hk = nums.kph[held.slug], hf = rate ? hk / held.left : Math.min(1, hk * Hh / held.left);
@@ -87,7 +97,7 @@ export function spotValue(sp, nums, opts, ctx) {
     if (!rec.bestiaryDone) charm += k * b.charmPoints / b.kills * (held && key === held.slug ? 1 + bonus / 100 : 1);
     if (!rec.wardenDone && !o.r && raidP > 0) charm += k * raidP * (rec.bestiaryDone ? RAID.wardenShareDone : RAID.wardenShare) * b.warden;
   });
-  v.m = { xp: v.parts.hunt + v.parts.today + v.parts.held + v.parts.weekly, profit: nums.pph != null ? nums.pph * Hh / H : null,
+  v.m = { xp: v.parts.hunt + v.parts.today + v.parts.held + v.parts.weekly, profit: nums.pph != null ? nums.pph * Hh / H + v.lootBonus : null,
     charm: charm * Hh / H, bounty };
   return v;
 }

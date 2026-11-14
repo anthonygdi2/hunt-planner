@@ -111,14 +111,15 @@ export function calibrate(sessions, picks, catalog) {
 // A reference spot's numbers for this character: scaled once calibrated (c), as recorded before that. Exp is
 // calibrated in raw terms; XP mode then applies the character's own boost (its XP / raw XP). Dated profit
 // (pre-rebalance or flagged profitStale) scales with kills only, without the profit offset. Creatures not in the
-// catalog are left out. Returns {src, kph {slug}, total, xph, profitStale, pph}.
+// catalog are left out. Loot/h (lph, for today's loot bonuses) scales with kills; null when the entry has none.
+// Returns {src, kph {slug}, total, xph, profitStale, pph, lph}.
 export function refNums(e, c, other, { xpMode, xpBoost, catalog }) {
   const K = c ? c.kill : 1, xp = xpMode === "xp", kph = {}, stale = profitStale(e);
   let total = 0, xph = e.rawXph * (c ? c.exp : 1) * (xp ? xpBoost : 1);
   if (!c && xp && e.xph > 0) xph = e.xph;
   e.creatures.forEach((cr) => { if (cr.kph > 0 && catalog.bySlug[cr.slug]) { kph[cr.slug] = cr.kph * K; total += cr.kph; } });
   return { src: other ? (c ? "otherAdj" : "other") : (c ? "refAdj" : "ref"), kph, total: total * K, xph, profitStale: stale,
-    pph: e.profitph != null ? e.profitph * K + (c && !stale ? c.offset : 0) : null };
+    pph: e.profitph != null ? e.profitph * K + (c && !stale ? c.offset : 0) : null, lph: e.lootph != null ? e.lootph * K : null };
 }
 
 // The reference spots the character hasn't logged, with their numbers: [{e, n (refNums), tier "voc" | "other",

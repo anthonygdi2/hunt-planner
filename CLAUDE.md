@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Hunt Planner (formerly the Bounty Task tier list), a Tibia hunt planner. Read `docs/PROJECT_CONTEXT.md` (what exists and why) and `docs/ARCHITECTURE.md` (the layers and their rules) before changing anything; the restructure in progress is `docs/RESTRUCTURE_PLAN.md`. Then `docs/PLANNER_PLAN.md` for the hunt planner (the default page) or `docs/REFERENCE_DB_PLAN.md` for the reference hunt data.
+Hunt Planner (formerly the Bounty Task tier list), a Tibia hunt planner. Read `docs/PROJECT_CONTEXT.md` (what exists and why) and `docs/ARCHITECTURE.md` (the layers and their rules) before changing anything; the restructure in progress is `docs/RESTRUCTURE_PLAN.md`. What to build next is the ranked list in `docs/IMPROVEMENTS.md`. Then `docs/PLANNER_PLAN.md` for the hunt planner (the default page) or `docs/REFERENCE_DB_PLAN.md` for the reference hunt data.
 
 ## Repo layout
 

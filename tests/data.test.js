@@ -26,6 +26,10 @@ test("src/data/reference.json matches tools/reference/readings.json (run node to
   const refFile = fs.readFileSync(path.join(ROOT, "src", "data", "reference.json"), "utf8").replace(/\r\n/g, "\n");
   assert.deepStrictEqual(gen.errors, []);
   assert.ok(gen.text === refFile, "file differs from the readings");
+  // Loot/h (for today's loot bonuses) wherever the analyser's loot was read: loot / length, never below the profit.
+  const withLoot = gen.entries.filter((e) => e.lootph != null);
+  assert.ok(withLoot.length > 700, "loot/h on " + withLoot.length + " entries");
+  assert.deepStrictEqual(withLoot.filter((e) => e.lootph < e.profitph).map((e) => e.id), []);
 });
 
 test("the planner's exp table (PL_EXP) matches tools/reference/wiki-exp.json", () => {

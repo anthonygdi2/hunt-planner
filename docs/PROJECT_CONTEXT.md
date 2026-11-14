@@ -92,7 +92,7 @@ Advanced mode (per device) adds: Echo Raid counts per hunt, renaming or deleting
 - **Bounty difficulty switch** (TibiaWiki BR Bounty Tasks, June 2026): changing it while a task is active is free and applies to the next board; while choosing offers, seeing another difficulty's board takes a reroll token.
 - **Reroll tokens**: +1 per completed bounty task, +1 claimable per day, maximum 10. An accepted (held) offer doesn’t lock you in: you can reroll the board while holding one, including the held one, so holding costs nothing (maintainer, October 24, 2026). Rerolling a held offer is assumed to lose its kill progress.
 - **Boosted creature** (TibiaWiki, October 2026): changes at each server save; double experience, double loot and twice the respawn rate. The planner counts the exp only.
-- **Prey** (TibiaWiki): one creature per slot for 2 hours of hunting. Bonus experience 13–40% and improved loot 13–40% (a chance of a second loot drop) in steps of 3; damage boost 7–25% and damage reduction 12–30% in steps of 2. The planner counts bonus experience only, applied on top of the boost (TibiaWiki says Prey and events apply on top of it); whether it multiplies or adds with other exp bonuses isn’t settled.
+- **Prey** (TibiaWiki): one creature per slot for 2 hours of hunting. Bonus experience 13–40% and improved loot 13–40% (a chance of a second loot drop) in steps of 3; damage boost 7–25% and damage reduction 12–30% in steps of 2. The planner counts bonus experience, applied on top of the boost (TibiaWiki says Prey and events apply on top of it; whether it multiplies or adds with other exp bonuses isn’t settled), and improved loot (TibiaWiki Prey System, November 2026: a 15% bonus is a 15% chance the kill drops another full set of loot, so the creature’s loot is worth 1 + percent/100). A loot Prey adds to a spot’s profit: the spot’s loot/h (its own hunts’ logged loot, else the reference entry’s `lootph`) × the creature’s share of it × the percent. The share is the creature’s share of the spot’s exp, an estimate, since there’s no loot value per creature. Spots without a loot/h (hunts logged without loot, a few readings) don’t count it. Damage and defense aren’t counted.
 - **Exp events** (TibiaWiki, Experience Point): Double Experience (+100%, about 6 a year) and world-quest bonuses (+10% to +50%, some limited to certain creatures).
 - **Bounty exp reward**: Hard creatures on Master pay exactly 1,875 exp per required kill (10 logged offers at levels 612–613, no level effect seen). Expert 510, Adept 97.5 and Beginner 15 come from the open-source Canary server model and are unverified. Challenging creatures on Master vary by creature: Gorerilla 2,034.75, Infernal Demon 2,844.18, Knight's Apparition 3,088.35 per kill (level 615). The tool learns each Challenging creature's rate from one entered reward; unseen ones use the average (about 2,700).
 - **Bestiary**: Easy 500 kills / 15 charm points, Medium 1,000 / 25, Hard 2,500 / 50, Challenging 5,000 / 100. First Echo Warden kill: Easy 5, Medium 10, Hard 15, Challenging 30 charm points.
@@ -116,11 +116,13 @@ Advanced mode (per device) adds: Echo Raid counts per hunt, renaming or deleting
 - Many creatures have thin or no data; the reference database (see REFERENCE_DB_PLAN.md) is the planned fix.
 - Weekly synergy uses the "reward share" model; a "time saved" model was discussed and not built.
 - Delivery tasks, hunting task points and soulseals aren't modeled.
-- Planner: double loot, faster respawn and Prey loot/damage aren’t counted; spot meta (travel, access and team per spot) is empty until there’s a source, and travel minutes have no screen in the redesign yet; the level band is a first guess. See the open questions in `PLANNER_PLAN.md`.
+- Planner: the boosted creature’s double loot, faster respawn and Prey damage/defense aren’t counted; spot meta (travel, access and team per spot) is empty until there’s a source, and travel minutes have no screen in the redesign yet; the level band is a first guess. See the open questions in `PLANNER_PLAN.md`.
 - Duo and team reference hunts are left out everywhere; nothing in the UI asks for them yet.
 - The golden test's real-data run uses the frozen copy of the data in `tests/golden/data/` (October 26, 2026), so new readings and creature data don't change it; data correctness is `generate.js --check`'s job.
 - Claude in Chrome's file upload has failed twice, so GitHub uploads have been manual drag-and-drop. Claude Code pushing with git avoids this.
 
-## Backlog (from outside feedback, October 2026)
+## Backlog
+
+The ranked list of what to build next, with why, is `docs/IMPROVEMENTS.md`; it’s re-evaluated after each step. From outside feedback, October 2026:
 
 Reference database with calibration and source badges (built), vocation lens with level ranges (built, in the planner), data freshness, per-session efficiency readout, access-quest tracking, crowdsourced average-player data, and a video demo script.

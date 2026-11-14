@@ -120,3 +120,18 @@ test("the Spots lens widens which shared hunts count there, as it widens the ref
   assert.equal(M.spotIndex(), M.spotIndex(null), "one index per lens");
   assert.deepEqual(M.derived.hunts.use, [], "the character's own numbers don't change");
 });
+
+test("a loot Prey reaches the profit of reference spots and logged spots", () => {
+  const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }, { n: "Cobra Scout", c: "M", m: 6 }]);
+  const reference = [{ id: "lair", spot: "Test Lair", vocation: "any", rawXph: 4e6, profitph: 2e5, lootph: 5e5, creatures: [{ slug: "cobra-scout", kph: 300 }], source: { date: "2026-09-01", postRebalance: true } },
+    { id: "pit", spot: "Old Pit", vocation: "any", rawXph: 1e6, profitph: 1e5, creatures: [{ slug: "cobra-scout", kph: 100 }], source: { date: "2026-09-01", postRebalance: true } }];
+  const sessions = [{ id: "s", spot: "Scout Cave", hours: 1, rawXp: 1e6, loot: 3e5, supplies: 1e5, balance: 2e5, by: { pid: "a" }, kills: [{ slug: "cobra-scout", count: 200 }] }];
+  const today = { boosted: null, boostedDay: null, prey: [{ slug: "cobra-scout", kind: "loot", pct: 40 }], event: 0 };
+  const M = makeModel({ catalog, reference, pid: "a", profile: { vocation: "Elite Knight", level: 500 }, sessions, entries: {}, advanced: false, difficulty: "all", expTable: {},
+    planner: { state: { today } } }, null, 0);
+  const at = (id, td) => M.spotValue(M.spotIndex().spots[id], { today: td });
+  assert.equal(Math.round(at("test-lair", M.today()).m.profit), 2e5 + 5e5 * 0.4, "a reference spot: its loot/h × 40%");
+  assert.equal(Math.round(at("scout-cave", M.today()).m.profit), 2e5 + 3e5 * 0.4, "a logged spot: its own loot/h");
+  assert.equal(at("old-pit", M.today()).m.profit, 1e5, "no loot/h on the entry: not counted");
+  assert.equal(at("test-lair", null).m.profit, 2e5);
+});

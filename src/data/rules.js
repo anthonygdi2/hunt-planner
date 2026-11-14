@@ -81,7 +81,9 @@ export const BOOSTED_EXP_MULT = 2;
 // Prey (TibiaWiki): three slots, each one creature for 2 hours of hunting.
 export const PREY_SLOTS = 3;
 // Prey bonuses in percent (TibiaWiki): bonus experience and improved loot 13-40% in steps of 3, damage boost 7-25% and
-// damage reduction 12-30% in steps of 2. Only bonus experience is counted.
+// damage reduction 12-30% in steps of 2. Improved loot is that chance of a second full set of loot from the kill (TibiaWiki
+// Prey System, November 2026), so the creature's loot is worth 1 + percent/100. Bonus experience and improved loot are
+// counted.
 export const PREY = deepFreeze({
   xp: { lo: 13, hi: 40, step: 3 }, loot: { lo: 13, hi: 40, step: 3 },
   damage: { lo: 7, hi: 25, step: 2 }, defense: { lo: 12, hi: 30, step: 2 },
