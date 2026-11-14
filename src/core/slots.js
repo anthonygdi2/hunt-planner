@@ -29,6 +29,17 @@ export function slotOdds(pool, slots, isGood) {
   return out;
 }
 
+// What a logged board keeps so the slot model can be tested later, when the lists will have changed: for each offer
+// (slugs, in board order), whether it was on the Preferred or the Unwanted list, and the pool and lists at that moment
+// (only slots in the difficulty's pool count, as in slotOdds). pool: the difficulty's pool [{slug}]; slots {preferred,
+// unwanted}. Returns [{pref, unw, nPool, nPref, nUnw}].
+export function boardSlotTags(offers, pool, slots) {
+  const inPool = {};
+  pool.forEach((c) => { inPool[c.slug] = 1; });
+  const pref = slots.preferred.filter((s) => inPool[s]), unw = slots.unwanted.filter((s) => inPool[s]);
+  return offers.map((slug) => ({ pref: pref.indexOf(slug) !== -1, unw: unw.indexOf(slug) !== -1, nPool: pool.length, nPref: pref.length, nUnw: unw.length }));
+}
+
 // Creatures to suggest for a list, best first, at most n: [{it, key, why}]. pool: creatures [{slug, name}]; taken:
 // slugs already in either list; info(it) → {avoided, locked, minLevel, score: {tier, rel} or undefined}. Preferred: S, A
 // or B creatures that aren't avoided or above level, by score. Unwanted: avoided, then above level, then D creatures

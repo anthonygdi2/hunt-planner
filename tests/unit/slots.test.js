@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { slotOdds, slotSuggestions } from "../../src/core/slots.js";
+import { slotOdds, slotSuggestions, boardSlotTags } from "../../src/core/slots.js";
 
 const pool = Array.from({ length: 100 }, (_, i) => ({ slug: "c" + i, name: "Creature " + String(i).padStart(3, "0") }));
 
@@ -31,4 +31,11 @@ test("suggestions", () => {
   assert.deepEqual(slotSuggestions("preferred", pool, ["c2"], info, 5).map((x) => [x.it.slug, x.why]), [["c1", "Score S"], ["c3", "Score B"]]);
   assert.deepEqual(slotSuggestions("unwanted", pool, [], info, 5).map((x) => [x.it.slug, x.why]), [["c7", "Avoided"], ["c8", "Needs level 700"], ["c5", "Score D"], ["c6", "Score D"]]);
   assert.equal(slotSuggestions("unwanted", pool, [], info, 2).length, 2);
+});
+
+test("a logged board's offers: Preferred or Unwanted, and the pool and lists then (slots outside the pool don't count)", () => {
+  const tags = boardSlotTags(["c1", "c3", "c9"], pool, { preferred: ["c1", "c2", "elsewhere"], unwanted: ["c3", "gone"] });
+  const sizes = { nPool: 100, nPref: 2, nUnw: 1 };
+  assert.deepEqual(tags, [Object.assign({ pref: true, unw: false }, sizes), Object.assign({ pref: false, unw: true }, sizes), Object.assign({ pref: false, unw: false }, sizes)]);
+  assert.deepEqual(boardSlotTags(["c1"], pool, { preferred: [], unwanted: [] }), [{ pref: false, unw: false, nPool: 100, nPref: 0, nUnw: 0 }]);
 });

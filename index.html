@@ -1689,884 +1689,6 @@
     return (plan.h[s - 1] - q.dT * contValue(plan.h, s, q)) / q.A;
   }
 
-  // src/store/repo.js
-  function makeRepo(db, opts) {
-    opts = opts || {};
-    const chain = {}, retryDelay = opts.retryDelay || (() => 400 + Math.random() * 800);
-    function write(path, op, onFail) {
-      const ref = db.doc(path), run = () => op(ref);
-      const attempt = () => run().catch((e) => {
-        if (e && e.code === "unavailable") return new Promise((res) => setTimeout(res, retryDelay())).then(run);
-        throw e;
-      });
-      chain[path] = (chain[path] || Promise.resolve()).then(attempt).catch((e) => {
-        const code = e && e.code;
-        if ((code === "invalid_argument" || code === "not_granted") && opts.onDenied) opts.onDenied(code);
-        if (onFail) onFail(code);
-      });
-      return chain[path];
-    }
-    return {
-      write,
-      set: (path, body, onFail) => write(path, (ref) => ref.set(body), onFail),
-      update: (path, patch, onFail) => write(path, (ref) => ref.update(patch), onFail),
-      remove: (path, onFail) => write(path, (ref) => ref.delete(), onFail),
-      // A fresh document id in a collection.
-      newId: (col) => db.collection(col).doc().id,
-      // Subscribes to a collection's documents (up to limit): onDocs([{id, data()}]); returns the unsubscribe function.
-      watch: (col, limit, onDocs, onError) => db.collection(col).limit(limit).onSnapshot((snap) => onDocs(snap.docs), onError || (() => {
-      })),
-      // The collection's documents once.
-      get: (col, limit) => db.collection(col).limit(limit).get().then((snap) => snap.docs),
-      // A write outside the queue that rejects on failure (restoring a backup, which reports its own progress).
-      setDirect: (path, body) => db.doc(path).set(body),
-      local: !!db.local
-    };
-  }
-
-  // src/store/prefs.js
-  var PREF = { profile: "btl.profile", advanced: "btl.adv", ui: "btl.ui", theme: "btl.theme", lang: "btl.lang" };
-  function makePrefs(storage) {
-    return {
-      get: (k) => {
-        try {
-          return storage ? storage.getItem(k) : null;
-        } catch (e) {
-          return null;
-        }
-      },
-      set: (k, v) => {
-        try {
-          if (storage) storage.setItem(k, v);
-        } catch (e) {
-        }
-      }
-    };
-  }
-
-  // src/store/schema.js
-  var has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
-  var PROFILES = "profiles";
-  var CREATURES = "creatures";
-  var profilePath = (pid) => "profiles/" + pid;
-  var entriesPath = (pid) => profilePath(pid) + "/entries";
-  var entryPath = (pid, slug) => entriesPath(pid) + "/" + slug;
-  var sessionsPath = (pid) => profilePath(pid) + "/sessions";
-  var sessionPath = (pid, id) => sessionsPath(pid) + "/" + id;
-  var plannerPath = (pid) => profilePath(pid) + "/planner";
-  var plStatePath = (pid) => plannerPath(pid) + "/state";
-  var marksPath = (pid) => profilePath(pid) + "/marks";
-  var occupancyPath = (pid) => profilePath(pid) + "/occupancy";
-  var creaturePath = (slug) => CREATURES + "/" + slug;
-  var spotsPath = (pid) => profilePath(pid) + "/spots";
-  var spotPath = (pid, id) => spotsPath(pid) + "/" + id;
-  var HUNTS = "hunts";
-  var SPOTS = "spots";
-  var huntPath = (id) => HUNTS + "/" + id;
-  var sharedSpotPath = (id) => SPOTS + "/" + id;
-  var META = "meta";
-  var HUNTS_META_ID = "hunts";
-  var huntsMetaPath = META + "/" + HUNTS_META_ID;
-  var validCharacterId = (id) => /^[A-Za-z0-9_.~:@+-]+$/.test(id);
-  var validHuntId = validCharacterId;
-  var validSpotId = (id) => /^[a-z0-9-]+$/.test(id);
-  function readSources(p) {
-    const s = p && p.sources;
-    if (s && typeof s === "object") return { reference: s.reference !== false, otherVocation: s.otherVocation !== false, older: s.older !== false };
-    return { reference: !(p && p.refOff), otherVocation: !(p && p.refOtherOff), older: true };
-  }
-  var SOURCE_PRESETS = {
-    mine: { reference: false, otherVocation: false, older: false },
-    reference: { reference: true, otherVocation: false, older: true },
-    everything: { reference: true, otherVocation: true, older: true }
-  };
-  function sourcesPreset(s) {
-    const hit = Object.keys(SOURCE_PRESETS).find((k) => ["reference", "otherVocation", "older"].every((f) => SOURCE_PRESETS[k][f] === s[f]));
-    return hit || "custom";
-  }
-  var sourcesPatch = (s) => ({ sources: { reference: !!s.reference, otherVocation: !!s.otherVocation, older: !!s.older }, refOff: !s.reference, refOtherOff: !s.otherVocation });
-  var LEVEL_WINDOWS = [0, 10, 20, 35];
-  var DEFAULT_LEVEL_WINDOW = 20;
-  var readHuntSources = (p) => ({
-    otherVocation: !!(p && p.otherVocationHunts === true),
-    window: p && LEVEL_WINDOWS.indexOf(p.levelWindow) !== -1 ? p.levelWindow : DEFAULT_LEVEL_WINDOW
-  });
-  var GOAL_FIELDS = ["xp", "profit", "charm", "bounty"];
-  function readGoal(p) {
-    const out = {}, g = p && p.goal, old = p && p.weights;
-    if (g && typeof g === "object") GOAL_FIELDS.forEach((k) => {
-      const v = Math.round(Number(g[k]));
-      out[k] = isFinite(v) && v > 0 ? Math.min(5, v) : 0;
-    });
-    else if (old && typeof old === "object") GOAL_FIELDS.forEach((k) => {
-      const v = Number(old[k]);
-      out[k] = isFinite(v) && v > 0 ? Math.max(1, Math.round(Math.min(10, v) / 2)) : 0;
-    });
-    else return { xp: 5, profit: 0, charm: 0, bounty: 0 };
-    return out;
-  }
-  function goalPatch(w2) {
-    const goal = {}, weights = {};
-    GOAL_FIELDS.forEach((k) => {
-      goal[k] = w2[k] || 0;
-      weights[k] = (w2[k] || 0) * 2;
-    });
-    return { goal, weights };
-  }
-  var TAKEN_MINUTES = [30, 45, 60, 120];
-  var DEFAULT_TAKEN_MINUTES = 45;
-  function readSettings(p, plState) {
-    const s = p && p.settings && typeof p.settings === "object" ? p.settings : {};
-    const w2 = typeof s.world === "string" && s.world.trim() ? s.world.trim().slice(0, 30) : plState && plState.world || null;
-    return { world: w2, takenMinutes: TAKEN_MINUTES.indexOf(s.takenMinutes) !== -1 ? s.takenMinutes : DEFAULT_TAKEN_MINUTES };
-  }
-  var THEMES = ["system", "dark", "light"];
-  var readTheme = (v) => THEMES.indexOf(v) !== -1 ? v : "system";
-  var RATINGS = ["S", "A", "B", "C", "D", "X"];
-  var NUM_FIELDS2 = ["kph", "xph", "pph"];
-  function readRecord(v) {
-    const r = {};
-    if (!v) return r;
-    if (RATINGS.indexOf(v.rating) !== -1) r.rating = v.rating;
-    NUM_FIELDS2.forEach((k) => {
-      if (typeof v[k] === "number" && isFinite(v[k])) r[k] = v[k];
-    });
-    if (typeof v.notes === "string" && v.notes) r.notes = v.notes.slice(0, 2e3);
-    if (v.bestiaryDone === true) r.bestiaryDone = true;
-    if (v.wardenDone === true) r.wardenDone = true;
-    if (typeof v.updatedAt === "string") r.updatedAt = v.updatedAt;
-    if (typeof v.numsAt === "string") r.numsAt = v.numsAt;
-    if (typeof v.pinSpot === "string" && v.pinSpot) r.pinSpot = v.pinSpot;
-    return r;
-  }
-  function readRecords(docs) {
-    const out = {};
-    docs.forEach((d) => {
-      const r = readRecord(d.data());
-      if (Object.keys(r).length) out[d.id] = r;
-    });
-    return out;
-  }
-  function readUserSpot(v) {
-    if (!v || typeof v.name !== "string" || !v.name.trim()) return null;
-    return {
-      name: v.name.trim().slice(0, 60),
-      parentId: typeof v.parentId === "string" && v.parentId ? v.parentId : null,
-      note: typeof v.note === "string" && v.note.trim() ? v.note.trim().slice(0, 200) : null,
-      createdAt: typeof v.createdAt === "string" ? v.createdAt : null
-    };
-  }
-  function readUserSpots(docs) {
-    const out = {};
-    docs.forEach((d) => {
-      if (validSpotId(d.id)) {
-        const s = readUserSpot(d.data());
-        if (s) out[d.id] = s;
-      }
-    });
-    return out;
-  }
-  var readSession = (id, v) => v && v.hours > 0 && Array.isArray(v.kills) ? Object.assign({ id }, v) : null;
-  function readHunt(id, v) {
-    const x = readSession(id, v);
-    if (!x) return null;
-    const lvl = Math.floor(Number(x.level)), by = v.by && typeof v.by === "object" ? v.by : {};
-    x.vocation = VOCATIONS.indexOf(x.vocation) !== -1 ? x.vocation : null;
-    x.level = lvl > 0 && lvl < 1e4 ? lvl : null;
-    x.by = { pid: typeof by.pid === "string" && by.pid ? by.pid : null, name: typeof by.name === "string" && by.name.trim() ? by.name.trim().slice(0, 40) : null };
-    return x;
-  }
-  function readHunts(docs) {
-    const out = [];
-    docs.forEach((d) => {
-      const x = readHunt(d.id, d.data());
-      if (x) out.push(x);
-    });
-    return out;
-  }
-  function readHuntsMeta(v) {
-    const map = (o) => {
-      const out = {};
-      Object.keys(o && typeof o === "object" ? o : {}).forEach((k) => {
-        const x = o[k];
-        if (x === null || typeof x === "string") out[k] = x;
-      });
-      return out;
-    };
-    return { version: Number(v && v.version) || 0, at: v && typeof v.at === "string" ? v.at : null, sessions: map(v && v.sessions), spots: map(v && v.spots) };
-  }
-  var readCreatureDoc = (v) => v && v.minLevel && typeof v.minLevel === "object" ? { name: v.name, minLevel: v.minLevel } : null;
-  function readCreatureDocs(docs) {
-    const out = {};
-    docs.forEach((d) => {
-      const c = readCreatureDoc(d.data());
-      if (c) out[d.id] = c;
-    });
-    return out;
-  }
-  function plDefaults() {
-    return { fixedHours: null, diff: "master", held: null, today: { boosted: null, boostedDay: null, prey: [], event: 0 }, lens: {}, active: null, travel: {}, world: null };
-  }
-  function plNum(v, lo, hi) {
-    const n = Number(v);
-    return v != null && v !== "" && isFinite(n) && n >= lo && n <= hi ? n : null;
-  }
-  function readPlState(v, known) {
-    const s = plDefaults();
-    if (!v || typeof v !== "object") return s;
-    const h2 = plNum(v.fixedHours, 0.25, 12), x = v.held, a = v.active;
-    if (h2) s.fixedHours = h2;
-    if (TASK[v.diff]) s.diff = v.diff;
-    if (x && typeof x === "object" && known(x.slug)) {
-      s.held = {
-        slug: x.slug,
-        kills: plNum(x.kills, 1, 1e5),
-        done: plNum(x.done, 0, 1e5) || 0,
-        kind: has(KIND_MULT, x.kind) ? x.kind : "normal",
-        exp: plNum(x.exp, 1, 1e13),
-        i: plNum(x.i, 0, 2) != null ? Math.floor(x.i) : -1,
-        since: typeof x.since === "string" ? x.since : null
-      };
-    }
-    const t2 = v.today && typeof v.today === "object" ? v.today : {};
-    s.today = {
-      boosted: known(t2.boosted) ? t2.boosted : null,
-      boostedDay: typeof t2.boostedDay === "string" ? t2.boostedDay : null,
-      // A slot with no creature yet (slug null) is kept: "Add a prey" saves one before the name is typed.
-      prey: (Array.isArray(t2.prey) ? t2.prey : []).slice(0, PREY_SLOTS).filter((q) => q && (q.slug == null || known(q.slug)) && has(PREY, q.kind)).map((q) => {
-        const r = PREY[q.kind];
-        return { slug: q.slug == null ? null : q.slug, kind: q.kind, pct: plNum(q.pct, r.lo, r.hi) || r.lo };
-      }),
-      event: plNum(t2.event, 0, 100) || 0
-    };
-    if (typeof v.world === "string" && v.world.trim()) s.world = v.world.trim().slice(0, 30);
-    if (v.travel && typeof v.travel === "object") Object.keys(v.travel).forEach((k) => {
-      const m = plNum(v.travel[k], 1, 600);
-      if (validSpotId(k) && m) s.travel[k] = m;
-    });
-    if (v.lens && typeof v.lens === "object") s.lens = v.lens;
-    if (v.bounty && typeof v.bounty === "object") s.bounty = v.bounty;
-    if (v.hunting === null || v.hunting && typeof v.hunting === "object") s.hunting = v.hunting;
-    if (a && typeof a === "object" && typeof a.spot === "string" && typeof a.at === "string") {
-      s.active = { spot: a.spot, name: String(a.name || a.spot).slice(0, 60), at: a.at, slug: known(a.slug) ? a.slug : null };
-    }
-    return s;
-  }
-  var WEEKLY_SLOTS = [6, 9];
-  function readWeeklyTasks(v, known) {
-    const w2 = v && typeof v === "object" ? v : {}, slots = w2.slots === 9 ? 9 : 6;
-    const tasks = (Array.isArray(w2.tasks) ? w2.tasks : []).slice(0, slots).map((t2) => {
-      t2 = t2 && typeof t2 === "object" ? t2 : {};
-      const slug = t2.slug && known(t2.slug) ? t2.slug : null;
-      return { slug, name: slug ? null : (typeof t2.name === "string" ? t2.name.trim().slice(0, 60) : "") || null, killsLeft: plNum(t2.killsLeft, 0, 1e5), done: t2.done === true };
-    });
-    return {
-      weekStart: typeof w2.weekStart === "string" ? w2.weekStart : null,
-      difficulty: TASK[w2.difficulty] ? w2.difficulty : "master",
-      slots,
-      exp: plNum(w2.exp, 1, 1e12),
-      tasks,
-      any: readAnyTask(w2.any)
-    };
-  }
-  function readAnyTask(v) {
-    v = v && typeof v === "object" ? v : {};
-    return { killsLeft: plNum(v.killsLeft, 0, 1e5), done: v.done === true };
-  }
-  function weeklyTasksFromOld(old, rows) {
-    const w2 = old && typeof old === "object" ? old : {}, n = Array.isArray(w2.tasks) ? w2.tasks.filter((t2) => t2 && (t2.name || t2.kills)).length : 0;
-    const tasks = rows.filter((r) => r.name).map((r) => ({ slug: r.creature ? r.creature.slug : null, name: r.creature ? null : r.name, killsLeft: r.K ? r.rem : null, done: !!(r.K && r.rem === 0) }));
-    return { weekStart: typeof w2.week === "string" ? w2.week : null, difficulty: TASK[w2.diff] ? w2.diff : "master", slots: n > 6 ? 9 : 6, exp: plNum(w2.exp, 1, 1e12), tasks, any: readAnyTask(null) };
-  }
-  function readHunting(st) {
-    const h2 = st && st.hunting;
-    if (h2 === null) return null;
-    if (h2 && typeof h2.spotId === "string" && typeof h2.at === "string") return { spotId: h2.spotId, at: h2.at };
-    const a = st && st.active;
-    return a && typeof a.spot === "string" && typeof a.at === "string" ? { spotId: a.spot, at: a.at } : null;
-  }
-  var OFFER_KINDS = ["normal", "silver", "gold"];
-  var blankOffer = () => ({ slug: null, kills: null, kind: "normal", exp: null });
-  function readOffer(o, ctx) {
-    if (!o || typeof o !== "object") return blankOffer();
-    const slug = o.slug && ctx.known(o.slug) ? o.slug : o.name ? ctx.slugOf(o.name) : null;
-    return { slug: slug || null, kills: plNum(o.kills, 1, 1e5), kind: OFFER_KINDS.indexOf(o.kind) !== -1 ? o.kind : "normal", exp: plNum(o.exp, 1, 1e13) };
-  }
-  function readActive(a, ctx) {
-    if (!a || typeof a !== "object" || !ctx.known(a.slug)) return null;
-    const kills = plNum(a.kills, 1, 1e5), left = plNum(a.killsLeft, 0, 1e5);
-    return {
-      slug: a.slug,
-      kills,
-      killsLeft: left != null ? kills ? Math.min(left, kills) : left : kills,
-      kind: OFFER_KINDS.indexOf(a.kind) !== -1 ? a.kind : "normal",
-      exp: plNum(a.exp, 1, 1e13),
-      since: typeof a.since === "string" ? a.since : null
-    };
-  }
-  function readBounty(plState, profile, ctx) {
-    const st = plState && typeof plState === "object" ? plState : {}, b = st.bounty;
-    const offers = (list) => [0, 1, 2].map((i) => readOffer((list || [])[i], ctx));
-    if (b && typeof b === "object") {
-      const active2 = readActive(b.active, ctx);
-      return {
-        difficulty: TASK[b.difficulty] ? b.difficulty : "master",
-        tokens: b.tokens == null ? null : Math.max(0, Math.min(10, Math.floor(Number(b.tokens)) || 0)),
-        mode: b.mode === "active" && active2 ? "active" : "offers",
-        offers: offers(Array.isArray(b.offers) ? b.offers : []),
-        active: active2,
-        zeroChecked: typeof b.zeroChecked === "string" ? b.zeroChecked : null
-      };
-    }
-    const p = profile || {}, reroll = p.reroll || {}, board = p.board || {}, h2 = st.held;
-    const left = reroll.left == null ? null : Math.max(0, Math.min(10, parseInt(reroll.left, 10) || 0));
-    let active = null;
-    if (h2 && typeof h2 === "object" && ctx.known(h2.slug)) {
-      const kills = plNum(h2.kills, 1, 1e5), done = plNum(h2.done, 0, 1e5) || 0;
-      active = {
-        slug: h2.slug,
-        kills,
-        killsLeft: kills != null ? Math.max(0, kills - done) : null,
-        kind: OFFER_KINDS.indexOf(h2.kind) !== -1 ? h2.kind : "normal",
-        exp: plNum(h2.exp, 1, 1e13),
-        since: typeof h2.since === "string" ? h2.since : null
-      };
-    }
-    return {
-      difficulty: TASK[st.diff] ? st.diff : "master",
-      tokens: left,
-      mode: active ? "active" : "offers",
-      offers: offers(Array.isArray(board.offers) ? board.offers : []),
-      active,
-      zeroChecked: null
-    };
-  }
-  function readOfferOdds(v) {
-    if (!v || typeof v !== "object" || v.silver == null || v.gold == null) return null;
-    const s = Number(v.silver), g = Number(v.gold);
-    return s >= 0 && g >= 0 && s + g <= 100 ? { silver: s, gold: g } : null;
-  }
-  function readOfferLog(v) {
-    const out = {};
-    if (!v || typeof v !== "object") return out;
-    Object.keys(TASK).forEach((d) => {
-      if (!Array.isArray(v[d])) return;
-      const list = v[d].filter((o) => o && typeof o === "object" && OFFER_KINDS.indexOf(o.kind) !== -1);
-      if (list.length) out[d] = list;
-    });
-    return out;
-  }
-  function readMark(v) {
-    return v && (v.state === "taken" || v.state === "free") && typeof v.at === "string" ? { state: v.state, at: v.at, world: typeof v.world === "string" ? v.world : null } : null;
-  }
-  function readMarks(docs) {
-    const out = {};
-    docs.forEach((d) => {
-      const m = readMark(d.data());
-      if (m) out[d.id] = m;
-    });
-    return out;
-  }
-  function readOcc(v) {
-    const out = { counts: {} };
-    Object.keys(v && v.counts && typeof v.counts === "object" ? v.counts : {}).forEach((k) => {
-      const c = v.counts[k];
-      if (/^[^|]*\|([0-9]|1[0-9]|2[0-3])$/.test(k) && Array.isArray(c)) out.counts[k] = [Math.max(0, Number(c[0]) || 0), Math.max(0, Number(c[1]) || 0)];
-    });
-    return out;
-  }
-  function readOccs(docs) {
-    const out = {};
-    docs.forEach((d) => {
-      out[d.id] = readOcc(d.data());
-    });
-    return out;
-  }
-
-  // src/store/backup.js
-  var BACKUP_APP = "bounty-task-tier-list";
-  var BACKUP_VERSION = 3;
-  var READ_LIMIT = 1e3;
-  function plannerRestoreWrites(id, pl) {
-    const out = [];
-    if (!pl || typeof pl !== "object") return out;
-    if (pl.state && typeof pl.state === "object") out.push([plStatePath(id), pl.state]);
-    Object.keys(pl.marks && typeof pl.marks === "object" ? pl.marks : {}).forEach((k) => {
-      if (validSpotId(k) && readMark(pl.marks[k])) out.push([marksPath(id) + "/" + k, pl.marks[k]]);
-    });
-    Object.keys(pl.occupancy && typeof pl.occupancy === "object" ? pl.occupancy : {}).forEach((k) => {
-      if (validSpotId(k)) out.push([occupancyPath(id) + "/" + k, readOcc(pl.occupancy[k])]);
-    });
-    return out;
-  }
-  var obj = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
-  function backupWrites(bk) {
-    if (!bk || bk.app !== BACKUP_APP || !bk.characters) throw new Error("bad");
-    const writes = [];
-    Object.keys(bk.characters).forEach((id) => {
-      const c = bk.characters[id] || {};
-      if (!validCharacterId(id) || !c.profile) return;
-      writes.push([profilePath(id), c.profile]);
-      Object.keys(c.entries || {}).forEach((e) => {
-        writes.push([entryPath(id, e), c.entries[e]]);
-      });
-      Object.keys(c.sessions || {}).forEach((x) => {
-        writes.push([sessionPath(id, x), c.sessions[x]]);
-      });
-      plannerRestoreWrites(id, c.planner).forEach((w2) => {
-        writes.push(w2);
-      });
-      Object.keys(obj(c.spots)).forEach((k) => {
-        if (validSpotId(k) && readUserSpot(c.spots[k])) writes.push([spotPath(id, k), c.spots[k]]);
-      });
-    });
-    Object.keys(bk.creatures || {}).forEach((k) => {
-      writes.push([creaturePath(k), bk.creatures[k]]);
-    });
-    Object.keys(obj(bk.spots)).forEach((k) => {
-      if (validSpotId(k) && readUserSpot(bk.spots[k])) writes.push([sharedSpotPath(k), bk.spots[k]]);
-    });
-    if (!writes.length && !Object.keys(obj(bk.hunts)).length) throw new Error("empty");
-    return writes;
-  }
-  function backupHuntsMeta(bk) {
-    if (!bk || !(bk.version >= 3)) return null;
-    if (bk.huntsMeta && typeof bk.huntsMeta === "object") return bk.huntsMeta;
-    const sessions = {}, spots = {};
-    Object.keys(obj(bk.characters)).forEach((pid) => {
-      const c = obj(bk.characters[pid]);
-      Object.keys(obj(c.sessions)).forEach((id) => {
-        sessions[pid + ":" + id] = null;
-      });
-      Object.keys(obj(c.spots)).forEach((id) => {
-        spots[pid + ":" + id] = null;
-      });
-    });
-    return { version: 1, sessions, spots };
-  }
-  function plannerBackup(repo, id) {
-    return Promise.all([repo.get(plannerPath(id), 10), repo.get(marksPath(id), READ_LIMIT), repo.get(occupancyPath(id), READ_LIMIT)]).then((res) => {
-      const st = res[0].filter((d) => d.id === "state")[0], marks = {}, occ = {};
-      res[1].forEach((d) => {
-        marks[d.id] = d.data();
-      });
-      res[2].forEach((d) => {
-        occ[d.id] = d.data();
-      });
-      return st || Object.keys(marks).length || Object.keys(occ).length ? { state: st ? st.data() : null, marks, occupancy: occ } : null;
-    });
-  }
-  var byId = (docs) => {
-    const out = {};
-    docs.forEach((d) => {
-      out[d.id] = d.data();
-    });
-    return out;
-  };
-  function buildBackup(repo, { ids, profiles, creatures, exportedAt }) {
-    const out = { app: BACKUP_APP, version: BACKUP_VERSION, exportedAt, creatures, characters: {}, hunts: {}, spots: {} };
-    const shared = Promise.all([repo.get(HUNTS, READ_LIMIT), repo.get(SPOTS, READ_LIMIT), repo.get(META, 10)]).then((res) => {
-      out.hunts = byId(res[0]);
-      out.spots = byId(res[1]);
-      const m = res[2].filter((d) => d.id === HUNTS_META_ID)[0];
-      if (m) out.huntsMeta = m.data();
-    });
-    return Promise.all([shared].concat(ids.map((id) => Promise.all([repo.get(entriesPath(id), READ_LIMIT), repo.get(sessionsPath(id), READ_LIMIT), plannerBackup(repo, id), repo.get(spotsPath(id), READ_LIMIT)]).then((res) => {
-      const spots = byId(res[3]);
-      out.characters[id] = { profile: profiles[id], entries: byId(res[0]), sessions: byId(res[1]) };
-      if (res[2]) out.characters[id].planner = res[2];
-      if (Object.keys(spots).length) out.characters[id].spots = spots;
-    })))).then(() => out);
-  }
-  function restoreWrites(repo, writes, onWrite) {
-    return writes.reduce((p, w2) => p.then(() => repo.setDirect(w2[0], w2[1]).then(() => {
-      if (onWrite) onWrite();
-    })), Promise.resolve());
-  }
-
-  // src/store/migrate.js
-  var HUNTS_MIGRATION = 1;
-  function huntKey(x) {
-    if (!x || !x.start || !x.end) return null;
-    const xp = x.rawXp != null ? x.rawXp : x.xp;
-    return String(x.start) + "|" + String(x.end) + "|" + (xp != null ? String(xp) : "");
-  }
-  function sameHunt(a, b) {
-    const ka = huntKey(a), kb = huntKey(b);
-    if (ka || kb) return ka === kb;
-    const core = (x) => JSON.stringify([x.hours, x.rawXp, x.xp, x.kills]);
-    return core(a) === core(b);
-  }
-  var spotName = (s) => String(s && s.name || "").trim().toLowerCase();
-  var pidSlug = (pid) => String(pid).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "c";
-  function freeId(taken, id, prefix, same) {
-    let n = 0, cand = id;
-    while (taken[cand] && !same(taken[cand])) {
-      n++;
-      cand = prefix + "-" + id + (n > 1 ? "-" + n : "");
-    }
-    return cand;
-  }
-  function migrateHunts({ profiles, sessions, spots, hunts, sharedSpots, meta, at }) {
-    const m = readHuntsMeta(meta), done = Object.assign({}, m.sessions), doneSpots = Object.assign({}, m.spots);
-    const allHunts = Object.assign({}, hunts || {}), allSpots = Object.assign({}, sharedSpots || {});
-    const before = /* @__PURE__ */ new Map(), outHunts = {}, outSpots = {};
-    Object.keys(allHunts).sort().forEach((id) => {
-      const k = huntKey(allHunts[id]);
-      if (k && !before.has(k)) before.set(k, id);
-    });
-    Object.keys(profiles || {}).sort().forEach((pid) => {
-      const p = profiles[pid] || {}, mySpots = (spots || {})[pid] || {}, mine = (sessions || {})[pid] || {}, idMap = {}, fresh = [];
-      Object.keys(mySpots).sort().forEach((id) => {
-        const key = pid + ":" + id, s = readUserSpot(mySpots[id]);
-        if (key in doneSpots) {
-          idMap[id] = doneSpots[key];
-          return;
-        }
-        if (!validSpotId(id) || !s) return;
-        const nid = freeId(allSpots, id, pidSlug(pid), (x) => spotName(x) === spotName(s));
-        idMap[id] = doneSpots[key] = nid;
-        if (!allSpots[nid]) fresh.push([nid, Object.assign({}, mySpots[id])]);
-      });
-      fresh.forEach(([nid, doc]) => {
-        if (doc.parentId && idMap[doc.parentId]) doc.parentId = idMap[doc.parentId];
-        allSpots[nid] = outSpots[nid] = doc;
-      });
-      const vocation = [p.untaggedVocation, p.vocation].filter((v) => VOCATIONS.indexOf(v) !== -1)[0] || VOCATIONS[0];
-      const level = Number(p.level) > 0 ? Math.floor(Number(p.level)) : null, name = typeof p.name === "string" && p.name.trim() ? p.name.trim().slice(0, 40) : null;
-      Object.keys(mine).sort().forEach((id) => {
-        const key = pid + ":" + id;
-        if (key in done) return;
-        if (!validHuntId(id) || !readSession(id, mine[id])) {
-          done[key] = null;
-          return;
-        }
-        const x = mine[id], body = Object.assign({}, x, {
-          vocation: VOCATIONS.indexOf(x.vocation) !== -1 ? x.vocation : vocation,
-          level: Number(x.level) > 0 ? x.level : level,
-          by: { pid, name }
-        });
-        delete body.id;
-        if (body.spotId && idMap[body.spotId]) body.spotId = idMap[body.spotId];
-        const k = huntKey(body);
-        if (k && before.has(k)) {
-          done[key] = before.get(k);
-          return;
-        }
-        const nid = freeId(allHunts, id, pid, (y) => sameHunt(y, body));
-        done[key] = nid;
-        if (!allHunts[nid]) allHunts[nid] = outHunts[nid] = body;
-      });
-    });
-    const changed = m.version < HUNTS_MIGRATION || Object.keys(done).length !== Object.keys(m.sessions).length || Object.keys(doneSpots).length !== Object.keys(m.spots).length;
-    return { hunts: outHunts, spots: outSpots, meta: { version: Math.max(m.version, HUNTS_MIGRATION), at: changed ? at : m.at || at, sessions: done, spots: doneSpots }, changed };
-  }
-  function mergeHunts(stored, incoming) {
-    const keys = /* @__PURE__ */ new Set(), out = {};
-    Object.keys(stored || {}).forEach((id) => {
-      const k = huntKey(stored[id]);
-      if (k) keys.add(k);
-    });
-    Object.keys(incoming && typeof incoming === "object" ? incoming : {}).sort().forEach((id) => {
-      const x = incoming[id];
-      if (!validHuntId(id) || !readSession(id, x)) return;
-      const k = huntKey(x);
-      if (!(stored || {})[id] && k && keys.has(k)) return;
-      if (k) keys.add(k);
-      const body = Object.assign({}, x);
-      delete body.id;
-      out[id] = body;
-    });
-    return out;
-  }
-  function mergeHuntsMeta(stored, incoming, at) {
-    const a = readHuntsMeta(stored), b = readHuntsMeta(incoming);
-    return { version: Math.max(a.version, b.version), at: a.at || b.at || at, sessions: Object.assign({}, b.sessions, a.sessions), spots: Object.assign({}, b.spots, a.spots) };
-  }
-
-  // src/app/actions.js
-  function makeActions(repo) {
-    const clear = (col) => repo.get(col, 1e3).then((docs) => {
-      docs.forEach((d) => {
-        repo.remove(col + "/" + d.id);
-      });
-    }, () => {
-    });
-    const forgetPlanner = (pid) => {
-      repo.remove(plStatePath(pid));
-      clear(marksPath(pid));
-      clear(occupancyPath(pid));
-    };
-    const byId2 = (docs) => {
-      const out = {};
-      docs.forEach((d) => {
-        out[d.id] = d.data();
-      });
-      return out;
-    };
-    const huntsMeta = () => repo.get(META, 10).then((docs) => {
-      const d = docs.filter((x) => x.id === HUNTS_META_ID)[0];
-      return d ? d.data() : null;
-    });
-    function migrate(at) {
-      return repo.get(PROFILES, 100).then((pdocs) => {
-        const profiles = byId2(pdocs), pids = Object.keys(profiles);
-        return Promise.all([repo.get(HUNTS, READ_LIMIT), repo.get(SPOTS, READ_LIMIT), huntsMeta()].concat(pids.map((pid) => Promise.all([repo.get(sessionsPath(pid), READ_LIMIT), repo.get(spotsPath(pid), READ_LIMIT)])))).then((res) => {
-          const sessions = {}, spots = {};
-          pids.forEach((pid, i) => {
-            sessions[pid] = byId2(res[3 + i][0]);
-            spots[pid] = byId2(res[3 + i][1]);
-          });
-          const m = migrateHunts({ profiles, sessions, spots, hunts: byId2(res[0]), sharedSpots: byId2(res[1]), meta: res[2], at });
-          if (!m.changed) return { hunts: {}, spots: {}, written: Promise.resolve(true) };
-          let ok = true;
-          const fail = () => {
-            ok = false;
-          };
-          const writes = Object.keys(m.spots).map((id) => repo.set(sharedSpotPath(id), m.spots[id], fail)).concat(Object.keys(m.hunts).map((id) => repo.set(huntPath(id), m.hunts[id], fail)));
-          const written = Promise.all(writes).then(() => ok ? repo.set(huntsMetaPath, m.meta, fail) : null).then(() => ok);
-          return { hunts: m.hunts, spots: m.spots, written };
-        });
-      });
-    }
-    return {
-      // Characters. createProfile returns the new character's id at once; onSaved runs once it's written.
-      createProfile(body, onSaved, onFail) {
-        const id = repo.newId(PROFILES);
-        repo.write(profilePath(id), (ref) => ref.set(body).then(onSaved), onFail);
-        return id;
-      },
-      updateProfile(pid, patch, onSaved, onFail) {
-        return repo.write(profilePath(pid), (ref) => ref.update(patch).then(onSaved), onFail);
-      },
-      // A character and what's only its own: entries (their slugs), planner documents, profile. The shared hunts and
-      // spots stay, and so do its old hunt and spot documents (already copied into them; Compatibility rule).
-      deleteCharacter(pid, entrySlugs) {
-        entrySlugs.forEach((s) => {
-          repo.remove(entryPath(pid, s));
-        });
-        forgetPlanner(pid);
-        repo.remove(profilePath(pid));
-      },
-      forgetPlanner,
-      // A creature's entry; null deletes it.
-      setEntry(pid, slug, body, onFail) {
-        return body ? repo.set(entryPath(pid, slug), body, onFail) : repo.remove(entryPath(pid, slug), onFail);
-      },
-      // Shared creature settings ({name, minLevel}); null deletes them.
-      setCreatureSettings(slug, body, onFail) {
-        return body ? repo.set(creaturePath(slug), body, onFail) : repo.remove(creaturePath(slug), onFail);
-      },
-      // Shared hunts. The id for a new one comes first, so the screen can show it before it's written; the stored
-      // document never carries its own id.
-      newHuntId() {
-        return repo.newId(HUNTS);
-      },
-      saveHunt(id, body, onFail) {
-        const b = Object.assign({}, body);
-        delete b.id;
-        return repo.set(huntPath(id), b, onFail);
-      },
-      deleteHunt(id, onFail) {
-        return repo.remove(huntPath(id), onFail);
-      },
-      // Shared spots.
-      saveSpot(id, body, onFail) {
-        return repo.set(sharedSpotPath(id), body, onFail);
-      },
-      deleteSpot(id, onFail) {
-        return repo.remove(sharedSpotPath(id), onFail);
-      },
-      // Planner documents.
-      savePlannerState(pid, body, onFail) {
-        return repo.set(plStatePath(pid), body, onFail);
-      },
-      setMark(pid, spotId, mark, occ) {
-        repo.set(marksPath(pid) + "/" + spotId, mark);
-        if (occ) repo.set(occupancyPath(pid) + "/" + spotId, occ);
-      },
-      migrate,
-      // Backups: the file's contents for these characters, and restoring one (throws Error("bad") or Error("empty") for a
-      // file it can't use; otherwise resolves when every document is written). Its hunts join the stored ones
-      // (mergeHunts); then the migration copies any old hunts it brought (version 1 and 2 files).
-      exportBackup(args) {
-        return buildBackup(repo, args);
-      },
-      restoreBackup(bk, at, onWrite) {
-        const writes = backupWrites(bk), meta = backupHuntsMeta(bk);
-        return Promise.all([repo.get(HUNTS, READ_LIMIT), meta ? huntsMeta() : null]).then((res) => {
-          const hunts = mergeHunts(byId2(res[0]), bk.hunts);
-          const all = writes.concat(Object.keys(hunts).map((id) => [huntPath(id), hunts[id]]));
-          if (meta) all.push([huntsMetaPath, mergeHuntsMeta(res[1], meta, at)]);
-          return restoreWrites(repo, all, onWrite);
-        }).then(() => migrate(at)).then((m) => m.written);
-      }
-    };
-  }
-
-  // src/app/state.js
-  function mergeProfiles(docs, { pending, pendingNew, current }) {
-    const next = {}, order = [];
-    docs.forEach((d) => {
-      const v = d.data();
-      if (v) {
-        next[d.id] = Object.assign({}, v, pending[d.id] || {});
-        order.push(d.id);
-      }
-    });
-    Object.keys(current).forEach((id) => {
-      if (!next[id] && pendingNew[id]) {
-        next[id] = current[id];
-        order.push(id);
-      }
-    });
-    order.sort((a, b) => String(next[a].createdAt || "").localeCompare(String(next[b].createdAt || "")));
-    return { profiles: next, order };
-  }
-  function makeWatchers(repo, { known }) {
-    return {
-      // Every character's profile document, raw (merge with mergeProfiles).
-      profiles: (fn, onError) => repo.watch(PROFILES, 100, fn, onError),
-      // Shared creature settings: slug → {name, minLevel}.
-      creatures: (fn, onError) => repo.watch(CREATURES, 1e3, (docs) => fn(readCreatureDocs(docs)), onError),
-      // Every logged hunt (with ids) and the spots made for them, shared by all characters.
-      hunts: (fn, onError) => repo.watch(HUNTS, READ_LIMIT, (docs) => fn(readHunts(docs)), onError),
-      spots: (fn, onError) => repo.watch(SPOTS, READ_LIMIT, (docs) => fn(readUserSpots(docs)), onError),
-      // A character's entries (slug → record).
-      entries: (pid, fn, onError) => repo.watch(entriesPath(pid), 1e3, (docs) => fn(readRecords(docs)), onError),
-      // A character's planner state, Taken/Free marks and occupancy counts.
-      plannerState: (pid, fn, onError) => repo.watch(plannerPath(pid), 10, (docs) => {
-        const d = docs.filter((x) => x.id === "state")[0];
-        fn(readPlState(d && d.data(), known));
-      }, onError),
-      marks: (pid, fn, onError) => repo.watch(marksPath(pid), 1e3, (docs) => fn(readMarks(docs)), onError),
-      occupancy: (pid, fn, onError) => repo.watch(occupancyPath(pid), 1e3, (docs) => fn(readOccs(docs)), onError)
-    };
-  }
-
-  // src/core/rates.js
-  var sessHours = (x) => x && x.hours > 0 ? x.hours : 0;
-  var sessionSpot = (x) => (x.spot || "Unnamed spot").trim();
-  var xpField = (xpMode) => xpMode === "xp" ? "xp" : "rawXp";
-  function raidRate(sessions, catalog) {
-    let raids = 0, kills = 0, n = 0;
-    sessions.forEach((x) => {
-      if (!Array.isArray(x.kills)) return;
-      const hasBy = x.raidsBy && typeof x.raidsBy === "object", hasTotal = typeof x.raids === "number";
-      if (!hasBy && !hasTotal) return;
-      n++;
-      raids += hasBy ? Object.keys(x.raidsBy).reduce((a, k) => a + (Number(x.raidsBy[k]) || 0), 0) : x.raids;
-      x.kills.forEach((k) => {
-        const c = k.slug && catalog.bySlug[k.slug];
-        if (!(c && c.r)) kills += k.count || 0;
-      });
-    });
-    return { p: (raids + RAID.priorPerKill * RAID.priorKills) / (kills + RAID.priorKills), info: n ? { raids, kills, n } : null };
-  }
-  function spotRates(sessions, catalog, keyOf, mode) {
-    const acc = {}, out = {};
-    sessions.forEach((x) => {
-      const h2 = sessHours(x);
-      if (!h2 || !Array.isArray(x.kills)) return;
-      let tot = 0;
-      x.kills.forEach((k) => {
-        tot += k.count || 0;
-      });
-      if (!tot) return;
-      const s = keyOf(x), a = acc[s] || (acc[s] = { kills: {}, total: 0, xp: 0, bal: 0, loot: 0, lootTotal: 0, cTotal: 0, cHours: 0 });
-      a.total += tot;
-      a.xp += x[mode] != null ? x[mode] : x.rawXp || 0;
-      a.bal += x.balance || 0;
-      if (x.loot != null) {
-        a.loot += x.loot;
-        a.lootTotal += tot;
-      }
-      x.kills.forEach((k) => {
-        const key = catalog.killKey(k);
-        a.kills[key] = (a.kills[key] || 0) + (k.count || 0);
-      });
-      if (!x.breaks) {
-        a.cTotal += tot;
-        a.cHours += h2;
-      }
-    });
-    Object.keys(acc).forEach((s) => {
-      const a = acc[s];
-      if (!(a.cHours > 0)) return;
-      const spk = a.cTotal / a.cHours, kph = {};
-      Object.keys(a.kills).forEach((slug) => {
-        kph[slug] = a.kills[slug] / a.total * spk;
-      });
-      out[s] = {
-        kph,
-        xph: a.xp / a.total * spk,
-        pph: a.bal / a.total * spk,
-        lph: a.lootTotal ? a.loot / a.lootTotal * spk : null,
-        hours: a.cHours,
-        kills: a.cTotal
-      };
-    });
-    return out;
-  }
-  function deriveRates(sessions, { catalog, xpMode }) {
-    const mode = xpField(xpMode), acc = {};
-    const blank = () => ({ kills: 0, cKills: 0, total: 0, n: 0, xp: 0, bal: 0, cTotal: 0, cHours: 0, nClean: 0, last: null });
-    sessions.forEach((x) => {
-      const h2 = sessHours(x);
-      if (!h2 || !Array.isArray(x.kills)) return;
-      let total = 0;
-      x.kills.forEach((k) => {
-        total += k.count || 0;
-      });
-      if (!total) return;
-      const spot = sessionSpot(x), clean = !x.breaks;
-      x.kills.forEach((k) => {
-        if (!k.slug || !catalog.bySlug[k.slug]) return;
-        const c = acc[k.slug] || (acc[k.slug] = {});
-        const sp = c[spot] || (c[spot] = { all: blank(), task: blank() });
-        [sp.all].concat(x.task === k.slug ? [sp.task] : []).forEach((b) => {
-          b.kills += k.count || 0;
-          b.total += total;
-          b.n++;
-          if (clean) b.cKills += k.count || 0;
-          b.xp += x[mode] != null ? x[mode] : x.rawXp || 0;
-          b.bal += x.balance || 0;
-          if (clean) {
-            b.cTotal += total;
-            b.cHours += h2;
-            b.nClean++;
-            if (!b.last || x.end > b.last) b.last = x.end;
-          }
-        });
-      });
-    });
-    const result = {};
-    Object.keys(acc).forEach((slug) => {
-      const spots = [];
-      Object.keys(acc[slug]).forEach((name) => {
-        const sp = acc[slug][name], useTask = sp.task.cHours > 0, b = useTask ? sp.task : sp.all;
-        if (!(b.cHours > 0)) return;
-        const spotKph = b.cTotal / b.cHours, perKill = (v) => v / b.total * spotKph;
-        spots.push({
-          spot: name,
-          taskBonus: useTask,
-          n: b.n,
-          nBreak: b.n - b.nClean,
-          hours: b.cHours,
-          share: b.kills / b.total,
-          kph: Math.round(b.kills / b.total * spotKph),
-          xph: Math.round(perKill(b.xp)),
-          pph: Math.round(perKill(b.bal)),
-          last: b.last,
-          sample: b.cKills,
-          sampleHours: b.cHours
-        });
-      });
-      if (spots.length) result[slug] = spots;
-    });
-    return result;
-  }
-
   // src/data/i18n/es.js
   var es_default = {
     // app.js
@@ -4465,6 +3587,942 @@
   }
   var EN = makeT("en");
 
+  // src/core/slots.js
+  function slotOdds(pool, slots, isGood) {
+    const inPool = {};
+    pool.forEach((c) => {
+      inPool[c.slug] = 1;
+    });
+    const unw = slots.unwanted.filter((s) => inPool[s]), pref = slots.preferred.filter((s) => inPool[s]);
+    const PW = SLOTS.preferredWeight, OFFERS = SLOTS.offers;
+    const N = pool.length - unw.length, k = pref.length, W = N + (PW - 1) * k;
+    const out = { poolSize: pool.length, unwanted: unw.length, preferred: k, N, W };
+    if (k) {
+      out.pAny = 1 - Math.pow(1 - PW * k / W, OFFERS);
+      out.pEach = 1 - Math.pow(1 - PW / W, OFFERS);
+      out.pBase = 1 - Math.pow(1 - 1 / N, OFFERS);
+    }
+    const good = pool.filter((c) => unw.indexOf(c.slug) === -1 && isGood(c.slug));
+    if (good.length) {
+      const wg = good.reduce((a, c) => a + (pref.indexOf(c.slug) !== -1 ? PW : 1), 0);
+      out.good = good.length;
+      out.pGood = 1 - Math.pow(1 - wg / W, OFFERS);
+    }
+    return out;
+  }
+  function boardSlotTags(offers, pool, slots) {
+    const inPool = {};
+    pool.forEach((c) => {
+      inPool[c.slug] = 1;
+    });
+    const pref = slots.preferred.filter((s) => inPool[s]), unw = slots.unwanted.filter((s) => inPool[s]);
+    return offers.map((slug) => ({ pref: pref.indexOf(slug) !== -1, unw: unw.indexOf(slug) !== -1, nPool: pool.length, nPref: pref.length, nUnw: unw.length }));
+  }
+  function slotSuggestions(which, pool, taken, info, n, t2) {
+    t2 = t2 || EN;
+    const scored = pool.filter((it) => taken.indexOf(it.slug) === -1).map((it) => {
+      const x = info(it), sc = x.score;
+      let key, why;
+      if (which === "preferred") {
+        if (x.avoided || x.locked || !sc || sc.tier === "C" || sc.tier === "D") return null;
+        key = sc.rel;
+        why = t2("Score {tier}", { tier: sc.tier });
+      } else {
+        if (x.avoided) {
+          key = 3;
+          why = t2("Avoided");
+        } else if (x.locked) {
+          key = 2;
+          why = t2("Needs level {level}", { level: x.minLevel });
+        } else if (sc && sc.tier === "D") {
+          key = 1 + (1 - sc.rel) / 2;
+          why = t2("Score {tier}", { tier: "D" });
+        } else return null;
+      }
+      return { it, key, why };
+    }).filter(Boolean);
+    scored.sort((a, b) => b.key - a.key || a.it.name.localeCompare(b.it.name));
+    return scored.slice(0, n);
+  }
+
+  // src/store/repo.js
+  function makeRepo(db, opts) {
+    opts = opts || {};
+    const chain = {}, retryDelay = opts.retryDelay || (() => 400 + Math.random() * 800);
+    function write(path, op, onFail) {
+      const ref = db.doc(path), run = () => op(ref);
+      const attempt = () => run().catch((e) => {
+        if (e && e.code === "unavailable") return new Promise((res) => setTimeout(res, retryDelay())).then(run);
+        throw e;
+      });
+      chain[path] = (chain[path] || Promise.resolve()).then(attempt).catch((e) => {
+        const code = e && e.code;
+        if ((code === "invalid_argument" || code === "not_granted") && opts.onDenied) opts.onDenied(code);
+        if (onFail) onFail(code);
+      });
+      return chain[path];
+    }
+    return {
+      write,
+      set: (path, body, onFail) => write(path, (ref) => ref.set(body), onFail),
+      update: (path, patch, onFail) => write(path, (ref) => ref.update(patch), onFail),
+      remove: (path, onFail) => write(path, (ref) => ref.delete(), onFail),
+      // A fresh document id in a collection.
+      newId: (col) => db.collection(col).doc().id,
+      // Subscribes to a collection's documents (up to limit): onDocs([{id, data()}]); returns the unsubscribe function.
+      watch: (col, limit, onDocs, onError) => db.collection(col).limit(limit).onSnapshot((snap) => onDocs(snap.docs), onError || (() => {
+      })),
+      // The collection's documents once.
+      get: (col, limit) => db.collection(col).limit(limit).get().then((snap) => snap.docs),
+      // A write outside the queue that rejects on failure (restoring a backup, which reports its own progress).
+      setDirect: (path, body) => db.doc(path).set(body),
+      local: !!db.local
+    };
+  }
+
+  // src/store/prefs.js
+  var PREF = { profile: "btl.profile", advanced: "btl.adv", ui: "btl.ui", theme: "btl.theme", lang: "btl.lang" };
+  function makePrefs(storage) {
+    return {
+      get: (k) => {
+        try {
+          return storage ? storage.getItem(k) : null;
+        } catch (e) {
+          return null;
+        }
+      },
+      set: (k, v) => {
+        try {
+          if (storage) storage.setItem(k, v);
+        } catch (e) {
+        }
+      }
+    };
+  }
+
+  // src/store/schema.js
+  var has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+  var PROFILES = "profiles";
+  var CREATURES = "creatures";
+  var profilePath = (pid) => "profiles/" + pid;
+  var entriesPath = (pid) => profilePath(pid) + "/entries";
+  var entryPath = (pid, slug) => entriesPath(pid) + "/" + slug;
+  var sessionsPath = (pid) => profilePath(pid) + "/sessions";
+  var sessionPath = (pid, id) => sessionsPath(pid) + "/" + id;
+  var plannerPath = (pid) => profilePath(pid) + "/planner";
+  var plStatePath = (pid) => plannerPath(pid) + "/state";
+  var marksPath = (pid) => profilePath(pid) + "/marks";
+  var occupancyPath = (pid) => profilePath(pid) + "/occupancy";
+  var creaturePath = (slug) => CREATURES + "/" + slug;
+  var spotsPath = (pid) => profilePath(pid) + "/spots";
+  var spotPath = (pid, id) => spotsPath(pid) + "/" + id;
+  var HUNTS = "hunts";
+  var SPOTS = "spots";
+  var huntPath = (id) => HUNTS + "/" + id;
+  var sharedSpotPath = (id) => SPOTS + "/" + id;
+  var META = "meta";
+  var HUNTS_META_ID = "hunts";
+  var huntsMetaPath = META + "/" + HUNTS_META_ID;
+  var validCharacterId = (id) => /^[A-Za-z0-9_.~:@+-]+$/.test(id);
+  var validHuntId = validCharacterId;
+  var validSpotId = (id) => /^[a-z0-9-]+$/.test(id);
+  function readSources(p) {
+    const s = p && p.sources;
+    if (s && typeof s === "object") return { reference: s.reference !== false, otherVocation: s.otherVocation !== false, older: s.older !== false };
+    return { reference: !(p && p.refOff), otherVocation: !(p && p.refOtherOff), older: true };
+  }
+  var SOURCE_PRESETS = {
+    mine: { reference: false, otherVocation: false, older: false },
+    reference: { reference: true, otherVocation: false, older: true },
+    everything: { reference: true, otherVocation: true, older: true }
+  };
+  function sourcesPreset(s) {
+    const hit = Object.keys(SOURCE_PRESETS).find((k) => ["reference", "otherVocation", "older"].every((f) => SOURCE_PRESETS[k][f] === s[f]));
+    return hit || "custom";
+  }
+  var sourcesPatch = (s) => ({ sources: { reference: !!s.reference, otherVocation: !!s.otherVocation, older: !!s.older }, refOff: !s.reference, refOtherOff: !s.otherVocation });
+  var LEVEL_WINDOWS = [0, 10, 20, 35];
+  var DEFAULT_LEVEL_WINDOW = 20;
+  var readHuntSources = (p) => ({
+    otherVocation: !!(p && p.otherVocationHunts === true),
+    window: p && LEVEL_WINDOWS.indexOf(p.levelWindow) !== -1 ? p.levelWindow : DEFAULT_LEVEL_WINDOW
+  });
+  var GOAL_FIELDS = ["xp", "profit", "charm", "bounty"];
+  function readGoal(p) {
+    const out = {}, g = p && p.goal, old = p && p.weights;
+    if (g && typeof g === "object") GOAL_FIELDS.forEach((k) => {
+      const v = Math.round(Number(g[k]));
+      out[k] = isFinite(v) && v > 0 ? Math.min(5, v) : 0;
+    });
+    else if (old && typeof old === "object") GOAL_FIELDS.forEach((k) => {
+      const v = Number(old[k]);
+      out[k] = isFinite(v) && v > 0 ? Math.max(1, Math.round(Math.min(10, v) / 2)) : 0;
+    });
+    else return { xp: 5, profit: 0, charm: 0, bounty: 0 };
+    return out;
+  }
+  function goalPatch(w2) {
+    const goal = {}, weights = {};
+    GOAL_FIELDS.forEach((k) => {
+      goal[k] = w2[k] || 0;
+      weights[k] = (w2[k] || 0) * 2;
+    });
+    return { goal, weights };
+  }
+  var TAKEN_MINUTES = [30, 45, 60, 120];
+  var DEFAULT_TAKEN_MINUTES = 45;
+  function readSettings(p, plState) {
+    const s = p && p.settings && typeof p.settings === "object" ? p.settings : {};
+    const w2 = typeof s.world === "string" && s.world.trim() ? s.world.trim().slice(0, 30) : plState && plState.world || null;
+    return { world: w2, takenMinutes: TAKEN_MINUTES.indexOf(s.takenMinutes) !== -1 ? s.takenMinutes : DEFAULT_TAKEN_MINUTES };
+  }
+  var THEMES = ["system", "dark", "light"];
+  var readTheme = (v) => THEMES.indexOf(v) !== -1 ? v : "system";
+  var RATINGS = ["S", "A", "B", "C", "D", "X"];
+  var NUM_FIELDS2 = ["kph", "xph", "pph"];
+  function readRecord(v) {
+    const r = {};
+    if (!v) return r;
+    if (RATINGS.indexOf(v.rating) !== -1) r.rating = v.rating;
+    NUM_FIELDS2.forEach((k) => {
+      if (typeof v[k] === "number" && isFinite(v[k])) r[k] = v[k];
+    });
+    if (typeof v.notes === "string" && v.notes) r.notes = v.notes.slice(0, 2e3);
+    if (v.bestiaryDone === true) r.bestiaryDone = true;
+    if (v.wardenDone === true) r.wardenDone = true;
+    if (typeof v.updatedAt === "string") r.updatedAt = v.updatedAt;
+    if (typeof v.numsAt === "string") r.numsAt = v.numsAt;
+    if (typeof v.pinSpot === "string" && v.pinSpot) r.pinSpot = v.pinSpot;
+    return r;
+  }
+  function readRecords(docs) {
+    const out = {};
+    docs.forEach((d) => {
+      const r = readRecord(d.data());
+      if (Object.keys(r).length) out[d.id] = r;
+    });
+    return out;
+  }
+  function readUserSpot(v) {
+    if (!v || typeof v.name !== "string" || !v.name.trim()) return null;
+    return {
+      name: v.name.trim().slice(0, 60),
+      parentId: typeof v.parentId === "string" && v.parentId ? v.parentId : null,
+      note: typeof v.note === "string" && v.note.trim() ? v.note.trim().slice(0, 200) : null,
+      createdAt: typeof v.createdAt === "string" ? v.createdAt : null
+    };
+  }
+  function readUserSpots(docs) {
+    const out = {};
+    docs.forEach((d) => {
+      if (validSpotId(d.id)) {
+        const s = readUserSpot(d.data());
+        if (s) out[d.id] = s;
+      }
+    });
+    return out;
+  }
+  var readSession = (id, v) => v && v.hours > 0 && Array.isArray(v.kills) ? Object.assign({ id }, v) : null;
+  function readHunt(id, v) {
+    const x = readSession(id, v);
+    if (!x) return null;
+    const lvl = Math.floor(Number(x.level)), by = v.by && typeof v.by === "object" ? v.by : {};
+    x.vocation = VOCATIONS.indexOf(x.vocation) !== -1 ? x.vocation : null;
+    x.level = lvl > 0 && lvl < 1e4 ? lvl : null;
+    x.by = { pid: typeof by.pid === "string" && by.pid ? by.pid : null, name: typeof by.name === "string" && by.name.trim() ? by.name.trim().slice(0, 40) : null };
+    return x;
+  }
+  function readHunts(docs) {
+    const out = [];
+    docs.forEach((d) => {
+      const x = readHunt(d.id, d.data());
+      if (x) out.push(x);
+    });
+    return out;
+  }
+  function readHuntsMeta(v) {
+    const map = (o) => {
+      const out = {};
+      Object.keys(o && typeof o === "object" ? o : {}).forEach((k) => {
+        const x = o[k];
+        if (x === null || typeof x === "string") out[k] = x;
+      });
+      return out;
+    };
+    return { version: Number(v && v.version) || 0, at: v && typeof v.at === "string" ? v.at : null, sessions: map(v && v.sessions), spots: map(v && v.spots) };
+  }
+  var readCreatureDoc = (v) => v && v.minLevel && typeof v.minLevel === "object" ? { name: v.name, minLevel: v.minLevel } : null;
+  function readCreatureDocs(docs) {
+    const out = {};
+    docs.forEach((d) => {
+      const c = readCreatureDoc(d.data());
+      if (c) out[d.id] = c;
+    });
+    return out;
+  }
+  function plDefaults() {
+    return { fixedHours: null, diff: "master", held: null, today: { boosted: null, boostedDay: null, prey: [], event: 0 }, lens: {}, active: null, travel: {}, world: null };
+  }
+  function plNum(v, lo, hi) {
+    const n = Number(v);
+    return v != null && v !== "" && isFinite(n) && n >= lo && n <= hi ? n : null;
+  }
+  function readPlState(v, known) {
+    const s = plDefaults();
+    if (!v || typeof v !== "object") return s;
+    const h2 = plNum(v.fixedHours, 0.25, 12), x = v.held, a = v.active;
+    if (h2) s.fixedHours = h2;
+    if (TASK[v.diff]) s.diff = v.diff;
+    if (x && typeof x === "object" && known(x.slug)) {
+      s.held = {
+        slug: x.slug,
+        kills: plNum(x.kills, 1, 1e5),
+        done: plNum(x.done, 0, 1e5) || 0,
+        kind: has(KIND_MULT, x.kind) ? x.kind : "normal",
+        exp: plNum(x.exp, 1, 1e13),
+        i: plNum(x.i, 0, 2) != null ? Math.floor(x.i) : -1,
+        since: typeof x.since === "string" ? x.since : null
+      };
+    }
+    const t2 = v.today && typeof v.today === "object" ? v.today : {};
+    s.today = {
+      boosted: known(t2.boosted) ? t2.boosted : null,
+      boostedDay: typeof t2.boostedDay === "string" ? t2.boostedDay : null,
+      // A slot with no creature yet (slug null) is kept: "Add a prey" saves one before the name is typed.
+      prey: (Array.isArray(t2.prey) ? t2.prey : []).slice(0, PREY_SLOTS).filter((q) => q && (q.slug == null || known(q.slug)) && has(PREY, q.kind)).map((q) => {
+        const r = PREY[q.kind];
+        return { slug: q.slug == null ? null : q.slug, kind: q.kind, pct: plNum(q.pct, r.lo, r.hi) || r.lo };
+      }),
+      event: plNum(t2.event, 0, 100) || 0
+    };
+    if (typeof v.world === "string" && v.world.trim()) s.world = v.world.trim().slice(0, 30);
+    if (v.travel && typeof v.travel === "object") Object.keys(v.travel).forEach((k) => {
+      const m = plNum(v.travel[k], 1, 600);
+      if (validSpotId(k) && m) s.travel[k] = m;
+    });
+    if (v.lens && typeof v.lens === "object") s.lens = v.lens;
+    if (v.bounty && typeof v.bounty === "object") s.bounty = v.bounty;
+    if (v.hunting === null || v.hunting && typeof v.hunting === "object") s.hunting = v.hunting;
+    if (a && typeof a === "object" && typeof a.spot === "string" && typeof a.at === "string") {
+      s.active = { spot: a.spot, name: String(a.name || a.spot).slice(0, 60), at: a.at, slug: known(a.slug) ? a.slug : null };
+    }
+    return s;
+  }
+  var WEEKLY_SLOTS = [6, 9];
+  function readWeeklyTasks(v, known) {
+    const w2 = v && typeof v === "object" ? v : {}, slots = w2.slots === 9 ? 9 : 6;
+    const tasks = (Array.isArray(w2.tasks) ? w2.tasks : []).slice(0, slots).map((t2) => {
+      t2 = t2 && typeof t2 === "object" ? t2 : {};
+      const slug = t2.slug && known(t2.slug) ? t2.slug : null;
+      return { slug, name: slug ? null : (typeof t2.name === "string" ? t2.name.trim().slice(0, 60) : "") || null, killsLeft: plNum(t2.killsLeft, 0, 1e5), done: t2.done === true };
+    });
+    return {
+      weekStart: typeof w2.weekStart === "string" ? w2.weekStart : null,
+      difficulty: TASK[w2.difficulty] ? w2.difficulty : "master",
+      slots,
+      exp: plNum(w2.exp, 1, 1e12),
+      tasks,
+      any: readAnyTask(w2.any)
+    };
+  }
+  function readAnyTask(v) {
+    v = v && typeof v === "object" ? v : {};
+    return { killsLeft: plNum(v.killsLeft, 0, 1e5), done: v.done === true };
+  }
+  function weeklyTasksFromOld(old, rows) {
+    const w2 = old && typeof old === "object" ? old : {}, n = Array.isArray(w2.tasks) ? w2.tasks.filter((t2) => t2 && (t2.name || t2.kills)).length : 0;
+    const tasks = rows.filter((r) => r.name).map((r) => ({ slug: r.creature ? r.creature.slug : null, name: r.creature ? null : r.name, killsLeft: r.K ? r.rem : null, done: !!(r.K && r.rem === 0) }));
+    return { weekStart: typeof w2.week === "string" ? w2.week : null, difficulty: TASK[w2.diff] ? w2.diff : "master", slots: n > 6 ? 9 : 6, exp: plNum(w2.exp, 1, 1e12), tasks, any: readAnyTask(null) };
+  }
+  function readHunting(st) {
+    const h2 = st && st.hunting;
+    if (h2 === null) return null;
+    if (h2 && typeof h2.spotId === "string" && typeof h2.at === "string") return { spotId: h2.spotId, at: h2.at };
+    const a = st && st.active;
+    return a && typeof a.spot === "string" && typeof a.at === "string" ? { spotId: a.spot, at: a.at } : null;
+  }
+  var OFFER_KINDS = ["normal", "silver", "gold"];
+  var blankOffer = () => ({ slug: null, kills: null, kind: "normal", exp: null });
+  function readOffer(o, ctx) {
+    if (!o || typeof o !== "object") return blankOffer();
+    const slug = o.slug && ctx.known(o.slug) ? o.slug : o.name ? ctx.slugOf(o.name) : null;
+    return { slug: slug || null, kills: plNum(o.kills, 1, 1e5), kind: OFFER_KINDS.indexOf(o.kind) !== -1 ? o.kind : "normal", exp: plNum(o.exp, 1, 1e13) };
+  }
+  function readActive(a, ctx) {
+    if (!a || typeof a !== "object" || !ctx.known(a.slug)) return null;
+    const kills = plNum(a.kills, 1, 1e5), left = plNum(a.killsLeft, 0, 1e5);
+    return {
+      slug: a.slug,
+      kills,
+      killsLeft: left != null ? kills ? Math.min(left, kills) : left : kills,
+      kind: OFFER_KINDS.indexOf(a.kind) !== -1 ? a.kind : "normal",
+      exp: plNum(a.exp, 1, 1e13),
+      since: typeof a.since === "string" ? a.since : null
+    };
+  }
+  function readBounty(plState, profile, ctx) {
+    const st = plState && typeof plState === "object" ? plState : {}, b = st.bounty;
+    const offers = (list) => [0, 1, 2].map((i) => readOffer((list || [])[i], ctx));
+    if (b && typeof b === "object") {
+      const active2 = readActive(b.active, ctx);
+      return {
+        difficulty: TASK[b.difficulty] ? b.difficulty : "master",
+        tokens: b.tokens == null ? null : Math.max(0, Math.min(10, Math.floor(Number(b.tokens)) || 0)),
+        mode: b.mode === "active" && active2 ? "active" : "offers",
+        offers: offers(Array.isArray(b.offers) ? b.offers : []),
+        active: active2,
+        zeroChecked: typeof b.zeroChecked === "string" ? b.zeroChecked : null
+      };
+    }
+    const p = profile || {}, reroll = p.reroll || {}, board = p.board || {}, h2 = st.held;
+    const left = reroll.left == null ? null : Math.max(0, Math.min(10, parseInt(reroll.left, 10) || 0));
+    let active = null;
+    if (h2 && typeof h2 === "object" && ctx.known(h2.slug)) {
+      const kills = plNum(h2.kills, 1, 1e5), done = plNum(h2.done, 0, 1e5) || 0;
+      active = {
+        slug: h2.slug,
+        kills,
+        killsLeft: kills != null ? Math.max(0, kills - done) : null,
+        kind: OFFER_KINDS.indexOf(h2.kind) !== -1 ? h2.kind : "normal",
+        exp: plNum(h2.exp, 1, 1e13),
+        since: typeof h2.since === "string" ? h2.since : null
+      };
+    }
+    return {
+      difficulty: TASK[st.diff] ? st.diff : "master",
+      tokens: left,
+      mode: active ? "active" : "offers",
+      offers: offers(Array.isArray(board.offers) ? board.offers : []),
+      active,
+      zeroChecked: null
+    };
+  }
+  function readOfferOdds(v) {
+    if (!v || typeof v !== "object" || v.silver == null || v.gold == null) return null;
+    const s = Number(v.silver), g = Number(v.gold);
+    return s >= 0 && g >= 0 && s + g <= 100 ? { silver: s, gold: g } : null;
+  }
+  function readOfferLog(v) {
+    const out = {};
+    if (!v || typeof v !== "object") return out;
+    Object.keys(TASK).forEach((d) => {
+      if (!Array.isArray(v[d])) return;
+      const list = v[d].filter((o) => o && typeof o === "object" && OFFER_KINDS.indexOf(o.kind) !== -1);
+      if (list.length) out[d] = list;
+    });
+    return out;
+  }
+  function readMark(v) {
+    return v && (v.state === "taken" || v.state === "free") && typeof v.at === "string" ? { state: v.state, at: v.at, world: typeof v.world === "string" ? v.world : null } : null;
+  }
+  function readMarks(docs) {
+    const out = {};
+    docs.forEach((d) => {
+      const m = readMark(d.data());
+      if (m) out[d.id] = m;
+    });
+    return out;
+  }
+  function readOcc(v) {
+    const out = { counts: {} };
+    Object.keys(v && v.counts && typeof v.counts === "object" ? v.counts : {}).forEach((k) => {
+      const c = v.counts[k];
+      if (/^[^|]*\|([0-9]|1[0-9]|2[0-3])$/.test(k) && Array.isArray(c)) out.counts[k] = [Math.max(0, Number(c[0]) || 0), Math.max(0, Number(c[1]) || 0)];
+    });
+    return out;
+  }
+  function readOccs(docs) {
+    const out = {};
+    docs.forEach((d) => {
+      out[d.id] = readOcc(d.data());
+    });
+    return out;
+  }
+
+  // src/store/backup.js
+  var BACKUP_APP = "bounty-task-tier-list";
+  var BACKUP_VERSION = 3;
+  var READ_LIMIT = 1e3;
+  function plannerRestoreWrites(id, pl) {
+    const out = [];
+    if (!pl || typeof pl !== "object") return out;
+    if (pl.state && typeof pl.state === "object") out.push([plStatePath(id), pl.state]);
+    Object.keys(pl.marks && typeof pl.marks === "object" ? pl.marks : {}).forEach((k) => {
+      if (validSpotId(k) && readMark(pl.marks[k])) out.push([marksPath(id) + "/" + k, pl.marks[k]]);
+    });
+    Object.keys(pl.occupancy && typeof pl.occupancy === "object" ? pl.occupancy : {}).forEach((k) => {
+      if (validSpotId(k)) out.push([occupancyPath(id) + "/" + k, readOcc(pl.occupancy[k])]);
+    });
+    return out;
+  }
+  var obj = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
+  function backupWrites(bk) {
+    if (!bk || bk.app !== BACKUP_APP || !bk.characters) throw new Error("bad");
+    const writes = [];
+    Object.keys(bk.characters).forEach((id) => {
+      const c = bk.characters[id] || {};
+      if (!validCharacterId(id) || !c.profile) return;
+      writes.push([profilePath(id), c.profile]);
+      Object.keys(c.entries || {}).forEach((e) => {
+        writes.push([entryPath(id, e), c.entries[e]]);
+      });
+      Object.keys(c.sessions || {}).forEach((x) => {
+        writes.push([sessionPath(id, x), c.sessions[x]]);
+      });
+      plannerRestoreWrites(id, c.planner).forEach((w2) => {
+        writes.push(w2);
+      });
+      Object.keys(obj(c.spots)).forEach((k) => {
+        if (validSpotId(k) && readUserSpot(c.spots[k])) writes.push([spotPath(id, k), c.spots[k]]);
+      });
+    });
+    Object.keys(bk.creatures || {}).forEach((k) => {
+      writes.push([creaturePath(k), bk.creatures[k]]);
+    });
+    Object.keys(obj(bk.spots)).forEach((k) => {
+      if (validSpotId(k) && readUserSpot(bk.spots[k])) writes.push([sharedSpotPath(k), bk.spots[k]]);
+    });
+    if (!writes.length && !Object.keys(obj(bk.hunts)).length) throw new Error("empty");
+    return writes;
+  }
+  function backupHuntsMeta(bk) {
+    if (!bk || !(bk.version >= 3)) return null;
+    if (bk.huntsMeta && typeof bk.huntsMeta === "object") return bk.huntsMeta;
+    const sessions = {}, spots = {};
+    Object.keys(obj(bk.characters)).forEach((pid) => {
+      const c = obj(bk.characters[pid]);
+      Object.keys(obj(c.sessions)).forEach((id) => {
+        sessions[pid + ":" + id] = null;
+      });
+      Object.keys(obj(c.spots)).forEach((id) => {
+        spots[pid + ":" + id] = null;
+      });
+    });
+    return { version: 1, sessions, spots };
+  }
+  function plannerBackup(repo, id) {
+    return Promise.all([repo.get(plannerPath(id), 10), repo.get(marksPath(id), READ_LIMIT), repo.get(occupancyPath(id), READ_LIMIT)]).then((res) => {
+      const st = res[0].filter((d) => d.id === "state")[0], marks = {}, occ = {};
+      res[1].forEach((d) => {
+        marks[d.id] = d.data();
+      });
+      res[2].forEach((d) => {
+        occ[d.id] = d.data();
+      });
+      return st || Object.keys(marks).length || Object.keys(occ).length ? { state: st ? st.data() : null, marks, occupancy: occ } : null;
+    });
+  }
+  var byId = (docs) => {
+    const out = {};
+    docs.forEach((d) => {
+      out[d.id] = d.data();
+    });
+    return out;
+  };
+  function buildBackup(repo, { ids, profiles, creatures, exportedAt }) {
+    const out = { app: BACKUP_APP, version: BACKUP_VERSION, exportedAt, creatures, characters: {}, hunts: {}, spots: {} };
+    const shared = Promise.all([repo.get(HUNTS, READ_LIMIT), repo.get(SPOTS, READ_LIMIT), repo.get(META, 10)]).then((res) => {
+      out.hunts = byId(res[0]);
+      out.spots = byId(res[1]);
+      const m = res[2].filter((d) => d.id === HUNTS_META_ID)[0];
+      if (m) out.huntsMeta = m.data();
+    });
+    return Promise.all([shared].concat(ids.map((id) => Promise.all([repo.get(entriesPath(id), READ_LIMIT), repo.get(sessionsPath(id), READ_LIMIT), plannerBackup(repo, id), repo.get(spotsPath(id), READ_LIMIT)]).then((res) => {
+      const spots = byId(res[3]);
+      out.characters[id] = { profile: profiles[id], entries: byId(res[0]), sessions: byId(res[1]) };
+      if (res[2]) out.characters[id].planner = res[2];
+      if (Object.keys(spots).length) out.characters[id].spots = spots;
+    })))).then(() => out);
+  }
+  function restoreWrites(repo, writes, onWrite) {
+    return writes.reduce((p, w2) => p.then(() => repo.setDirect(w2[0], w2[1]).then(() => {
+      if (onWrite) onWrite();
+    })), Promise.resolve());
+  }
+
+  // src/store/migrate.js
+  var HUNTS_MIGRATION = 1;
+  function huntKey(x) {
+    if (!x || !x.start || !x.end) return null;
+    const xp = x.rawXp != null ? x.rawXp : x.xp;
+    return String(x.start) + "|" + String(x.end) + "|" + (xp != null ? String(xp) : "");
+  }
+  function sameHunt(a, b) {
+    const ka = huntKey(a), kb = huntKey(b);
+    if (ka || kb) return ka === kb;
+    const core = (x) => JSON.stringify([x.hours, x.rawXp, x.xp, x.kills]);
+    return core(a) === core(b);
+  }
+  var spotName = (s) => String(s && s.name || "").trim().toLowerCase();
+  var pidSlug = (pid) => String(pid).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "c";
+  function freeId(taken, id, prefix, same) {
+    let n = 0, cand = id;
+    while (taken[cand] && !same(taken[cand])) {
+      n++;
+      cand = prefix + "-" + id + (n > 1 ? "-" + n : "");
+    }
+    return cand;
+  }
+  function migrateHunts({ profiles, sessions, spots, hunts, sharedSpots, meta, at }) {
+    const m = readHuntsMeta(meta), done = Object.assign({}, m.sessions), doneSpots = Object.assign({}, m.spots);
+    const allHunts = Object.assign({}, hunts || {}), allSpots = Object.assign({}, sharedSpots || {});
+    const before = /* @__PURE__ */ new Map(), outHunts = {}, outSpots = {};
+    Object.keys(allHunts).sort().forEach((id) => {
+      const k = huntKey(allHunts[id]);
+      if (k && !before.has(k)) before.set(k, id);
+    });
+    Object.keys(profiles || {}).sort().forEach((pid) => {
+      const p = profiles[pid] || {}, mySpots = (spots || {})[pid] || {}, mine = (sessions || {})[pid] || {}, idMap = {}, fresh = [];
+      Object.keys(mySpots).sort().forEach((id) => {
+        const key = pid + ":" + id, s = readUserSpot(mySpots[id]);
+        if (key in doneSpots) {
+          idMap[id] = doneSpots[key];
+          return;
+        }
+        if (!validSpotId(id) || !s) return;
+        const nid = freeId(allSpots, id, pidSlug(pid), (x) => spotName(x) === spotName(s));
+        idMap[id] = doneSpots[key] = nid;
+        if (!allSpots[nid]) fresh.push([nid, Object.assign({}, mySpots[id])]);
+      });
+      fresh.forEach(([nid, doc]) => {
+        if (doc.parentId && idMap[doc.parentId]) doc.parentId = idMap[doc.parentId];
+        allSpots[nid] = outSpots[nid] = doc;
+      });
+      const vocation = [p.untaggedVocation, p.vocation].filter((v) => VOCATIONS.indexOf(v) !== -1)[0] || VOCATIONS[0];
+      const level = Number(p.level) > 0 ? Math.floor(Number(p.level)) : null, name = typeof p.name === "string" && p.name.trim() ? p.name.trim().slice(0, 40) : null;
+      Object.keys(mine).sort().forEach((id) => {
+        const key = pid + ":" + id;
+        if (key in done) return;
+        if (!validHuntId(id) || !readSession(id, mine[id])) {
+          done[key] = null;
+          return;
+        }
+        const x = mine[id], body = Object.assign({}, x, {
+          vocation: VOCATIONS.indexOf(x.vocation) !== -1 ? x.vocation : vocation,
+          level: Number(x.level) > 0 ? x.level : level,
+          by: { pid, name }
+        });
+        delete body.id;
+        if (body.spotId && idMap[body.spotId]) body.spotId = idMap[body.spotId];
+        const k = huntKey(body);
+        if (k && before.has(k)) {
+          done[key] = before.get(k);
+          return;
+        }
+        const nid = freeId(allHunts, id, pid, (y) => sameHunt(y, body));
+        done[key] = nid;
+        if (!allHunts[nid]) allHunts[nid] = outHunts[nid] = body;
+      });
+    });
+    const changed = m.version < HUNTS_MIGRATION || Object.keys(done).length !== Object.keys(m.sessions).length || Object.keys(doneSpots).length !== Object.keys(m.spots).length;
+    return { hunts: outHunts, spots: outSpots, meta: { version: Math.max(m.version, HUNTS_MIGRATION), at: changed ? at : m.at || at, sessions: done, spots: doneSpots }, changed };
+  }
+  function mergeHunts(stored, incoming) {
+    const keys = /* @__PURE__ */ new Set(), out = {};
+    Object.keys(stored || {}).forEach((id) => {
+      const k = huntKey(stored[id]);
+      if (k) keys.add(k);
+    });
+    Object.keys(incoming && typeof incoming === "object" ? incoming : {}).sort().forEach((id) => {
+      const x = incoming[id];
+      if (!validHuntId(id) || !readSession(id, x)) return;
+      const k = huntKey(x);
+      if (!(stored || {})[id] && k && keys.has(k)) return;
+      if (k) keys.add(k);
+      const body = Object.assign({}, x);
+      delete body.id;
+      out[id] = body;
+    });
+    return out;
+  }
+  function mergeHuntsMeta(stored, incoming, at) {
+    const a = readHuntsMeta(stored), b = readHuntsMeta(incoming);
+    return { version: Math.max(a.version, b.version), at: a.at || b.at || at, sessions: Object.assign({}, b.sessions, a.sessions), spots: Object.assign({}, b.spots, a.spots) };
+  }
+
+  // src/app/actions.js
+  function makeActions(repo) {
+    const clear = (col) => repo.get(col, 1e3).then((docs) => {
+      docs.forEach((d) => {
+        repo.remove(col + "/" + d.id);
+      });
+    }, () => {
+    });
+    const forgetPlanner = (pid) => {
+      repo.remove(plStatePath(pid));
+      clear(marksPath(pid));
+      clear(occupancyPath(pid));
+    };
+    const byId2 = (docs) => {
+      const out = {};
+      docs.forEach((d) => {
+        out[d.id] = d.data();
+      });
+      return out;
+    };
+    const huntsMeta = () => repo.get(META, 10).then((docs) => {
+      const d = docs.filter((x) => x.id === HUNTS_META_ID)[0];
+      return d ? d.data() : null;
+    });
+    function migrate(at) {
+      return repo.get(PROFILES, 100).then((pdocs) => {
+        const profiles = byId2(pdocs), pids = Object.keys(profiles);
+        return Promise.all([repo.get(HUNTS, READ_LIMIT), repo.get(SPOTS, READ_LIMIT), huntsMeta()].concat(pids.map((pid) => Promise.all([repo.get(sessionsPath(pid), READ_LIMIT), repo.get(spotsPath(pid), READ_LIMIT)])))).then((res) => {
+          const sessions = {}, spots = {};
+          pids.forEach((pid, i) => {
+            sessions[pid] = byId2(res[3 + i][0]);
+            spots[pid] = byId2(res[3 + i][1]);
+          });
+          const m = migrateHunts({ profiles, sessions, spots, hunts: byId2(res[0]), sharedSpots: byId2(res[1]), meta: res[2], at });
+          if (!m.changed) return { hunts: {}, spots: {}, written: Promise.resolve(true) };
+          let ok = true;
+          const fail = () => {
+            ok = false;
+          };
+          const writes = Object.keys(m.spots).map((id) => repo.set(sharedSpotPath(id), m.spots[id], fail)).concat(Object.keys(m.hunts).map((id) => repo.set(huntPath(id), m.hunts[id], fail)));
+          const written = Promise.all(writes).then(() => ok ? repo.set(huntsMetaPath, m.meta, fail) : null).then(() => ok);
+          return { hunts: m.hunts, spots: m.spots, written };
+        });
+      });
+    }
+    return {
+      // Characters. createProfile returns the new character's id at once; onSaved runs once it's written.
+      createProfile(body, onSaved, onFail) {
+        const id = repo.newId(PROFILES);
+        repo.write(profilePath(id), (ref) => ref.set(body).then(onSaved), onFail);
+        return id;
+      },
+      updateProfile(pid, patch, onSaved, onFail) {
+        return repo.write(profilePath(pid), (ref) => ref.update(patch).then(onSaved), onFail);
+      },
+      // A character and what's only its own: entries (their slugs), planner documents, profile. The shared hunts and
+      // spots stay, and so do its old hunt and spot documents (already copied into them; Compatibility rule).
+      deleteCharacter(pid, entrySlugs) {
+        entrySlugs.forEach((s) => {
+          repo.remove(entryPath(pid, s));
+        });
+        forgetPlanner(pid);
+        repo.remove(profilePath(pid));
+      },
+      forgetPlanner,
+      // A creature's entry; null deletes it.
+      setEntry(pid, slug, body, onFail) {
+        return body ? repo.set(entryPath(pid, slug), body, onFail) : repo.remove(entryPath(pid, slug), onFail);
+      },
+      // Shared creature settings ({name, minLevel}); null deletes them.
+      setCreatureSettings(slug, body, onFail) {
+        return body ? repo.set(creaturePath(slug), body, onFail) : repo.remove(creaturePath(slug), onFail);
+      },
+      // Shared hunts. The id for a new one comes first, so the screen can show it before it's written; the stored
+      // document never carries its own id.
+      newHuntId() {
+        return repo.newId(HUNTS);
+      },
+      saveHunt(id, body, onFail) {
+        const b = Object.assign({}, body);
+        delete b.id;
+        return repo.set(huntPath(id), b, onFail);
+      },
+      deleteHunt(id, onFail) {
+        return repo.remove(huntPath(id), onFail);
+      },
+      // Shared spots.
+      saveSpot(id, body, onFail) {
+        return repo.set(sharedSpotPath(id), body, onFail);
+      },
+      deleteSpot(id, onFail) {
+        return repo.remove(sharedSpotPath(id), onFail);
+      },
+      // Planner documents.
+      savePlannerState(pid, body, onFail) {
+        return repo.set(plStatePath(pid), body, onFail);
+      },
+      setMark(pid, spotId, mark, occ) {
+        repo.set(marksPath(pid) + "/" + spotId, mark);
+        if (occ) repo.set(occupancyPath(pid) + "/" + spotId, occ);
+      },
+      migrate,
+      // Backups: the file's contents for these characters, and restoring one (throws Error("bad") or Error("empty") for a
+      // file it can't use; otherwise resolves when every document is written). Its hunts join the stored ones
+      // (mergeHunts); then the migration copies any old hunts it brought (version 1 and 2 files).
+      exportBackup(args) {
+        return buildBackup(repo, args);
+      },
+      restoreBackup(bk, at, onWrite) {
+        const writes = backupWrites(bk), meta = backupHuntsMeta(bk);
+        return Promise.all([repo.get(HUNTS, READ_LIMIT), meta ? huntsMeta() : null]).then((res) => {
+          const hunts = mergeHunts(byId2(res[0]), bk.hunts);
+          const all = writes.concat(Object.keys(hunts).map((id) => [huntPath(id), hunts[id]]));
+          if (meta) all.push([huntsMetaPath, mergeHuntsMeta(res[1], meta, at)]);
+          return restoreWrites(repo, all, onWrite);
+        }).then(() => migrate(at)).then((m) => m.written);
+      }
+    };
+  }
+
+  // src/app/state.js
+  function mergeProfiles(docs, { pending, pendingNew, current }) {
+    const next = {}, order = [];
+    docs.forEach((d) => {
+      const v = d.data();
+      if (v) {
+        next[d.id] = Object.assign({}, v, pending[d.id] || {});
+        order.push(d.id);
+      }
+    });
+    Object.keys(current).forEach((id) => {
+      if (!next[id] && pendingNew[id]) {
+        next[id] = current[id];
+        order.push(id);
+      }
+    });
+    order.sort((a, b) => String(next[a].createdAt || "").localeCompare(String(next[b].createdAt || "")));
+    return { profiles: next, order };
+  }
+  function makeWatchers(repo, { known }) {
+    return {
+      // Every character's profile document, raw (merge with mergeProfiles).
+      profiles: (fn, onError) => repo.watch(PROFILES, 100, fn, onError),
+      // Shared creature settings: slug → {name, minLevel}.
+      creatures: (fn, onError) => repo.watch(CREATURES, 1e3, (docs) => fn(readCreatureDocs(docs)), onError),
+      // Every logged hunt (with ids) and the spots made for them, shared by all characters.
+      hunts: (fn, onError) => repo.watch(HUNTS, READ_LIMIT, (docs) => fn(readHunts(docs)), onError),
+      spots: (fn, onError) => repo.watch(SPOTS, READ_LIMIT, (docs) => fn(readUserSpots(docs)), onError),
+      // A character's entries (slug → record).
+      entries: (pid, fn, onError) => repo.watch(entriesPath(pid), 1e3, (docs) => fn(readRecords(docs)), onError),
+      // A character's planner state, Taken/Free marks and occupancy counts.
+      plannerState: (pid, fn, onError) => repo.watch(plannerPath(pid), 10, (docs) => {
+        const d = docs.filter((x) => x.id === "state")[0];
+        fn(readPlState(d && d.data(), known));
+      }, onError),
+      marks: (pid, fn, onError) => repo.watch(marksPath(pid), 1e3, (docs) => fn(readMarks(docs)), onError),
+      occupancy: (pid, fn, onError) => repo.watch(occupancyPath(pid), 1e3, (docs) => fn(readOccs(docs)), onError)
+    };
+  }
+
+  // src/core/rates.js
+  var sessHours = (x) => x && x.hours > 0 ? x.hours : 0;
+  var sessionSpot = (x) => (x.spot || "Unnamed spot").trim();
+  var xpField = (xpMode) => xpMode === "xp" ? "xp" : "rawXp";
+  function raidRate(sessions, catalog) {
+    let raids = 0, kills = 0, n = 0;
+    sessions.forEach((x) => {
+      if (!Array.isArray(x.kills)) return;
+      const hasBy = x.raidsBy && typeof x.raidsBy === "object", hasTotal = typeof x.raids === "number";
+      if (!hasBy && !hasTotal) return;
+      n++;
+      raids += hasBy ? Object.keys(x.raidsBy).reduce((a, k) => a + (Number(x.raidsBy[k]) || 0), 0) : x.raids;
+      x.kills.forEach((k) => {
+        const c = k.slug && catalog.bySlug[k.slug];
+        if (!(c && c.r)) kills += k.count || 0;
+      });
+    });
+    return { p: (raids + RAID.priorPerKill * RAID.priorKills) / (kills + RAID.priorKills), info: n ? { raids, kills, n } : null };
+  }
+  function spotRates(sessions, catalog, keyOf, mode) {
+    const acc = {}, out = {};
+    sessions.forEach((x) => {
+      const h2 = sessHours(x);
+      if (!h2 || !Array.isArray(x.kills)) return;
+      let tot = 0;
+      x.kills.forEach((k) => {
+        tot += k.count || 0;
+      });
+      if (!tot) return;
+      const s = keyOf(x), a = acc[s] || (acc[s] = { kills: {}, total: 0, xp: 0, bal: 0, loot: 0, lootTotal: 0, cTotal: 0, cHours: 0 });
+      a.total += tot;
+      a.xp += x[mode] != null ? x[mode] : x.rawXp || 0;
+      a.bal += x.balance || 0;
+      if (x.loot != null) {
+        a.loot += x.loot;
+        a.lootTotal += tot;
+      }
+      x.kills.forEach((k) => {
+        const key = catalog.killKey(k);
+        a.kills[key] = (a.kills[key] || 0) + (k.count || 0);
+      });
+      if (!x.breaks) {
+        a.cTotal += tot;
+        a.cHours += h2;
+      }
+    });
+    Object.keys(acc).forEach((s) => {
+      const a = acc[s];
+      if (!(a.cHours > 0)) return;
+      const spk = a.cTotal / a.cHours, kph = {};
+      Object.keys(a.kills).forEach((slug) => {
+        kph[slug] = a.kills[slug] / a.total * spk;
+      });
+      out[s] = {
+        kph,
+        xph: a.xp / a.total * spk,
+        pph: a.bal / a.total * spk,
+        lph: a.lootTotal ? a.loot / a.lootTotal * spk : null,
+        hours: a.cHours,
+        kills: a.cTotal
+      };
+    });
+    return out;
+  }
+  function deriveRates(sessions, { catalog, xpMode }) {
+    const mode = xpField(xpMode), acc = {};
+    const blank = () => ({ kills: 0, cKills: 0, total: 0, n: 0, xp: 0, bal: 0, cTotal: 0, cHours: 0, nClean: 0, last: null });
+    sessions.forEach((x) => {
+      const h2 = sessHours(x);
+      if (!h2 || !Array.isArray(x.kills)) return;
+      let total = 0;
+      x.kills.forEach((k) => {
+        total += k.count || 0;
+      });
+      if (!total) return;
+      const spot = sessionSpot(x), clean = !x.breaks;
+      x.kills.forEach((k) => {
+        if (!k.slug || !catalog.bySlug[k.slug]) return;
+        const c = acc[k.slug] || (acc[k.slug] = {});
+        const sp = c[spot] || (c[spot] = { all: blank(), task: blank() });
+        [sp.all].concat(x.task === k.slug ? [sp.task] : []).forEach((b) => {
+          b.kills += k.count || 0;
+          b.total += total;
+          b.n++;
+          if (clean) b.cKills += k.count || 0;
+          b.xp += x[mode] != null ? x[mode] : x.rawXp || 0;
+          b.bal += x.balance || 0;
+          if (clean) {
+            b.cTotal += total;
+            b.cHours += h2;
+            b.nClean++;
+            if (!b.last || x.end > b.last) b.last = x.end;
+          }
+        });
+      });
+    });
+    const result = {};
+    Object.keys(acc).forEach((slug) => {
+      const spots = [];
+      Object.keys(acc[slug]).forEach((name) => {
+        const sp = acc[slug][name], useTask = sp.task.cHours > 0, b = useTask ? sp.task : sp.all;
+        if (!(b.cHours > 0)) return;
+        const spotKph = b.cTotal / b.cHours, perKill = (v) => v / b.total * spotKph;
+        spots.push({
+          spot: name,
+          taskBonus: useTask,
+          n: b.n,
+          nBreak: b.n - b.nClean,
+          hours: b.cHours,
+          share: b.kills / b.total,
+          kph: Math.round(b.kills / b.total * spotKph),
+          xph: Math.round(perKill(b.xp)),
+          pph: Math.round(perKill(b.bal)),
+          last: b.last,
+          sample: b.cKills,
+          sampleHours: b.cHours
+        });
+      });
+      if (spots.length) result[slug] = spots;
+    });
+    return result;
+  }
+
   // src/core/reference.js
   var REF_CLAMP_LO = 0.2;
   var REF_CLAMP_HI = 1.5;
@@ -6069,14 +6127,16 @@
       confirmNoTokens() {
         saveBounty({ zeroChecked: serverDay(now()) });
       },
-      // Silver and Gold (Advanced mode). Log this board: its three offers (creature, kills, kind, the character's level),
-      // under its difficulty in the profile's rewardObs (the classic page's shape), once per board; the newest
-      // OFFER_LOG_MAX per difficulty are kept.
+      // Silver and Gold (Advanced mode). Log this board: its three offers (creature, kills, kind, the character's level,
+      // and whether it was Preferred or Unwanted with the pool and list sizes then, to test the slot model later), under
+      // its difficulty in the profile's rewardObs (the classic page's shape), once per board; the newest OFFER_LOG_MAX
+      // per difficulty are kept.
       logBoard() {
         const M = model(), b = M.bounty(), p = profile();
         if (!p || b.mode !== "offers" || b.offers.some((o) => !o.slug) || M.boardLogged()) return;
         const at = iso(), level = Number(p.level) || null, log = Object.assign({}, p.rewardObs);
-        const add = b.offers.map((o) => ({ name: catalog.bySlug[o.slug].name, kills: o.kills, kind: o.kind, level, at }));
+        const tags = boardSlotTags(b.offers.map((o) => o.slug), catalog.poolOf(b.difficulty), M.slots());
+        const add = b.offers.map((o, i) => Object.assign({ name: catalog.bySlug[o.slug].name, kills: o.kills, kind: o.kind, level, at }, tags[i]));
         log[b.difficulty] = (Array.isArray(log[b.difficulty]) ? log[b.difficulty] : []).concat(add).slice(-OFFER_LOG_MAX);
         updateCharacter({ rewardObs: log });
       },
@@ -6442,56 +6502,6 @@
       s.appendChild(c);
     }
     return s;
-  }
-
-  // src/core/slots.js
-  function slotOdds(pool, slots, isGood) {
-    const inPool = {};
-    pool.forEach((c) => {
-      inPool[c.slug] = 1;
-    });
-    const unw = slots.unwanted.filter((s) => inPool[s]), pref = slots.preferred.filter((s) => inPool[s]);
-    const PW = SLOTS.preferredWeight, OFFERS = SLOTS.offers;
-    const N = pool.length - unw.length, k = pref.length, W = N + (PW - 1) * k;
-    const out = { poolSize: pool.length, unwanted: unw.length, preferred: k, N, W };
-    if (k) {
-      out.pAny = 1 - Math.pow(1 - PW * k / W, OFFERS);
-      out.pEach = 1 - Math.pow(1 - PW / W, OFFERS);
-      out.pBase = 1 - Math.pow(1 - 1 / N, OFFERS);
-    }
-    const good = pool.filter((c) => unw.indexOf(c.slug) === -1 && isGood(c.slug));
-    if (good.length) {
-      const wg = good.reduce((a, c) => a + (pref.indexOf(c.slug) !== -1 ? PW : 1), 0);
-      out.good = good.length;
-      out.pGood = 1 - Math.pow(1 - wg / W, OFFERS);
-    }
-    return out;
-  }
-  function slotSuggestions(which, pool, taken, info, n, t2) {
-    t2 = t2 || EN;
-    const scored = pool.filter((it) => taken.indexOf(it.slug) === -1).map((it) => {
-      const x = info(it), sc = x.score;
-      let key, why;
-      if (which === "preferred") {
-        if (x.avoided || x.locked || !sc || sc.tier === "C" || sc.tier === "D") return null;
-        key = sc.rel;
-        why = t2("Score {tier}", { tier: sc.tier });
-      } else {
-        if (x.avoided) {
-          key = 3;
-          why = t2("Avoided");
-        } else if (x.locked) {
-          key = 2;
-          why = t2("Needs level {level}", { level: x.minLevel });
-        } else if (sc && sc.tier === "D") {
-          key = 1 + (1 - sc.rel) / 2;
-          why = t2("Score {tier}", { tier: "D" });
-        } else return null;
-      }
-      return { it, key, why };
-    }).filter(Boolean);
-    scored.sort((a, b) => b.key - a.key || a.it.name.localeCompare(b.it.name));
-    return scored.slice(0, n);
   }
 
   // src/core/session.js

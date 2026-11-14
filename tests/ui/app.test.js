@@ -330,6 +330,9 @@ test("Advanced mode: log a board, and the Silver and Gold odds", async () => {
   await until(() => store["profiles/ek"].rewardObs.master.length === 6, "the logged board");
   assert.deepEqual(store["profiles/ek"].rewardObs.master.slice(3).map((o) => [o.name, o.kind, o.level]),
     [["Cobra Assassin", "normal", 615], ["Gorerilla", "silver", 615], ["Frazzlemaw", "normal", 615]]);
+  // With the slot lists then: Cobra Assassin is Preferred; the fixture's lists are all in the Master pool (280).
+  assert.deepEqual(store["profiles/ek"].rewardObs.master.slice(3).map((o) => [o.pref, o.unw, o.nPool, o.nPref, o.nUnw]),
+    [[true, false, 280, 2, 1], [false, false, 280, 2, 1], [false, false, 280, 2, 1]]);
   await wait(30);
   assert.equal(p.$("#bounty-log").disabled, true);
   assert.equal(p.$("#bounty-log-note").textContent, "This board is logged.");
