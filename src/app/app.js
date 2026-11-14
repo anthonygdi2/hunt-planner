@@ -10,6 +10,7 @@ import { isChallengingMaster, learnChallenging } from "../core/rewards.js";
 import { makeCatalog } from "../core/catalog.js";
 import { PRESETS, readWeights } from "../core/score.js";
 import { loggedOdds, MIN_BOARD_OBS } from "../core/reroll.js";
+import { boardSlotTags } from "../core/slots.js";
 import { makeRepo } from "../store/repo.js";
 import { PREF } from "../store/prefs.js";
 import { plDefaults, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, readOfferOdds, WEEKLY_SLOTS, readHunting, readHunt, LEVEL_WINDOWS } from "../store/schema.js";
@@ -350,14 +351,16 @@ export function createApp({ data, prefs, now, browserLang }) {
     // At 0 tokens the player says they really have none (the daily one claimed too): the Plan's check stays away until
     // the next server save.
     confirmNoTokens() { saveBounty({ zeroChecked: serverDay(now()) }); },
-    // Silver and Gold (Advanced mode). Log this board: its three offers (creature, kills, kind, the character's level),
-    // under its difficulty in the profile's rewardObs (the classic page's shape), once per board; the newest
-    // OFFER_LOG_MAX per difficulty are kept.
+    // Silver and Gold (Advanced mode). Log this board: its three offers (creature, kills, kind, the character's level,
+    // and whether it was Preferred or Unwanted with the pool and list sizes then, to test the slot model later), under
+    // its difficulty in the profile's rewardObs (the classic page's shape), once per board; the newest OFFER_LOG_MAX
+    // per difficulty are kept.
     logBoard() {
       const M = model(), b = M.bounty(), p = profile();
       if (!p || b.mode !== "offers" || b.offers.some((o) => !o.slug) || M.boardLogged()) return;
       const at = iso(), level = Number(p.level) || null, log = Object.assign({}, p.rewardObs);
-      const add = b.offers.map((o) => ({ name: catalog.bySlug[o.slug].name, kills: o.kills, kind: o.kind, level, at }));
+      const tags = boardSlotTags(b.offers.map((o) => o.slug), catalog.poolOf(b.difficulty), M.slots());
+      const add = b.offers.map((o, i) => Object.assign({ name: catalog.bySlug[o.slug].name, kills: o.kills, kind: o.kind, level, at }, tags[i]));
       log[b.difficulty] = (Array.isArray(log[b.difficulty]) ? log[b.difficulty] : []).concat(add).slice(-OFFER_LOG_MAX);
       updateCharacter({ rewardObs: log });
     },

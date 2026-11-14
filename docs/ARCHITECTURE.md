@@ -179,7 +179,7 @@ Everything the UI can change, one function each. Each validates input, writes th
 - Spots: `renameSpot(id, name)`, `deleteSpot(id)` (user spots only; deletes the hunts logged there by any character)
 - Creatures: `setAvoid(slug, on)`, `setPreferred(slug, on)`, `setUnwanted(slug, on)`, `setBestiaryDone(slug, on)`, `setWardenDone(slug, on)`, `setNotes(slug, text)`, `setCreatureNumbers(slug, nums)`, `pinSpot(slug, spotId)`, `setMinLevel(slug, level)`
 - Weekly: `setWeeklyDifficulty(d)`, `setWeeklySlots(6 | 9)`, `setWeeklyTask(i, {slug, killsLeft})`, `setWeeklyDone(i, on)`, `startNewWeek()`
-- Settings: `setWorld(name)`, `setTakenMinutes(m)`, `setTheme(t)`, `setAdvanced(on)`, `setXpMode(m)`, `setHoursPerDay(h)`, `logBoard()` (Silver/Gold observation)
+- Settings: `setWorld(name)`, `setTakenMinutes(m)`, `setTheme(t)`, `setAdvanced(on)`, `setXpMode(m)`, `setHoursPerDay(h)`, `logBoard()` (Silver/Gold observation, with each offer's Preferred/Unwanted tags and the list sizes)
 - Backup: `exportBackup() → json`, `restoreBackup(json)`
 
 ## View models (`app/views.js`)
