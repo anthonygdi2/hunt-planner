@@ -96,6 +96,7 @@ export function mount(root, app, host) {
         preset: a.applyPreset,
         weight: (key, n) => { const w = {}; v.goal.rows.forEach((row) => { w[row.key] = row.value; }); w[key] = n; a.setWeights(w); },
         bounty: { difficulty: a.setDifficulty, tokens: a.setTokens, offer: a.setOffer, pick: a.pickOffer, active: a.setActive, finished: a.finishedBounty, rerolled: a.rerolled,
+          logBoard: a.logBoard, odds: a.setOfferOdds, useLoggedOdds: a.useLoggedOdds, useGuessOdds: a.useGuessOdds,
           lists: () => { ui.creatures.lists = true; go("creatures"); } },
       });
     }

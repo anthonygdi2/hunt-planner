@@ -79,3 +79,18 @@ test("shared hunts: vocation, level and who logged it, read leniently", () => {
     { version: 1, at: "t", sessions: { "a:s1": "s1", "a:s2": null }, spots: {} });
   assert.deepEqual(S.readHuntsMeta(null), { version: 0, at: null, sessions: {}, spots: {} });
 });
+
+test("Silver and Gold: the character's odds and the logged offers", () => {
+  assert.equal(S.readOfferOdds(undefined), null);
+  assert.equal(S.readOfferOdds(null), null, "cleared: back to the guess");
+  assert.deepEqual(S.readOfferOdds({ silver: 12.5, gold: "3" }), { silver: 12.5, gold: 3 });
+  assert.deepEqual(S.readOfferOdds({ silver: 0, gold: 0 }), { silver: 0, gold: 0 });
+  assert.equal(S.readOfferOdds({ silver: 10 }), null, "both or neither");
+  assert.equal(S.readOfferOdds({ silver: 80, gold: 30 }), null, "more than 100 together");
+  assert.equal(S.readOfferOdds({ silver: -1, gold: 2 }), null);
+  assert.equal(S.readOfferOdds({ silver: "x", gold: 2 }), null);
+  // The classic page's shape, kept; unknown kinds and difficulties left out.
+  const row = { name: "Cobra Assassin", kills: 450, kind: "silver", level: 615, at: "2026-10-20T18:00:00.000Z" };
+  assert.deepEqual(S.readOfferLog({ master: [row, { kind: "platinum" }, null], hard: [row], expert: "x" }), { master: [row] });
+  assert.deepEqual(S.readOfferLog(undefined), {});
+});

@@ -90,7 +90,7 @@ function boardFacts(M, state) {
       reward: rewardPerKill(diff, it, p.chalRates && typeof p.chalRates === "object" ? p.chalRates : {}) };
   });
   if (pm) {
-    out.model = pick(pm, ["keys", "known", "best", "medKph", "fallback", "nObs", "kinds", "levels", "max"]);
+    out.model = pick(pm, ["keys", "known", "best", "medKph", "fallback", "kinds", "levels", "max"]);
     if (pm.known && pm.best > 0) out.planH = M.rerollPlan(pm, set.hpd).h;
   }
   return out;

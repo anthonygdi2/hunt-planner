@@ -9,9 +9,10 @@ import { NUM_FIELDS } from "../core/numbers.js";
 import { isChallengingMaster, learnChallenging } from "../core/rewards.js";
 import { makeCatalog } from "../core/catalog.js";
 import { PRESETS, readWeights } from "../core/score.js";
+import { loggedOdds, MIN_BOARD_OBS } from "../core/reroll.js";
 import { makeRepo } from "../store/repo.js";
 import { PREF } from "../store/prefs.js";
-import { plDefaults, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, WEEKLY_SLOTS, readHunting, readHunt, LEVEL_WINDOWS } from "../store/schema.js";
+import { plDefaults, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, readOfferOdds, WEEKLY_SLOTS, readHunting, readHunt, LEVEL_WINDOWS } from "../store/schema.js";
 import { makeActions } from "./actions.js";
 import { makeWatchers, mergeProfiles } from "./state.js";
 import { makeModel, makePlanCache } from "./model.js";
@@ -46,6 +47,8 @@ export function createApp({ data, prefs, now, browserLang }) {
   const changed = () => { cachedModel = null; diffModels = {}; listeners.forEach((fn) => fn()); };
   const iso = () => new Date(now()).toISOString();
   const profile = () => state.profiles[state.pid] || null;
+  // Logged offers kept per difficulty (the newest), so the profile document stays small.
+  const OFFER_LOG_MAX = 1500;
 
   function watchCharacter(pid) {
     charUnsub.forEach((u) => u());
@@ -347,6 +350,35 @@ export function createApp({ data, prefs, now, browserLang }) {
     // At 0 tokens the player says they really have none (the daily one claimed too): the Plan's check stays away until
     // the next server save.
     confirmNoTokens() { saveBounty({ zeroChecked: serverDay(now()) }); },
+    // Silver and Gold (Advanced mode). Log this board: its three offers (creature, kills, kind, the character's level),
+    // under its difficulty in the profile's rewardObs (the classic page's shape), once per board; the newest
+    // OFFER_LOG_MAX per difficulty are kept.
+    logBoard() {
+      const M = model(), b = M.bounty(), p = profile();
+      if (!p || b.mode !== "offers" || b.offers.some((o) => !o.slug) || M.boardLogged()) return;
+      const at = iso(), level = Number(p.level) || null, log = Object.assign({}, p.rewardObs);
+      const add = b.offers.map((o) => ({ name: catalog.bySlug[o.slug].name, kills: o.kills, kind: o.kind, level, at }));
+      log[b.difficulty] = (Array.isArray(log[b.difficulty]) ? log[b.difficulty] : []).concat(add).slice(-OFFER_LOG_MAX);
+      updateCharacter({ rewardObs: log });
+    },
+    // The character's own odds in percent ({silver, gold}, either one typed; the other stays as the plan has it).
+    // Nothing changes when a value isn't a number or the two add up to more than 100.
+    setOfferOdds(patch) {
+      const now0 = model().offerOdds(), next = Object.assign({}, now0.odds);
+      ["silver", "gold"].forEach((k) => {
+        if (!(k in patch)) return;
+        const raw = String(patch[k]).trim().replace("%", "").replace(",", "."), n = Number(raw);
+        if (raw !== "" && n >= 0) next[k] = Math.round(n * 10) / 10;
+      });
+      if (readOfferOdds(next) && (!now0.typed || next.silver !== now0.odds.silver || next.gold !== now0.odds.gold)) updateCharacter({ offerOdds: next });
+    },
+    // The shares of the logged offers (once there are enough) become the character's odds.
+    useLoggedOdds() {
+      const L = loggedOdds(model().offerLog());
+      if (L.n >= MIN_BOARD_OBS) updateCharacter({ offerOdds: { silver: Math.round(L.silver * 10) / 10, gold: Math.round(L.gold * 10) / 10 } });
+    },
+    // Back to the guess (OFFER_ODDS).
+    useGuessOdds() { updateCharacter({ offerOdds: null }); },
     // Plan: Free and Taken marks (each counted once per 15 minutes toward how often the spot is free), Hunting now.
     markTaken(spotId) { mark(spotId, "taken"); },
     markFree(spotId) { mark(spotId, "free"); },

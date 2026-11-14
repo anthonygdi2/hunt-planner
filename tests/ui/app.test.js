@@ -306,6 +306,48 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   p.w.close();
 });
 
+test("Advanced mode: log a board, and the Silver and Gold odds", async () => {
+  const store = fixtureStore();
+  const p = load({ store, prefs: { "btl.profile": "ek", "btl.adv": "1" }, now: Date.parse("2026-10-24T18:00:00Z") });
+  await until(() => p.$("#step1-title"), "the plan");
+  await p.click("#chip-bounty");
+  if (p.$("#active-name")) await p.click("#bounty-rerolled");
+  await until(() => p.$("#offer-0-name"), "the offers");
+  // The guess, and the fixture's three logged offers (one of each kind): too few to use.
+  assert.equal(p.$("#odds-line").textContent, "The plan uses a guess: Silver 10%, Gold 2% per offer. The real odds aren’t published.");
+  assert.equal(p.$("#odds-logged").textContent, "3 offers logged: Silver 33.3%, Gold 33.3%. Your shares can be used once 10 offers are logged.");
+  assert.equal(p.$("#odds-use"), null);
+  assert.equal(p.$("#odds-guess"), null, "already the guess");
+  assert.equal(p.$("#bounty-log").disabled, true);
+  assert.equal(p.$("#bounty-log-note").textContent, "Fill in all three offers to log this board.");
+  // A board: logged once.
+  await p.type("#offer-0-name", "Cobra Assassin");
+  await p.type("#offer-1-name", "Gorerilla");
+  await p.type("#offer-2-name", "Frazzlemaw");
+  await p.click('[aria-label="Offer B kind"] button:nth-child(2)');
+  assert.equal(p.$("#bounty-log").disabled, false);
+  await p.click("#bounty-log");
+  await until(() => store["profiles/ek"].rewardObs.master.length === 6, "the logged board");
+  assert.deepEqual(store["profiles/ek"].rewardObs.master.slice(3).map((o) => [o.name, o.kind, o.level]),
+    [["Cobra Assassin", "normal", 615], ["Gorerilla", "silver", 615], ["Frazzlemaw", "normal", 615]]);
+  await wait(30);
+  assert.equal(p.$("#bounty-log").disabled, true);
+  assert.equal(p.$("#bounty-log-note").textContent, "This board is logged.");
+  assert.match(p.$("#odds-logged").textContent, /^6 offers logged: Silver 33\.3%, Gold 16\.7%\./);
+  // Typed odds, then back to the guess.
+  await p.type("#odds-silver", "15");
+  await until(() => JSON.stringify(store["profiles/ek"].offerOdds) === '{"silver":15,"gold":2}', "the typed odds");
+  await wait(30);
+  assert.equal(p.$("#odds-line").textContent, "The plan uses your odds: Silver 15%, Gold 2% per offer.");
+  await p.type("#odds-gold", "95");
+  await wait(30);
+  assert.equal(store["profiles/ek"].offerOdds.gold, 2, "more than 100 together: not saved");
+  await p.click("#odds-guess");
+  await until(() => store["profiles/ek"].offerOdds === null, "back to the guess");
+  assert.deepEqual(p.errors, []);
+  p.w.close();
+});
+
 test("Spots and a spot page over the golden fixture: search, a variation, Taken, raids, delete a hunt, rename and delete a spot", async () => {
   const store = fixtureStore();
   const p = load({ store, prefs: { "btl.profile": "ek", "btl.adv": "1" }, now: Date.parse("2026-10-24T18:00:00Z") });
