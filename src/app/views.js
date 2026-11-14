@@ -112,7 +112,7 @@ export function oddsView(o, log, logged, b) {
       : t("No boards logged yet.")) + (L.n < MIN_BOARD_OBS ? " " + t("Your shares can be used once {n} offers are logged.", { n: MIN_BOARD_OBS }) : ""),
     canUse: L.n >= MIN_BOARD_OBS && !(o.typed && same),
     board: !(b.mode === "active" && b.active) ? { canLog: filled && !logged,
-      text: logged ? t("This board is logged.") : !filled ? t("Fill in all three offers to log this board.") : t("Log each new board once, as it comes up.") } : null,
+      text: logged ? t("This board is logged.") : !filled ? t("Fill in all three offers to log this board.") : t("Picking an offer or rerolling here logs the board by itself. Use this if you won’t.") } : null,
   };
 }
 

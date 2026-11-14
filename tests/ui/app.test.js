@@ -347,6 +347,48 @@ test("Advanced mode: log a board, and the Silver and Gold odds", async () => {
   assert.equal(store["profiles/ek"].offerOdds.gold, 2, "more than 100 together: not saved");
   await p.click("#odds-guess");
   await until(() => store["profiles/ek"].offerOdds === null, "back to the guess");
+  // Picking an offer from the board logged by hand marks the pick; no rows are added.
+  await p.click("#offer-1-pick");
+  await until(() => store["profiles/ek"].rewardObs.master[4].picked === true, "the pick");
+  assert.equal(store["profiles/ek"].rewardObs.master.length, 6);
+  assert.deepEqual(store["profiles/ek"].rewardObs.master.slice(3).map((o) => !!o.picked), [false, true, false]);
+  assert.deepEqual(p.errors, []);
+  p.w.close();
+});
+
+test("Basic mode: a board picked from or rerolled is logged by itself", async () => {
+  const store = fixtureStore();
+  const p = load({ store, prefs: { "btl.profile": "ek" }, now: Date.parse("2026-10-24T18:00:00Z") });
+  await until(() => p.$("#step1-title"), "the plan");
+  await p.click("#chip-bounty");
+  if (p.$("#active-name")) await p.click("#bounty-rerolled");
+  await until(() => p.$("#offer-0-name"), "the offers");
+  assert.equal(p.$("#bounty-log"), null, "no log controls in Basic mode");
+  const logged = () => store["profiles/ek"].rewardObs.master;
+  assert.equal(logged().length, 3, "the fixture's three");
+  // A partly typed board isn't logged.
+  await p.type("#offer-0-name", "Cobra Assassin");
+  await p.click("#bounty-rerolled");
+  await until(() => !p.$("#offer-0-name").value, "the offers clear");
+  await wait(30);
+  assert.equal(logged().length, 3);
+  // A full board, rerolled: logged with no pick.
+  await p.type("#offer-0-name", "Cobra Assassin");
+  await p.type("#offer-1-name", "Gorerilla");
+  await p.type("#offer-2-name", "Frazzlemaw");
+  await p.click("#bounty-rerolled");
+  await until(() => logged().length === 6, "the rerolled board");
+  assert.deepEqual(logged().slice(3).map((o) => [o.name, !!o.picked, o.pref]), [["Cobra Assassin", false, true], ["Gorerilla", false, false], ["Frazzlemaw", false, false]]);
+  // A full board, offer C picked: logged with the pick.
+  await until(() => !p.$("#offer-0-name").value, "the offers clear");
+  await p.type("#offer-0-name", "Frazzlemaw");
+  await p.type("#offer-1-name", "Cobra Assassin");
+  await p.type("#offer-2-name", "Gorerilla");
+  await p.click('[aria-label="Offer C kind"] button:nth-child(3)');
+  await p.click("#offer-2-pick");
+  await until(() => logged().length === 9, "the picked board");
+  assert.deepEqual(logged().slice(6).map((o) => [o.name, o.kind, !!o.picked]), [["Frazzlemaw", "normal", false], ["Cobra Assassin", "normal", false], ["Gorerilla", "gold", true]]);
+  await until(() => p.$("#active-name"), "the active bounty");
   assert.deepEqual(p.errors, []);
   p.w.close();
 });
