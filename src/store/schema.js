@@ -1,6 +1,6 @@
 // Document paths and shapes. Each reader takes whatever is stored and returns a valid current-shape value with
 // defaults; none throws on bad data. Writers elsewhere write these shapes.
-import { TASK, KIND_MULT, PREY, PREY_SLOTS, VOCATIONS } from "../data/rules.js";
+import { TASK, KIND_MULT, PREY, PREY_SLOTS, VOCATIONS, TALISMAN } from "../data/rules.js";
 
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 
@@ -309,6 +309,16 @@ export function readOfferLog(v) {
     if (list.length) out[d] = list;
   });
   return out;
+}
+
+// ---------- the Bounty Talisman: the profile's talisman and bestiaryBonus ----------
+// {loot, bestiary}: the Talisman's more-loot and double-bestiary chances in percent (0 for none or bad values).
+// bestiary is the older bestiaryBonus field, kept in step with talisman.bestiary, so an older build's edit of it wins.
+export function readTalisman(p) {
+  const tl = p && p.talisman && typeof p.talisman === "object" ? p.talisman : {};
+  const pct = (v, max) => { const n = Number(v); return v != null && v !== "" && n >= 0 && n <= max ? n : null; };
+  const bOld = pct(p && p.bestiaryBonus, TALISMAN.bestiary.max), b = bOld != null ? bOld : pct(tl.bestiary, TALISMAN.bestiary.max);
+  return { loot: pct(tl.loot, TALISMAN.loot.max) || 0, bestiary: b || 0 };
 }
 
 // ---------- marks and occupancy: profiles/{pid}/marks/{spotId}, profiles/{pid}/occupancy/{spotId} ----------

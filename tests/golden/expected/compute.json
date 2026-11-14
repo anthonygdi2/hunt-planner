@@ -103,17 +103,17 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"other","Druid Only Spot":"otherAdj","Feru Way":"refAdj","Roshamuul West":"other"},
      "scores": {"midnight-asura":0.579137459636,"silencer":1,"werehyaena":0.38970258825},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":4619929.37804},
-      "Bastion lure": {"pph":900000,"xph":5200000},
-      "Bookworld: Chapter IV": {"pph":250000,"xph":4000000},
-      "Cobra Bastion -1": {"pph":604658.385093,"xph":3774534.16149},
-      "Druid Only Spot": {"pph":334476.82924,"xph":3110466.203},
-      "Feru Way": {"pph":292924.74884,"xph":5543915.25365},
-      "Knight Den": {"pph":300000,"xph":3800000},
-      "Nightmare Isles": {"pph":364766.839378,"xph":4377202.07254},
-      "Roshamuul West": {"pph":400000,"xph":3500000},
-      "Test Hideout": {"pph":266666.666667,"xph":3466666.66667},
-      "Warzone 2": {"pph":400000,"xph":4000000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":4619929.37804},
+      "Bastion lure": {"lph":2400000,"pph":900000,"xph":5200000},
+      "Bookworld: Chapter IV": {"lph":null,"pph":250000,"xph":4000000},
+      "Cobra Bastion -1": {"lph":1759006.21118,"pph":604658.385093,"xph":3774534.16149},
+      "Druid Only Spot": {"lph":null,"pph":334476.82924,"xph":3110466.203},
+      "Feru Way": {"lph":null,"pph":292924.74884,"xph":5543915.25365},
+      "Knight Den": {"lph":1100000,"pph":300000,"xph":3800000},
+      "Nightmare Isles": {"lph":1367875.64767,"pph":364766.839378,"xph":4377202.07254},
+      "Roshamuul West": {"lph":null,"pph":400000,"xph":3500000},
+      "Test Hideout": {"lph":1200000,"pph":266666.666667,"xph":3466666.66667},
+      "Warzone 2": {"lph":1500000,"pph":400000,"xph":4000000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},
@@ -409,17 +409,17 @@
       "werehyaena": 0.496212538914
      },
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":4619929.37804},
-      "Bastion lure": {"pph":900000,"xph":5200000},
-      "Bookworld: Chapter IV": {"pph":250000,"xph":4000000},
-      "Cobra Bastion -1": {"pph":604658.385093,"xph":3774534.16149},
-      "Druid Only Spot": {"pph":334476.82924,"xph":3110466.203},
-      "Feru Way": {"pph":292924.74884,"xph":5543915.25365},
-      "Knight Den": {"pph":300000,"xph":3800000},
-      "Nightmare Isles": {"pph":364766.839378,"xph":4377202.07254},
-      "Roshamuul West": {"pph":400000,"xph":3500000},
-      "Test Hideout": {"pph":266666.666667,"xph":3466666.66667},
-      "Warzone 2": {"pph":400000,"xph":4000000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":4619929.37804},
+      "Bastion lure": {"lph":2400000,"pph":900000,"xph":5200000},
+      "Bookworld: Chapter IV": {"lph":null,"pph":250000,"xph":4000000},
+      "Cobra Bastion -1": {"lph":1759006.21118,"pph":604658.385093,"xph":3774534.16149},
+      "Druid Only Spot": {"lph":null,"pph":334476.82924,"xph":3110466.203},
+      "Feru Way": {"lph":null,"pph":292924.74884,"xph":5543915.25365},
+      "Knight Den": {"lph":1100000,"pph":300000,"xph":3800000},
+      "Nightmare Isles": {"lph":1367875.64767,"pph":364766.839378,"xph":4377202.07254},
+      "Roshamuul West": {"lph":null,"pph":400000,"xph":3500000},
+      "Test Hideout": {"lph":1200000,"pph":266666.666667,"xph":3466666.66667},
+      "Warzone 2": {"lph":1500000,"pph":400000,"xph":4000000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},
@@ -527,17 +527,17 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"other","Druid Only Spot":"otherAdj","Feru Way":"refAdj","Roshamuul West":"other"},
      "scores": {},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":4619929.37804},
-      "Bastion lure": {"pph":900000,"xph":5200000},
-      "Bookworld: Chapter IV": {"pph":250000,"xph":4000000},
-      "Cobra Bastion -1": {"pph":604658.385093,"xph":3774534.16149},
-      "Druid Only Spot": {"pph":334476.82924,"xph":3110466.203},
-      "Feru Way": {"pph":292924.74884,"xph":5543915.25365},
-      "Knight Den": {"pph":300000,"xph":3800000},
-      "Nightmare Isles": {"pph":364766.839378,"xph":4377202.07254},
-      "Roshamuul West": {"pph":400000,"xph":3500000},
-      "Test Hideout": {"pph":266666.666667,"xph":3466666.66667},
-      "Warzone 2": {"pph":400000,"xph":4000000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":4619929.37804},
+      "Bastion lure": {"lph":2400000,"pph":900000,"xph":5200000},
+      "Bookworld: Chapter IV": {"lph":null,"pph":250000,"xph":4000000},
+      "Cobra Bastion -1": {"lph":1759006.21118,"pph":604658.385093,"xph":3774534.16149},
+      "Druid Only Spot": {"lph":null,"pph":334476.82924,"xph":3110466.203},
+      "Feru Way": {"lph":null,"pph":292924.74884,"xph":5543915.25365},
+      "Knight Den": {"lph":1100000,"pph":300000,"xph":3800000},
+      "Nightmare Isles": {"lph":1367875.64767,"pph":364766.839378,"xph":4377202.07254},
+      "Roshamuul West": {"lph":null,"pph":400000,"xph":3500000},
+      "Test Hideout": {"lph":1200000,"pph":266666.666667,"xph":3466666.66667},
+      "Warzone 2": {"lph":1500000,"pph":400000,"xph":4000000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},
@@ -875,17 +875,17 @@
       "werehyaena": 0.496301812067
      },
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":4619929.37804},
-      "Bastion lure": {"pph":900000,"xph":5200000},
-      "Bookworld: Chapter IV": {"pph":250000,"xph":4000000},
-      "Cobra Bastion -1": {"pph":604658.385093,"xph":3774534.16149},
-      "Druid Only Spot": {"pph":334476.82924,"xph":3110466.203},
-      "Feru Way": {"pph":292924.74884,"xph":5543915.25365},
-      "Knight Den": {"pph":300000,"xph":3800000},
-      "Nightmare Isles": {"pph":364766.839378,"xph":4377202.07254},
-      "Roshamuul West": {"pph":400000,"xph":3500000},
-      "Test Hideout": {"pph":266666.666667,"xph":3466666.66667},
-      "Warzone 2": {"pph":400000,"xph":4000000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":4619929.37804},
+      "Bastion lure": {"lph":2400000,"pph":900000,"xph":5200000},
+      "Bookworld: Chapter IV": {"lph":null,"pph":250000,"xph":4000000},
+      "Cobra Bastion -1": {"lph":1759006.21118,"pph":604658.385093,"xph":3774534.16149},
+      "Druid Only Spot": {"lph":null,"pph":334476.82924,"xph":3110466.203},
+      "Feru Way": {"lph":null,"pph":292924.74884,"xph":5543915.25365},
+      "Knight Den": {"lph":1100000,"pph":300000,"xph":3800000},
+      "Nightmare Isles": {"lph":1367875.64767,"pph":364766.839378,"xph":4377202.07254},
+      "Roshamuul West": {"lph":null,"pph":400000,"xph":3500000},
+      "Test Hideout": {"lph":1200000,"pph":266666.666667,"xph":3466666.66667},
+      "Warzone 2": {"lph":1500000,"pph":400000,"xph":4000000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},
@@ -1163,17 +1163,17 @@
       "weeper": 0.658838603226
      },
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":4619929.37804},
-      "Bastion lure": {"pph":900000,"xph":5200000},
-      "Bookworld: Chapter IV": {"pph":250000,"xph":4000000},
-      "Cobra Bastion -1": {"pph":604658.385093,"xph":3774534.16149},
-      "Druid Only Spot": {"pph":334476.82924,"xph":3110466.203},
-      "Feru Way": {"pph":292924.74884,"xph":5543915.25365},
-      "Knight Den": {"pph":300000,"xph":3800000},
-      "Nightmare Isles": {"pph":364766.839378,"xph":4377202.07254},
-      "Roshamuul West": {"pph":400000,"xph":3500000},
-      "Test Hideout": {"pph":266666.666667,"xph":3466666.66667},
-      "Warzone 2": {"pph":400000,"xph":4000000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":4619929.37804},
+      "Bastion lure": {"lph":2400000,"pph":900000,"xph":5200000},
+      "Bookworld: Chapter IV": {"lph":null,"pph":250000,"xph":4000000},
+      "Cobra Bastion -1": {"lph":1759006.21118,"pph":604658.385093,"xph":3774534.16149},
+      "Druid Only Spot": {"lph":null,"pph":334476.82924,"xph":3110466.203},
+      "Feru Way": {"lph":null,"pph":292924.74884,"xph":5543915.25365},
+      "Knight Den": {"lph":1100000,"pph":300000,"xph":3800000},
+      "Nightmare Isles": {"lph":1367875.64767,"pph":364766.839378,"xph":4377202.07254},
+      "Roshamuul West": {"lph":null,"pph":400000,"xph":3500000},
+      "Test Hideout": {"lph":1200000,"pph":266666.666667,"xph":3466666.66667},
+      "Warzone 2": {"lph":1500000,"pph":400000,"xph":4000000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},
@@ -1315,17 +1315,17 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"other","Druid Only Spot":"otherAdj","Feru Way":"refAdj","Roshamuul West":"other"},
      "scores": {"midnight-asura":1,"silencer":0.820773579179,"werehyaena":0.672901712308},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":4619929.37804},
-      "Bastion lure": {"pph":900000,"xph":5200000},
-      "Bookworld: Chapter IV": {"pph":250000,"xph":4000000},
-      "Cobra Bastion -1": {"pph":604658.385093,"xph":3774534.16149},
-      "Druid Only Spot": {"pph":334476.82924,"xph":3110466.203},
-      "Feru Way": {"pph":292924.74884,"xph":5543915.25365},
-      "Knight Den": {"pph":300000,"xph":3800000},
-      "Nightmare Isles": {"pph":364766.839378,"xph":4377202.07254},
-      "Roshamuul West": {"pph":400000,"xph":3500000},
-      "Test Hideout": {"pph":266666.666667,"xph":3466666.66667},
-      "Warzone 2": {"pph":400000,"xph":4000000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":4619929.37804},
+      "Bastion lure": {"lph":2400000,"pph":900000,"xph":5200000},
+      "Bookworld: Chapter IV": {"lph":null,"pph":250000,"xph":4000000},
+      "Cobra Bastion -1": {"lph":1759006.21118,"pph":604658.385093,"xph":3774534.16149},
+      "Druid Only Spot": {"lph":null,"pph":334476.82924,"xph":3110466.203},
+      "Feru Way": {"lph":null,"pph":292924.74884,"xph":5543915.25365},
+      "Knight Den": {"lph":1100000,"pph":300000,"xph":3800000},
+      "Nightmare Isles": {"lph":1367875.64767,"pph":364766.839378,"xph":4377202.07254},
+      "Roshamuul West": {"lph":null,"pph":400000,"xph":3500000},
+      "Test Hideout": {"lph":1200000,"pph":266666.666667,"xph":3466666.66667},
+      "Warzone 2": {"lph":1500000,"pph":400000,"xph":4000000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},
@@ -1617,17 +1617,17 @@
       "werehyaena": 0.533617165992
      },
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":4619929.37804},
-      "Bastion lure": {"pph":900000,"xph":5200000},
-      "Bookworld: Chapter IV": {"pph":250000,"xph":4000000},
-      "Cobra Bastion -1": {"pph":604658.385093,"xph":3774534.16149},
-      "Druid Only Spot": {"pph":334476.82924,"xph":3110466.203},
-      "Feru Way": {"pph":292924.74884,"xph":5543915.25365},
-      "Knight Den": {"pph":300000,"xph":3800000},
-      "Nightmare Isles": {"pph":364766.839378,"xph":4377202.07254},
-      "Roshamuul West": {"pph":400000,"xph":3500000},
-      "Test Hideout": {"pph":266666.666667,"xph":3466666.66667},
-      "Warzone 2": {"pph":400000,"xph":4000000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":4619929.37804},
+      "Bastion lure": {"lph":2400000,"pph":900000,"xph":5200000},
+      "Bookworld: Chapter IV": {"lph":null,"pph":250000,"xph":4000000},
+      "Cobra Bastion -1": {"lph":1759006.21118,"pph":604658.385093,"xph":3774534.16149},
+      "Druid Only Spot": {"lph":null,"pph":334476.82924,"xph":3110466.203},
+      "Feru Way": {"lph":null,"pph":292924.74884,"xph":5543915.25365},
+      "Knight Den": {"lph":1100000,"pph":300000,"xph":3800000},
+      "Nightmare Isles": {"lph":1367875.64767,"pph":364766.839378,"xph":4377202.07254},
+      "Roshamuul West": {"lph":null,"pph":400000,"xph":3500000},
+      "Test Hideout": {"lph":1200000,"pph":266666.666667,"xph":3466666.66667},
+      "Warzone 2": {"lph":1500000,"pph":400000,"xph":4000000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},
@@ -1731,17 +1731,17 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"other","Druid Only Spot":"otherAdj","Feru Way":"refAdj","Roshamuul West":"other"},
      "scores": {},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":4619929.37804},
-      "Bastion lure": {"pph":900000,"xph":5200000},
-      "Bookworld: Chapter IV": {"pph":250000,"xph":4000000},
-      "Cobra Bastion -1": {"pph":604658.385093,"xph":3774534.16149},
-      "Druid Only Spot": {"pph":334476.82924,"xph":3110466.203},
-      "Feru Way": {"pph":292924.74884,"xph":5543915.25365},
-      "Knight Den": {"pph":300000,"xph":3800000},
-      "Nightmare Isles": {"pph":364766.839378,"xph":4377202.07254},
-      "Roshamuul West": {"pph":400000,"xph":3500000},
-      "Test Hideout": {"pph":266666.666667,"xph":3466666.66667},
-      "Warzone 2": {"pph":400000,"xph":4000000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":4619929.37804},
+      "Bastion lure": {"lph":2400000,"pph":900000,"xph":5200000},
+      "Bookworld: Chapter IV": {"lph":null,"pph":250000,"xph":4000000},
+      "Cobra Bastion -1": {"lph":1759006.21118,"pph":604658.385093,"xph":3774534.16149},
+      "Druid Only Spot": {"lph":null,"pph":334476.82924,"xph":3110466.203},
+      "Feru Way": {"lph":null,"pph":292924.74884,"xph":5543915.25365},
+      "Knight Den": {"lph":1100000,"pph":300000,"xph":3800000},
+      "Nightmare Isles": {"lph":1367875.64767,"pph":364766.839378,"xph":4377202.07254},
+      "Roshamuul West": {"lph":null,"pph":400000,"xph":3500000},
+      "Test Hideout": {"lph":1200000,"pph":266666.666667,"xph":3466666.66667},
+      "Warzone 2": {"lph":1500000,"pph":400000,"xph":4000000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},
@@ -2075,17 +2075,17 @@
       "werehyaena": 0.58257054533
      },
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":4619929.37804},
-      "Bastion lure": {"pph":900000,"xph":5200000},
-      "Bookworld: Chapter IV": {"pph":250000,"xph":4000000},
-      "Cobra Bastion -1": {"pph":604658.385093,"xph":3774534.16149},
-      "Druid Only Spot": {"pph":334476.82924,"xph":3110466.203},
-      "Feru Way": {"pph":292924.74884,"xph":5543915.25365},
-      "Knight Den": {"pph":300000,"xph":3800000},
-      "Nightmare Isles": {"pph":364766.839378,"xph":4377202.07254},
-      "Roshamuul West": {"pph":400000,"xph":3500000},
-      "Test Hideout": {"pph":266666.666667,"xph":3466666.66667},
-      "Warzone 2": {"pph":400000,"xph":4000000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":4619929.37804},
+      "Bastion lure": {"lph":2400000,"pph":900000,"xph":5200000},
+      "Bookworld: Chapter IV": {"lph":null,"pph":250000,"xph":4000000},
+      "Cobra Bastion -1": {"lph":1759006.21118,"pph":604658.385093,"xph":3774534.16149},
+      "Druid Only Spot": {"lph":null,"pph":334476.82924,"xph":3110466.203},
+      "Feru Way": {"lph":null,"pph":292924.74884,"xph":5543915.25365},
+      "Knight Den": {"lph":1100000,"pph":300000,"xph":3800000},
+      "Nightmare Isles": {"lph":1367875.64767,"pph":364766.839378,"xph":4377202.07254},
+      "Roshamuul West": {"lph":null,"pph":400000,"xph":3500000},
+      "Test Hideout": {"lph":1200000,"pph":266666.666667,"xph":3466666.66667},
+      "Warzone 2": {"lph":1500000,"pph":400000,"xph":4000000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},
@@ -2359,17 +2359,17 @@
       "weeper": 0.708502024291
      },
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":4619929.37804},
-      "Bastion lure": {"pph":900000,"xph":5200000},
-      "Bookworld: Chapter IV": {"pph":250000,"xph":4000000},
-      "Cobra Bastion -1": {"pph":604658.385093,"xph":3774534.16149},
-      "Druid Only Spot": {"pph":334476.82924,"xph":3110466.203},
-      "Feru Way": {"pph":292924.74884,"xph":5543915.25365},
-      "Knight Den": {"pph":300000,"xph":3800000},
-      "Nightmare Isles": {"pph":364766.839378,"xph":4377202.07254},
-      "Roshamuul West": {"pph":400000,"xph":3500000},
-      "Test Hideout": {"pph":266666.666667,"xph":3466666.66667},
-      "Warzone 2": {"pph":400000,"xph":4000000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":4619929.37804},
+      "Bastion lure": {"lph":2400000,"pph":900000,"xph":5200000},
+      "Bookworld: Chapter IV": {"lph":null,"pph":250000,"xph":4000000},
+      "Cobra Bastion -1": {"lph":1759006.21118,"pph":604658.385093,"xph":3774534.16149},
+      "Druid Only Spot": {"lph":null,"pph":334476.82924,"xph":3110466.203},
+      "Feru Way": {"lph":null,"pph":292924.74884,"xph":5543915.25365},
+      "Knight Den": {"lph":1100000,"pph":300000,"xph":3800000},
+      "Nightmare Isles": {"lph":1367875.64767,"pph":364766.839378,"xph":4377202.07254},
+      "Roshamuul West": {"lph":null,"pph":400000,"xph":3500000},
+      "Test Hideout": {"lph":1200000,"pph":266666.666667,"xph":3466666.66667},
+      "Warzone 2": {"lph":1500000,"pph":400000,"xph":4000000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":493.080937665,"midnight-asura":563.521071617},
@@ -2454,10 +2454,10 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"refAdj"},
      "scores": {"silencer":1},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":6079826.12533},
-      "Bookworld: Chapter IV": {"pph":169622.308798,"xph":4863860.90027},
-      "Paladin Test Cave": {"pph":18181.8181818,"xph":3000000},
-      "Roshamuul West": {"pph":250000,"xph":3450000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":6079826.12533},
+      "Bookworld: Chapter IV": {"lph":null,"pph":169622.308798,"xph":4863860.90027},
+      "Paladin Test Cave": {"lph":484848.484848,"pph":18181.8181818,"xph":3000000},
+      "Roshamuul West": {"lph":900000,"pph":250000,"xph":3450000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":499.769858539,"midnight-asura":571.165552616},
@@ -2519,10 +2519,10 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"refAdj"},
      "scores": {"crusader":0.347216037398,"frazzlemaw":1,"guzzlemaw":0.955019295723,"headwalker":0.343217752574,"silencer":0.944983600813},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":6079826.12533},
-      "Bookworld: Chapter IV": {"pph":169622.308798,"xph":4863860.90027},
-      "Paladin Test Cave": {"pph":18181.8181818,"xph":3000000},
-      "Roshamuul West": {"pph":250000,"xph":3450000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":6079826.12533},
+      "Bookworld: Chapter IV": {"lph":null,"pph":169622.308798,"xph":4863860.90027},
+      "Paladin Test Cave": {"lph":484848.484848,"pph":18181.8181818,"xph":3000000},
+      "Roshamuul West": {"lph":900000,"pph":250000,"xph":3450000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":499.769858539,"midnight-asura":571.165552616},
@@ -2565,10 +2565,10 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"refAdj"},
      "scores": {},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":6079826.12533},
-      "Bookworld: Chapter IV": {"pph":169622.308798,"xph":4863860.90027},
-      "Paladin Test Cave": {"pph":18181.8181818,"xph":3000000},
-      "Roshamuul West": {"pph":250000,"xph":3450000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":6079826.12533},
+      "Bookworld: Chapter IV": {"lph":null,"pph":169622.308798,"xph":4863860.90027},
+      "Paladin Test Cave": {"lph":484848.484848,"pph":18181.8181818,"xph":3000000},
+      "Roshamuul West": {"lph":900000,"pph":250000,"xph":3450000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":499.769858539,"midnight-asura":571.165552616},
@@ -2652,10 +2652,10 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"refAdj"},
      "scores": {"crusader":0.355893245182,"frazzlemaw":1,"guzzlemaw":0.986278349607,"headwalker":0.354673542925,"silencer":0.995426116536},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":6079826.12533},
-      "Bookworld: Chapter IV": {"pph":169622.308798,"xph":4863860.90027},
-      "Paladin Test Cave": {"pph":18181.8181818,"xph":3000000},
-      "Roshamuul West": {"pph":250000,"xph":3450000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":6079826.12533},
+      "Bookworld: Chapter IV": {"lph":null,"pph":169622.308798,"xph":4863860.90027},
+      "Paladin Test Cave": {"lph":484848.484848,"pph":18181.8181818,"xph":3000000},
+      "Roshamuul West": {"lph":900000,"pph":250000,"xph":3450000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":499.769858539,"midnight-asura":571.165552616},
@@ -2704,10 +2704,10 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"refAdj"},
      "scores": {"crusader":0.347216037398,"frazzlemaw":1,"guzzlemaw":0.955019295723,"headwalker":0.343217752574},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":6079826.12533},
-      "Bookworld: Chapter IV": {"pph":169622.308798,"xph":4863860.90027},
-      "Paladin Test Cave": {"pph":18181.8181818,"xph":3000000},
-      "Roshamuul West": {"pph":250000,"xph":3450000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":6079826.12533},
+      "Bookworld: Chapter IV": {"lph":null,"pph":169622.308798,"xph":4863860.90027},
+      "Paladin Test Cave": {"lph":484848.484848,"pph":18181.8181818,"xph":3000000},
+      "Roshamuul West": {"lph":900000,"pph":250000,"xph":3450000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":499.769858539,"midnight-asura":571.165552616},
@@ -2764,10 +2764,10 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"refAdj"},
      "scores": {"silencer":1},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":6079826.12533},
-      "Bookworld: Chapter IV": {"pph":169622.308798,"xph":4863860.90027},
-      "Paladin Test Cave": {"pph":18181.8181818,"xph":3000000},
-      "Roshamuul West": {"pph":250000,"xph":3450000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":6079826.12533},
+      "Bookworld: Chapter IV": {"lph":null,"pph":169622.308798,"xph":4863860.90027},
+      "Paladin Test Cave": {"lph":484848.484848,"pph":18181.8181818,"xph":3000000},
+      "Roshamuul West": {"lph":900000,"pph":250000,"xph":3450000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":499.769858539,"midnight-asura":571.165552616},
@@ -2829,10 +2829,10 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"refAdj"},
      "scores": {"crusader":0.347216037398,"frazzlemaw":1,"guzzlemaw":0.955019295723,"headwalker":0.343217752574,"silencer":0.944983600813},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":6079826.12533},
-      "Bookworld: Chapter IV": {"pph":169622.308798,"xph":4863860.90027},
-      "Paladin Test Cave": {"pph":18181.8181818,"xph":3000000},
-      "Roshamuul West": {"pph":250000,"xph":3450000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":6079826.12533},
+      "Bookworld: Chapter IV": {"lph":null,"pph":169622.308798,"xph":4863860.90027},
+      "Paladin Test Cave": {"lph":484848.484848,"pph":18181.8181818,"xph":3000000},
+      "Roshamuul West": {"lph":900000,"pph":250000,"xph":3450000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":499.769858539,"midnight-asura":571.165552616},
@@ -2875,10 +2875,10 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"refAdj"},
      "scores": {},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":6079826.12533},
-      "Bookworld: Chapter IV": {"pph":169622.308798,"xph":4863860.90027},
-      "Paladin Test Cave": {"pph":18181.8181818,"xph":3000000},
-      "Roshamuul West": {"pph":250000,"xph":3450000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":6079826.12533},
+      "Bookworld: Chapter IV": {"lph":null,"pph":169622.308798,"xph":4863860.90027},
+      "Paladin Test Cave": {"lph":484848.484848,"pph":18181.8181818,"xph":3000000},
+      "Roshamuul West": {"lph":900000,"pph":250000,"xph":3450000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":499.769858539,"midnight-asura":571.165552616},
@@ -2962,10 +2962,10 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"refAdj"},
      "scores": {"crusader":0.355893245182,"frazzlemaw":1,"guzzlemaw":0.986278349607,"headwalker":0.354673542925,"silencer":0.995426116536},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":6079826.12533},
-      "Bookworld: Chapter IV": {"pph":169622.308798,"xph":4863860.90027},
-      "Paladin Test Cave": {"pph":18181.8181818,"xph":3000000},
-      "Roshamuul West": {"pph":250000,"xph":3450000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":6079826.12533},
+      "Bookworld: Chapter IV": {"lph":null,"pph":169622.308798,"xph":4863860.90027},
+      "Paladin Test Cave": {"lph":484848.484848,"pph":18181.8181818,"xph":3000000},
+      "Roshamuul West": {"lph":900000,"pph":250000,"xph":3450000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":499.769858539,"midnight-asura":571.165552616},
@@ -3014,10 +3014,10 @@
      "refSpotSrc": {"Asura Mirror":"refAdj","Bookworld: Chapter IV":"refAdj"},
      "scores": {"crusader":0.347216037398,"frazzlemaw":1,"guzzlemaw":0.955019295723,"headwalker":0.343217752574},
      "spotEco": {
-      "Asura Mirror": {"pph":null,"xph":6079826.12533},
-      "Bookworld: Chapter IV": {"pph":169622.308798,"xph":4863860.90027},
-      "Paladin Test Cave": {"pph":18181.8181818,"xph":3000000},
-      "Roshamuul West": {"pph":250000,"xph":3450000}
+      "Asura Mirror": {"lph":null,"pph":null,"xph":6079826.12533},
+      "Bookworld: Chapter IV": {"lph":null,"pph":169622.308798,"xph":4863860.90027},
+      "Paladin Test Cave": {"lph":484848.484848,"pph":18181.8181818,"xph":3000000},
+      "Roshamuul West": {"lph":900000,"pph":250000,"xph":3450000}
      },
      "spotKph": {
       "Asura Mirror": {"dawnfire-asura":499.769858539,"midnight-asura":571.165552616},

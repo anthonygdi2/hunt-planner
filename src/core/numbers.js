@@ -37,6 +37,7 @@ export function effective(entry, pick) {
   out.src = "own";
   out.numsAt = manualNums(r) ? (r.numsAt || r.updatedAt) : d.last;
   out.fromSessions = true;
+  out.taskBonus = !!d.taskBonus;
   out.spot = d.spot;
   if (r.kph == null) { out.sample = d.sample; out.sampleHours = d.sampleHours; }
   return out;

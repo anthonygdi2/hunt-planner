@@ -1125,6 +1125,7 @@
     damage: { lo: 7, hi: 25, step: 2 },
     defense: { lo: 12, hi: 30, step: 2 }
   });
+  var TALISMAN = deepFreeze({ loot: { max: 50 }, bestiary: { max: 100 } });
   var EXP_EVENTS = deepFreeze({ double: 100, world: [50, 30, 25, 10] });
 
   // src/core/occupancy.js
@@ -1435,6 +1436,7 @@
     out.src = "own";
     out.numsAt = manualNums(r) ? r.numsAt || r.updatedAt : d.last;
     out.fromSessions = true;
+    out.taskBonus = !!d.taskBonus;
     out.spot = d.spot;
     if (r.kph == null) {
       out.sample = d.sample;
@@ -1914,6 +1916,7 @@
     "{amount} hunting": "{amount} cazando",
     "{amount} from today’s boosts": "{amount} de los bonus de hoy",
     "{amount} from the bounty": "{amount} del bounty",
+    "{amount} from the Bounty Talisman": "{amount} del Bounty Talisman",
     "{amount} from weekly tasks": "{amount} de tareas semanales",
     "{amount} charm points/h": "{amount} puntos de charm/h",
     "{amount} bounty points/h": "{amount} puntos de bounty/h",
@@ -1990,6 +1993,8 @@
     "Vocation": "Vocación",
     "Level": "Nivel",
     "Talisman bestiary bonus (%)": "Bonus de bestiary del Talisman (%)",
+    "Talisman loot bonus (%)": "Bonus de loot del Talisman (%)",
+    "Your Bounty Talisman’s bonuses as the game shows them, 0 without one. They count on your bounty’s creature only.": "Los bonus de tu Bounty Talisman como los muestra el juego, 0 si no tienes. Cuentan solo en la criatura de tu bounty.",
     "Delete this character…": "Borrar este personaje…",
     "Numbers from": "Números de",
     "Your logged hunts": "Tus cazas registradas",
@@ -2536,6 +2541,7 @@
     "{amount} hunting": "{amount} caçando",
     "{amount} from today’s boosts": "{amount} dos bônus de hoje",
     "{amount} from the bounty": "{amount} da bounty",
+    "{amount} from the Bounty Talisman": "{amount} do Bounty Talisman",
     "{amount} from weekly tasks": "{amount} de tasks semanais",
     "{amount} charm points/h": "{amount} pontos de charm/h",
     "{amount} bounty points/h": "{amount} pontos de bounty/h",
@@ -2612,6 +2618,8 @@
     "Vocation": "Vocação",
     "Level": "Level",
     "Talisman bestiary bonus (%)": "Bônus de bestiary do Talisman (%)",
+    "Talisman loot bonus (%)": "Bônus de loot do Talisman (%)",
+    "Your Bounty Talisman’s bonuses as the game shows them, 0 without one. They count on your bounty’s creature only.": "Os bônus do seu Bounty Talisman como o jogo mostra, 0 se não tiver. Contam só na criatura da sua bounty.",
     "Delete this character…": "Apagar este personagem…",
     "Numbers from": "Números de",
     "Your logged hunts": "Suas hunts registradas",
@@ -3158,6 +3166,7 @@
     "{amount} hunting": "{amount} z polowania",
     "{amount} from today’s boosts": "{amount} z dzisiejszych bonusów",
     "{amount} from the bounty": "{amount} z bounty",
+    "{amount} from the Bounty Talisman": "{amount} z Bounty Talismanu",
     "{amount} from weekly tasks": "{amount} z tasków tygodniowych",
     "{amount} charm points/h": "{amount} punktów charm/h",
     "{amount} bounty points/h": "{amount} punktów bounty/h",
@@ -3234,6 +3243,8 @@
     "Vocation": "Profesja",
     "Level": "Poziom",
     "Talisman bestiary bonus (%)": "Bonus bestiary z Talismanu (%)",
+    "Talisman loot bonus (%)": "Bonus loot z Talismanu (%)",
+    "Your Bounty Talisman’s bonuses as the game shows them, 0 without one. They count on your bounty’s creature only.": "Bonusy twojego Bounty Talismanu tak, jak pokazuje je gra, 0 bez niego. Liczą się tylko na stworze z twojego bounty.",
     "Delete this character…": "Usuń tę postać…",
     "Numbers from": "Liczby z",
     "Your logged hunts": "Twoje zapisane polowania",
@@ -4012,6 +4023,15 @@
     });
     return out;
   }
+  function readTalisman(p) {
+    const tl = p && p.talisman && typeof p.talisman === "object" ? p.talisman : {};
+    const pct2 = (v, max) => {
+      const n = Number(v);
+      return v != null && v !== "" && n >= 0 && n <= max ? n : null;
+    };
+    const bOld = pct2(p && p.bestiaryBonus, TALISMAN.bestiary.max), b = bOld != null ? bOld : pct2(tl.bestiary, TALISMAN.bestiary.max);
+    return { loot: pct2(tl.loot, TALISMAN.loot.max) || 0, bestiary: b || 0 };
+  }
   function readMark(v) {
     return v && (v.state === "taken" || v.state === "free") && typeof v.at === "string" ? { state: v.state, at: v.at, world: typeof v.world === "string" ? v.world : null } : null;
   }
@@ -4429,7 +4449,7 @@
         tot += k.count || 0;
       });
       if (!tot) return;
-      const s = keyOf(x), a = acc[s] || (acc[s] = { kills: {}, total: 0, xp: 0, bal: 0, loot: 0, lootTotal: 0, cTotal: 0, cHours: 0 });
+      const s = keyOf(x), a = acc[s] || (acc[s] = { kills: {}, total: 0, xp: 0, bal: 0, loot: 0, lootTotal: 0, cTotal: 0, cHours: 0, tasks: {} });
       a.total += tot;
       a.xp += x[mode] != null ? x[mode] : x.rawXp || 0;
       a.bal += x.balance || 0;
@@ -4437,6 +4457,7 @@
         a.loot += x.loot;
         a.lootTotal += tot;
       }
+      if (x.task) a.tasks[x.task] = true;
       x.kills.forEach((k) => {
         const key = catalog.killKey(k);
         a.kills[key] = (a.kills[key] || 0) + (k.count || 0);
@@ -4459,7 +4480,8 @@
         pph: a.bal / a.total * spk,
         lph: a.lootTotal ? a.loot / a.lootTotal * spk : null,
         hours: a.cHours,
-        kills: a.cTotal
+        kills: a.cTotal,
+        tasks: Object.keys(a.tasks)
       };
     });
     return out;
@@ -4827,7 +4849,7 @@
   }
   function spotNumbers(sp, ctx) {
     const own = sp.sessions.length ? spotRates(sp.sessions, ctx.catalog, () => sp.id, xpField(ctx.xpMode))[sp.id] : null;
-    if (own) return { src: "own", kph: own.kph, xph: own.xph, pph: own.pph, lph: own.lph, hours: own.hours, kills: own.kills, entry: null };
+    if (own) return { src: "own", kph: own.kph, xph: own.xph, pph: own.pph, lph: own.lph, tasks: own.tasks, hours: own.hours, kills: own.kills, entry: null };
     if (!ctx.refOn) return null;
     const opts = { xpMode: ctx.xpMode, xpBoost: ctx.xpBoost, catalog: ctx.catalog }, k = norm(sp.name);
     let e = ctx.picks.by[k], n = null;
@@ -4904,6 +4926,18 @@
     const b = BESTIARY[c.cls] || BESTIARY.H;
     return { kills: b.kills, charmPoints: b.charmPoints, warden: b.warden };
   }
+  function expShares(kph, expTable) {
+    const keys = Object.keys(kph || {}), exp = expTable || {}, byExp = keys.every((k) => exp[k] > 0), w2 = {}, out = {};
+    let tot = 0;
+    keys.forEach((k) => {
+      w2[k] = kph[k] * (byExp ? exp[k] : 1);
+      tot += w2[k];
+    });
+    if (tot > 0) keys.forEach((k) => {
+      out[k] = w2[k] / tot;
+    });
+    return out;
+  }
   var wardenShare = (entry) => entry.bestiaryDone ? RAID.wardenShareDone : RAID.wardenShare;
   function metrics(c, rec, ctx) {
     rec = rec || {};
@@ -4920,6 +4954,12 @@
     m.weeklyXph = ctx.weeklyXph && hours ? ctx.weeklyXph(rec.spot, hours, c.slug, kills) : 0;
     m.xp = rec.xph != null ? rec.xph + (rewardXph || 0) + m.weeklyXph : null;
     m.profit = rec.pph != null ? rec.pph : null;
+    m.talismanLoot = 0;
+    const tl = Number(ctx.talismanLoot) || 0, eco = rec.spot && ctx.spotEco && ctx.spotEco[rec.spot], at = rec.spot && ctx.spotKph && ctx.spotKph[rec.spot];
+    if (m.profit != null && tl > 0 && !rec.taskBonus && eco && eco.lph > 0 && at && at[c.slug] > 0) {
+      m.talismanLoot = eco.lph * (expShares(at, ctx.expTable)[c.slug] || 0) * tl / 100;
+      m.profit += m.talismanLoot;
+    }
     const b = bestiaryOf(c), bonus = Number(ctx.bestiaryBonus) || 0, raidP = ctx.raidP;
     const wardenOpen = !rec.wardenDone && !c.r && raidP > 0;
     if (kph != null) {
@@ -4955,7 +4995,7 @@
     const logged = spotRates(sessions, catalog, sessionSpot, xpField(p.xpMode)), spotKph = {}, spotEco = {}, refSpotSrc = {};
     Object.keys(logged).forEach((s) => {
       spotKph[s] = logged[s].kph;
-      spotEco[s] = { xph: logged[s].xph, pph: logged[s].pph };
+      spotEco[s] = { xph: logged[s].xph, pph: logged[s].pph, lph: logged[s].lph };
     });
     const refActive = referenceSpots({
       picks,
@@ -4972,13 +5012,14 @@
     refActive.forEach((a) => {
       if (!a.active) return;
       spotKph[a.e.spot] = a.n.kph;
-      spotEco[a.e.spot] = { xph: a.n.xph, pph: a.n.pph };
+      spotEco[a.e.spot] = { xph: a.n.xph, pph: a.n.pph, lph: a.n.lph };
       refSpotSrc[a.e.spot] = a.n.src;
     });
     const weeklyNow = advanced ? openWeeklyTasks(weeklyState(p, ownHunts(sessions, state.pid), catalog, new Date(now)), catalog) : [];
     const weights = scoringWeights(readGoal(p)), chalRates = p.chalRates && typeof p.chalRates === "object" ? p.chalRates : {};
     const weeklyXph = weeklyNow.length ? (spot, hours, slug, kills) => weeklyBonus(weeklyNow, spot && spotKph[spot], hours, slug, kills) : null;
-    const ctx = (diff) => ({ diff, chalRates, bestiaryBonus: p.bestiaryBonus, raidP: raid.p, spotKph, entries, catalog, weeklyXph });
+    const tal = readTalisman(p);
+    const ctx = (diff) => ({ diff, chalRates, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, raidP: raid.p, spotKph, spotEco, expTable: state.expTable, entries, catalog, weeklyXph });
     const diffFor = (c) => difficulty !== "all" ? difficulty : topPool(c);
     const choose = (c, spots, pin) => {
       const d = diffFor(c);
@@ -5074,8 +5115,12 @@
         if (some(o.parts.held)) sub.push(t2("{amount} from the bounty", { amount: fmtBig(o.parts.held) }));
         if (some(o.parts.weekly)) sub.push(t2("{amount} from weekly tasks", { amount: fmtBig(o.parts.weekly) }));
         bits.push(t2("{amount} exp/h", { amount: fmtBig(o.m.xp) }) + (sub.length > 1 ? " (" + sub.join(", ") + ")" : ""));
-      } else if (k === "profit") bits.push(t2("{amount} profit/h", { amount: fmtBig(o.m.profit) }) + (o.lootBonus > 0 && fmtBig(o.lootBonus) !== "0" ? " (" + t2("{amount} from today’s boosts", { amount: fmtBig(o.lootBonus) }) + ")" : ""));
-      else if (k === "charm") bits.push(t2("{amount} charm points/h", { amount: fmtSmall(o.m.charm) }));
+      } else if (k === "profit") {
+        const some = (x) => x > 0 && fmtBig(x) !== "0", sub = [];
+        if (some(o.lootBonus)) sub.push(t2("{amount} from today’s boosts", { amount: fmtBig(o.lootBonus) }));
+        if (some(o.talismanLoot)) sub.push(t2("{amount} from the Bounty Talisman", { amount: fmtBig(o.talismanLoot) }));
+        bits.push(t2("{amount} profit/h", { amount: fmtBig(o.m.profit) }) + (sub.length ? " (" + sub.join(", ") + ")" : ""));
+      } else if (k === "charm") bits.push(t2("{amount} charm points/h", { amount: fmtSmall(o.m.charm) }));
       else if (k === "bounty") bits.push(t2("{amount} bounty points/h", { amount: fmtSmall(o.m.bounty) }));
     });
     let s = bits.length ? t2("Scores {score}: {parts}.", { score: ctx.pct(o.v), parts: bits.join(", ") }) : t2("Scores {score}.", { score: ctx.pct(o.v) });
@@ -5129,12 +5174,8 @@
   function todayFactor(kph, today, ctx) {
     const out = { mult: 1, notes: [], loot: 1, lootNotes: [] }, t2 = ctx.t || EN;
     if (!today) return out;
-    const keys = Object.keys(kph), exp = ctx.expTable, byExp = keys.every((k) => exp[k] > 0), w2 = {};
-    let tot = 0, per = 0, loot = 0;
-    keys.forEach((k) => {
-      w2[k] = kph[k] * (byExp ? exp[k] : 1);
-      tot += w2[k];
-    });
+    const keys = Object.keys(kph), share = expShares(kph, ctx.expTable), tot = keys.length && share[keys[0]] != null;
+    let per = 0, loot = 0;
     keys.forEach((k) => {
       let m = 1;
       const name = ctx.catalog.bySlug[k] ? ctx.catalog.bySlug[k].name : k;
@@ -5151,12 +5192,12 @@
       let lm = 1;
       (today.prey || []).forEach((p) => {
         if (p.slug === k && p.kind === "loot" && p.pct > 0) {
-          lm *= 1 + p.pct / 100;
+          lm += p.pct / 100;
           out.lootNotes.push(t2("{creature} prey +{pct}% loot", { creature: name, pct: p.pct }));
         }
       });
-      per += tot ? w2[k] / tot * m : 0;
-      loot += tot ? w2[k] / tot * lm : 0;
+      per += tot ? share[k] * m : 0;
+      loot += tot ? share[k] * lm : 0;
     });
     if (tot) {
       out.mult = per;
@@ -5200,11 +5241,17 @@
     v.lootBonus = lootOn ? nums.lph * (tf.loot - 1) * Hh / H : 0;
     if (lootOn) v.today = tf.notes.concat(tf.lootNotes);
     let bounty = 0;
+    v.talismanLoot = 0;
     if (held && held.left > 0 && nums.kph[held.slug] > 0) {
       const hk = nums.kph[held.slug], hf = rate ? hk / held.left : Math.min(1, hk * Hh / held.left);
       v.parts.held = held.reward * hf / H;
       bounty = held.points * hf / H;
       v.held = { slug: held.slug, kph: hk, kills: rate ? null : Math.min(held.left, hk * Hh), left: held.left, finishes: !rate && hf >= 1, hoursLeft: held.left / hk };
+      const tl = Number(ctx.talismanLoot) || 0, logged = nums.src === "own" && (nums.tasks || []).indexOf(held.slug) !== -1;
+      if (tl > 0 && nums.pph != null && nums.lph > 0 && !logged) {
+        const on = rate || !(hk * Hh > 0) ? 1 : Math.min(1, held.left / (hk * Hh));
+        v.talismanLoot = nums.lph * (expShares(nums.kph, ctx.expTable)[held.slug] || 0) * tl / 100 * on * Hh / H;
+      }
     }
     (opts.weekly || []).forEach((w2) => {
       const k = w2.key === ANY_CREATURE ? allKph(nums.kph) : nums.kph[w2.key];
@@ -5224,7 +5271,7 @@
     });
     v.m = {
       xp: v.parts.hunt + v.parts.today + v.parts.held + v.parts.weekly,
-      profit: nums.pph != null ? nums.pph * Hh / H + v.lootBonus : null,
+      profit: nums.pph != null ? nums.pph * Hh / H + v.lootBonus + v.talismanLoot : null,
       charm: charm * Hh / H,
       bounty
     };
@@ -5515,6 +5562,7 @@
     };
     const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost });
     const heldTask2 = (h2, diff) => heldTask(h2, diff, { catalog, chalRates: chalRates() });
+    const tal = readTalisman(p);
     const spotValue2 = (sp, o) => {
       o = o || {};
       const nums = spotNums(sp);
@@ -5523,7 +5571,7 @@
         sp,
         nums,
         { hours: o.hours, held: o.held, diff: o.diff || boardDiff(), today: o.today, travel: o.travel, weekly: o.weekly || openWeeklies() },
-        { catalog, chalRates: chalRates(), entries, bestiaryBonus: p.bestiaryBonus, raidP: d.raidP, expTable: state.expTable, t: t2 }
+        { catalog, chalRates: chalRates(), entries, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, raidP: d.raidP, expTable: state.expTable, t: t2 }
       );
     };
     const scaleArgs = (diff) => {
@@ -6170,6 +6218,22 @@
       useGuessOdds() {
         updateCharacter({ offerOdds: null });
       },
+      // The Bounty Talisman's more-loot and double-bestiary chances as the game shows them, in percent ({loot} or
+      // {bestiary}, typed; empty is 0, no Talisman). Written as talisman {loot, bestiary} with bestiaryBonus kept in step,
+      // so older builds still read the bestiary bonus. Nothing changes when a value isn't a number in range.
+      setTalisman(patch) {
+        const cur2 = readTalisman(profile() || {}), next = Object.assign({}, cur2);
+        let ok = false;
+        Object.keys(TALISMAN).forEach((k) => {
+          if (!(k in patch)) return;
+          const raw = String(patch[k] == null ? "" : patch[k]).trim().replace("%", "").replace(",", "."), n = raw === "" ? 0 : Number(raw);
+          if (n >= 0 && n <= TALISMAN[k].max) {
+            next[k] = Math.round(n * 100) / 100;
+            ok = true;
+          }
+        });
+        if (ok && (next.loot !== cur2.loot || next.bestiary !== cur2.bestiary)) updateCharacter({ talisman: next, bestiaryBonus: next.bestiary });
+      },
       // Plan: Free and Taken marks (each counted once per 15 minutes toward how often the spot is free), Hunting now.
       markTaken(spotId) {
         mark(spotId, "taken");
@@ -6739,7 +6803,7 @@
         const x = state.profiles[id] || {};
         return { id, label: displayName(x) + (x.level && x.name ? " · " + x.level : ""), pressed: id === state.pid };
       }),
-      character: p && { name: p.name || "", vocation: p.vocation || VOCATIONS[0], level: p.level || "", bestiaryBonus: Number(p.bestiaryBonus) || 0, displayName: displayName(p) },
+      character: p && { name: p.name || "", vocation: p.vocation || VOCATIONS[0], level: p.level || "", talisman: readTalisman(p), displayName: displayName(p) },
       vocations: VOCATIONS,
       sources: {
         preset: sourcesPreset(sources),
@@ -7596,17 +7660,13 @@
               if (n > 0 && n < 1e4) on.update({ level: n });
             } })
           ),
-          field({
-            id: "ch-bonus",
-            label: t("Talisman bestiary bonus (%)"),
-            value: c.bestiaryBonus,
-            inputmode: "numeric",
-            disabled: ro,
-            onCommit: (v) => {
-              const n = Number(v);
-              if (n >= 0 && n <= 100) on.update({ bestiaryBonus: n });
-            }
-          }),
+          h(
+            "div",
+            { class: "hp-grid2" },
+            field({ id: "ch-loot", label: t("Talisman loot bonus (%)"), value: c.talisman.loot, inputmode: "decimal", disabled: ro, onCommit: (v) => on.talisman({ loot: v }) }),
+            field({ id: "ch-bonus", label: t("Talisman bestiary bonus (%)"), value: c.talisman.bestiary, inputmode: "decimal", disabled: ro, onCommit: (v) => on.talisman({ bestiary: v }) })
+          ),
+          h("p", { class: "hp-p hp-caption" }, t("Your Bounty Talisman’s bonuses as the game shows them, 0 without one. They count on your bounty’s creature only.")),
           confirmButton({
             id: "ch-delete",
             label: t("Delete this character…"),
@@ -8999,6 +9059,7 @@
             draw();
           },
           update: a.updateCharacter,
+          talisman: a.setTalisman,
           setSources: a.setSources,
           setOtherVocationHunts: a.setOtherVocationHunts,
           setLevelWindow: a.setLevelWindow,

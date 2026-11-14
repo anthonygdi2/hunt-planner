@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { metrics, bestiaryOf } from "../../src/core/metrics.js";
+import { metrics, bestiaryOf, expShares } from "../../src/core/metrics.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 
 const catalog = makeCatalog([
@@ -74,4 +74,24 @@ test("the weekly share comes from the callback", () => {
   assert.deepEqual(seen, [["X", 1, "cobra-assassin", 450]]);
   assert.equal(m.weeklyXph, 5000);
   assert.equal(m.xp, 1e6 + 1875 * 450 + 5000);
+});
+
+test("each creature's share of a spot's exp, by base exp or else by kills", () => {
+  assert.deepEqual(expShares({ a: 300, b: 200 }, { a: 1000, b: 500 }), { a: 0.75, b: 0.25 });
+  assert.deepEqual(expShares({ a: 300, b: 100 }, { a: 1000 }), { a: 0.75, b: 0.25 }, "b's exp unknown: kill shares");
+  assert.deepEqual(expShares({}, {}), {});
+  assert.deepEqual(expShares(null, null), {});
+});
+
+test("the Bounty Talisman's more loot raises the profit, unless the hunts were on the bounty", () => {
+  const ctx = Object.assign({}, base, { talismanLoot: 10, expTable: { "cobra-assassin": 1000, "cobra-scout": 500 },
+    spotKph: { "Cobra Bastion": { "cobra-assassin": 300, "cobra-scout": 200 } }, spotEco: { "Cobra Bastion": { lph: 4e5 } } });
+  const rec = { kph: 300, xph: 2e6, pph: 1e5, spot: "Cobra Bastion" };
+  const m = metrics(cobra, rec, ctx);
+  assert.ok(Math.abs(m.talismanLoot - 4e5 * 0.75 * 0.1) < 1e-6);
+  assert.ok(Math.abs(m.profit - 1.3e5) < 1e-6);
+  assert.equal(metrics(cobra, Object.assign({ taskBonus: true }, rec), ctx).profit, 1e5, "logged on its bounty: already in");
+  assert.equal(metrics(cobra, rec, Object.assign({}, ctx, { talismanLoot: 0 })).profit, 1e5, "no Talisman");
+  assert.equal(metrics(cobra, rec, Object.assign({}, ctx, { spotEco: { "Cobra Bastion": { lph: null } } })).profit, 1e5, "loot/h unknown");
+  assert.equal(metrics(cobra, Object.assign({}, rec, { pph: null }), ctx).profit, null);
 });

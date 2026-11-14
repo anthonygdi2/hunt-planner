@@ -3,7 +3,7 @@
 // state, the derived values and `now`, so the same model backs the screens, the view models and the golden capture.
 import { VOCATIONS, SLOTS, DIFFICULTIES, OFFER_ODDS } from "../data/rules.js";
 import { compute, ownHunts } from "./compute.js";
-import { readSources, readSettings, readGoal, readBounty, readOfferOdds, readOfferLog } from "../store/schema.js";
+import { readSources, readSettings, readGoal, readBounty, readOfferOdds, readOfferLog, readTalisman } from "../store/schema.js";
 import { norm } from "../core/text.js";
 import { effective } from "../core/numbers.js";
 import { metrics } from "../core/metrics.js";
@@ -134,12 +134,13 @@ export function makeModel(state, derived, now, opts) {
   };
   const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost });
   const heldTask = (h, diff) => coreHeldTask(h, diff, { catalog, chalRates: chalRates() });
+  const tal = readTalisman(p);
   const spotValue = (sp, o) => {
     o = o || {};
     const nums = spotNums(sp);
     if (!nums) return null;
     return coreSpotValue(sp, nums, { hours: o.hours, held: o.held, diff: o.diff || boardDiff(), today: o.today, travel: o.travel, weekly: o.weekly || openWeeklies() },
-      { catalog, chalRates: chalRates(), entries, bestiaryBonus: p.bestiaryBonus, raidP: d.raidP, expTable: state.expTable, t });
+      { catalog, chalRates: chalRates(), entries, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, raidP: d.raidP, expTable: state.expTable, t });
   };
   const scaleArgs = (diff) => { const w = weights(); return { weights: w, model: GOAL_KEYS.some((k) => w[k] > 0) ? poolModel(diff) : null }; };
   const plScale = (values, diff) => scaleSpots(values, scaleArgs(diff));

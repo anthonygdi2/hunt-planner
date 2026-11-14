@@ -11,7 +11,7 @@ const ext = (href, text) => h("a", { href, target: "_blank", rel: "noopener nore
 const THEME_LABELS = { system: _("System"), dark: _("Dark"), light: _("Light") };
 
 // view: app/views.js charactersPageView. ui: this page's own state {armed (delete), status (backup/restore line)}.
-// on: {back(), switchCharacter(id), add(), update(patch), setSources(s), setOtherVocationHunts(b), setLevelWindow(w), setWorld(w), setTakenMinutes(m), setAdvanced(b),
+// on: {back(), switchCharacter(id), add(), update(patch), talisman({loot} | {bestiary}), setSources(s), setOtherVocationHunts(b), setLevelWindow(w), setWorld(w), setTakenMinutes(m), setAdvanced(b),
 //      setTheme(t), setLang(l), deleteCharacter(), arm(b), download(), restore()}.
 export function render(view, ui, on) {
   const ro = !view.canWrite, c = view.character, sw = view.sources.switches;
@@ -30,8 +30,10 @@ export function render(view, ui, on) {
         h("div", { class: "hp-grid2" },
           selectField({ id: "ch-voc", label: t("Vocation"), value: c.vocation, options: view.vocations.map((v) => ({ value: v, label: v })), disabled: ro, onPick: (v) => on.update({ vocation: v }) }),
           field({ id: "ch-level", label: t("Level"), value: c.level, inputmode: "numeric", disabled: ro, onCommit: (v) => { const n = parseInt(v, 10); if (n > 0 && n < 10000) on.update({ level: n }); } })),
-        field({ id: "ch-bonus", label: t("Talisman bestiary bonus (%)"), value: c.bestiaryBonus, inputmode: "numeric", disabled: ro,
-          onCommit: (v) => { const n = Number(v); if (n >= 0 && n <= 100) on.update({ bestiaryBonus: n }); } }),
+        h("div", { class: "hp-grid2" },
+          field({ id: "ch-loot", label: t("Talisman loot bonus (%)"), value: c.talisman.loot, inputmode: "decimal", disabled: ro, onCommit: (v) => on.talisman({ loot: v }) }),
+          field({ id: "ch-bonus", label: t("Talisman bestiary bonus (%)"), value: c.talisman.bestiary, inputmode: "decimal", disabled: ro, onCommit: (v) => on.talisman({ bestiary: v }) })),
+        h("p", { class: "hp-p hp-caption" }, t("Your Bounty Talisman’s bonuses as the game shows them, 0 without one. They count on your bounty’s creature only.")),
         confirmButton({ id: "ch-delete", label: t("Delete this character…"), confirmLabel: t("Tap again to delete {name}. Its logged hunts stay for your other characters.", { name: c.displayName }), armed: ui.armed,
           disabled: ro, onArm: () => on.arm(true), onConfirm: on.deleteCharacter })) : null),
     c ? section("src-h", t("Numbers from"),

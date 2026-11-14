@@ -93,6 +93,13 @@ export const PREY = deepFreeze({
   damage: { lo: 7, hi: 25, step: 2 }, defense: { lo: 12, hi: 30, step: 2 },
 });
 
+// Bounty Talisman: its bonuses apply to the active bounty's creature only (TibiaWiki BR Bounty Tasks). More loot is a
+// chance of one more set of loot, like Prey's improved loot (maintainer, November 13, 2026), up to 50%; double bestiary
+// a chance of a kill counting twice for the bestiary, up to 100% (community-reported, TibiaQA, December 2025). How more
+// loot stacks with Prey isn't published: each bonus is taken as its own chance of one more set of loot, so the expected
+// loot is 1 + the sum of the chances (an assumption, maintainer's OK November 14, 2026).
+export const TALISMAN = deepFreeze({ loot: { max: 50 }, bestiary: { max: 100 } });
+
 // Exp events in percent (TibiaWiki, Experience Point): Double Experience (+100%, about 6 a year) and world-quest
 // bonuses (+10% to +50%, some limited to certain creatures).
 export const EXP_EVENTS = deepFreeze({ double: 100, world: [50, 30, 25, 10] });

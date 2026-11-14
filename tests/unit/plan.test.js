@@ -74,6 +74,32 @@ test("a loot Prey adds to a spot's profit", () => {
   const other = spotValue(SP, Object.assign({ lph: 4e5 }, NUMS), { diff: "master", today: { prey: [{ slug: "rat", kind: "loot", pct: 40 }] } }, ctx);
   assert.deepEqual([other.m.profit, other.today], [1e5, []]);
   assert.equal(spotValue(SP, Object.assign({ lph: 4e5 }, NUMS), { diff: "master" }, ctx).m.profit, 1e5, "no boosts: unchanged");
+  // Two loot bonuses on one creature add their chances (rules.js TALISMAN): 1 + 0.4 + 0.13, not 1.4 × 1.13.
+  const two = todayFactor(NUMS.kph, { prey: [{ slug: "cobra-scout", kind: "loot", pct: 40 }, { slug: "cobra-scout", kind: "loot", pct: 13 }] }, ctx);
+  near(two.loot, 0.75 + 0.25 * 1.53);
+});
+
+test("the Bounty Talisman's more loot adds to the held creature's spots", () => {
+  const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-6, a + " vs " + b);
+  const tctx = Object.assign({}, ctx, { talismanLoot: 10 }), held = { slug: "cobra-assassin", kills: 300 }, nums = Object.assign({ lph: 4e5, tasks: [] }, NUMS);
+  // Loot 400k/h, the assassin three quarters of it (by exp): 10% of 300k.
+  const v = spotValue(SP, nums, { diff: "master", held }, tctx);
+  near(v.talismanLoot, 4e5 * 0.75 * 0.1);
+  near(v.m.profit, 1e5 + 3e4);
+  // With a 40% loot Prey on it too, the chances add: 0.75 × (0.4 + 0.1) of the loot.
+  const both = spotValue(SP, nums, { diff: "master", held, today: { prey: [{ slug: "cobra-assassin", kind: "loot", pct: 40 }] } }, tctx);
+  near(both.lootBonus + both.talismanLoot, 4e5 * 0.75 * 0.5);
+  near(both.m.profit, 1e5 + 1.5e5);
+  // Own hunts logged on this bounty include it already; reference numbers never do.
+  assert.equal(spotValue(SP, Object.assign({}, nums, { tasks: ["cobra-assassin"] }), { diff: "master", held }, tctx).talismanLoot, 0);
+  near(spotValue(SP, Object.assign({}, nums, { src: "ref", tasks: undefined }), { diff: "master", held }, tctx).talismanLoot, 3e4);
+  // A 2-hour session that finishes the bounty halfway (300 kills at 300/h): half the hours have it.
+  near(spotValue(SP, nums, { diff: "master", held, hours: 2 }, tctx).talismanLoot, 4e5 * 0.75 * 0.1 * 0.5);
+  // Only on the held creature, only with a Talisman, only with the spot's loot/h and profit.
+  assert.equal(spotValue(SP, nums, { diff: "master" }, tctx).talismanLoot, 0);
+  assert.equal(spotValue(SP, nums, { diff: "master", held }, ctx).talismanLoot, 0);
+  assert.equal(spotValue(SP, NUMS, { diff: "master", held }, tctx).talismanLoot, 0);
+  assert.equal(spotValue(SP, nums, { diff: "master", held: { slug: "rat", kills: 100 } }, tctx).talismanLoot, 0);
 });
 
 test("scaling spots", () => {

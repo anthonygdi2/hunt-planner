@@ -1,7 +1,7 @@
 // The compute pipeline (docs/ARCHITECTURE.md): one pure function from the app's state to everything derived from it.
 // Each stage is a core call whose output feeds the next.
 import { VOCATIONS } from "../data/rules.js";
-import { readSources, readGoal, readHuntSources } from "../store/schema.js";
+import { readSources, readGoal, readHuntSources, readTalisman } from "../store/schema.js";
 import { topPool } from "../core/catalog.js";
 import { raidRate, spotRates, sessionSpot, xpField, deriveRates } from "../core/rates.js";
 import { splitHunts } from "../core/spots.js";
@@ -39,13 +39,13 @@ export function compute(state, now) {
 
   // Spot rates: the character's logged spots, then the reference spots it hasn't logged.
   const logged = spotRates(sessions, catalog, sessionSpot, xpField(p.xpMode)), spotKph = {}, spotEco = {}, refSpotSrc = {};
-  Object.keys(logged).forEach((s) => { spotKph[s] = logged[s].kph; spotEco[s] = { xph: logged[s].xph, pph: logged[s].pph }; });
+  Object.keys(logged).forEach((s) => { spotKph[s] = logged[s].kph; spotEco[s] = { xph: logged[s].xph, pph: logged[s].pph, lph: logged[s].lph }; });
   const refActive = referenceSpots({ picks, calib: cal.calib, calibOther: cal.calibOther, sessions, loggedSpots: spotKph, vocation, otherOn,
     xpMode: p.xpMode, xpBoost: cal.xpBoost, catalog });
   refActive.forEach((a) => {
     if (!a.active) return;
     spotKph[a.e.spot] = a.n.kph;
-    spotEco[a.e.spot] = { xph: a.n.xph, pph: a.n.pph };
+    spotEco[a.e.spot] = { xph: a.n.xph, pph: a.n.pph, lph: a.n.lph };
     refSpotSrc[a.e.spot] = a.n.src;
   });
 
@@ -54,7 +54,8 @@ export function compute(state, now) {
 
   const weights = scoringWeights(readGoal(p)), chalRates = p.chalRates && typeof p.chalRates === "object" ? p.chalRates : {};
   const weeklyXph = weeklyNow.length ? (spot, hours, slug, kills) => weeklyBonus(weeklyNow, spot && spotKph[spot], hours, slug, kills) : null;
-  const ctx = (diff) => ({ diff, chalRates, bestiaryBonus: p.bestiaryBonus, raidP: raid.p, spotKph, entries, catalog, weeklyXph });
+  const tal = readTalisman(p);
+  const ctx = (diff) => ({ diff, chalRates, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, raidP: raid.p, spotKph, spotEco, expTable: state.expTable, entries, catalog, weeklyXph });
   const diffFor = (c) => (difficulty !== "all" ? difficulty : topPool(c));
   const choose = (c, spots, pin) => { const d = diffFor(c); return pickSpot(spots, pin, { metricFor: (x) => metrics(c, x, ctx(d)), weights }); };
 

@@ -84,6 +84,16 @@ test("browser storage: first run, characters and settings, no page errors", asyn
   assert.deepEqual(after.sources, { reference: true, otherVocation: true, older: false });
   assert.equal(after.refOff, false, "old flags kept in step");
   assert.deepEqual(after.settings, { world: "Antica", takenMinutes: 60 });
+  // The Talisman: stored as talisman, with the older bestiaryBonus kept in step; bad values change nothing.
+  await p.type("#ch-loot", "12,5");
+  await p.type("#ch-bonus", "20");
+  await until(() => (p.local()[path] || {}).bestiaryBonus === 20, "the Talisman saved");
+  assert.deepEqual([p.local()[path].talisman, p.local()[path].bestiaryBonus], [{ loot: 12.5, bestiary: 20 }, 20]);
+  await p.type("#ch-loot", "60");
+  await p.type("#ch-bonus", "");
+  await until(() => p.local()[path].bestiaryBonus === 0, "empty is no Talisman");
+  assert.deepEqual(p.local()[path].talisman, { loot: 12.5, bestiary: 0 }, "60% is more than the Talisman gives");
+  assert.equal(p.$("#ch-loot").value, "12.5");
   assert.equal(p.$('[aria-label="Numbers from"] button[aria-pressed="true"]'), null, "custom mix of switches: no preset pressed");
   // Theme is per device.
   await p.click('[aria-label="Theme"] button:nth-child(3)');
