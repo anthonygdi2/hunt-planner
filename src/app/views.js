@@ -3,7 +3,7 @@
 // translated where they're shown.
 
 import { VOCATIONS, PREY, PREY_SLOTS, EXP_EVENTS, SLOTS } from "../data/rules.js";
-import { readSources, readHuntSources, sourcesPreset, SOURCE_PRESETS, readSettings, TAKEN_MINUTES, THEMES, readGoal, readHunting, LEVEL_WINDOWS } from "../store/schema.js";
+import { readSources, readHuntSources, sourcesPreset, SOURCE_PRESETS, readSettings, TAKEN_MINUTES, THEMES, readGoal, readHunting, LEVEL_WINDOWS, readTalisman } from "../store/schema.js";
 import { huntKey } from "../store/migrate.js";
 import { GOAL_KEYS, PRESET_IDS, presetOf } from "../core/score.js";
 import { fmtBig, fmtHours, fmtSmall, fmtField, pct, norm } from "../core/text.js";
@@ -180,7 +180,7 @@ export function charactersPageView(state, model) {
   return {
     canWrite: state.canWrite && state.status === "ready",
     pills: state.order.map((id) => { const x = state.profiles[id] || {}; return { id, label: displayName(x) + (x.level && x.name ? " · " + x.level : ""), pressed: id === state.pid }; }),
-    character: p && { name: p.name || "", vocation: p.vocation || VOCATIONS[0], level: p.level || "", bestiaryBonus: Number(p.bestiaryBonus) || 0, displayName: displayName(p) },
+    character: p && { name: p.name || "", vocation: p.vocation || VOCATIONS[0], level: p.level || "", talisman: readTalisman(p), displayName: displayName(p) },
     vocations: VOCATIONS,
     sources: { preset: sourcesPreset(sources), switches: sources,
       presets: [["mine", _("Mine only")], ["reference", _("+ Reference")], ["everything", _("Everything")]].map(([value, label]) => ({ value, label: t(label), switches: SOURCE_PRESETS[value] })),

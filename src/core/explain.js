@@ -53,8 +53,12 @@ export function partsWhy(o, ctx) {
       if (some(o.parts.held)) sub.push(t("{amount} from the bounty", { amount: fmtBig(o.parts.held) }));
       if (some(o.parts.weekly)) sub.push(t("{amount} from weekly tasks", { amount: fmtBig(o.parts.weekly) }));
       bits.push(t("{amount} exp/h", { amount: fmtBig(o.m.xp) }) + (sub.length > 1 ? " (" + sub.join(", ") + ")" : ""));
-    } else if (k === "profit") bits.push(t("{amount} profit/h", { amount: fmtBig(o.m.profit) }) +
-      (o.lootBonus > 0 && fmtBig(o.lootBonus) !== "0" ? " (" + t("{amount} from today’s boosts", { amount: fmtBig(o.lootBonus) }) + ")" : ""));
+    } else if (k === "profit") {
+      const some = (x) => x > 0 && fmtBig(x) !== "0", sub = [];
+      if (some(o.lootBonus)) sub.push(t("{amount} from today’s boosts", { amount: fmtBig(o.lootBonus) }));
+      if (some(o.talismanLoot)) sub.push(t("{amount} from the Bounty Talisman", { amount: fmtBig(o.talismanLoot) }));
+      bits.push(t("{amount} profit/h", { amount: fmtBig(o.m.profit) }) + (sub.length ? " (" + sub.join(", ") + ")" : ""));
+    }
     else if (k === "charm") bits.push(t("{amount} charm points/h", { amount: fmtSmall(o.m.charm) }));
     else if (k === "bounty") bits.push(t("{amount} bounty points/h", { amount: fmtSmall(o.m.bounty) }));
   });

@@ -135,3 +135,21 @@ test("a loot Prey reaches the profit of reference spots and logged spots", () =>
   assert.equal(at("old-pit", M.today()).m.profit, 1e5, "no loot/h on the entry: not counted");
   assert.equal(at("test-lair", null).m.profit, 2e5);
 });
+
+test("the Bounty Talisman's loot reaches the plan's spots and the creature metrics, but not hunts on the bounty", () => {
+  const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }, { n: "Cobra Scout", c: "M", m: 6 }]);
+  const reference = [{ id: "lair", spot: "Test Lair", vocation: "any", rawXph: 4e6, profitph: 2e5, lootph: 5e5, creatures: [{ slug: "cobra-scout", kph: 300 }], source: { date: "2026-09-01", postRebalance: true } }];
+  const lap = { id: "s", spot: "Scout Cave", hours: 1, rawXp: 1e6, loot: 3e5, supplies: 1e5, balance: 2e5, by: { pid: "a" }, kills: [{ slug: "cobra-assassin", count: 200 }] };
+  const state = (sessions) => ({ catalog, reference, pid: "a", profile: { vocation: "Elite Knight", level: 500, talisman: { loot: 10, bestiary: 0 }, bestiaryBonus: 0 },
+    sessions, entries: {}, advanced: false, difficulty: "master", expTable: {}, planner: { state: {} } });
+  const M = makeModel(state([lap]), null, 0);
+  const at = (id, slug) => M.spotValue(M.spotIndex().spots[id], { held: { slug, kills: 400 }, diff: "master" });
+  assert.equal(Math.round(at("test-lair", "cobra-scout").m.profit), 2e5 + 5e5 * 0.1, "a reference spot: its loot/h × 10%");
+  assert.equal(Math.round(at("scout-cave", "cobra-assassin").m.profit), 2e5 + 3e5 * 0.1, "a test lap: its own loot/h × 10%");
+  assert.equal(at("test-lair", "cobra-assassin").m.profit, 2e5, "the held creature isn't there");
+  assert.equal(Math.round(M.derived.metrics["cobra-assassin"].profit), 2e5 + 3e5 * 0.1, "the creature's metrics count it too");
+  // A hunt logged on that bounty already has it.
+  const B = makeModel(state([Object.assign({}, lap, { task: "cobra-assassin" })]), null, 0);
+  assert.equal(B.spotValue(B.spotIndex().spots["scout-cave"], { held: { slug: "cobra-assassin", kills: 400 }, diff: "master" }).m.profit, 2e5);
+  assert.equal(B.derived.metrics["cobra-assassin"].profit, 2e5);
+});

@@ -10,6 +10,17 @@ export function bestiaryOf(c) {
   return { kills: b.kills, charmPoints: b.charmPoints, warden: b.warden };
 }
 
+// Each creature's share of a spot's exp: kph {slug: kills/h} × base exp (expTable {slug: exp}), or of its kills when any
+// creature's exp is unknown. Also stands in for its share of the spot's loot (there's no loot value per creature).
+// Returns {slug: share}, empty when nothing dies there.
+export function expShares(kph, expTable) {
+  const keys = Object.keys(kph || {}), exp = expTable || {}, byExp = keys.every((k) => exp[k] > 0), w = {}, out = {};
+  let tot = 0;
+  keys.forEach((k) => { w[k] = kph[k] * (byExp ? exp[k] : 1); tot += w[k]; });
+  if (tot > 0) keys.forEach((k) => { out[k] = w[k] / tot; });
+  return out;
+}
+
 // The chance a kill of this creature brings its first Echo Warden kill: raid chance × the share of raids a Warden
 // leads (higher once the bestiary is done).
 const wardenShare = (entry) => (entry.bestiaryDone ? RAID.wardenShareDone : RAID.wardenShare);
@@ -21,12 +32,16 @@ const wardenShare = (entry) => (entry.bestiaryDone ? RAID.wardenShareDone : RAID
 //   rewardExp   the task reward shown in game, used instead of the per-kill rate (Challenging on Master)
 //   chalRates   learned Challenging rates (rewards.js)
 //   bestiaryBonus  the Bounty Talisman's double-bestiary chance in percent (bounty creature only)
+//   talismanLoot   the Talisman's more-loot chance in percent: the creature's share of its spot's loot/h × the chance
+//                  is added to the profit, unless its numbers come from hunts logged on its bounty (rec.taskBonus),
+//                  which already include it
+//   spotEco     spot → {lph (loot/h, null when unknown)}, and expTable (slug → base exp), for that share
 //   raidP       Echo Raid chance per kill
 //   spotKph     spot → {slug: kills/h}, for what else dies at rec.spot
 //   entries     slug → entry {bestiaryDone, wardenDone}, for those other creatures
 //   catalog     makeCatalog(...), for those other creatures' classes and rarity
 //   weeklyXph   (spot, hours, slug, kills) → weekly reward share per hour, or null when there are no weekly tasks
-// Returns {hours, rewardXph, weeklyXph, xp, profit, bestiaryCharm?, wardenCharm?, otherCharm?, charm, bounty}; a metric
+// Returns {hours, rewardXph, weeklyXph, xp, profit, talismanLoot, bestiaryCharm?, wardenCharm?, otherCharm?, charm, bounty}; a metric
 // is null when its numbers are missing.
 export function metrics(c, rec, ctx) {
   rec = rec || {};
@@ -43,6 +58,12 @@ export function metrics(c, rec, ctx) {
   m.weeklyXph = ctx.weeklyXph && hours ? ctx.weeklyXph(rec.spot, hours, c.slug, kills) : 0;
   m.xp = rec.xph != null ? rec.xph + (rewardXph || 0) + m.weeklyXph : null;
   m.profit = rec.pph != null ? rec.pph : null;
+  m.talismanLoot = 0;
+  const tl = Number(ctx.talismanLoot) || 0, eco = rec.spot && ctx.spotEco && ctx.spotEco[rec.spot], at = rec.spot && ctx.spotKph && ctx.spotKph[rec.spot];
+  if (m.profit != null && tl > 0 && !rec.taskBonus && eco && eco.lph > 0 && at && at[c.slug] > 0) {
+    m.talismanLoot = eco.lph * (expShares(at, ctx.expTable)[c.slug] || 0) * tl / 100;
+    m.profit += m.talismanLoot;
+  }
   const b = bestiaryOf(c), bonus = Number(ctx.bestiaryBonus) || 0, raidP = ctx.raidP;
   const wardenOpen = !rec.wardenDone && !c.r && raidP > 0;
   if (kph != null) {

@@ -36,7 +36,7 @@ test("first run: vocations, level, and Show my plan only once a level is typed",
 
 const STATE = {
   status: "ready", canWrite: true, local: true, notice: "", pid: "a", order: ["a", "b"], advanced: false, theme: "system", planner: { state: {} },
-  profiles: { a: { name: "Main EK", vocation: "Elite Knight", level: 615, bestiaryBonus: 0, refOtherOff: true }, b: { vocation: "Royal Paladin", level: 420 } },
+  profiles: { a: { name: "Main EK", vocation: "Elite Knight", level: 615, talisman: { loot: 12.5, bestiary: 20 }, bestiaryBonus: 20, refOtherOff: true }, b: { vocation: "Royal Paladin", level: 420 } },
 };
 
 test("characters page: what it shows", () => {
@@ -45,6 +45,8 @@ test("characters page: what it shows", () => {
   assert.deepEqual([...document.querySelectorAll(".hp-pill")].map((b) => [b.textContent, b.getAttribute("aria-pressed")]), [["Main EK · 615", "true"], ["RP 420", "false"], ["+ Add", null]]);
   assert.equal($("#ch-name").value, "Main EK");
   assert.equal($("#ch-voc").value, "Elite Knight");
+  assert.deepEqual([$("#ch-loot").value, $("#ch-bonus").value], ["12.5", "20"], "the Talisman's loot and bestiary bonuses");
+  assert.match(document.body.textContent, /bonuses as the game shows them, 0 without one/);
   assert.equal($("#src-ref").getAttribute("aria-checked"), "true");
   assert.equal($("#src-other").getAttribute("aria-checked"), "false", "refOtherOff migrates to the switch");
   assert.equal($("#src-older").getAttribute("aria-checked"), "true");
@@ -70,12 +72,14 @@ test("characters page: each control calls its action", () => {
   $("#ch-level").value = "abc"; $("#ch-level").dispatchEvent(new dom.window.Event("change"));
   $("#ch-level").value = "616"; $("#ch-level").dispatchEvent(new dom.window.Event("change"));
   $("#set-taken").value = "120"; $("#set-taken").dispatchEvent(new dom.window.Event("change"));
+  $("#ch-loot").value = "15"; $("#ch-loot").dispatchEvent(new dom.window.Event("change"));
+  $("#ch-bonus").value = "25"; $("#ch-bonus").dispatchEvent(new dom.window.Event("change"));
   $("#ch-delete").click();
   $("#bk-download").click();
   assert.deepEqual(s.calls, [
     ["switchCharacter", "b"], ["add"], ["setSources", { reference: true, otherVocation: true, older: true }],
     ["setSources", { reference: false, otherVocation: false, older: false }], ["setAdvanced", true], ["setTheme", "light"],
-    ["update", { name: "Knighty" }], ["update", { level: 616 }], ["setTakenMinutes", 120], ["arm", true], ["download"]]);
+    ["update", { name: "Knighty" }], ["update", { level: 616 }], ["setTakenMinutes", 120], ["talisman", { loot: "15" }], ["talisman", { bestiary: "25" }], ["arm", true], ["download"]]);
   // Armed: the same button deletes.
   $ = mount(characters.render(charactersPageView(STATE, null), { armed: true, status: "Backup saved." }, on));
   assert.equal($("#ch-delete").textContent, "Tap again to delete Main EK. Its logged hunts stay for your other characters.", "deleting keeps the hunts, and says so");

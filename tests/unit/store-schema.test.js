@@ -80,6 +80,16 @@ test("shared hunts: vocation, level and who logged it, read leniently", () => {
   assert.deepEqual(S.readHuntsMeta(null), { version: 0, at: null, sessions: {}, spots: {} });
 });
 
+test("the Bounty Talisman: loot and bestiary chances, the bestiary kept in step with bestiaryBonus", () => {
+  assert.deepEqual(S.readTalisman({}), { loot: 0, bestiary: 0 });
+  assert.deepEqual(S.readTalisman(undefined), { loot: 0, bestiary: 0 });
+  assert.deepEqual(S.readTalisman({ bestiaryBonus: 12 }), { loot: 0, bestiary: 12 }, "older profiles: the bestiary bonus alone");
+  assert.deepEqual(S.readTalisman({ talisman: { loot: "12.5", bestiary: 20 }, bestiaryBonus: 20 }), { loot: 12.5, bestiary: 20 });
+  assert.deepEqual(S.readTalisman({ talisman: { loot: 5, bestiary: 20 }, bestiaryBonus: 25 }), { loot: 5, bestiary: 25 }, "an older build changed bestiaryBonus: it wins");
+  assert.deepEqual(S.readTalisman({ talisman: { loot: 5, bestiary: 20 } }), { loot: 5, bestiary: 20 });
+  assert.deepEqual(S.readTalisman({ talisman: { loot: 60, bestiary: -1 }, bestiaryBonus: "x" }), { loot: 0, bestiary: 0 }, "out of range");
+});
+
 test("Silver and Gold: the character's odds and the logged offers", () => {
   assert.equal(S.readOfferOdds(undefined), null);
   assert.equal(S.readOfferOdds(null), null, "cleared: back to the guess");

@@ -31,6 +31,8 @@ test("the parts of a spot's score", () => {
     "Scores 92: 4.84kk exp/h (4.1kk hunting, 540k from the bounty, 200k from weekly tasks), 200k profit/h. Bounty done in about 1 h 30 min here.");
   const boosted = Object.assign({}, o, { lootBonus: 4e4, today: ["Cobra Scout prey +40% loot"] });
   assert.match(partsWhy(boosted, { sc: { keys: ["xp", "profit"] }, pct }), /200k profit\/h \(40k from today’s boosts\)\. Today: Cobra Scout prey \+40% loot\./);
+  const tal = Object.assign({}, boosted, { talismanLoot: 3e4 });
+  assert.match(partsWhy(tal, { sc: { keys: ["profit"] }, pct }), /200k profit\/h \(40k from today’s boosts, 30k from the Bounty Talisman\)/);
 });
 
 test("picking, rerolling and the end of the chain", () => {

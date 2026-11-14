@@ -1,7 +1,7 @@
 // The running app: one state object fed by db subscriptions, the actions that change it (writing through the store and
 // updating the state at once), and the model of the active character derived from it. The UI subscribes, renders
 // view models from it and calls its actions; it keeps no game state of its own.
-import { VOCATIONS, TASK, TOKEN_CAP, PREY, PREY_SLOTS, SLOTS } from "../data/rules.js";
+import { VOCATIONS, TASK, TOKEN_CAP, PREY, PREY_SLOTS, SLOTS, TALISMAN } from "../data/rules.js";
 import { occKey, markAge } from "../core/occupancy.js";
 import { serverDay, weekKey } from "../core/weekly.js";
 import { norm, slugify, parseNum } from "../core/text.js";
@@ -13,7 +13,7 @@ import { loggedOdds, MIN_BOARD_OBS } from "../core/reroll.js";
 import { boardSlotTags } from "../core/slots.js";
 import { makeRepo } from "../store/repo.js";
 import { PREF } from "../store/prefs.js";
-import { plDefaults, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, readOfferOdds, WEEKLY_SLOTS, readHunting, readHunt, LEVEL_WINDOWS } from "../store/schema.js";
+import { plDefaults, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, readOfferOdds, readTalisman, WEEKLY_SLOTS, readHunting, readHunt, LEVEL_WINDOWS } from "../store/schema.js";
 import { makeActions } from "./actions.js";
 import { makeWatchers, mergeProfiles } from "./state.js";
 import { makeModel, makePlanCache } from "./model.js";
@@ -394,6 +394,19 @@ export function createApp({ data, prefs, now, browserLang }) {
     },
     // Back to the guess (OFFER_ODDS).
     useGuessOdds() { updateCharacter({ offerOdds: null }); },
+    // The Bounty Talisman's more-loot and double-bestiary chances as the game shows them, in percent ({loot} or
+    // {bestiary}, typed; empty is 0, no Talisman). Written as talisman {loot, bestiary} with bestiaryBonus kept in step,
+    // so older builds still read the bestiary bonus. Nothing changes when a value isn't a number in range.
+    setTalisman(patch) {
+      const cur = readTalisman(profile() || {}), next = Object.assign({}, cur);
+      let ok = false;
+      Object.keys(TALISMAN).forEach((k) => {
+        if (!(k in patch)) return;
+        const raw = String(patch[k] == null ? "" : patch[k]).trim().replace("%", "").replace(",", "."), n = raw === "" ? 0 : Number(raw);
+        if (n >= 0 && n <= TALISMAN[k].max) { next[k] = Math.round(n * 100) / 100; ok = true; }
+      });
+      if (ok && (next.loot !== cur.loot || next.bestiary !== cur.bestiary)) updateCharacter({ talisman: next, bestiaryBonus: next.bestiary });
+    },
     // Plan: Free and Taken marks (each counted once per 15 minutes toward how often the spot is free), Hunting now.
     markTaken(spotId) { mark(spotId, "taken"); },
     markFree(spotId) { mark(spotId, "free"); },
