@@ -613,7 +613,7 @@ export default {
   "Your shares can be used once {n} offers are logged.": "Suas proporções podem ser usadas quando houver {n} ofertas registradas.",
   "This board is logged.": "Este quadro está registrado.",
   "Fill in all three offers to log this board.": "Preencha as três ofertas para registrar este quadro.",
-  "Log each new board once, as it comes up.": "Registre cada quadro novo uma vez, quando aparecer.",
+  "Picking an offer or rerolling here logs the board by itself. Use this if you won’t.": "Ao escolher uma oferta ou fazer reroll aqui, o quadro é registrado sozinho. Use isto se não for fazer isso.",
   "Silver and Gold odds": "Chances de Silver e Gold",
   "Silver (%)": "Silver (%)",
   "Gold (%)": "Gold (%)",

@@ -1,5 +1,5 @@
 // Hunt Planner offline cache. The version changes on every build, so updates roll out.
-var CACHE = "btl-550ffe7605";
+var CACHE = "btl-3050e81b5c";
 var FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));

@@ -614,7 +614,7 @@ export default {
   "Your shares can be used once {n} offers are logged.": "Twoich udziałów można użyć, gdy zapiszesz {n} ofert.",
   "This board is logged.": "Ta tablica jest zapisana.",
   "Fill in all three offers to log this board.": "Wypełnij wszystkie trzy oferty, aby zapisać tę tablicę.",
-  "Log each new board once, as it comes up.": "Zapisz każdą nową tablicę raz, gdy się pojawi.",
+  "Picking an offer or rerolling here logs the board by itself. Use this if you won’t.": "Wybór oferty lub reroll tutaj zapisuje tablicę automatycznie. Użyj tego, jeśli tego nie zrobisz.",
   "Silver and Gold odds": "Szanse na Silver i Gold",
   "Silver (%)": "Silver (%)",
   "Gold (%)": "Gold (%)",

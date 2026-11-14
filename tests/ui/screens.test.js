@@ -169,7 +169,7 @@ test("plan: Silver and Gold odds and Log this board (Advanced mode)", async () =
   assert.equal(o.logged, "12 offers logged: Silver 25%, Gold 8.3%.");
   $ = mount(plan.render({ goal, bounty: bountyView(filled, catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
   assert.equal($("#bounty-log").disabled, false);
-  assert.equal($("#bounty-log-note").textContent, "Log each new board once, as it comes up.");
+  assert.equal($("#bounty-log-note").textContent, "Picking an offer or rerolling here logs the board by itself. Use this if you won’t.");
   $("#bounty-log").click(); $("#odds-use").click(); $("#odds-guess").click();
   assert.deepEqual(s.calls.splice(0), [["logBoard"], ["useLoggedOdds"], ["useGuessOdds"]]);
   // Logged already; the shares already in use: no Use button.

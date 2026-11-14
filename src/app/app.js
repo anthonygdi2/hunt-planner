@@ -121,6 +121,27 @@ export function createApp({ data, prefs, now, browserLang }) {
     saveBounty({ tokens, mode: "offers", active: null, offers: [blankOffer(), blankOffer(), blankOffer()] });
     updateCharacter({ reroll: Object.assign({}, (profile() || {}).reroll, { left: tokens }) });
   }
+  // Logs the board being chosen from: its three offers (creature, kills, kind, the character's level, and whether each
+  // was Preferred or Unwanted with the pool and list sizes then, to test the slot model later), under its difficulty in
+  // the profile's rewardObs (the classic page's shape), once per board; the newest OFFER_LOG_MAX per difficulty are
+  // kept. picked: the index of the offer taken (it gets picked: true, also on a board logged before), or -1. Nothing
+  // happens unless all three creatures are typed.
+  function logOffers(picked) {
+    const M = model(), b = M.bounty(), p = profile();
+    if (!p || b.mode !== "offers" || b.offers.some((o) => !o.slug)) return;
+    const log = Object.assign({}, p.rewardObs), list = Array.isArray(log[b.difficulty]) ? log[b.difficulty] : [];
+    if (M.boardLogged()) {
+      const row = list[list.length - 3 + picked];
+      if (picked < 0 || !row || row.picked) return;
+      log[b.difficulty] = list.slice(0, list.length - 3 + picked).concat([Object.assign({}, row, { picked: true })], list.slice(list.length - 2 + picked));
+    } else {
+      const at = iso(), level = Number(p.level) || null;
+      const tags = boardSlotTags(b.offers.map((o) => o.slug), catalog.poolOf(b.difficulty), M.slots());
+      const add = b.offers.map((o, i) => Object.assign({ name: catalog.bySlug[o.slug].name, kills: o.kills, kind: o.kind, level, at }, tags[i], i === picked ? { picked: true } : {}));
+      log[b.difficulty] = list.concat(add).slice(-OFFER_LOG_MAX);
+    }
+    updateCharacter({ rewardObs: log });
+  }
   // A new spot's id: "my-" and its name as a slug, made unique.
   function newSpotId(name) {
     const base = "my-" + (slugify(name) || "spot"), taken = model().spotIndex().spots;
@@ -324,10 +345,12 @@ export function createApp({ data, prefs, now, browserLang }) {
       saveBounty({ offers });
       learnReward(b.difficulty, o);
     },
-    // Offer i was picked in game: it becomes the active bounty with all its kills left; the other two are gone.
+    // Offer i was picked in game: the board is logged (in every mode, with the pick) when all three offers are typed,
+    // and the offer becomes the active bounty with all its kills left; the other two are gone.
     pickOffer(i) {
       const b = model().bounty(), o = b.offers[i];
       if (!o || !o.slug) return;
+      logOffers(i);
       saveBounty({ mode: "active", active: { slug: o.slug, kills: o.kills, killsLeft: o.kills, kind: o.kind, exp: o.exp, since: iso() }, offers: [blankOffer(), blankOffer(), blankOffer()] });
     },
     // The active bounty's fields, kills left included (never more than its kills).
@@ -346,24 +369,13 @@ export function createApp({ data, prefs, now, browserLang }) {
     },
     // Finished it: +1 token (at most 10), the bounty clears, back to choosing offers.
     finishedBounty() { const b = model().bounty(); endBounty(b.assumed ? null : Math.min(TOKEN_CAP, b.tokens + 1)); },
-    // Rerolled: −1 token, offers and any active bounty clear.
-    rerolled() { const b = model().bounty(); endBounty(b.assumed ? null : Math.max(0, b.tokens - 1)); },
+    // Rerolled: a fully typed board is logged first (in every mode), then −1 token, and offers and any active bounty clear.
+    rerolled() { logOffers(-1); const b = model().bounty(); endBounty(b.assumed ? null : Math.max(0, b.tokens - 1)); },
     // At 0 tokens the player says they really have none (the daily one claimed too): the Plan's check stays away until
     // the next server save.
     confirmNoTokens() { saveBounty({ zeroChecked: serverDay(now()) }); },
-    // Silver and Gold (Advanced mode). Log this board: its three offers (creature, kills, kind, the character's level,
-    // and whether it was Preferred or Unwanted with the pool and list sizes then, to test the slot model later), under
-    // its difficulty in the profile's rewardObs (the classic page's shape), once per board; the newest OFFER_LOG_MAX
-    // per difficulty are kept.
-    logBoard() {
-      const M = model(), b = M.bounty(), p = profile();
-      if (!p || b.mode !== "offers" || b.offers.some((o) => !o.slug) || M.boardLogged()) return;
-      const at = iso(), level = Number(p.level) || null, log = Object.assign({}, p.rewardObs);
-      const tags = boardSlotTags(b.offers.map((o) => o.slug), catalog.poolOf(b.difficulty), M.slots());
-      const add = b.offers.map((o, i) => Object.assign({ name: catalog.bySlug[o.slug].name, kills: o.kills, kind: o.kind, level, at }, tags[i]));
-      log[b.difficulty] = (Array.isArray(log[b.difficulty]) ? log[b.difficulty] : []).concat(add).slice(-OFFER_LOG_MAX);
-      updateCharacter({ rewardObs: log });
-    },
+    // Silver and Gold (Advanced mode). Log this board, for a board not picked or rerolled here (those log themselves).
+    logBoard() { logOffers(-1); },
     // The character's own odds in percent ({silver, gold}, either one typed; the other stays as the plan has it).
     // Nothing changes when a value isn't a number or the two add up to more than 100.
     setOfferOdds(patch) {
