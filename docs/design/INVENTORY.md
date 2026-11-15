@@ -66,7 +66,7 @@ Each opens below the chips, has a one-line intro saying what it changes, and end
 - **Rerolled**: tokens −1, drops the bounty, switches to choosing offers.
 - Chip value: "Cobra Assassin · 4 tokens", or "3 offers · 4 tokens" while choosing.
 
-**Today's boosts**: boosted creature; Prey 1 (creature, bonus type, size); Add a prey; Exp event. Counts the boosted creature's double exp, prey exp bonus and exp events only. Clears at server save.
+**Today's boosts**: boosted creature; Prey 1 (creature, bonus type, size); Add a prey; Exp event. Counts the boosted creature's double exp and double loot, Prey exp and loot bonuses, and exp events. Clears at server save.
 
 **Weekly**: compact list of open kill tasks with kills left and Done; link to the Weekly tab.
 

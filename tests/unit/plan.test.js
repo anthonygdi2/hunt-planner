@@ -14,10 +14,13 @@ test("today's bonuses weigh each creature by its share of the spot's exp", () =>
   // Exp shares: 300 × 1000 vs 200 × 500 → 3/4 and 1/4. Boosted assassin: 3/4 × 2 + 1/4.
   const t = todayFactor(NUMS.kph, { boosted: "cobra-assassin", prey: [{ slug: "cobra-scout", kind: "xp", pct: 40 }, { slug: "cobra-scout", kind: "loot", pct: 40 }], event: 50 }, ctx);
   assert.ok(Math.abs(t.mult - (0.75 * 2 + 0.25 * 1.4) * 1.5) < 1e-12);
-  assert.deepEqual(t.notes, ["Cobra Assassin is boosted (double exp)", "Cobra Scout prey +40% exp", "+50% exp event"]);
-  // The loot Prey: the scout's quarter of the loot × 1.4; the boost and the event don't touch it.
-  assert.ok(Math.abs(t.loot - (0.75 + 0.25 * 1.4)) < 1e-12);
+  assert.deepEqual(t.notes, ["Cobra Assassin is boosted (double exp and loot)", "Cobra Scout prey +40% exp", "+50% exp event"]);
+  // Loot: the boosted assassin's three quarters doubled, the scout's quarter × 1.4 for its loot Prey; the event doesn't touch it.
+  assert.ok(Math.abs(t.loot - (0.75 * 2 + 0.25 * 1.4)) < 1e-12);
   assert.deepEqual(t.lootNotes, ["Cobra Scout prey +40% loot"]);
+  // A loot Prey on the boosted creature: its chance is of a doubled set (2 × 1.25).
+  const both = todayFactor(NUMS.kph, { boosted: "cobra-assassin", prey: [{ slug: "cobra-assassin", kind: "loot", pct: 25 }] }, ctx);
+  assert.ok(Math.abs(both.loot - (0.75 * 2 * 1.25 + 0.25)) < 1e-12);
   // A creature with unknown exp: kill shares instead.
   assert.ok(Math.abs(todayFactor({ "cobra-assassin": 300, rat: 100 }, { boosted: "rat" }, ctx).mult - (0.75 + 0.25 * 2)) < 1e-12);
 });
@@ -100,6 +103,8 @@ test("the Bounty Talisman's more loot adds to the held creature's spots", () => 
   assert.equal(spotValue(SP, nums, { diff: "master", held }, ctx).talismanLoot, 0);
   assert.equal(spotValue(SP, NUMS, { diff: "master", held }, tctx).talismanLoot, 0);
   assert.equal(spotValue(SP, nums, { diff: "master", held: { slug: "rat", kills: 100 } }, tctx).talismanLoot, 0);
+  // On the boosted creature the Talisman's chance is of a doubled set of loot.
+  near(spotValue(SP, nums, { diff: "master", held, today: { boosted: "cobra-assassin" } }, tctx).talismanLoot, 4e5 * 0.75 * 2 * 0.1);
 });
 
 test("scaling spots", () => {

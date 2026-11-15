@@ -1,5 +1,6 @@
 // Rates from logged sessions: per creature and spot, per spot, and the Echo Raid chance.
 import { RAID } from "../data/rules.js";
+import { expShares, lootMult } from "./metrics.js";
 
 // A session's length in hours, 0 when unknown.
 export const sessHours = (x) => (x && x.hours > 0 ? x.hours : 0);
@@ -24,11 +25,31 @@ export function raidRate(sessions, catalog) {
   return { p: (raids + RAID.priorPerKill * RAID.priorKills) / (kills + RAID.priorKills), info: n ? { raids, kills, n } : null };
 }
 
+// The loot a logged hunt's bonuses added, so its numbers can be base rates: x.boosts {boosted (slug or null), prey
+// [{slug, pct}] (loot Preys), talisman (the logging character's Talisman loot %, on its bounty creature x.task)}, as
+// they were on during the hunt. Each creature's share of the hunt's loot is its share of the exp (kills × base exp,
+// expShares over expTable); the loot is divided by what they multiply it by (lootMult) and the difference returned.
+// 0 for a hunt without boosts (logged before they were recorded) or without logged loot.
+export function huntLootBonus(x, catalog, expTable) {
+  const b = x && x.boosts;
+  if (!b || typeof b !== "object" || !(x.loot > 0) || !Array.isArray(x.kills)) return 0;
+  const kills = {}, chances = {};
+  x.kills.forEach((k) => { const key = catalog.killKey(k); kills[key] = (kills[key] || 0) + (k.count || 0); });
+  (Array.isArray(b.prey) ? b.prey : []).forEach((p) => { if (p && p.slug && p.pct > 0) chances[p.slug] = (chances[p.slug] || 0) + Number(p.pct); });
+  if (b.talisman > 0 && x.task) chances[x.task] = (chances[x.task] || 0) + Number(b.talisman);
+  const m = lootMult(expShares(kills, expTable), b.boosted || null, chances);
+  return m > 1 ? x.loot * (1 - 1 / m) : 0;
+}
+// A hunt logged on a bounty before boosts were recorded: its loot includes the Talisman's, and nothing says how much.
+const talismanIn = (x) => !!x.task && !(x.boosts && typeof x.boosts === "object");
+
 // Per spot (sessions grouped by keyOf(session)): each creature's kills/h (its share of all kills × the clean kill
 // rate, keyed by catalog.killKey), and exp/h (the `mode` field) and profit/h per kill scaled the same way, plus clean
 // hours and kills, loot/h (lph) the same way over the sessions that logged their loot (null when none did), and tasks
-// (the creatures whose bounty any of these sessions was on). Spots with no clean time are left out.
-export function spotRates(sessions, catalog, keyOf, mode) {
+// (the creatures whose bounty any of these sessions was on, logged before boosts were recorded, so they include the
+// Talisman's loot). Loot and profit are without the bonuses each hunt recorded (huntLootBonus over expTable, slug → base
+// exp). Spots with no clean time are left out.
+export function spotRates(sessions, catalog, keyOf, mode, expTable) {
   const acc = {}, out = {};
   sessions.forEach((x) => {
     const h = sessHours(x);
@@ -37,9 +58,10 @@ export function spotRates(sessions, catalog, keyOf, mode) {
     x.kills.forEach((k) => { tot += k.count || 0; });
     if (!tot) return;
     const s = keyOf(x), a = acc[s] || (acc[s] = { kills: {}, total: 0, xp: 0, bal: 0, loot: 0, lootTotal: 0, cTotal: 0, cHours: 0, tasks: {} });
-    a.total += tot; a.xp += (x[mode] != null ? x[mode] : (x.rawXp || 0)); a.bal += x.balance || 0;
-    if (x.loot != null) { a.loot += x.loot; a.lootTotal += tot; }
-    if (x.task) a.tasks[x.task] = true;
+    const extra = huntLootBonus(x, catalog, expTable);
+    a.total += tot; a.xp += (x[mode] != null ? x[mode] : (x.rawXp || 0)); a.bal += (x.balance || 0) - extra;
+    if (x.loot != null) { a.loot += x.loot - extra; a.lootTotal += tot; }
+    if (talismanIn(x)) a.tasks[x.task] = true;
     x.kills.forEach((k) => { const key = catalog.killKey(k); a.kills[key] = (a.kills[key] || 0) + (k.count || 0); });
     if (!x.breaks) { a.cTotal += tot; a.cHours += h; }
   });
@@ -57,18 +79,19 @@ export function spotRates(sessions, catalog, keyOf, mode) {
 // Each known creature's numbers at every spot it was logged at: slug → [{spot, taskBonus, n, nBreak, hours, share,
 // kph, xph, pph, last, sample, sampleHours}]. The kill rate comes from clean sessions only; exp, profit and kill share
 // are taken per kill from every session (breaks included), then scaled by the clean kill rate. When the creature was
-// the session's bounty task at a spot (with clean time), only those sessions count there (taskBonus). Creatures
-// with no clean time anywhere are left out.
-export function deriveRates(sessions, { catalog, xpMode }) {
+// the session's bounty task at a spot (with clean time), only those sessions count there; taskBonus says their profit
+// includes the Talisman's loot (some were logged before boosts were recorded). Profit is without the loot bonuses each
+// hunt recorded (huntLootBonus over expTable). Creatures with no clean time anywhere are left out.
+export function deriveRates(sessions, { catalog, xpMode, expTable }) {
   const mode = xpField(xpMode), acc = {};
-  const blank = () => ({ kills: 0, cKills: 0, total: 0, n: 0, xp: 0, bal: 0, cTotal: 0, cHours: 0, nClean: 0, last: null });
+  const blank = () => ({ kills: 0, cKills: 0, total: 0, n: 0, xp: 0, bal: 0, cTotal: 0, cHours: 0, nClean: 0, last: null, talisman: false });
   sessions.forEach((x) => {
     const h = sessHours(x);
     if (!h || !Array.isArray(x.kills)) return;
     let total = 0;
     x.kills.forEach((k) => { total += k.count || 0; });
     if (!total) return;
-    const spot = sessionSpot(x), clean = !x.breaks;
+    const spot = sessionSpot(x), clean = !x.breaks, bal = (x.balance || 0) - huntLootBonus(x, catalog, expTable), tal = talismanIn(x);
     x.kills.forEach((k) => {
       if (!k.slug || !catalog.bySlug[k.slug]) return;
       const c = acc[k.slug] || (acc[k.slug] = {});
@@ -76,7 +99,8 @@ export function deriveRates(sessions, { catalog, xpMode }) {
       [sp.all].concat(x.task === k.slug ? [sp.task] : []).forEach((b) => {
         b.kills += k.count || 0; b.total += total; b.n++;
         if (clean) b.cKills += k.count || 0;
-        b.xp += (x[mode] != null ? x[mode] : (x.rawXp || 0)); b.bal += x.balance || 0;
+        b.xp += (x[mode] != null ? x[mode] : (x.rawXp || 0)); b.bal += bal;
+        if (tal) b.talisman = true;
         if (clean) { b.cTotal += total; b.cHours += h; b.nClean++; if (!b.last || x.end > b.last) b.last = x.end; }
       });
     });
@@ -88,7 +112,7 @@ export function deriveRates(sessions, { catalog, xpMode }) {
       const sp = acc[slug][name], useTask = sp.task.cHours > 0, b = useTask ? sp.task : sp.all;
       if (!(b.cHours > 0)) return;
       const spotKph = b.cTotal / b.cHours, perKill = (v) => v / b.total * spotKph;
-      spots.push({ spot: name, taskBonus: useTask, n: b.n, nBreak: b.n - b.nClean, hours: b.cHours, share: b.kills / b.total,
+      spots.push({ spot: name, taskBonus: useTask && b.talisman, n: b.n, nBreak: b.n - b.nClean, hours: b.cHours, share: b.kills / b.total,
         kph: Math.round(b.kills / b.total * spotKph), xph: Math.round(perKill(b.xp)), pph: Math.round(perKill(b.bal)), last: b.last, sample: b.cKills, sampleHours: b.cHours });
     });
     if (spots.length) result[slug] = spots;

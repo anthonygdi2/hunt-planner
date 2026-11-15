@@ -80,6 +80,19 @@ test("shared hunts: vocation, level and who logged it, read leniently", () => {
   assert.deepEqual(S.readHuntsMeta(null), { version: 0, at: null, sessions: {}, spots: {} });
 });
 
+test("the loot bonuses on during a hunt", () => {
+  assert.equal(S.readBoosts(null), null);
+  assert.equal(S.readBoosts("x"), null);
+  assert.deepEqual(S.readBoosts({}), { boosted: null, prey: [], talisman: 0 });
+  // Prey percents clamped to 13–40, at most three, slots without a creature dropped; the Talisman 0–50.
+  assert.deepEqual(S.readBoosts({ boosted: "rat", prey: [{ slug: "rat", pct: 99 }, { pct: 20 }, { slug: "a", pct: "x" }, { slug: "b", pct: 25 }, { slug: "c", pct: 25 }], talisman: 70 }),
+    { boosted: "rat", prey: [{ slug: "rat", pct: 40 }, { slug: "a", pct: 13 }, { slug: "b", pct: 25 }], talisman: 0 });
+  assert.equal(S.readBoosts({ talisman: "7.5" }).talisman, 7.5);
+  // On a hunt: kept when there, left out when not (hunts logged before they were recorded).
+  assert.deepEqual(S.readHunt("h", { hours: 1, kills: [], boosts: { boosted: "rat" } }).boosts, { boosted: "rat", prey: [], talisman: 0 });
+  assert.equal("boosts" in S.readHunt("h", { hours: 1, kills: [], boosts: 3 }), false);
+});
+
 test("the Bounty Talisman: loot and bestiary chances, the bestiary kept in step with bestiaryBonus", () => {
   assert.deepEqual(S.readTalisman({}), { loot: 0, bestiary: 0 });
   assert.deepEqual(S.readTalisman(undefined), { loot: 0, bestiary: 0 });

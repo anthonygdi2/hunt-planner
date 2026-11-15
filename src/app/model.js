@@ -132,7 +132,7 @@ export function makeModel(state, derived, now, opts) {
       skip: key ? (x, sp) => huntCheck(x, sp, d.huntCtx, lens) : (x) => d.hunts.why.get(x) || "" });
     return indexes[key];
   };
-  const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost });
+  const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost, expTable: state.expTable });
   const heldTask = (h, diff) => coreHeldTask(h, diff, { catalog, chalRates: chalRates() });
   const tal = readTalisman(p);
   const spotValue = (sp, o) => {

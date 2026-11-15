@@ -60,13 +60,13 @@
         },
         "creatures": {"midnight-asura":{"score":{"$del":1},"tier":{"$del":1}},"silencer":{"score":{"$set":1},"tier":{"$set":"S"}},"werehyaena":{"score":{"$set":0.973921742243},"tier":{"$set":"S"}}},
         "planner": {
-         "chosen": {"$set":["test-hideout","roshamuul-west","my-knight-den","my-bastion-lure","cobra-bastion-1"]},
+         "chosen": {"$set":["test-hideout","my-knight-den","roshamuul-west","my-bastion-lure","cobra-bastion-1"]},
          "cutoff": {"$set":"druid-only-spot"},
          "options": {
           "$set": [
+           ["my-knight-den","held cobra-assassin",7.53776484196,0.859042887403,null,0.363636363636],
            ["roshamuul-west","held cobra-assassin",6.36395512611,0.859042887403,null,0.363636363636],
-           ["my-knight-den","held cobra-assassin",6.26407730992,0.859042887403,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",4.8861822957,0.859042887403,"free",0.717171717172],
+           ["test-hideout","held cobra-assassin",5.60789842425,0.859042887403,"free",0.717171717172],
            ["my-bastion-lure","held cobra-assassin",1.90735323541,0.85903831998,null,0.363636363636],
            ["nightmare-isles","held cobra-assassin",1.35135219318,0.859042887403,"taken",null],
            ["cobra-bastion-1","held cobra-assassin",1.311476508,0.859039666791,null,0.555844155844],
@@ -82,17 +82,17 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 569: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (222), by 347. A reroll is worth 100 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Roshamuul West",
-            "why": "Scores 741: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 100 with 4 tokens left."
+            "why": "Scores 653: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (222), by 431. A reroll is worth 100 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 729: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 100 with 4 tokens left."
+            "why": "Scores 878: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 100 with 4 tokens left."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Roshamuul West",
+            "why": "Scores 741: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 100 with 4 tokens left."
            },
            {
             "kind": "go",
@@ -289,7 +289,7 @@
             "text": "Go to Bookworld: Chapter IV",
             "why": "Scores 100: 32.3 charm points/h. Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (54), by 46. A reroll is worth 65 with 4 tokens left."
            },
-           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 81: 26 charm points/h. Today: Silencer is boosted (double exp). A reroll is worth 65 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 81: 26 charm points/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 65 with 4 tokens left."},
            {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 78: 25.2 charm points/h. A reroll is worth 65 with 4 tokens left."},
            {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Nightmare Isles (58), is worth less than a reroll (65). Rerolling drops Cobra Assassin."}
           ]
@@ -454,17 +454,17 @@
           {
            "kind": "go",
            "text": "Go to Test Hideout",
-           "why": "Scores 898: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (112), by 786. A reroll is worth 82 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+           "why": "Scores 898: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (112), by 786. A reroll is worth 82 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
           },
           {
            "kind": "go",
            "text": "Taken? → Knight Den",
-           "why": "Scores 1163: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 82 with 4 tokens left."
+           "why": "Scores 1163: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 82 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 1153: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 82 with 4 tokens left."
+           "why": "Scores 1153: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp and loot). A reroll is worth 82 with 4 tokens left."
           },
           {"kind":"go","text":"Taken? → Feru Way","why":"Scores 119: 5.54kk exp/h. A reroll is worth 82 with 4 tokens left."},
           {
@@ -532,13 +532,13 @@
         },
         "creatures": {"midnight-asura":{"score":{"$del":1},"tier":{"$del":1}},"silencer":{"score":{"$set":1},"tier":{"$set":"S"}},"werehyaena":{"score":{"$set":0.924101365779},"tier":{"$set":"S"}}},
         "planner": {
-         "chosen": {"$set":["test-hideout","roshamuul-west","my-knight-den","my-bastion-lure","cobra-bastion-1"]},
+         "chosen": {"$set":["test-hideout","my-knight-den","roshamuul-west","my-bastion-lure","cobra-bastion-1"]},
          "cutoff": {"$set":"bookworld-chapter-iv"},
          "options": {
           "$set": [
+           ["my-knight-den","held cobra-assassin",8.9022538818,0.846408564516,null,0.363636363636],
            ["roshamuul-west","held cobra-assassin",8.08664120887,0.846408564516,null,0.363636363636],
-           ["my-knight-den","held cobra-assassin",8.05312886045,0.846408564516,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",6.24915486586,0.846408564516,"free",0.717171717172],
+           ["test-hideout","held cobra-assassin",6.73029895156,0.846408564516,"free",0.717171717172],
            ["my-bastion-lure","held cobra-assassin",1.64621498885,0.846402473135,null,0.363636363636],
            ["nightmare-isles","held cobra-assassin",1.43828332062,0.846408564516,"taken",null],
            ["cobra-bastion-1","held cobra-assassin",1.14604444826,0.846404269321,null,0.555844155844],
@@ -554,17 +554,17 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 739: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (195), by 544. A reroll is worth 100 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Roshamuul West",
-            "why": "Scores 956: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 100 with 4 tokens left."
+            "why": "Scores 795: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (195), by 600. A reroll is worth 100 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 952: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 100 with 4 tokens left."
+            "why": "Scores 1052: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 100 with 4 tokens left."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Roshamuul West",
+            "why": "Scores 956: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 100 with 4 tokens left."
            },
            {
             "kind": "go",
@@ -635,34 +635,43 @@
         },
         "creatures": {"midnight-asura":{"score":{"$del":1},"tier":{"$del":1}},"silencer":{"score":{"$set":0.896922658359}},"werehyaena":{"score":{"$set":1},"tier":{"$set":"S"}}},
         "planner": {
-         "chosen": {"$set":["my-bastion-lure","cobra-bastion-1","warzone-2","roshamuul-west"]},
+         "chosen": {"$set":["test-hideout","my-knight-den","my-bastion-lure","cobra-bastion-1","warzone-2"]},
          "cutoff": {"$set":"druid-only-spot"},
          "options": {
           "$set": [
+           ["my-knight-den","held cobra-assassin",3.44429772243,1.00023735877,null,0.363636363636],
            ["my-bastion-lure","held cobra-assassin",2.69076797508,1.00023714573,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",2.24069684231,1.00023735877,"free",0.717171717172],
            ["cobra-bastion-1","held cobra-assassin",1.80777268719,1.00023721558,null,0.555844155844],
            ["warzone-2","held cobra-assassin",1.19589687781,1.00023735877,null,0.363636363636],
            ["roshamuul-west","held cobra-assassin",1.19589687781,1.00023735877,null,0.363636363636],
            ["nightmare-isles","held cobra-assassin",1.09055881085,1.00023735877,"taken",null],
            ["druid-only-spot","held cobra-assassin",0.999999489472,1.00023735877,null,null],
-           ["my-knight-den","held cobra-assassin",0.896922658359,1.00023735877,null,null],
            ["feru-way","held cobra-assassin",0.875769481429,1.00023735877,null,null],
-           ["test-hideout","held cobra-assassin",0.797264585208,1.00023735877,"free",null],
            ["bookworld-chapter-iv","held cobra-assassin",0.747435548633,1.00023735877,null,null]
           ]
          },
          "pool": {"known":{"$set":2}},
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Bastion lure","why":"Scores 269: 900k profit/h. Bounty done in about 48 min here. A reroll is worth 100 with 4 tokens left."},
+           {
+            "kind": "go",
+            "text": "Go to Test Hideout",
+            "why": "Scores 224: 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). A reroll is worth 100 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Knight Den",
+            "why": "Scores 344: 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 100 with 4 tokens left."
+           },
+           {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 269: 900k profit/h. Bounty done in about 48 min here. A reroll is worth 100 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Cobra Bastion -1",
             "why": "Scores 181: 604.66k profit/h. Bounty done in about 1 h 12 min here. A reroll is worth 100 with 4 tokens left. Free 2 of 3 times you checked around this hour."
            },
            {"kind":"go","text":"Taken? → Warzone 2","why":"Scores 120: 400k profit/h. A reroll is worth 100 with 4 tokens left."},
-           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 120: 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 100 with 4 tokens left."},
-           {"kind":"reroll","text":"Taken? → Reroll and re-plan","why":"The next spot, Druid Only Spot (100), is worth less than a reroll (100). Rerolling drops Cobra Assassin."}
+           {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
         }
@@ -1586,19 +1595,19 @@
        "balanced": {
         "board": {"model":{"keys":{"$set":["xp","profit"]}}},
         "planner": {
-         "chosen": {"$set":["test-hideout","roshamuul-west","my-knight-den","my-bastion-lure","cobra-bastion-1"]},
+         "chosen": {"$set":["test-hideout","my-knight-den","roshamuul-west","my-bastion-lure","cobra-bastion-1"]},
          "options": {
           "$set": [
-           ["roshamuul-west","held cobra-assassin",0.7179570426,null,null,0.363636363636],
-           ["my-knight-den","held cobra-assassin",0.666666666667,null,null,0.363636363636],
-           ["my-bastion-lure","held cobra-assassin",0.547892879976,null,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",0.533967123984,null,"free",0.717171717172],
-           ["cobra-bastion-1","held cobra-assassin",0.370681090907,null,null,0.555844155844],
-           ["nightmare-isles","held cobra-assassin",0.271950686903,null,"taken",null],
-           ["warzone-2","held cobra-assassin",0.2590037859,null,null,0.363636363636],
-           ["druid-only-spot","held cobra-assassin",0.214422413367,null,null,0.363636363636],
-           ["feru-way","held cobra-assassin",0.213714439559,null,null,0.363636363636],
-           ["bookworld-chapter-iv","held cobra-assassin",0.175670452566,null,null,0.363636363636]
+           ["my-knight-den","held cobra-assassin",1,null,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",0.711095276389,null,"free",0.717171717172],
+           ["roshamuul-west","held cobra-assassin",0.66934014927,null,null,0.363636363636],
+           ["my-bastion-lure","held cobra-assassin",0.438504869985,null,null,0.363636363636],
+           ["cobra-bastion-1","held cobra-assassin",0.297189560385,null,null,0.555844155844],
+           ["nightmare-isles","held cobra-assassin",0.227616110603,null,"taken",null],
+           ["warzone-2","held cobra-assassin",0.21038689257,null,null,0.363636363636],
+           ["feru-way","held cobra-assassin",0.178111711389,null,null,0.363636363636],
+           ["druid-only-spot","held cobra-assassin",0.173769352546,null,null,0.363636363636],
+           ["bookworld-chapter-iv","held cobra-assassin",0.145284894235,null,null,0.363636363636]
           ]
          },
          "steps": {
@@ -1606,23 +1615,23 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 74: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Roshamuul West",
-            "why": "Scores 100: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp)."
+            "why": "Scores 71: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (44), by 27. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 93: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp."
+            "why": "Scores 100: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp."
            },
-           {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 76: 5.21kk exp/h (5.2kk hunting, 8357 from the bounty), 900k profit/h. Bounty done in about 48 min here."},
+           {
+            "kind": "go",
+            "text": "Taken? → Roshamuul West",
+            "why": "Scores 67: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot)."
+           },
+           {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 44: 5.21kk exp/h (5.2kk hunting, 8357 from the bounty), 900k profit/h. Bounty done in about 48 min here."},
            {
             "kind": "go",
             "text": "Taken? → Cobra Bastion -1",
-            "why": "Scores 52: 3.78kk exp/h (3.77kk hunting, 5595 from the bounty), 604.66k profit/h. Bounty done in about 1 h 12 min here. Free 2 of 3 times you checked around this hour."
+            "why": "Scores 30: 3.78kk exp/h (3.77kk hunting, 5595 from the bounty), 604.66k profit/h. Bounty done in about 1 h 12 min here. Free 2 of 3 times you checked around this hour."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -1653,7 +1662,7 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 0: 0 bounty points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+            "why": "Scores 0: 0 bounty points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 100: 3.71 bounty points/h. Bounty done in about 48 min here."},
            {"kind":"go","text":"Taken? → Cobra Bastion -1","why":"Scores 67: 2.49 bounty points/h. Bounty done in about 1 h 12 min here. Free 2 of 3 times you checked around this hour."},
@@ -1688,10 +1697,10 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 53: 17.2 charm points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+            "why": "Scores 53: 17.2 charm points/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {"kind":"go","text":"Taken? → Bookworld: Chapter IV","why":"Scores 100: 32.3 charm points/h."},
-           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 80: 26 charm points/h. Today: Silencer is boosted (double exp)."},
+           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 80: 26 charm points/h. Today: Silencer is boosted (double exp and loot)."},
            {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 78: 25.2 charm points/h."},
            {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 54: 17.5 charm points/h. Bounty done in about 48 min here."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
@@ -1775,17 +1784,17 @@
           {
            "kind": "go",
            "text": "Go to Test Hideout",
-           "why": "Scores 77: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (10), by 67. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+           "why": "Scores 77: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (10), by 67. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
           },
           {
            "kind": "go",
            "text": "Taken? → Knight Den",
-           "why": "Scores 100: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp."
+           "why": "Scores 100: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp."
           },
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 99: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp)."
+           "why": "Scores 99: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp and loot)."
           },
           {"kind":"go","text":"Taken? → Feru Way","why":"Scores 10: 5.54kk exp/h."},
           {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 10: 5.21kk exp/h (5.2kk hunting, 8357 from the bounty). Bounty done in about 48 min here."},
@@ -1798,19 +1807,19 @@
        "mostly": {
         "board": {"model":{"keys":{"$set":["xp","profit"]}}},
         "planner": {
-         "chosen": {"$set":["test-hideout","roshamuul-west","my-knight-den","my-bastion-lure","cobra-bastion-1"]},
+         "chosen": {"$set":["test-hideout","my-knight-den","roshamuul-west","my-bastion-lure","cobra-bastion-1"]},
          "options": {
           "$set": [
-           ["roshamuul-west","held cobra-assassin",0.809127908652,null,null,0.363636363636],
-           ["my-knight-den","held cobra-assassin",0.777777777778,null,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",0.613190733213,null,"free",0.717171717172],
-           ["my-bastion-lure","held cobra-assassin",0.397190506635,null,null,0.363636363636],
-           ["cobra-bastion-1","held cobra-assassin",0.270293904508,null,null,0.555844155844],
-           ["nightmare-isles","held cobra-assassin",0.227502086471,null,"taken",null],
-           ["warzone-2","held cobra-assassin",0.197190233051,null,null,0.363636363636],
-           ["feru-way","held cobra-assassin",0.17646193836,null,null,0.363636363636],
-           ["druid-only-spot","held cobra-assassin",0.16201624403,null,null,0.363636363636],
-           ["bookworld-chapter-iv","held cobra-assassin",0.141634677496,null,null,0.363636363636]
+           ["my-knight-den","held cobra-assassin",1,null,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",0.776716646432,null,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",0.73127616815,null,"free",0.717171717172],
+           ["my-bastion-lure","held cobra-assassin",0.324265166641,null,null,0.363636363636],
+           ["cobra-bastion-1","held cobra-assassin",0.221299550826,null,null,0.555844155844],
+           ["nightmare-isles","held cobra-assassin",0.197945702271,null,"taken",null],
+           ["warzone-2","held cobra-assassin",0.164778970832,null,null,0.363636363636],
+           ["feru-way","held cobra-assassin",0.152726786247,null,null,0.363636363636],
+           ["druid-only-spot","held cobra-assassin",0.134914203483,null,null,0.363636363636],
+           ["bookworld-chapter-iv","held cobra-assassin",0.121377638609,null,null,0.363636363636]
           ]
          },
          "steps": {
@@ -1818,23 +1827,23 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 76: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (49), by 27. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Roshamuul West",
-            "why": "Scores 100: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp)."
+            "why": "Scores 73: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (32), by 41. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 96: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp."
+            "why": "Scores 100: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp."
            },
-           {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 49: 5.21kk exp/h (5.2kk hunting, 8357 from the bounty), 900k profit/h. Bounty done in about 48 min here."},
+           {
+            "kind": "go",
+            "text": "Taken? → Roshamuul West",
+            "why": "Scores 78: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot)."
+           },
+           {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 32: 5.21kk exp/h (5.2kk hunting, 8357 from the bounty), 900k profit/h. Bounty done in about 48 min here."},
            {
             "kind": "go",
             "text": "Taken? → Cobra Bastion -1",
-            "why": "Scores 33: 3.78kk exp/h (3.77kk hunting, 5595 from the bounty), 604.66k profit/h. Bounty done in about 1 h 12 min here. Free 2 of 3 times you checked around this hour."
+            "why": "Scores 22: 3.78kk exp/h (3.77kk hunting, 5595 from the bounty), 604.66k profit/h. Bounty done in about 1 h 12 min here. Free 2 of 3 times you checked around this hour."
            },
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
@@ -1844,19 +1853,19 @@
        "profit": {
         "board": {"model":{"keys":{"$set":["profit"]}}},
         "planner": {
-         "chosen": {"$set":["test-hideout","my-bastion-lure","cobra-bastion-1","warzone-2","roshamuul-west"]},
+         "chosen": {"$set":["test-hideout","my-knight-den","my-bastion-lure","cobra-bastion-1","warzone-2"]},
          "options": {
           "$set": [
-           ["my-bastion-lure","held cobra-assassin",1,null,null,0.363636363636],
-           ["cobra-bastion-1","held cobra-assassin",0.671842650104,null,null,0.555844155844],
-           ["warzone-2","held cobra-assassin",0.444444444444,null,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",0.444444444444,null,null,0.363636363636],
-           ["nightmare-isles","held cobra-assassin",0.405296488198,null,"taken",null],
-           ["druid-only-spot","held cobra-assassin",0.371640921378,null,null,0.363636363636],
-           ["my-knight-den","held cobra-assassin",0.333333333333,null,null,0.363636363636],
-           ["feru-way","held cobra-assassin",0.325471943155,null,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",0.296296296296,null,"free",0.717171717172],
-           ["bookworld-chapter-iv","held cobra-assassin",0.277777777778,null,null,0.363636363636]
+           ["my-knight-den","held cobra-assassin",1,null,null,0.363636363636],
+           ["my-bastion-lure","held cobra-assassin",0.781223980017,null,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",0.650552601107,null,"free",0.717171717172],
+           ["cobra-bastion-1","held cobra-assassin",0.524859589059,null,null,0.555844155844],
+           ["warzone-2","held cobra-assassin",0.347210657785,null,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",0.347210657785,null,null,0.363636363636],
+           ["nightmare-isles","held cobra-assassin",0.316627335597,null,"taken",null],
+           ["druid-only-spot","held cobra-assassin",0.290334799736,null,null,0.363636363636],
+           ["feru-way","held cobra-assassin",0.254266486816,null,null,0.363636363636],
+           ["bookworld-chapter-iv","held cobra-assassin",0.217006661116,null,null,0.363636363636]
           ]
          },
          "steps": {
@@ -1864,12 +1873,16 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 30: 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+            "why": "Scores 65: 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
-           {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 100: 900k profit/h. Bounty done in about 48 min here."},
-           {"kind":"go","text":"Taken? → Cobra Bastion -1","why":"Scores 67: 604.66k profit/h. Bounty done in about 1 h 12 min here. Free 2 of 3 times you checked around this hour."},
-           {"kind":"go","text":"Taken? → Warzone 2","why":"Scores 44: 400k profit/h."},
-           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 44: 400k profit/h. Today: Silencer is boosted (double exp)."},
+           {
+            "kind": "go",
+            "text": "Taken? → Knight Den",
+            "why": "Scores 100: 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp."
+           },
+           {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 78: 900k profit/h. Bounty done in about 48 min here."},
+           {"kind":"go","text":"Taken? → Cobra Bastion -1","why":"Scores 52: 604.66k profit/h. Bounty done in about 1 h 12 min here. Free 2 of 3 times you checked around this hour."},
+           {"kind":"go","text":"Taken? → Warzone 2","why":"Scores 35: 400k profit/h."},
            {"kind":"seeSpots","text":"Taken? → See Spots for more","why":"More spots still beat a reroll than fit here."}
           ]
          }
@@ -1958,12 +1971,12 @@
          "werehyaena": {"score":{"$set":0.485296106007}}
         },
         "planner": {
-         "chosen": {"$set":["test-hideout","roshamuul-west","my-knight-den","my-bastion-lure","cobra-bastion-1"]},
+         "chosen": {"$set":["test-hideout","my-knight-den","roshamuul-west","my-bastion-lure","cobra-bastion-1"]},
          "options": {
           "$set": [
+           ["my-knight-den","held cobra-assassin",5.44677182349,0.636688491662,null,0.363636363636],
            ["roshamuul-west","held cobra-assassin",4.98796942081,0.636688491662,null,0.363636363636],
-           ["my-knight-den","held cobra-assassin",4.97341717388,0.636688491662,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",3.85721926373,0.636688491662,"free",0.717171717172],
+           ["test-hideout","held cobra-assassin",4.12543864765,0.636688491662,"free",0.717171717172],
            ["my-bastion-lure","held cobra-assassin",0.98479767978,0.593443436877,null,0.363636363636],
            ["nightmare-isles","held cobra-assassin",0.868887348298,0.636688491662,"taken",null],
            ["cobra-bastion-1","held cobra-assassin",0.686406240193,0.606199770472,null,0.555844155844],
@@ -1979,17 +1992,17 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 392: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (100), by 292. A reroll is worth 65 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Roshamuul West",
-            "why": "Scores 507: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 65 with 4 tokens left."
+            "why": "Scores 420: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (100), by 320. A reroll is worth 65 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 506: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 65 with 4 tokens left."
+            "why": "Scores 554: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 65 with 4 tokens left."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Roshamuul West",
+            "why": "Scores 507: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 65 with 4 tokens left."
            },
            {
             "kind": "go",
@@ -2258,7 +2271,7 @@
             "text": "Go to Bookworld: Chapter IV",
             "why": "Scores 81: 32.3 charm points/h. Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (44), by 37. A reroll is worth 47 with 4 tokens left."
            },
-           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 65: 26 charm points/h. Today: Silencer is boosted (double exp). A reroll is worth 47 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 65: 26 charm points/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 47 with 4 tokens left."},
            {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 63: 25.2 charm points/h. A reroll is worth 47 with 4 tokens left."},
            {
             "kind": "reroll",
@@ -2875,17 +2888,17 @@
           {
            "kind": "go",
            "text": "Go to Test Hideout",
-           "why": "Scores 742: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (97), by 645. A reroll is worth 78 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+           "why": "Scores 742: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (97), by 645. A reroll is worth 78 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
           },
           {
            "kind": "go",
            "text": "Taken? → Knight Den",
-           "why": "Scores 961: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 78 with 4 tokens left."
+           "why": "Scores 961: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 78 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 953: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 78 with 4 tokens left."
+           "why": "Scores 953: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp and loot). A reroll is worth 78 with 4 tokens left."
           },
           {"kind":"go","text":"Taken? → Feru Way","why":"Scores 98: 5.54kk exp/h. A reroll is worth 78 with 4 tokens left."},
           {
@@ -2977,9 +2990,9 @@
          "chosen": {"$set":["test-hideout","my-knight-den","roshamuul-west","my-bastion-lure","feru-way"]},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",6.52011178739,0.680856307541,null,0.363636363636],
+           ["my-knight-den","held cobra-assassin",6.8356815538,0.680856307541,null,0.363636363636],
            ["roshamuul-west","held cobra-assassin",6.50247774626,0.680856307541,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",5.04419358621,0.680856307541,"free",0.717171717172],
+           ["test-hideout","held cobra-assassin",5.22300650882,0.680856307541,"free",0.717171717172],
            ["nightmare-isles","held cobra-assassin",1.023417635,0.680856307541,"taken",null],
            ["my-bastion-lure","held cobra-assassin",0.979730239707,0.63982375764,null,0.363636363636],
            ["feru-way","held cobra-assassin",0.761932719253,0.680856307541,null,0.363636363636],
@@ -2995,17 +3008,17 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 516: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (100), by 416. A reroll is worth 70 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+            "why": "Scores 534: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (100), by 434. A reroll is worth 70 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 667: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 70 with 4 tokens left."
+            "why": "Scores 699: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 70 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 665: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 70 with 4 tokens left."
+            "why": "Scores 665: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 70 with 4 tokens left."
            },
            {
             "kind": "go",
@@ -3093,19 +3106,19 @@
          "werehyaena": {"score":{"$set":0.371641111111},"tier":{"$set":"D"}}
         },
         "planner": {
-         "chosen": {"$set":["my-bastion-lure","cobra-bastion-1"]},
+         "chosen": {"$set":["test-hideout","my-knight-den","my-bastion-lure","cobra-bastion-1"]},
          "notes": {"$set":[]},
          "options": {
           "$set": [
+           ["my-knight-den","held cobra-assassin",1.28004263256,0.515258103618,null,0.363636363636],
            ["my-bastion-lure","held cobra-assassin",1,0.455962278231,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",0.83273506414,0.515258103618,"free",0.717171717172],
            ["cobra-bastion-1","held cobra-assassin",0.671842650104,0.473449028127,null,0.555844155844],
            ["warzone-2","held cobra-assassin",0.444444444444,0.515258103618,null,null],
            ["roshamuul-west","held cobra-assassin",0.444444444444,0.515258103618,null,null],
            ["nightmare-isles","held cobra-assassin",0.405296488198,0.515258103618,"taken",null],
            ["druid-only-spot","held cobra-assassin",0.371640921378,0.515258103618,null,null],
-           ["my-knight-den","held cobra-assassin",0.333333333333,0.515258103618,null,null],
            ["feru-way","held cobra-assassin",0.325471943155,0.515258103618,null,null],
-           ["test-hideout","held cobra-assassin",0.296296296296,0.515258103618,"free",null],
            ["bookworld-chapter-iv","held cobra-assassin",0.277777777778,0.515258103618,null,null]
           ]
          },
@@ -3113,7 +3126,17 @@
          "skipped": {"$set":[]},
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Bastion lure","why":"Scores 100: 900k profit/h. Bounty done in about 48 min here. A reroll is worth 46 with 4 tokens left."},
+           {
+            "kind": "go",
+            "text": "Go to Test Hideout",
+            "why": "Scores 83: 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). A reroll is worth 52 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Knight Den",
+            "why": "Scores 128: 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 52 with 4 tokens left."
+           },
+           {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 100: 900k profit/h. Bounty done in about 48 min here. A reroll is worth 46 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Cobra Bastion -1",
@@ -3197,13 +3220,13 @@
          "weeper": {"score":{"$set":0.576473234368},"tier":{"$set":"C"}}
         },
         "planner": {
-         "chosen": {"$set":["test-hideout","roshamuul-west","my-knight-den","my-bastion-lure","cobra-bastion-1"]},
+         "chosen": {"$set":["test-hideout","my-knight-den","roshamuul-west","my-bastion-lure","cobra-bastion-1"]},
          "cutoff": {"$set":"feru-way"},
          "options": {
           "$set": [
+           ["my-knight-den","held cobra-assassin",5.04286077297,0.658131603112,null,0.363636363636],
            ["roshamuul-west","held cobra-assassin",4.58750387666,0.658131603112,null,0.363636363636],
-           ["my-knight-den","held cobra-assassin",4.56950612336,0.658131603112,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",3.54554616805,0.658131603112,"free",0.717171717172],
+           ["test-hideout","held cobra-assassin",3.81376555197,0.658131603112,"free",0.717171717172],
            ["my-bastion-lure","held cobra-assassin",1.00563909774,0.534556820302,null,0.363636363636],
            ["nightmare-isles","held cobra-assassin",0.812903303345,0.658131603112,"taken",null],
            ["cobra-bastion-1","held cobra-assassin",0.698181715038,0.571084003714,null,0.555844155844],
@@ -3219,17 +3242,17 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 355: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (101), by 254. A reroll is worth 66 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
-           },
-           {
-            "kind": "go",
-            "text": "Taken? → Roshamuul West",
-            "why": "Scores 459: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 66 with 4 tokens left."
+            "why": "Scores 381: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (101), by 280. A reroll is worth 66 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 457: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 66 with 4 tokens left."
+            "why": "Scores 504: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 66 with 4 tokens left."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Roshamuul West",
+            "why": "Scores 459: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 66 with 4 tokens left."
            },
            {
             "kind": "go",
@@ -3460,7 +3483,7 @@
             "text": "Go to Bookworld: Chapter IV",
             "why": "Scores 81: 32.3 charm points/h. Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (44), by 37. A reroll is worth 48 with 4 tokens left."
            },
-           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 65: 26 charm points/h. Today: Silencer is boosted (double exp). A reroll is worth 48 with 4 tokens left."},
+           {"kind":"go","text":"Taken? → Roshamuul West","why":"Scores 65: 26 charm points/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 48 with 4 tokens left."},
            {"kind":"go","text":"Taken? → Asura Mirror","why":"Scores 63: 25.2 charm points/h. A reroll is worth 48 with 4 tokens left."},
            {
             "kind": "reroll",
@@ -3952,17 +3975,17 @@
           {
            "kind": "go",
            "text": "Go to Test Hideout",
-           "why": "Scores 679: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (101), by 578. A reroll is worth 80 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+           "why": "Scores 679: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (101), by 578. A reroll is worth 80 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
           },
           {
            "kind": "go",
            "text": "Taken? → Knight Den",
-           "why": "Scores 881: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 80 with 4 tokens left."
+           "why": "Scores 881: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 80 with 4 tokens left."
           },
           {
            "kind": "go",
            "text": "Taken? → Roshamuul West",
-           "why": "Scores 873: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 80 with 4 tokens left."
+           "why": "Scores 873: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp and loot). A reroll is worth 80 with 4 tokens left."
           },
           {
            "kind": "go",
@@ -4045,9 +4068,9 @@
          "cutoff": {"$set":"feru-way"},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",5.98156372004,0.720224049734,null,0.363636363636],
+           ["my-knight-den","held cobra-assassin",6.29713348645,0.720224049734,null,0.363636363636],
            ["roshamuul-west","held cobra-assassin",5.96852368739,0.720224049734,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",4.62862945864,0.720224049734,"free",0.717171717172],
+           ["test-hideout","held cobra-assassin",4.80744238125,0.720224049734,"free",0.717171717172],
            ["my-bastion-lure","held cobra-assassin",1.00751879699,0.617188875777,null,0.363636363636],
            ["nightmare-isles","held cobra-assassin",0.948772241728,0.720224049734,"taken",null],
            ["feru-way","held cobra-assassin",0.707024008437,0.720224049734,null,null],
@@ -4063,17 +4086,17 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 463: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (101), by 362. A reroll is worth 72 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+            "why": "Scores 481: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (101), by 380. A reroll is worth 72 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 598: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 72 with 4 tokens left."
+            "why": "Scores 630: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 72 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 597: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 72 with 4 tokens left."
+            "why": "Scores 597: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 72 with 4 tokens left."
            },
            {
             "kind": "go",
@@ -4150,20 +4173,20 @@
          "weeper": {"score":{"$set":0.444444444444},"tier":{"$set":"D"}}
         },
         "planner": {
-         "chosen": {"$set":["my-bastion-lure","cobra-bastion-1"]},
+         "chosen": {"$set":["test-hideout","my-knight-den","my-bastion-lure","cobra-bastion-1"]},
          "cutoff": {"$set":"warzone-2"},
          "notes": {"$set":[]},
          "options": {
           "$set": [
+           ["my-knight-den","held cobra-assassin",1.28004263256,0.539518976223,null,0.363636363636],
            ["my-bastion-lure","held cobra-assassin",1,0.378096942159,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",0.83273506414,0.539518976223,"free",0.717171717172],
            ["cobra-bastion-1","held cobra-assassin",0.671842650104,0.425747876536,null,0.555844155844],
            ["warzone-2","held cobra-assassin",0.444444444444,0.539518976223,null,null],
            ["roshamuul-west","held cobra-assassin",0.444444444444,0.539518976223,null,null],
            ["nightmare-isles","held cobra-assassin",0.405296488198,0.539518976223,"taken",null],
            ["druid-only-spot","held cobra-assassin",0.371640921378,0.539518976223,null,null],
-           ["my-knight-den","held cobra-assassin",0.333333333333,0.539518976223,null,null],
            ["feru-way","held cobra-assassin",0.325471943155,0.539518976223,null,null],
-           ["test-hideout","held cobra-assassin",0.296296296296,0.539518976223,"free",null],
            ["bookworld-chapter-iv","held cobra-assassin",0.277777777778,0.539518976223,null,null]
           ]
          },
@@ -4171,7 +4194,17 @@
          "skipped": {"$set":[]},
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Bastion lure","why":"Scores 100: 900k profit/h. Bounty done in about 48 min here. A reroll is worth 38 with 4 tokens left."},
+           {
+            "kind": "go",
+            "text": "Go to Test Hideout",
+            "why": "Scores 83: 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). A reroll is worth 54 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+           },
+           {
+            "kind": "go",
+            "text": "Taken? → Knight Den",
+            "why": "Scores 128: 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 54 with 4 tokens left."
+           },
+           {"kind":"go","text":"Taken? → Bastion lure","why":"Scores 100: 900k profit/h. Bounty done in about 48 min here. A reroll is worth 38 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Cobra Bastion -1",
@@ -4292,12 +4325,12 @@
         "hours": null,
         "huntHours": null,
         "kph": {"choking-fear":120,"silencer":380},
-        "m": {"bounty":0,"charm":12.4193199382,"profit":300000,"xp":54375067.2902},
+        "m": {"bounty":0,"charm":12.4193199382,"profit":1152038.3693,"xp":54375067.2902},
         "parts": {"held":0,"hunt":3800000,"today":3157553.95683,"weekly":47417513.3333},
         "pph": 300000,
         "profitStale": false,
         "src": "own",
-        "today": ["Silencer is boosted (double exp)","Choking Fear prey +25% exp"],
+        "today": ["Silencer is boosted (double exp and loot)","Choking Fear prey +25% exp"],
         "travelMin": 0,
         "weekly": [{"exp":46599970,"key":"silencer","kills":null,"kph":380,"left":10},{"exp":817543.333333,"key":"choking-fear","kills":null,"kph":120,"left":180}],
         "xph": 3800000
@@ -4330,7 +4363,7 @@
         "pph": 400000,
         "profitStale": false,
         "src": "other",
-        "today": ["Silencer is boosted (double exp)"],
+        "today": ["Silencer is boosted (double exp and loot)"],
         "travelMin": 0,
         "weekly": [{"exp":49052600,"key":"silencer","kills":null,"kph":400,"left":10}],
         "xph": 3500000
@@ -4341,12 +4374,12 @@
         "hours": null,
         "huntHours": null,
         "kph": {"choking-fear":346.666666667,"retching-horror":120,"silencer":280},
-        "m": {"bounty":0,"charm":17.2421432251,"profit":266666.666667,"xp":41957865.5458},
+        "m": {"bounty":0,"charm":17.2421432251,"profit":749461.557726,"xp":41957865.5458},
         "parts": {"held":0,"hunt":3466666.66667,"today":1792587.0273,"weekly":36698611.8519},
         "pph": 266666.666667,
         "profitStale": false,
         "src": "own",
-        "today": ["Choking Fear prey +25% exp","Silencer is boosted (double exp)"],
+        "today": ["Choking Fear prey +25% exp","Silencer is boosted (double exp and loot)"],
         "travelMin": 0,
         "weekly": [{"exp":34336820,"key":"silencer","kills":null,"kph":280,"left":10},{"exp":2361791.85185,"key":"choking-fear","kills":null,"kph":346.666666667,"left":180}],
         "xph": 3466666.66667
@@ -6960,9 +6993,9 @@
          "options": {
           "$set": {
            "$set": [
+            ["my-knight-den","held cobra-assassin",5.2251291313,0.948968634994,null,0.363636363636],
             ["roshamuul-west","held cobra-assassin",4.07104702887,0.948968634994,null,0.363636363636],
-            ["my-knight-den","held cobra-assassin",3.95144159927,0.948968634994,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",3.10166481296,0.948968634994,"free",0.717171717172],
+            ["test-hideout","held cobra-assassin",3.82338094152,0.948968634994,"free",0.717171717172],
             ["my-bastion-lure","held cobra-assassin",1.68388075112,0.948859396704,null,0.363636363636],
             ["cobra-bastion-1","held cobra-assassin",1.14939435322,0.948891609509,null,0.555844155844],
             ["nightmare-isles","held cobra-assassin",1.03080958505,0.948968634994,"taken",null],
@@ -6979,17 +7012,17 @@
             {
              "kind": "go",
              "text": "Go to Test Hideout",
-             "why": "Scores 327: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (178), by 149. A reroll is worth 100 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
-            },
-            {
-             "kind": "go",
-             "text": "Taken? → Roshamuul West",
-             "why": "Scores 429: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 100 with 4 tokens left."
+             "why": "Scores 403: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (178), by 225. A reroll is worth 100 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
             },
             {
              "kind": "go",
              "text": "Taken? → Knight Den",
-             "why": "Scores 417: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 100 with 4 tokens left."
+             "why": "Scores 551: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 100 with 4 tokens left."
+            },
+            {
+             "kind": "go",
+             "text": "Taken? → Roshamuul West",
+             "why": "Scores 429: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 100 with 4 tokens left."
             },
             {
              "kind": "go",
@@ -7248,17 +7281,17 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 520: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (65), by 455. A reroll is worth 59 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+            "why": "Scores 520: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (65), by 455. A reroll is worth 59 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 674: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 59 with 4 tokens left."
+            "why": "Scores 674: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 59 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 668: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 59 with 4 tokens left."
+            "why": "Scores 668: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp and loot). A reroll is worth 59 with 4 tokens left."
            },
            {"kind":"go","text":"Taken? → Feru Way","why":"Scores 69: 5.54kk exp/h. A reroll is worth 59 with 4 tokens left."},
            {
@@ -7354,14 +7387,14 @@
          "werehyaena": {"score":{"$set":{"$set":0.62501900934}},"tier":{"$set":{"$set":"B"}}}
         },
         "planner": {
-         "chosen": {"$set":{"$set":["test-hideout","roshamuul-west","my-knight-den","my-bastion-lure"]}},
+         "chosen": {"$set":{"$set":["test-hideout","my-knight-den","roshamuul-west","my-bastion-lure"]}},
          "cutoff": {"$set":{"$set":"cobra-bastion-1"}},
          "options": {
           "$set": {
            "$set": [
+            ["my-knight-den","held cobra-assassin",5.81873960093,0.966224206015,null,0.363636363636],
             ["roshamuul-west","held cobra-assassin",5.02943041255,0.966224206015,null,0.363636363636],
-            ["my-knight-den","held cobra-assassin",4.96961457957,0.966224206015,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",3.86979822222,0.966224206015,"free",0.717171717172],
+            ["test-hideout","held cobra-assassin",4.35094230792,0.966224206015,"free",0.717171717172],
             ["my-bastion-lure","held cobra-assassin",1.34825167646,0.966078403706,null,0.363636363636],
             ["nightmare-isles","held cobra-assassin",1.01089317645,0.966224206015,"taken",null],
             ["cobra-bastion-1","held cobra-assassin",0.929934908564,0.966121396578,null,null],
@@ -7378,17 +7411,17 @@
             {
              "kind": "go",
              "text": "Go to Test Hideout",
-             "why": "Scores 401: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (140), by 261. A reroll is worth 100 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
-            },
-            {
-             "kind": "go",
-             "text": "Taken? → Roshamuul West",
-             "why": "Scores 521: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 100 with 4 tokens left."
+             "why": "Scores 451: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (140), by 311. A reroll is worth 100 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
             },
             {
              "kind": "go",
              "text": "Taken? → Knight Den",
-             "why": "Scores 515: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 100 with 4 tokens left."
+             "why": "Scores 603: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 100 with 4 tokens left."
+            },
+            {
+             "kind": "go",
+             "text": "Taken? → Roshamuul West",
+             "why": "Scores 521: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 100 with 4 tokens left."
             },
             {
              "kind": "go",
@@ -8211,9 +8244,9 @@
          "options": {
           "$set": {
            "$set": [
+            ["my-knight-den","held cobra-assassin",4.7349742898,0.632526348492,null,0.363636363636],
             ["roshamuul-west","held cobra-assassin",4.28224377579,0.632526348492,null,0.363636363636],
-            ["my-knight-den","held cobra-assassin",4.26161964018,0.632526348492,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",3.30796927283,0.632526348492,"free",0.717171717172],
+            ["test-hideout","held cobra-assassin",3.57618865675,0.632526348492,"free",0.717171717172],
             ["my-bastion-lure","held cobra-assassin",0.913007435563,0.594117549482,null,0.363636363636],
             ["nightmare-isles","held cobra-assassin",0.770228732564,0.632526348492,"taken",null],
             ["cobra-bastion-1","held cobra-assassin",0.634505419083,0.605446780216,null,0.555844155844],
@@ -8230,17 +8263,17 @@
             {
              "kind": "go",
              "text": "Go to Test Hideout",
-             "why": "Scores 363: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (100), by 263. A reroll is worth 69 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
-            },
-            {
-             "kind": "go",
-             "text": "Taken? → Roshamuul West",
-             "why": "Scores 470: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 69 with 4 tokens left."
+             "why": "Scores 392: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (100), by 292. A reroll is worth 69 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
             },
             {
              "kind": "go",
              "text": "Taken? → Knight Den",
-             "why": "Scores 467: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 69 with 4 tokens left."
+             "why": "Scores 519: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 69 with 4 tokens left."
+            },
+            {
+             "kind": "go",
+             "text": "Taken? → Roshamuul West",
+             "why": "Scores 470: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 69 with 4 tokens left."
             },
             {
              "kind": "go",
@@ -8472,17 +8505,17 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 632: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (83), by 549. A reroll is worth 77 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+            "why": "Scores 632: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (83), by 549. A reroll is worth 77 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 819: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 77 with 4 tokens left."
+            "why": "Scores 819: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 77 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 812: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 77 with 4 tokens left."
+            "why": "Scores 812: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp and loot). A reroll is worth 77 with 4 tokens left."
            },
            {"kind":"go","text":"Taken? → Feru Way","why":"Scores 84: 5.54kk exp/h. A reroll is worth 77 with 4 tokens left."},
            {
@@ -8577,9 +8610,9 @@
          "options": {
           "$set": {
            "$set": [
-            ["my-knight-den","held cobra-assassin",5.57104840914,0.658871571811,null,0.363636363636],
+            ["my-knight-den","held cobra-assassin",5.88661817554,0.658871571811,null,0.363636363636],
             ["roshamuul-west","held cobra-assassin",5.56151021957,0.658871571811,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",4.311860265,0.658871571811,"free",0.717171717172],
+            ["test-hideout","held cobra-assassin",4.49067318762,0.658871571811,"free",0.717171717172],
             ["nightmare-isles","held cobra-assassin",0.89187281402,0.658871571811,"taken",null],
             ["my-bastion-lure","held cobra-assassin",0.884009914083,0.618056847921,null,0.363636363636],
             ["feru-way","held cobra-assassin",0.665169125172,0.658871571811,null,0.363636363636],
@@ -8596,17 +8629,17 @@
             {
              "kind": "go",
              "text": "Go to Test Hideout",
-             "why": "Scores 489: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (100), by 389. A reroll is worth 75 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+             "why": "Scores 509: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (100), by 409. A reroll is worth 75 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
             },
             {
              "kind": "go",
              "text": "Taken? → Knight Den",
-             "why": "Scores 632: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 75 with 4 tokens left."
+             "why": "Scores 667: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 75 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Roshamuul West",
-             "why": "Scores 630: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 75 with 4 tokens left."
+             "why": "Scores 630: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 75 with 4 tokens left."
             },
             {
              "kind": "go",
@@ -8751,9 +8784,9 @@
          "options": {
           "$set": {
            "$set": [
+            ["my-knight-den","held cobra-assassin",4.73423770299,0.666258033325,null,0.363636363636],
             ["roshamuul-west","held cobra-assassin",4.28151347233,0.666258033325,null,0.363636363636],
-            ["my-knight-den","held cobra-assassin",4.26088305338,0.666258033325,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",3.30740089449,0.666258033325,"free",0.717171717172],
+            ["test-hideout","held cobra-assassin",3.57562027842,0.666258033325,"free",0.717171717172],
             ["my-bastion-lure","held cobra-assassin",0.970195631731,0.555676055598,null,0.363636363636],
             ["nightmare-isles","held cobra-assassin",0.770126638035,0.666258033325,"taken",null],
             ["cobra-bastion-1","held cobra-assassin",0.672788576181,0.588339643896,null,0.555844155844],
@@ -8770,17 +8803,17 @@
             {
              "kind": "go",
              "text": "Go to Test Hideout",
-             "why": "Scores 343: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (101), by 242. A reroll is worth 69 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
-            },
-            {
-             "kind": "go",
-             "text": "Taken? → Roshamuul West",
-             "why": "Scores 444: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 69 with 4 tokens left."
+             "why": "Scores 371: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (101), by 270. A reroll is worth 69 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
             },
             {
              "kind": "go",
              "text": "Taken? → Knight Den",
-             "why": "Scores 442: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 69 with 4 tokens left."
+             "why": "Scores 491: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 69 with 4 tokens left."
+            },
+            {
+             "kind": "go",
+             "text": "Taken? → Roshamuul West",
+             "why": "Scores 444: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 69 with 4 tokens left."
             },
             {
              "kind": "go",
@@ -8972,17 +9005,17 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 632: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (94), by 538. A reroll is worth 85 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+            "why": "Scores 632: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (94), by 538. A reroll is worth 85 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 819: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 85 with 4 tokens left."
+            "why": "Scores 819: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 85 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 812: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp). A reroll is worth 85 with 4 tokens left."
+            "why": "Scores 812: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp and loot). A reroll is worth 85 with 4 tokens left."
            },
            {
             "kind": "go",
@@ -9066,9 +9099,9 @@
          "options": {
           "$set": {
            "$set": [
-            ["my-knight-den","held cobra-assassin",5.5700662934,0.705987699429,null,0.363636363636],
+            ["my-knight-den","held cobra-assassin",5.88563605981,0.705987699429,null,0.363636363636],
             ["roshamuul-west","held cobra-assassin",5.56053648163,0.705987699429,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",4.31110242723,0.705987699429,"free",0.717171717172],
+            ["test-hideout","held cobra-assassin",4.48991534984,0.705987699429,"free",0.717171717172],
             ["my-bastion-lure","held cobra-assassin",0.960260842307,0.593848404706,null,0.363636363636],
             ["nightmare-isles","held cobra-assassin",0.89173668798,0.705987699429,"taken",null],
             ["cobra-bastion-1","held cobra-assassin",0.673103884873,0.626986347255,null,0.555844155844],
@@ -9085,17 +9118,17 @@
             {
              "kind": "go",
              "text": "Go to Test Hideout",
-             "why": "Scores 452: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 266.67k profit/h. Today: Choking Fear prey +25% exp and Silencer is boosted (double exp). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (101), by 351. A reroll is worth 74 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+             "why": "Scores 471: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks), 749.46k profit/h (482.79k from today’s boosts). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (101), by 370. A reroll is worth 74 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
             },
             {
              "kind": "go",
              "text": "Taken? → Knight Den",
-             "why": "Scores 584: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 300k profit/h. Today: Silencer is boosted (double exp) and Choking Fear prey +25% exp. A reroll is worth 74 with 4 tokens left."
+             "why": "Scores 617: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks), 1.15kk profit/h (852.04k from today’s boosts). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 74 with 4 tokens left."
             },
             {
              "kind": "go",
              "text": "Taken? → Roshamuul West",
-             "why": "Scores 583: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp). A reroll is worth 74 with 4 tokens left."
+             "why": "Scores 583: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks), 400k profit/h. Today: Silencer is boosted (double exp and loot). A reroll is worth 74 with 4 tokens left."
             },
             {
              "kind": "go",

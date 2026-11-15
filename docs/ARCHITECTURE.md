@@ -87,7 +87,7 @@ Each module lists its job, its main functions, and what it replaces in the old c
 
 **Key types** (JSDoc typedefs in `core/types.js`):
 
-- `Session` {id, spot, spotId?, start, end, hours, rawXp, xp, loot, supplies, balance, kills [{slug, count}], breaks, raidsBy, level, vocation, by {pid, name}} (a shared hunt; `vocation`, `level` and `by` as the store reads them, null when unknown)
+- `Session` {id, spot, spotId?, start, end, hours, rawXp, xp, loot, supplies, balance, kills [{slug, count}], breaks, raidsBy, level, vocation, by {pid, name}, boosts? {boosted, prey [{slug, pct}], talisman}} (a shared hunt; `vocation`, `level` and `by` as the store reads them, null when unknown; `boosts`: the loot bonuses on during it, on hunts logged since November 14, 2026, `readBoosts`)
 - `Numbers` {kph, xph, pph, cph, spot, spotId, src, samples, lowSample}
 - `Spot` {id, name, parentId?, userMade, creatures [slug], entries (reference), sessions, meta {travelMin, access, team, notes}}
 - `Step` {kind: "go" | "reroll" | "seeSpots", spotId, offer?, value, numbers, badges, why}
@@ -134,7 +134,7 @@ Shared by every character in the same storage (the Claude artifact db, or one br
 
 | Area | Shape | Notes and migration from the current data |
 |---|---|---|
-| Hunts | `hunts/{id}`: the session shape (below), plus `vocation` and `level` (required: what it was logged at) and `by {pid, name}` (the character that logged it, for display only; it never decides whether a hunt counts) | copied once from every `profiles/{pid}/sessions/{id}` by `store/migrate.js` on connect and after a restore: vocation = the session's, else the profile's `untaggedVocation`, else its vocation; level = the session's, else the profile's. An id already taken by a different hunt becomes `{pid}-{id}`; the same hunt (same start, end and exp) is copied once. Readers use only `hunts/`, and new hunts are written only there |
+| Hunts | `hunts/{id}`: the session shape (below), plus `vocation` and `level` (required: what it was logged at) and `by {pid, name}` (the character that logged it, for display only; it never decides whether a hunt counts), and since November 14, 2026 `boosts {boosted, prey [{slug, pct}], talisman}` (the loot bonuses on during it: the boosted creature, loot Preys, and on its bounty the logging character's Talisman loot %; stored on every new hunt, none on as none; older builds ignore it) | copied once from every `profiles/{pid}/sessions/{id}` by `store/migrate.js` on connect and after a restore: vocation = the session's, else the profile's `untaggedVocation`, else its vocation; level = the session's, else the profile's. An id already taken by a different hunt becomes `{pid}-{id}`; the same hunt (same start, end and exp) is copied once. Readers use only `hunts/`, and new hunts are written only there |
 | Spots | `spots/{id}` {name, parentId?, note?, createdAt} | copied the same way from `profiles/{pid}/spots/{id}`; a different spot under a taken id becomes `{pid as a slug}-{id}`, with the hunts' `spotId` and variations' `parentId` rewritten; a spot with the same name is the same spot |
 | Migration record | `meta/hunts` {version: 1, at, sessions {"pid:id": hunt id or null}, spots {"pid:id": spot id}} | which old documents were copied and where to, so running the migration again (or restoring an old backup) never copies one twice and a hunt deleted later doesn't come back. Written after the copies |
 
@@ -175,7 +175,7 @@ Everything the UI can change, one function each. Each validates input, writes th
 - Today and time: `setBoosted(slug)`, `setPrey(i, prey)`, `addPrey()`, `removePrey(i)`, `setEvent(pct)`, `setFixedHours(h)`
 - Sources: `setSources(presetOrSwitches)`, `setOtherVocationHunts(on)`, `setLevelWindow(0 | 10 | 20 | 35)`
 - Plan: `markTaken(spotId)`, `markFree(spotId)`, `startHunting(spotId)`, `stopHunting()`
-- Logging: `readHunt(text) → preview` (pure, no write), `saveHunt({preview, spot: {id} | {name, parentId?, note?}})` (to the shared hunts, with the character's vocation, level and `by`), `editHunt(id, {vocation?, level?, spotId?})`, `deleteSession(id)`, `setSessionRaids(id, raidsBy)`
+- Logging: `readHunt(text) → preview` (pure, no write), `saveHunt({preview, spot: {id} | {name, parentId?, note?}, boosts?})` (to the shared hunts, with the character's vocation, level, `by` and the loot bonuses on during it), `editHunt(id, {vocation?, level?, spotId?, boosts?})`, `deleteSession(id)`, `setSessionRaids(id, raidsBy)`
 - Spots: `renameSpot(id, name)`, `deleteSpot(id)` (user spots only; deletes the hunts logged there by any character)
 - Creatures: `setAvoid(slug, on)`, `setPreferred(slug, on)`, `setUnwanted(slug, on)`, `setBestiaryDone(slug, on)`, `setWardenDone(slug, on)`, `setNotes(slug, text)`, `setCreatureNumbers(slug, nums)`, `pinSpot(slug, spotId)`, `setMinLevel(slug, level)`
 - Weekly: `setWeeklyDifficulty(d)`, `setWeeklySlots(6 | 9)`, `setWeeklyTask(i, {slug, killsLeft})`, `setWeeklyDone(i, on)`, `startNewWeek()`

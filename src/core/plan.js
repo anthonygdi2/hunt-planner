@@ -2,14 +2,14 @@
 import { norm } from "./text.js";
 import { creatureInPool } from "./catalog.js";
 import { taskReward, kindMult } from "./rewards.js";
-import { bestiaryOf, expShares } from "./metrics.js";
+import { bestiaryOf, expShares, lootMult } from "./metrics.js";
 import { GOAL_KEYS, weightedValue } from "./score.js";
 import { RHO, taskShape, rateThreshold } from "./reroll.js";
 import { markAge, markActive, occOdds, orderByOdds } from "./occupancy.js";
 import { offerLetter, goWhy, rerollWhy, seeSpotsWhy } from "./explain.js";
 import { EN } from "./i18n.js";
 import { ANY_CREATURE, allKph } from "./weekly.js";
-import { BOOSTED_EXP_MULT, RAID, TASK, TOKEN_CAP } from "../data/rules.js";
+import { BOOSTED_EXP_MULT, BOOSTED_LOOT_MULT, RAID, TASK, TOKEN_CAP } from "../data/rules.js";
 
 // The chain shows at most this many spots.
 export const MAX_STEPS = 5;
@@ -19,26 +19,24 @@ export const CHECK_HOURS = 2;
 
 // How much today's bonuses raise a spot's hunting exp: each creature's share of the spot's exp (kills/h × base exp from
 // ctx.expTable, or kill shares when a creature's exp is unknown) times its own bonus (Boosted Creature, exp Prey), then
-// any exp event. A loot Prey raises the spot's loot the same way: the creature's share of the loot (taken as its share
-// of the exp, an estimate: there's no loot value per creature) times 1 + its percent; two loot bonuses on one creature
-// add their chances (rules.js TALISMAN). today: {boosted (slug), prey
-// [{slug, kind, pct}], event (percent)} or null. Returns {mult, notes, loot (the loot multiplier), lootNotes}.
+// any exp event. The loot is raised the same way (lootMult in metrics.js): the creature's share of the loot (taken as
+// its share of the exp, an estimate: there's no loot value per creature) doubled for the boosted creature, times 1 + its
+// loot Preys' percents (loot chances add, rules.js TALISMAN). today: {boosted (slug), prey [{slug, kind, pct}], event
+// (percent)} or null. Returns {mult, notes, loot (the loot multiplier), lootNotes}.
 export function todayFactor(kph, today, ctx) {
   const out = { mult: 1, notes: [], loot: 1, lootNotes: [] }, t = ctx.t || EN;
   if (!today) return out;
-  const keys = Object.keys(kph), share = expShares(kph, ctx.expTable), tot = keys.length && share[keys[0]] != null;
-  let per = 0, loot = 0;
+  const keys = Object.keys(kph), share = expShares(kph, ctx.expTable), tot = keys.length && share[keys[0]] != null, chances = {};
+  let per = 0;
   keys.forEach((k) => {
     let m = 1;
     const name = ctx.catalog.bySlug[k] ? ctx.catalog.bySlug[k].name : k;
-    if (today.boosted === k) { m *= BOOSTED_EXP_MULT; out.notes.push(t("{creature} is boosted (double exp)", { creature: name })); }
+    if (today.boosted === k) { m *= BOOSTED_EXP_MULT; out.notes.push(t("{creature} is boosted (double exp and loot)", { creature: name })); }
     (today.prey || []).forEach((p) => { if (p.slug === k && p.kind === "xp" && p.pct > 0) { m *= 1 + p.pct / 100; out.notes.push(t("{creature} prey +{pct}% exp", { creature: name, pct: p.pct })); } });
-    let lm = 1;
-    (today.prey || []).forEach((p) => { if (p.slug === k && p.kind === "loot" && p.pct > 0) { lm += p.pct / 100; out.lootNotes.push(t("{creature} prey +{pct}% loot", { creature: name, pct: p.pct })); } });
+    (today.prey || []).forEach((p) => { if (p.slug === k && p.kind === "loot" && p.pct > 0) { chances[k] = (chances[k] || 0) + p.pct; out.lootNotes.push(t("{creature} prey +{pct}% loot", { creature: name, pct: p.pct })); } });
     per += tot ? share[k] * m : 0;
-    loot += tot ? share[k] * lm : 0;
   });
-  if (tot) { out.mult = per; out.loot = loot; }
+  if (tot) { out.mult = per; out.loot = lootMult(share, today.boosted, chances); }
   if (today.event > 0) { out.mult *= 1 + today.event / 100; out.notes.push(t("+{pct}% exp event", { pct: today.event })); }
   return out;
 }
@@ -58,8 +56,9 @@ export function heldTask(held, diff, ctx) {
 // hunting time but not the session: value = what the hunting hours earn / session hours. Today's loot bonuses add to
 // the profit (lootBonus: the spot's loot/h × what they raise it by) when the spot's loot/h is known, and so does the
 // Bounty Talisman's more-loot chance on the held creature (talismanLoot: loot/h × its share × the chance, while the bounty
-// lasts), unless the spot's numbers are the character's own hunts and some were logged on that bounty (they include
-// it already). With no session length
+// lasts; doubled on the boosted creature), unless the spot's numbers are the character's own hunts and some were logged
+// on that bounty without the bonuses on during them (nums.tasks: they include it; hunts with boosts have it taken out,
+// rates.js huntLootBonus). With no session length
 // (the default): hourly rates, every remaining kill worth reward / kills left with no cap, and no travel.
 // nums: spotNumbers(sp). opts: {hours, held, diff, today, travel (spot id → the character's minutes), weekly (open
 // weeklies)}. ctx: {catalog, chalRates, entries, bestiaryBonus, talismanLoot, raidP, expTable}.
@@ -87,7 +86,9 @@ export function spotValue(sp, nums, opts, ctx) {
     if (tl > 0 && nums.pph != null && nums.lph > 0 && !logged) {
       // The share of the hunting time the bounty is still on: all of it, unless the session finishes it.
       const on = rate || !(hk * Hh > 0) ? 1 : Math.min(1, held.left / (hk * Hh));
-      v.talismanLoot = nums.lph * (expShares(nums.kph, ctx.expTable)[held.slug] || 0) * tl / 100 * on * Hh / H;
+      // On the boosted creature the chance is of a doubled set of loot.
+      const boost = opts.today && opts.today.boosted === held.slug ? BOOSTED_LOOT_MULT : 1;
+      v.talismanLoot = nums.lph * (expShares(nums.kph, ctx.expTable)[held.slug] || 0) * boost * tl / 100 * on * Hh / H;
     }
   }
   (opts.weekly || []).forEach((w) => {

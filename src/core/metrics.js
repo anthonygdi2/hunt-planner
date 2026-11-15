@@ -1,6 +1,6 @@
 // Per creature metrics for a goal: what a bounty task on it is worth per hour in exp, profit, charm points and bounty
 // points.
-import { BESTIARY, RAID, TASK } from "../data/rules.js";
+import { BESTIARY, BOOSTED_LOOT_MULT, RAID, TASK } from "../data/rules.js";
 import { defaultKills, rewardPerKill } from "./rewards.js";
 
 // The creature's bestiary: kills to finish, charm points for it, and charm points for its first Echo Warden. Unknown
@@ -19,6 +19,18 @@ export function expShares(kph, expTable) {
   keys.forEach((k) => { w[k] = kph[k] * (byExp ? exp[k] : 1); tot += w[k]; });
   if (tot > 0) keys.forEach((k) => { out[k] = w[k] / tot; });
   return out;
+}
+
+// What loot bonuses multiply a spot's loot by: each creature's share of the loot (shares: expShares, an estimate) × 2
+// when it's the boosted creature (rules.js BOOSTED_LOOT_MULT) × (1 + the sum of its loot chances / 100: loot Preys and
+// the Talisman add their chances, rules.js TALISMAN). boosted: a slug or null; chances: {slug: percent}. 1 when nothing
+// dies there.
+export function lootMult(shares, boosted, chances) {
+  const keys = Object.keys(shares || {}), ch = chances || {};
+  if (!keys.length) return 1;
+  let m = 0;
+  keys.forEach((k) => { m += shares[k] * (boosted && k === boosted ? BOOSTED_LOOT_MULT : 1) * (1 + (Number(ch[k]) || 0) / 100); });
+  return m;
 }
 
 // The chance a kill of this creature brings its first Echo Warden kill: raid chance × the share of raids a Warden

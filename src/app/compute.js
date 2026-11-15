@@ -38,7 +38,7 @@ export function compute(state, now) {
   const cal = calibrate(sessions, picks, catalog);
 
   // Spot rates: the character's logged spots, then the reference spots it hasn't logged.
-  const logged = spotRates(sessions, catalog, sessionSpot, xpField(p.xpMode)), spotKph = {}, spotEco = {}, refSpotSrc = {};
+  const logged = spotRates(sessions, catalog, sessionSpot, xpField(p.xpMode), state.expTable), spotKph = {}, spotEco = {}, refSpotSrc = {};
   Object.keys(logged).forEach((s) => { spotKph[s] = logged[s].kph; spotEco[s] = { xph: logged[s].xph, pph: logged[s].pph, lph: logged[s].lph }; });
   const refActive = referenceSpots({ picks, calib: cal.calib, calibOther: cal.calibOther, sessions, loggedSpots: spotKph, vocation, otherOn,
     xpMode: p.xpMode, xpBoost: cal.xpBoost, catalog });
@@ -60,7 +60,7 @@ export function compute(state, now) {
   const choose = (c, spots, pin) => { const d = diffFor(c); return pickSpot(spots, pin, { metricFor: (x) => metrics(c, x, ctx(d)), weights }); };
 
   // Each creature's numbers: its logged spots, else reference spots.
-  const rates = deriveRates(sessions, { catalog, xpMode: p.xpMode }), derived = {};
+  const rates = deriveRates(sessions, { catalog, xpMode: p.xpMode, expTable: state.expTable }), derived = {};
   Object.keys(rates).forEach((slug) => { derived[slug] = choose(catalog.bySlug[slug], rates[slug], (entries[slug] || {}).pinSpot); });
   const ref = referenceUse(refActive, derived, entries);
   Object.keys(ref.use).forEach((slug) => {

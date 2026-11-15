@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { sessHours, sessionSpot, xpField, raidRate, spotRates, deriveRates } from "../../src/core/rates.js";
+import { sessHours, sessionSpot, xpField, raidRate, spotRates, deriveRates, huntLootBonus } from "../../src/core/rates.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 
 const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }, { n: "Cobra Scout", c: "M", m: 6 }, { n: "Cobra Vizier", c: "H", m: 12, r: 1 }]);
@@ -67,4 +67,35 @@ test("derived creature rates per spot", () => {
   // xpMode "xp" uses the boosted exp where a session has it.
   assert.equal(deriveRates(sessions, { catalog, xpMode: "xp" })["cobra-scout"][0].xph, Math.round((1500 + 1000) / 205 * 102.5));
   assert.deepEqual(deriveRates([], { catalog }), {});
+});
+
+test("the loot a hunt's recorded bonuses added comes out of its loot and profit", () => {
+  const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-6, a + " vs " + b);
+  const exp = { "cobra-assassin": 1000, "cobra-scout": 500 };
+  // 300 assassins × 1000 exp and 200 scouts × 500: three quarters and a quarter of the exp, and so of the loot.
+  const kills = [{ slug: "cobra-assassin", count: 300 }, { slug: "cobra-scout", count: 200 }];
+  const plain = S({ spot: "A", loot: 4e5, balance: 1e5, kills });
+  assert.equal(huntLootBonus(plain, catalog, exp), 0, "no boosts recorded");
+  assert.equal(huntLootBonus(Object.assign({}, plain, { boosts: { boosted: null, prey: [], talisman: 0 } }), catalog, exp), 0);
+  assert.equal(huntLootBonus(Object.assign({}, plain, { loot: null, boosts: { boosted: "cobra-assassin" } }), catalog, exp), 0, "no loot logged");
+  // The assassin boosted: loot × (0.75 × 2 + 0.25) = 1.75 × base.
+  const boosted = Object.assign({}, plain, { boosts: { boosted: "cobra-assassin", prey: [], talisman: 0 } });
+  near(huntLootBonus(boosted, catalog, exp), 4e5 * (1 - 1 / 1.75));
+  // A loot Prey on the scout and the Talisman on the assassin's bounty: 0.75 × 1.1 + 0.25 × 1.4.
+  const both = Object.assign({}, plain, { task: "cobra-assassin", boosts: { boosted: null, prey: [{ slug: "cobra-scout", pct: 40 }], talisman: 10 } });
+  near(huntLootBonus(both, catalog, exp), 4e5 * (1 - 1 / (0.75 * 1.1 + 0.25 * 1.4)));
+  // The Talisman counts only on a bounty hunt.
+  near(huntLootBonus(Object.assign({}, both, { task: null }), catalog, exp), 4e5 * (1 - 1 / (0.75 + 0.25 * 1.4)));
+
+  // Spot rates: loot and profit without the bonus; a bounty hunt with boosts doesn't count as including the Talisman.
+  const extra = 4e5 * (1 - 1 / 1.75), r = spotRates([Object.assign({}, boosted, { task: "cobra-assassin" })], catalog, sessionSpot, "rawXp", exp).A;
+  near(r.lph, 4e5 - extra);
+  near(r.pph, 1e5 - extra);
+  assert.deepEqual(r.tasks, []);
+  assert.deepEqual(spotRates([Object.assign({}, plain, { task: "cobra-assassin" })], catalog, sessionSpot, "rawXp", exp).A.tasks, ["cobra-assassin"]);
+  // Creature rates: the same profit, and taskBonus only for bounty hunts logged before boosts were recorded.
+  const d = deriveRates([Object.assign({}, boosted, { task: "cobra-assassin" })], { catalog, xpMode: "raw", expTable: exp })["cobra-assassin"][0];
+  assert.equal(d.pph, Math.round(1e5 - extra));
+  assert.equal(d.taskBonus, false);
+  assert.equal(deriveRates([Object.assign({}, plain, { task: "cobra-assassin" })], { catalog, expTable: exp })["cobra-assassin"][0].taskBonus, true);
 });
