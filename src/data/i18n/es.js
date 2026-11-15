@@ -257,7 +257,7 @@ export default {
   // i18n.js
   "and": "y",
   // plan.js
-  "{creature} is boosted (double exp)": "{creature} está boosted (exp doble)",
+  "{creature} is boosted (double exp and loot)": "{creature} está boosted (exp y loot dobles)",
   "{creature} prey +{pct}% exp": "{creature} prey +{pct}% exp",
   "{creature} prey +{pct}% loot": "{creature} prey +{pct}% loot",
   "+{pct}% exp event": "+{pct}% evento de exp",
@@ -623,4 +623,9 @@ export default {
   "Use my logged shares": "Usar mis proporciones registradas",
   "Use the guess": "Usar la estimación",
   "Log this board": "Registrar este tablero",
+  "On during this hunt": "Activo durante esta hunt",
+  "Loot bonuses only. They’re taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.": "Solo bonus de loot. Se descuentan del loot de esta hunt, para que los bonus de hoy no se cuenten dos veces.",
+  "Loot Prey {n}": "Prey de loot {n}",
+  "+ Add a loot Prey": "+ Añadir un prey de loot",
+  "Type a percent from 0 to 50, or leave it empty.": "Escribe un porcentaje de 0 a 50 o déjalo vacío.",
 };

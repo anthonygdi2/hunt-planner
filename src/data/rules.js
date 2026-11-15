@@ -78,9 +78,12 @@ export const TOKEN_CAP = 10;
 // with weight 5, Unwanted ones are removed from the pool, and a board shows 3 offers. Unofficial.
 export const SLOTS = deepFreeze({ max: 5, preferredWeight: 5, offers: 3 });
 
-// Boosted Creature (TibiaWiki, October 2026): changes at each server save; double experience (also double loot and
-// twice the respawn, which aren't counted).
+// Boosted Creature (TibiaWiki, October 2026): changes at each server save; double experience, double loot and twice the
+// respawn (not counted). TibiaWiki (Boosted Creature, November 14, 2026): it carries “double the normal amount” of loot,
+// and Prey and events apply on top, so its loot chances (Prey, the Talisman) multiply the doubled loot (maintainer,
+// November 14, 2026).
 export const BOOSTED_EXP_MULT = 2;
+export const BOOSTED_LOOT_MULT = 2;
 
 // Prey (TibiaWiki): three slots, each one creature for 2 hours of hunting.
 export const PREY_SLOTS = 3;

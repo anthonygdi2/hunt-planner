@@ -1,10 +1,30 @@
 // Log a clean hunt (full page): paste the Hunting Session Analyser text, say where (a known spot, or a new spot or
 // variation), check the preview, save or don't. Leaving after a paste asks inline whether to discard it. A hunt saved
-// before asks inline too (Save anyway / Open the existing one). Below, the saved hunts every character shares, with
-// vocation and level filters and an inline editor for a hunt's vocation, level and spot.
+// before asks inline too (Save anyway / Open the existing one). The preview says which loot bonuses were on during the
+// hunt. Below, the saved hunts every character shares, with vocation and level filters and an inline editor for a
+// hunt's vocation, level, spot and loot bonuses.
 import { h, icon } from "../dom.js";
 import { segmented, selectField, confirmButton } from "../components.js";
 import { t } from "../../app/lang.js";
+
+// The loot bonuses on during a hunt (b: logView's boosts, or a saved hunt's editor.boosts), ids under `pre`; onBoost(patch)
+// with app/views.js boostsPatch's patches.
+function boostsCard(pre, b, onBoost) {
+  return h("div", { id: pre + "boosts", class: "hp-card hp-stack", role: "group", "aria-labelledby": pre + "boosts-h" },
+    h("b", { id: pre + "boosts-h" }, t("On during this hunt")),
+    h("span", { class: "hp-caption" }, t("Loot bonuses only. They’re taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.")),
+    selectField({ id: pre + "boosted", label: t("Boosted creature"), value: b.boosted, options: b.boostedOptions, onPick: (x) => onBoost({ boosted: x }) }),
+    b.prey.map((q) => h("div", { class: "hp-offer", role: "group", "aria-label": t("Loot Prey {n}", { n: q.i + 1 }) },
+      h("div", { class: "hp-grid2" },
+        selectField({ id: pre + "prey-" + q.i, label: t("Loot Prey {n}", { n: q.i + 1 }), value: q.slug, options: q.creatures, onPick: (x) => onBoost({ prey: q.i, slug: x }) }),
+        selectField({ id: pre + "prey-" + q.i + "-pct", label: t("Size"), value: q.pct, options: b.pcts, onPick: (x) => onBoost({ prey: q.i, pct: Number(x) }) })),
+      h("button", { id: pre + "prey-" + q.i + "-remove", type: "button", class: "hp-linkbtn hp-tap", onClick: () => onBoost({ removePrey: q.i }) }, t("Remove")))),
+    b.canAddPrey ? h("button", { id: pre + "prey-add", type: "button", class: "hp-btn dashed", onClick: () => onBoost({ addPrey: b.nextPrey }) }, t("+ Add a loot Prey")) : null,
+    b.talisman != null ? h("label", { class: "hp-field" }, t("Talisman loot bonus (%)"),
+      h("input", { id: pre + "talisman", class: "hp-input", value: b.talisman, inputmode: "decimal", maxlength: 5, autocomplete: "off", "aria-invalid": b.talismanOk ? null : "true",
+        onChange: (e) => onBoost({ talisman: e.target.value }) })) : null,
+    b.talismanOk ? null : h("span", { class: "hp-caption", role: "alert" }, t("Type a percent from 0 to 50, or leave it empty.")));
+}
 
 // The saved hunts (view.saved: logView's), each with its editor when open.
 function savedHunts(s, on) {
@@ -31,6 +51,7 @@ function savedHunts(s, on) {
             "aria-invalid": r.editor.levelOk ? null : "true" })),
         r.editor.levelOk ? null : h("span", { class: "hp-caption", role: "alert" }, t("Type a level, or leave it empty.")),
         selectField({ id: "saved-" + r.id + "-spot", label: t("Spot"), value: r.editor.spotId, options: r.editor.spots, onPick: (x) => on.editField("spotId", x) }),
+        boostsCard("saved-" + r.id + "-", r.editor.boosts, on.editBoost),
         h("div", { class: "hp-grid2" },
           h("button", { id: "saved-" + r.id + "-cancel", type: "button", class: "hp-btn", onClick: on.editCancel }, t("Cancel")),
           h("button", { id: "saved-" + r.id + "-save", type: "button", class: "hp-btn solid", disabled: !r.editor.canSave, onClick: () => on.editSave(r) }, t("Save changes"))),
@@ -40,8 +61,8 @@ function savedHunts(s, on) {
 }
 
 // view: app/views.js logView; ui: {leaving}. on: {text(t), where(w), spot(id), name(n), parent(id), note(n), raid(name, n),
-// save(), saveAnyway(), openExisting(), discard(), back(), keep(), filterVoc(v), filterLevel(v), more(), edit(id),
-// editField(key, value), editSave(row), editCancel(), arm(id), deleteHunt(id)}.
+// boost(patch), save(), saveAnyway(), openExisting(), discard(), back(), keep(), filterVoc(v), filterLevel(v), more(),
+// edit(id), editField(key, value), editBoost(patch), editSave(row), editCancel(), arm(id), deleteHunt(id)}.
 export function render(view, ui, on) {
   const field = (id, label, value, onCommit, opts) => h("label", { class: "hp-field" }, label,
     h("input", Object.assign({ id, class: "hp-input", value, autocomplete: "off", onChange: (e) => onCommit(e.target.value) }, opts || {})));
@@ -72,6 +93,7 @@ export function render(view, ui, on) {
       h("div", { class: "hp-card" }, h("b", null, t("Kills per hour")), h("ul", { class: "hp-list" }, view.kph.map((k) => h("li", null, h("span", null, k.name), h("span", null, k.perHour))))),
       view.raids ? h("div", { class: "hp-card" }, h("b", null, t("Echo Raids (advanced)")), view.raids.map((r, i) =>
         field("log-raid-" + i, t("{creature} raids", { creature: r.name }), r.value, (v) => on.raid(r.name, v), { inputmode: "numeric" }))) : null,
+      view.boosts ? boostsCard("log-", view.boosts, on.boost) : null,
       dup && dup.asked ? h("div", { id: "log-dupe", class: "hp-pick", role: "alert" }, h("b", null, dup.text),
         h("div", { class: "hp-grid2" }, h("button", { id: "log-save-anyway", type: "button", class: "hp-btn", disabled: !view.canSave, onClick: on.saveAnyway }, t("Save anyway")),
           h("button", { id: "log-open-existing", type: "button", class: "hp-btn", onClick: on.openExisting }, t("Open the existing one")))) : null,

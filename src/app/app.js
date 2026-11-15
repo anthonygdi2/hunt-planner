@@ -13,7 +13,7 @@ import { loggedOdds, MIN_BOARD_OBS } from "../core/reroll.js";
 import { boardSlotTags } from "../core/slots.js";
 import { makeRepo } from "../store/repo.js";
 import { PREF } from "../store/prefs.js";
-import { plDefaults, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, readOfferOdds, readTalisman, WEEKLY_SLOTS, readHunting, readHunt, LEVEL_WINDOWS } from "../store/schema.js";
+import { plDefaults, readSettings, sourcesPatch, SOURCE_PRESETS, readTheme, TAKEN_MINUTES, goalPatch, OFFER_KINDS, blankOffer, readOfferOdds, readTalisman, WEEKLY_SLOTS, readHunting, readHunt, readBoosts, LEVEL_WINDOWS } from "../store/schema.js";
 import { makeActions } from "./actions.js";
 import { makeWatchers, mergeProfiles } from "./state.js";
 import { makeModel, makePlanCache } from "./model.js";
@@ -143,6 +143,12 @@ export function createApp({ data, prefs, now, browserLang }) {
     updateCharacter({ rewardObs: log });
   }
   // A new spot's id: "my-" and its name as a slug, made unique.
+  // The loot bonuses stored on a hunt (store/schema.js readBoosts): creatures the catalog knows, the Talisman only when
+  // the hunt was on its bounty (task). None given stores none on, so the hunt reads as base rates.
+  function huntBoosts(b, task) {
+    const v = readBoosts(b || {});
+    return { boosted: known(v.boosted) ? v.boosted : null, prey: v.prey.filter((q) => known(q.slug)), talisman: task ? v.talisman : 0 };
+  }
   function newSpotId(name) {
     const base = "my-" + (slugify(name) || "spot"), taken = model().spotIndex().spots;
     let id = base, n = 2;
@@ -459,8 +465,9 @@ export function createApp({ data, prefs, now, browserLang }) {
     // Logging a clean hunt. preview: parseSession's result. spot: {id} (a known spot) or {name, parentId, note} (a new
     // spot, or a variation of parentId). raidsBy: Echo Raids per creature (advanced). Saves the hunt to the shared
     // hunts at that spot (and the new spot first), with the character's vocation and level and who logged it; Hunting
-    // now ends. Returns the hunt's id, or null when there's nothing to save.
-    saveHunt({ preview, spot, raidsBy }) {
+    // now ends. boosts: the loot bonuses on during it (logView's boosts.value), stored on every new hunt (none on are
+    // recorded as none), the Talisman only on a hunt on the bounty. Returns the hunt's id, or null when there's nothing to save.
+    saveHunt({ preview, spot, raidsBy, boosts }) {
       const pid = state.pid, p = profile();
       if (!act || !pid || !p || !preview || !preview.hours || !preview.kills || !preview.kills.length) return null;
       let spotId = spot && spot.id, name;
@@ -480,7 +487,7 @@ export function createApp({ data, prefs, now, browserLang }) {
         rawXp: preview.rawXp != null ? preview.rawXp : null, xp: preview.xp != null ? preview.xp : null, loot: preview.loot != null ? preview.loot : null,
         supplies: preview.supplies != null ? preview.supplies : null, balance: preview.balance != null ? preview.balance : null,
         kills: preview.kills.map((k) => (k.slug ? { slug: k.slug, name: k.name, count: k.count } : { name: k.name, count: k.count })), level: Number(p.level) || null, vocation: p.vocation || VOCATIONS[0],
-        by: { pid, name: p.name ? String(p.name).trim().slice(0, 40) : null }, createdAt: iso() };
+        by: { pid, name: p.name ? String(p.name).trim().slice(0, 40) : null }, boosts: huntBoosts(boosts, task), createdAt: iso() };
       const raids = {};
       Object.keys(raidsBy || {}).forEach((k) => { const n = parseInt(raidsBy[k], 10); if (n >= 0 && n < 1000) raids[k] = n; });
       if (Object.keys(raids).length) body.raidsBy = raids;
@@ -496,7 +503,8 @@ export function createApp({ data, prefs, now, browserLang }) {
       act.deleteHunt(id, () => { state.notice = t("Couldn’t delete that hunt."); changed(); });
       changed();
     },
-    // A saved hunt's vocation, level (a number, or "" for none) and spot (a spot id), as corrected on the Log screen.
+    // A saved hunt's vocation, level (a number, or "" for none), spot (a spot id) and loot bonuses (boosts, only when
+    // changed: a hunt logged before they were recorded keeps reading as including the Talisman until then), as corrected on the Log screen.
     editHunt(id, patch) {
       const x = state.hunts.filter((y) => y.id === id)[0];
       if (!act || !x) return;
@@ -508,6 +516,7 @@ export function createApp({ data, prefs, now, browserLang }) {
         const sp = model().spotIndex().spots[patch.spotId];
         if (sp) { body.spotId = sp.id; body.spot = sp.name; }
       }
+      if ("boosts" in patch && patch.boosts) body.boosts = huntBoosts(patch.boosts, body.task);
       const prev = state.hunts;
       state.hunts = state.hunts.map((y) => (y.id === id ? readHunt(id, body) : y));
       act.saveHunt(id, body, () => { state.hunts = prev; state.notice = t("Couldn’t save that change. Try again in a moment."); changed(); });

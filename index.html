@@ -1118,6 +1118,7 @@
   var TOKEN_CAP = 10;
   var SLOTS = deepFreeze({ max: 5, preferredWeight: 5, offers: 3 });
   var BOOSTED_EXP_MULT = 2;
+  var BOOSTED_LOOT_MULT = 2;
   var PREY_SLOTS = 3;
   var PREY = deepFreeze({
     xp: { lo: 13, hi: 40, step: 3 },
@@ -1948,7 +1949,7 @@
     // i18n.js
     "and": "y",
     // plan.js
-    "{creature} is boosted (double exp)": "{creature} está boosted (exp doble)",
+    "{creature} is boosted (double exp and loot)": "{creature} está boosted (exp y loot dobles)",
     "{creature} prey +{pct}% exp": "{creature} prey +{pct}% exp",
     "{creature} prey +{pct}% loot": "{creature} prey +{pct}% loot",
     "+{pct}% exp event": "+{pct}% evento de exp",
@@ -2313,7 +2314,12 @@
     "Gold (%)": "Gold (%)",
     "Use my logged shares": "Usar mis proporciones registradas",
     "Use the guess": "Usar la estimación",
-    "Log this board": "Registrar este tablero"
+    "Log this board": "Registrar este tablero",
+    "On during this hunt": "Activo durante esta hunt",
+    "Loot bonuses only. They’re taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.": "Solo bonus de loot. Se descuentan del loot de esta hunt, para que los bonus de hoy no se cuenten dos veces.",
+    "Loot Prey {n}": "Prey de loot {n}",
+    "+ Add a loot Prey": "+ Añadir un prey de loot",
+    "Type a percent from 0 to 50, or leave it empty.": "Escribe un porcentaje de 0 a 50 o déjalo vacío."
   };
 
   // src/data/i18n/pt.js
@@ -2573,7 +2579,7 @@
     // i18n.js
     "and": "e",
     // plan.js
-    "{creature} is boosted (double exp)": "{creature} está boosted (exp dobrada)",
+    "{creature} is boosted (double exp and loot)": "{creature} está boosted (exp e loot dobrados)",
     "{creature} prey +{pct}% exp": "{creature} prey +{pct}% exp",
     "{creature} prey +{pct}% loot": "{creature} prey +{pct}% loot",
     "+{pct}% exp event": "+{pct}% evento de exp",
@@ -2938,7 +2944,12 @@
     "Gold (%)": "Gold (%)",
     "Use my logged shares": "Usar minhas proporções registradas",
     "Use the guess": "Usar a estimativa",
-    "Log this board": "Registrar este quadro"
+    "Log this board": "Registrar este quadro",
+    "On during this hunt": "Ativo durante esta hunt",
+    "Loot bonuses only. They’re taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.": "Só bônus de loot. Eles são descontados do loot desta hunt, para que os bônus de hoje não contem duas vezes.",
+    "Loot Prey {n}": "Prey de loot {n}",
+    "+ Add a loot Prey": "+ Adicionar uma prey de loot",
+    "Type a percent from 0 to 50, or leave it empty.": "Digite uma porcentagem de 0 a 50 ou deixe vazio."
   };
 
   // src/data/i18n/pl.js
@@ -3198,7 +3209,7 @@
     // i18n.js
     "and": "i",
     // plan.js
-    "{creature} is boosted (double exp)": "{creature} jest boosted (podwójny exp)",
+    "{creature} is boosted (double exp and loot)": "{creature} jest boosted (podwójny exp i loot)",
     "{creature} prey +{pct}% exp": "{creature} prey +{pct}% exp",
     "{creature} prey +{pct}% loot": "{creature} prey +{pct}% loot",
     "+{pct}% exp event": "+{pct}% event exp",
@@ -3563,7 +3574,12 @@
     "Gold (%)": "Gold (%)",
     "Use my logged shares": "Użyj moich zapisanych udziałów",
     "Use the guess": "Użyj szacunku",
-    "Log this board": "Zapisz tę tablicę"
+    "Log this board": "Zapisz tę tablicę",
+    "On during this hunt": "Aktywne podczas tego huntu",
+    "Loot bonuses only. They’re taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.": "Tylko bonusy do lootu. Są odejmowane od lootu z tego huntu, żeby dzisiejsze bonusy nie liczyły się dwa razy.",
+    "Loot Prey {n}": "Prey na loot {n}",
+    "+ Add a loot Prey": "+ Dodaj prey na loot",
+    "Type a percent from 0 to 50, or leave it empty.": "Wpisz procent od 0 do 50 albo zostaw puste."
   };
 
   // src/data/i18n/index.js
@@ -3841,7 +3857,19 @@
     x.vocation = VOCATIONS.indexOf(x.vocation) !== -1 ? x.vocation : null;
     x.level = lvl > 0 && lvl < 1e4 ? lvl : null;
     x.by = { pid: typeof by.pid === "string" && by.pid ? by.pid : null, name: typeof by.name === "string" && by.name.trim() ? by.name.trim().slice(0, 40) : null };
+    const b = readBoosts(v.boosts);
+    if (b) x.boosts = b;
+    else delete x.boosts;
     return x;
+  }
+  function readBoosts(v) {
+    if (!v || typeof v !== "object") return null;
+    const slug = (s) => typeof s === "string" && s ? s.slice(0, 80) : null, lp = PREY.loot;
+    return {
+      boosted: slug(v.boosted),
+      prey: (Array.isArray(v.prey) ? v.prey : []).filter((q) => q && slug(q.slug)).slice(0, PREY_SLOTS).map((q) => ({ slug: slug(q.slug), pct: Math.min(lp.hi, Math.max(lp.lo, Math.round(Number(q.pct)) || lp.lo)) })),
+      talisman: plNum(v.talisman, 0, TALISMAN.loot.max) || 0
+    };
   }
   function readHunts(docs) {
     const out = [];
@@ -4420,6 +4448,75 @@
     };
   }
 
+  // src/core/metrics.js
+  function bestiaryOf(c) {
+    const b = BESTIARY[c.cls] || BESTIARY.H;
+    return { kills: b.kills, charmPoints: b.charmPoints, warden: b.warden };
+  }
+  function expShares(kph, expTable) {
+    const keys = Object.keys(kph || {}), exp = expTable || {}, byExp = keys.every((k) => exp[k] > 0), w2 = {}, out = {};
+    let tot = 0;
+    keys.forEach((k) => {
+      w2[k] = kph[k] * (byExp ? exp[k] : 1);
+      tot += w2[k];
+    });
+    if (tot > 0) keys.forEach((k) => {
+      out[k] = w2[k] / tot;
+    });
+    return out;
+  }
+  function lootMult(shares, boosted, chances) {
+    const keys = Object.keys(shares || {}), ch = chances || {};
+    if (!keys.length) return 1;
+    let m = 0;
+    keys.forEach((k) => {
+      m += shares[k] * (boosted && k === boosted ? BOOSTED_LOOT_MULT : 1) * (1 + (Number(ch[k]) || 0) / 100);
+    });
+    return m;
+  }
+  var wardenShare = (entry) => entry.bestiaryDone ? RAID.wardenShareDone : RAID.wardenShare;
+  function metrics(c, rec, ctx) {
+    rec = rec || {};
+    const diff = ctx.diff, t2 = TASK[diff], kph = rec.kph, m = {};
+    const kills = ctx.kills || defaultKills(diff), mult = ctx.mult || 1;
+    const hours = kph ? kills / kph : null;
+    m.hours = hours;
+    let rewardXph = null;
+    if (hours) {
+      if (ctx.rewardExp != null) rewardXph = ctx.rewardExp / hours;
+      else rewardXph = rewardPerKill(diff, c, ctx.chalRates).perKill * kills * mult / hours;
+    }
+    m.rewardXph = rewardXph;
+    m.weeklyXph = ctx.weeklyXph && hours ? ctx.weeklyXph(rec.spot, hours, c.slug, kills) : 0;
+    m.xp = rec.xph != null ? rec.xph + (rewardXph || 0) + m.weeklyXph : null;
+    m.profit = rec.pph != null ? rec.pph : null;
+    m.talismanLoot = 0;
+    const tl = Number(ctx.talismanLoot) || 0, eco = rec.spot && ctx.spotEco && ctx.spotEco[rec.spot], at = rec.spot && ctx.spotKph && ctx.spotKph[rec.spot];
+    if (m.profit != null && tl > 0 && !rec.taskBonus && eco && eco.lph > 0 && at && at[c.slug] > 0) {
+      m.talismanLoot = eco.lph * (expShares(at, ctx.expTable)[c.slug] || 0) * tl / 100;
+      m.profit += m.talismanLoot;
+    }
+    const b = bestiaryOf(c), bonus = Number(ctx.bestiaryBonus) || 0, raidP = ctx.raidP;
+    const wardenOpen = !rec.wardenDone && !c.r && raidP > 0;
+    if (kph != null) {
+      m.bestiaryCharm = rec.bestiaryDone ? 0 : kph * (b.charmPoints / b.kills) * (1 + bonus / 100);
+      m.wardenCharm = wardenOpen ? kph * raidP * wardenShare(rec) * b.warden : 0;
+      let others = 0;
+      const sk = rec.spot && ctx.spotKph && ctx.spotKph[rec.spot];
+      if (sk) Object.keys(sk).forEach((key) => {
+        const o = key !== c.slug && ctx.catalog.bySlug[key];
+        if (!o) return;
+        const ok = sk[key], orec = ctx.entries && ctx.entries[key] || {}, ob = bestiaryOf(o);
+        if (!orec.bestiaryDone) others += ok * ob.charmPoints / ob.kills;
+        if (!orec.wardenDone && !o.r && raidP > 0) others += ok * raidP * wardenShare(orec) * ob.warden;
+      });
+      m.otherCharm = others;
+      m.charm = m.bestiaryCharm + m.wardenCharm + others;
+    } else m.charm = rec.bestiaryDone && !wardenOpen ? 0 : null;
+    m.bounty = hours ? t2.points * mult / hours : null;
+    return m;
+  }
+
   // src/core/rates.js
   var sessHours = (x) => x && x.hours > 0 ? x.hours : 0;
   var sessionSpot = (x) => (x.spot || "Unnamed spot").trim();
@@ -4439,7 +4536,23 @@
     });
     return { p: (raids + RAID.priorPerKill * RAID.priorKills) / (kills + RAID.priorKills), info: n ? { raids, kills, n } : null };
   }
-  function spotRates(sessions, catalog, keyOf, mode) {
+  function huntLootBonus(x, catalog, expTable) {
+    const b = x && x.boosts;
+    if (!b || typeof b !== "object" || !(x.loot > 0) || !Array.isArray(x.kills)) return 0;
+    const kills = {}, chances = {};
+    x.kills.forEach((k) => {
+      const key = catalog.killKey(k);
+      kills[key] = (kills[key] || 0) + (k.count || 0);
+    });
+    (Array.isArray(b.prey) ? b.prey : []).forEach((p) => {
+      if (p && p.slug && p.pct > 0) chances[p.slug] = (chances[p.slug] || 0) + Number(p.pct);
+    });
+    if (b.talisman > 0 && x.task) chances[x.task] = (chances[x.task] || 0) + Number(b.talisman);
+    const m = lootMult(expShares(kills, expTable), b.boosted || null, chances);
+    return m > 1 ? x.loot * (1 - 1 / m) : 0;
+  }
+  var talismanIn = (x) => !!x.task && !(x.boosts && typeof x.boosts === "object");
+  function spotRates(sessions, catalog, keyOf, mode, expTable) {
     const acc = {}, out = {};
     sessions.forEach((x) => {
       const h2 = sessHours(x);
@@ -4450,14 +4563,15 @@
       });
       if (!tot) return;
       const s = keyOf(x), a = acc[s] || (acc[s] = { kills: {}, total: 0, xp: 0, bal: 0, loot: 0, lootTotal: 0, cTotal: 0, cHours: 0, tasks: {} });
+      const extra = huntLootBonus(x, catalog, expTable);
       a.total += tot;
       a.xp += x[mode] != null ? x[mode] : x.rawXp || 0;
-      a.bal += x.balance || 0;
+      a.bal += (x.balance || 0) - extra;
       if (x.loot != null) {
-        a.loot += x.loot;
+        a.loot += x.loot - extra;
         a.lootTotal += tot;
       }
-      if (x.task) a.tasks[x.task] = true;
+      if (talismanIn(x)) a.tasks[x.task] = true;
       x.kills.forEach((k) => {
         const key = catalog.killKey(k);
         a.kills[key] = (a.kills[key] || 0) + (k.count || 0);
@@ -4486,9 +4600,9 @@
     });
     return out;
   }
-  function deriveRates(sessions, { catalog, xpMode }) {
+  function deriveRates(sessions, { catalog, xpMode, expTable }) {
     const mode = xpField(xpMode), acc = {};
-    const blank = () => ({ kills: 0, cKills: 0, total: 0, n: 0, xp: 0, bal: 0, cTotal: 0, cHours: 0, nClean: 0, last: null });
+    const blank = () => ({ kills: 0, cKills: 0, total: 0, n: 0, xp: 0, bal: 0, cTotal: 0, cHours: 0, nClean: 0, last: null, talisman: false });
     sessions.forEach((x) => {
       const h2 = sessHours(x);
       if (!h2 || !Array.isArray(x.kills)) return;
@@ -4497,7 +4611,7 @@
         total += k.count || 0;
       });
       if (!total) return;
-      const spot = sessionSpot(x), clean = !x.breaks;
+      const spot = sessionSpot(x), clean = !x.breaks, bal = (x.balance || 0) - huntLootBonus(x, catalog, expTable), tal = talismanIn(x);
       x.kills.forEach((k) => {
         if (!k.slug || !catalog.bySlug[k.slug]) return;
         const c = acc[k.slug] || (acc[k.slug] = {});
@@ -4508,7 +4622,8 @@
           b.n++;
           if (clean) b.cKills += k.count || 0;
           b.xp += x[mode] != null ? x[mode] : x.rawXp || 0;
-          b.bal += x.balance || 0;
+          b.bal += bal;
+          if (tal) b.talisman = true;
           if (clean) {
             b.cTotal += total;
             b.cHours += h2;
@@ -4527,7 +4642,7 @@
         const spotKph = b.cTotal / b.cHours, perKill = (v) => v / b.total * spotKph;
         spots.push({
           spot: name,
-          taskBonus: useTask,
+          taskBonus: useTask && b.talisman,
           n: b.n,
           nBreak: b.n - b.nClean,
           hours: b.cHours,
@@ -4848,7 +4963,7 @@
     return { spots, list, idOf: (name) => byKey[norm((name || "").trim())] || null };
   }
   function spotNumbers(sp, ctx) {
-    const own = sp.sessions.length ? spotRates(sp.sessions, ctx.catalog, () => sp.id, xpField(ctx.xpMode))[sp.id] : null;
+    const own = sp.sessions.length ? spotRates(sp.sessions, ctx.catalog, () => sp.id, xpField(ctx.xpMode), ctx.expTable)[sp.id] : null;
     if (own) return { src: "own", kph: own.kph, xph: own.xph, pph: own.pph, lph: own.lph, tasks: own.tasks, hours: own.hours, kills: own.kills, entry: null };
     if (!ctx.refOn) return null;
     const opts = { xpMode: ctx.xpMode, xpBoost: ctx.xpBoost, catalog: ctx.catalog }, k = norm(sp.name);
@@ -4921,66 +5036,6 @@
     return open;
   }
 
-  // src/core/metrics.js
-  function bestiaryOf(c) {
-    const b = BESTIARY[c.cls] || BESTIARY.H;
-    return { kills: b.kills, charmPoints: b.charmPoints, warden: b.warden };
-  }
-  function expShares(kph, expTable) {
-    const keys = Object.keys(kph || {}), exp = expTable || {}, byExp = keys.every((k) => exp[k] > 0), w2 = {}, out = {};
-    let tot = 0;
-    keys.forEach((k) => {
-      w2[k] = kph[k] * (byExp ? exp[k] : 1);
-      tot += w2[k];
-    });
-    if (tot > 0) keys.forEach((k) => {
-      out[k] = w2[k] / tot;
-    });
-    return out;
-  }
-  var wardenShare = (entry) => entry.bestiaryDone ? RAID.wardenShareDone : RAID.wardenShare;
-  function metrics(c, rec, ctx) {
-    rec = rec || {};
-    const diff = ctx.diff, t2 = TASK[diff], kph = rec.kph, m = {};
-    const kills = ctx.kills || defaultKills(diff), mult = ctx.mult || 1;
-    const hours = kph ? kills / kph : null;
-    m.hours = hours;
-    let rewardXph = null;
-    if (hours) {
-      if (ctx.rewardExp != null) rewardXph = ctx.rewardExp / hours;
-      else rewardXph = rewardPerKill(diff, c, ctx.chalRates).perKill * kills * mult / hours;
-    }
-    m.rewardXph = rewardXph;
-    m.weeklyXph = ctx.weeklyXph && hours ? ctx.weeklyXph(rec.spot, hours, c.slug, kills) : 0;
-    m.xp = rec.xph != null ? rec.xph + (rewardXph || 0) + m.weeklyXph : null;
-    m.profit = rec.pph != null ? rec.pph : null;
-    m.talismanLoot = 0;
-    const tl = Number(ctx.talismanLoot) || 0, eco = rec.spot && ctx.spotEco && ctx.spotEco[rec.spot], at = rec.spot && ctx.spotKph && ctx.spotKph[rec.spot];
-    if (m.profit != null && tl > 0 && !rec.taskBonus && eco && eco.lph > 0 && at && at[c.slug] > 0) {
-      m.talismanLoot = eco.lph * (expShares(at, ctx.expTable)[c.slug] || 0) * tl / 100;
-      m.profit += m.talismanLoot;
-    }
-    const b = bestiaryOf(c), bonus = Number(ctx.bestiaryBonus) || 0, raidP = ctx.raidP;
-    const wardenOpen = !rec.wardenDone && !c.r && raidP > 0;
-    if (kph != null) {
-      m.bestiaryCharm = rec.bestiaryDone ? 0 : kph * (b.charmPoints / b.kills) * (1 + bonus / 100);
-      m.wardenCharm = wardenOpen ? kph * raidP * wardenShare(rec) * b.warden : 0;
-      let others = 0;
-      const sk = rec.spot && ctx.spotKph && ctx.spotKph[rec.spot];
-      if (sk) Object.keys(sk).forEach((key) => {
-        const o = key !== c.slug && ctx.catalog.bySlug[key];
-        if (!o) return;
-        const ok = sk[key], orec = ctx.entries && ctx.entries[key] || {}, ob = bestiaryOf(o);
-        if (!orec.bestiaryDone) others += ok * ob.charmPoints / ob.kills;
-        if (!orec.wardenDone && !o.r && raidP > 0) others += ok * raidP * wardenShare(orec) * ob.warden;
-      });
-      m.otherCharm = others;
-      m.charm = m.bestiaryCharm + m.wardenCharm + others;
-    } else m.charm = rec.bestiaryDone && !wardenOpen ? 0 : null;
-    m.bounty = hours ? t2.points * mult / hours : null;
-    return m;
-  }
-
   // src/app/compute.js
   var ownHunts = (sessions, pid) => pid ? sessions.filter((x) => !x.by || !x.by.pid || x.by.pid === pid) : sessions;
   function compute(state, now) {
@@ -4992,7 +5047,7 @@
     const raid = raidRate(sessions, catalog);
     const picks = pickReference(reference, { vocation, level: p.level, enabled: refOn, older: sources.older });
     const cal = calibrate(sessions, picks, catalog);
-    const logged = spotRates(sessions, catalog, sessionSpot, xpField(p.xpMode)), spotKph = {}, spotEco = {}, refSpotSrc = {};
+    const logged = spotRates(sessions, catalog, sessionSpot, xpField(p.xpMode), state.expTable), spotKph = {}, spotEco = {}, refSpotSrc = {};
     Object.keys(logged).forEach((s) => {
       spotKph[s] = logged[s].kph;
       spotEco[s] = { xph: logged[s].xph, pph: logged[s].pph, lph: logged[s].lph };
@@ -5025,7 +5080,7 @@
       const d = diffFor(c);
       return pickSpot(spots, pin, { metricFor: (x) => metrics(c, x, ctx(d)), weights });
     };
-    const rates = deriveRates(sessions, { catalog, xpMode: p.xpMode }), derived = {};
+    const rates = deriveRates(sessions, { catalog, xpMode: p.xpMode, expTable: state.expTable }), derived = {};
     Object.keys(rates).forEach((slug) => {
       derived[slug] = choose(catalog.bySlug[slug], rates[slug], (entries[slug] || {}).pinSpot);
     });
@@ -5174,14 +5229,14 @@
   function todayFactor(kph, today, ctx) {
     const out = { mult: 1, notes: [], loot: 1, lootNotes: [] }, t2 = ctx.t || EN;
     if (!today) return out;
-    const keys = Object.keys(kph), share = expShares(kph, ctx.expTable), tot = keys.length && share[keys[0]] != null;
-    let per = 0, loot = 0;
+    const keys = Object.keys(kph), share = expShares(kph, ctx.expTable), tot = keys.length && share[keys[0]] != null, chances = {};
+    let per = 0;
     keys.forEach((k) => {
       let m = 1;
       const name = ctx.catalog.bySlug[k] ? ctx.catalog.bySlug[k].name : k;
       if (today.boosted === k) {
         m *= BOOSTED_EXP_MULT;
-        out.notes.push(t2("{creature} is boosted (double exp)", { creature: name }));
+        out.notes.push(t2("{creature} is boosted (double exp and loot)", { creature: name }));
       }
       (today.prey || []).forEach((p) => {
         if (p.slug === k && p.kind === "xp" && p.pct > 0) {
@@ -5189,19 +5244,17 @@
           out.notes.push(t2("{creature} prey +{pct}% exp", { creature: name, pct: p.pct }));
         }
       });
-      let lm = 1;
       (today.prey || []).forEach((p) => {
         if (p.slug === k && p.kind === "loot" && p.pct > 0) {
-          lm += p.pct / 100;
+          chances[k] = (chances[k] || 0) + p.pct;
           out.lootNotes.push(t2("{creature} prey +{pct}% loot", { creature: name, pct: p.pct }));
         }
       });
       per += tot ? share[k] * m : 0;
-      loot += tot ? share[k] * lm : 0;
     });
     if (tot) {
       out.mult = per;
-      out.loot = loot;
+      out.loot = lootMult(share, today.boosted, chances);
     }
     if (today.event > 0) {
       out.mult *= 1 + today.event / 100;
@@ -5250,7 +5303,8 @@
       const tl = Number(ctx.talismanLoot) || 0, logged = nums.src === "own" && (nums.tasks || []).indexOf(held.slug) !== -1;
       if (tl > 0 && nums.pph != null && nums.lph > 0 && !logged) {
         const on = rate || !(hk * Hh > 0) ? 1 : Math.min(1, held.left / (hk * Hh));
-        v.talismanLoot = nums.lph * (expShares(nums.kph, ctx.expTable)[held.slug] || 0) * tl / 100 * on * Hh / H;
+        const boost = opts.today && opts.today.boosted === held.slug ? BOOSTED_LOOT_MULT : 1;
+        v.talismanLoot = nums.lph * (expShares(nums.kph, ctx.expTable)[held.slug] || 0) * boost * tl / 100 * on * Hh / H;
       }
     }
     (opts.weekly || []).forEach((w2) => {
@@ -5560,7 +5614,7 @@
       });
       return indexes[key];
     };
-    const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost });
+    const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost, expTable: state.expTable });
     const heldTask2 = (h2, diff) => heldTask(h2, diff, { catalog, chalRates: chalRates() });
     const tal = readTalisman(p);
     const spotValue2 = (sp, o) => {
@@ -5865,6 +5919,10 @@
         log[b.difficulty] = list.concat(add).slice(-OFFER_LOG_MAX);
       }
       updateCharacter({ rewardObs: log });
+    }
+    function huntBoosts(b, task) {
+      const v = readBoosts(b || {});
+      return { boosted: known(v.boosted) ? v.boosted : null, prey: v.prey.filter((q) => known(q.slug)), talisman: task ? v.talisman : 0 };
     }
     function newSpotId(name) {
       const base = "my-" + (slugify(name) || "spot"), taken = model().spotIndex().spots;
@@ -6322,8 +6380,9 @@
       // Logging a clean hunt. preview: parseSession's result. spot: {id} (a known spot) or {name, parentId, note} (a new
       // spot, or a variation of parentId). raidsBy: Echo Raids per creature (advanced). Saves the hunt to the shared
       // hunts at that spot (and the new spot first), with the character's vocation and level and who logged it; Hunting
-      // now ends. Returns the hunt's id, or null when there's nothing to save.
-      saveHunt({ preview, spot, raidsBy }) {
+      // now ends. boosts: the loot bonuses on during it (logView's boosts.value), stored on every new hunt (none on are
+      // recorded as none), the Talisman only on a hunt on the bounty. Returns the hunt's id, or null when there's nothing to save.
+      saveHunt({ preview, spot, raidsBy, boosts }) {
         const pid = state.pid, p = profile();
         if (!act || !pid || !p || !preview || !preview.hours || !preview.kills || !preview.kills.length) return null;
         let spotId = spot && spot.id, name;
@@ -6355,6 +6414,7 @@
           level: Number(p.level) || null,
           vocation: p.vocation || VOCATIONS[0],
           by: { pid, name: p.name ? String(p.name).trim().slice(0, 40) : null },
+          boosts: huntBoosts(boosts, task),
           createdAt: iso()
         };
         const raids = {};
@@ -6383,7 +6443,8 @@
         });
         changed();
       },
-      // A saved hunt's vocation, level (a number, or "" for none) and spot (a spot id), as corrected on the Log screen.
+      // A saved hunt's vocation, level (a number, or "" for none), spot (a spot id) and loot bonuses (boosts, only when
+      // changed: a hunt logged before they were recorded keeps reading as including the Talisman until then), as corrected on the Log screen.
       editHunt(id, patch) {
         const x = state.hunts.filter((y) => y.id === id)[0];
         if (!act || !x) return;
@@ -6401,6 +6462,7 @@
             body.spot = sp.name;
           }
         }
+        if ("boosts" in patch && patch.boosts) body.boosts = huntBoosts(patch.boosts, body.task);
         const prev = state.hunts;
         state.hunts = state.hunts.map((y) => y.id === id ? readHunt(id, body) : y);
         act.saveHunt(id, body, () => {
@@ -6990,6 +7052,53 @@
       } : null
     };
   }
+  var boostsDraft = (b, talisman) => ({
+    boosted: b && b.boosted || null,
+    prey: (b && b.prey || []).map((q) => ({ slug: q.slug, pct: q.pct })),
+    talisman: talisman > 0 ? String(talisman) : ""
+  });
+  function boostsPatch(d, patch) {
+    const out = { boosted: d.boosted, prey: d.prey.map((q) => Object.assign({}, q)), talisman: d.talisman };
+    if ("boosted" in patch) out.boosted = patch.boosted || null;
+    if ("prey" in patch && out.prey[patch.prey]) {
+      if ("slug" in patch) out.prey[patch.prey].slug = patch.slug || null;
+      if ("pct" in patch) out.prey[patch.prey].pct = Number(patch.pct) || PREY.loot.lo;
+    }
+    if ("addPrey" in patch && out.prey.length < PREY_SLOTS) out.prey.push({ slug: patch.addPrey || null, pct: PREY.loot.lo });
+    if ("removePrey" in patch) out.prey.splice(patch.removePrey, 1);
+    if ("talisman" in patch) out.talisman = String(patch.talisman == null ? "" : patch.talisman);
+    return out;
+  }
+  var preyPcts = () => {
+    const r = PREY.loot, out = [];
+    for (let x = r.lo; x <= r.hi; x += r.step) out.push({ value: x, label: "+" + x + "%" });
+    return out;
+  };
+  function boostsView(d, kills, onBounty) {
+    const seen = {}, killed = [];
+    (kills || []).forEach((k) => {
+      if (k && k.slug && !seen[k.slug]) {
+        seen[k.slug] = true;
+        killed.push({ value: k.slug, label: k.name || k.slug });
+      }
+    });
+    const none = [{ value: "", label: t("None") }], raw = String(d.talisman || "").trim().replace(",", ".");
+    const talisman = raw === "" ? 0 : /^\d+(\.\d+)?$/.test(raw) && Number(raw) <= 50 ? Number(raw) : null, talismanOk = !onBounty || talisman != null;
+    const boosted = d.boosted && seen[d.boosted] ? d.boosted : null, free = killed.filter((c) => !d.prey.some((q) => q.slug === c.value));
+    return {
+      boosted: boosted || "",
+      boostedOptions: none.concat(killed),
+      prey: d.prey.map((q, i) => ({ i, slug: q.slug && seen[q.slug] ? q.slug : "", pct: q.pct, creatures: none.concat(killed) })),
+      pcts: preyPcts(),
+      canAddPrey: d.prey.length < PREY_SLOTS && free.length > 0,
+      nextPrey: free.length ? free[0].value : null,
+      talisman: onBounty ? String(d.talisman || "") : null,
+      talismanOk,
+      draft: d,
+      value: talismanOk ? { boosted, prey: d.prey.filter((q) => q.slug && seen[q.slug]).map((q) => ({ slug: q.slug, pct: q.pct })), talisman: onBounty ? talisman : 0 } : null
+    };
+  }
+  var boostedBadge = (x, name) => x && x.boosts && x.boosts.boosted ? t("{creature} boosted", { creature: name(x.boosts.boosted) }) : null;
   function logView(draft, model, catalog, advanced, state) {
     state = state || {};
     const p = draft.text ? parseSession(draft.text, catalog) : null, problem = draft.text ? sessionProblems(p, translator()) : "";
@@ -7020,7 +7129,16 @@
     const limit = draft.limit > 0 ? draft.limit : 20;
     const rows = shown.slice(0, limit), editing = draft.edit && all.filter((x) => x.id === draft.edit)[0];
     if (editing && rows.indexOf(editing) === -1) rows.unshift(editing);
-    const ed = draft.editDraft || {};
+    const ed = draft.editDraft || {}, nameOf = (s) => catalog.bySlug[s] ? catalog.bySlug[s].name : s;
+    let boosts = null;
+    if (ok) {
+      const b = model.bounty(), active = b.mode === "active" && b.active ? b.active.slug : null, on = (s) => !!s && p.kills.some((k) => k.slug === s);
+      const onBounty = on(active), end = Date.parse(p.end || ""), today = !(end > 0) || serverDay(end) === serverDay(model.now), td = model.today();
+      boosts = boostsView(draft.boosts || boostsDraft(
+        today ? { boosted: on(td.boosted) ? td.boosted : null, prey: (td.prey || []).filter((q) => q.kind === "loot" && on(q.slug)) } : null,
+        onBounty ? readTalisman(me).loot : 0
+      ), p.kills, onBounty);
+    }
     const saved = {
       filters: {
         vocation: fVoc,
@@ -7036,11 +7154,13 @@
       more: Math.max(0, shown.length - limit),
       rows: rows.map((x) => {
         const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, open = !!editing && editing === x;
+        const by = x.by && x.by.pid && (state.profiles || {})[x.by.pid];
+        const bv = open ? boostsView(ed.boosts || boostsDraft(x.boosts, x.boosts ? x.boosts.talisman : x.task && by ? readTalisman(by).loot : 0), x.kills, !!x.task) : null;
         const level = ed.level != null ? ed.level : x.level != null ? String(x.level) : "", lvlOk = level === "" || /^\d+$/.test(String(level)) && Number(level) > 0 && Number(level) < 1e4;
         return {
           id: x.id,
           title: dayOf(x) + " · " + spotLabel(x),
-          sub: [huntAt(x), t("by {name}", { name: byName(state, x.by) }), t("{amount} exp/h", { amount: H && xp != null ? fmtBig(xp / H) : "–" })].filter(Boolean).join(" · "),
+          sub: [huntAt(x), t("by {name}", { name: byName(state, x.by) }), t("{amount} exp/h", { amount: H && xp != null ? fmtBig(xp / H) : "–" }), boostedBadge(x, nameOf)].filter(Boolean).join(" · "),
           label: t("Edit the hunt of {date} at {spot}", { date: dayOf(x), spot: spotLabel(x) }),
           open,
           editor: open ? {
@@ -7051,7 +7171,9 @@
             spotId: ed.spotId || spotOf(x) || "",
             spots: (spotOf(x) ? [] : [{ value: "", label: x.spot || t("Unnamed spot") }]).concat(spots),
             armed: draft.armed === x.id,
-            canSave: lvlOk
+            boosts: bv,
+            boostsChanged: !!ed.boosts,
+            canSave: lvlOk && !!bv.value
           } : null
         };
       })
@@ -7073,7 +7195,8 @@
       profit: profit != null ? fmtBig(profit) : "–",
       kph: kills.map((k) => ({ name: k.name, perHour: Math.round(k.count / p.hours) + "/h" })),
       raids: advanced && ok ? kills.map((k) => ({ name: k.name, value: (draft.raids || {})[k.name] || "" })) : null,
-      canSave: !!ok && (where === "known" ? !!spotId : !!(draft.name && draft.name.trim()) && !nameTaken),
+      boosts,
+      canSave: !!ok && (where === "known" ? !!spotId : !!(draft.name && draft.name.trim()) && !nameTaken) && !!(boosts && boosts.value),
       duplicate: dupe ? { id: dupe.id, asked: !!draft.dupe, text: t("You saved this hunt already: {date} at {spot}, by {name}.", { date: dayOf(dupe), spot: spotLabel(dupe), name: byName(state, dupe.by) }) } : null,
       saved
     };
@@ -7270,6 +7393,7 @@
       const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, raids = raidsOf(x);
       const clock = (s) => /T\d\d:\d\d/.test(s || "") ? String(s).slice(11, 16) : null, from = clock(x.start), to = clock(x.end);
       const caption = [from && to ? from + "–" + to : null, huntAt(x), t("by {name}", { name: byName(state, x.by) }), x.breaks ? t("with breaks") : null].filter(Boolean).join(" · ");
+      const boostedTag = boostedBadge(x, name);
       return {
         id: x.id,
         date: when(x) ? fmtDay(when(x).slice(0, 10)) : t("Undated"),
@@ -7277,6 +7401,7 @@
         exp: t("{amount} exp/h", { amount: H && xp != null ? fmtBig(xp / H) : "–" }),
         profit: t("{amount} profit/h", { amount: H && x.balance != null ? fmtBig(x.balance / H) : "–" }),
         breaks: !!x.breaks,
+        boosted: boostedTag,
         skipped: notCounting.get(x) || null,
         armed: ui.armed === x.id,
         raidsBy: raids,
@@ -8313,6 +8438,43 @@
   }
 
   // src/ui/screens/log.js
+  function boostsCard(pre, b, onBoost) {
+    return h(
+      "div",
+      { id: pre + "boosts", class: "hp-card hp-stack", role: "group", "aria-labelledby": pre + "boosts-h" },
+      h("b", { id: pre + "boosts-h" }, t("On during this hunt")),
+      h("span", { class: "hp-caption" }, t("Loot bonuses only. They’re taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.")),
+      selectField({ id: pre + "boosted", label: t("Boosted creature"), value: b.boosted, options: b.boostedOptions, onPick: (x) => onBoost({ boosted: x }) }),
+      b.prey.map((q) => h(
+        "div",
+        { class: "hp-offer", role: "group", "aria-label": t("Loot Prey {n}", { n: q.i + 1 }) },
+        h(
+          "div",
+          { class: "hp-grid2" },
+          selectField({ id: pre + "prey-" + q.i, label: t("Loot Prey {n}", { n: q.i + 1 }), value: q.slug, options: q.creatures, onPick: (x) => onBoost({ prey: q.i, slug: x }) }),
+          selectField({ id: pre + "prey-" + q.i + "-pct", label: t("Size"), value: q.pct, options: b.pcts, onPick: (x) => onBoost({ prey: q.i, pct: Number(x) }) })
+        ),
+        h("button", { id: pre + "prey-" + q.i + "-remove", type: "button", class: "hp-linkbtn hp-tap", onClick: () => onBoost({ removePrey: q.i }) }, t("Remove"))
+      )),
+      b.canAddPrey ? h("button", { id: pre + "prey-add", type: "button", class: "hp-btn dashed", onClick: () => onBoost({ addPrey: b.nextPrey }) }, t("+ Add a loot Prey")) : null,
+      b.talisman != null ? h(
+        "label",
+        { class: "hp-field" },
+        t("Talisman loot bonus (%)"),
+        h("input", {
+          id: pre + "talisman",
+          class: "hp-input",
+          value: b.talisman,
+          inputmode: "decimal",
+          maxlength: 5,
+          autocomplete: "off",
+          "aria-invalid": b.talismanOk ? null : "true",
+          onChange: (e) => onBoost({ talisman: e.target.value })
+        })
+      ) : null,
+      b.talismanOk ? null : h("span", { class: "hp-caption", role: "alert" }, t("Type a percent from 0 to 50, or leave it empty."))
+    );
+  }
   function savedHunts(s, on) {
     const field2 = (id, label, value, onCommit, opts) => h(
       "label",
@@ -8368,6 +8530,7 @@
           ),
           r.editor.levelOk ? null : h("span", { class: "hp-caption", role: "alert" }, t("Type a level, or leave it empty.")),
           selectField({ id: "saved-" + r.id + "-spot", label: t("Spot"), value: r.editor.spotId, options: r.editor.spots, onPick: (x) => on.editField("spotId", x) }),
+          boostsCard("saved-" + r.id + "-", r.editor.boosts, on.editBoost),
           h(
             "div",
             { class: "hp-grid2" },
@@ -8445,6 +8608,7 @@
         ),
         h("div", { class: "hp-card" }, h("b", null, t("Kills per hour")), h("ul", { class: "hp-list" }, view.kph.map((k) => h("li", null, h("span", null, k.name), h("span", null, k.perHour))))),
         view.raids ? h("div", { class: "hp-card" }, h("b", null, t("Echo Raids (advanced)")), view.raids.map((r, i) => field2("log-raid-" + i, t("{creature} raids", { creature: r.name }), r.value, (v) => on.raid(r.name, v), { inputmode: "numeric" }))) : null,
+        view.boosts ? boostsCard("log-", view.boosts, on.boost) : null,
         dup && dup.asked ? h(
           "div",
           { id: "log-dupe", class: "hp-pick", role: "alert" },
@@ -8653,7 +8817,7 @@
               null,
               h("b", null, x.date + " · " + x.length),
               h("br"),
-              h("span", { class: "hp-small hp-muted" }, x.exp + " · " + x.profit + (x.breaks ? " · " + t("with breaks") : "")),
+              h("span", { class: "hp-small hp-muted" }, x.exp + " · " + x.profit + (x.breaks ? " · " + t("with breaks") : "") + (x.boosted ? " · " + x.boosted : "")),
               x.skipped ? [h("br"), h("span", { class: "hp-small" }, x.skipped)] : null
             )
           ),
@@ -9165,13 +9329,14 @@
           L.armed = null;
         };
         const save = () => {
-          a.saveHunt({ preview: v.preview, spot: v.where === "known" ? { id: v.spotId } : { name: L.name, parentId: L.parentId || null, note: L.note }, raidsBy: L.raids });
+          a.saveHunt({ preview: v.preview, spot: v.where === "known" ? { id: v.spotId } : { name: L.name, parentId: L.parentId || null, note: L.note }, raidsBy: L.raids, boosts: v.boosts && v.boosts.value });
           leave();
         };
         return render5(v, L, {
           text: (t2) => {
             L.text = t2;
             L.dupe = false;
+            L.boosts = null;
             draw();
           },
           where: (w2) => {
@@ -9196,6 +9361,11 @@
           },
           raid: (k, n) => {
             L.raids[k] = n;
+            draw();
+          },
+          boost: (patch) => {
+            if (!v.boosts) return;
+            L.boosts = boostsPatch(v.boosts.draft, patch);
             draw();
           },
           // A hunt saved before asks first: Save anyway, or Open the existing one (in the saved hunts' editor).
@@ -9258,9 +9428,15 @@
             L.editDraft = Object.assign({}, L.editDraft, { [k]: x });
             draw();
           },
+          editBoost: (patch) => {
+            const r2 = v.saved.rows.filter((x) => x.editor)[0];
+            if (!r2) return;
+            L.editDraft = Object.assign({}, L.editDraft, { boosts: boostsPatch(r2.editor.boosts.draft, patch) });
+            draw();
+          },
           editSave: (row) => {
             if (!row.editor || !row.editor.canSave) return;
-            a.editHunt(row.id, { vocation: row.editor.vocation, level: row.editor.level, spotId: row.editor.spotId });
+            a.editHunt(row.id, Object.assign({ vocation: row.editor.vocation, level: row.editor.level, spotId: row.editor.spotId }, row.editor.boostsChanged ? { boosts: row.editor.boosts.value } : {}));
             closeEditor();
             draw();
           },
@@ -9431,6 +9607,7 @@
         parentId: "",
         note: "",
         raids: {},
+        boosts: null,
         leaving: false,
         back: "plan",
         dupe: false,

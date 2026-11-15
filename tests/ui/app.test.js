@@ -244,6 +244,7 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   assert.equal(logged.length, 1);
   const hunt = store[logged[0]], huntId = logged[0].slice("hunts/".length);
   assert.equal(hunt.task, "cobra-assassin", "the active bounty's creature was killed: the hunt's task");
+  assert.deepEqual(hunt.boosts, { boosted: null, prey: [], talisman: 0 }, "no loot bonuses on (the boosted Silencer wasn't killed; no Talisman), recorded as none");
   assert.deepEqual([hunt.vocation, hunt.level, hunt.by], ["Elite Knight", 615, { pid: "ek", name: "Test Knight" }], "shared: who logged it, as what, at what level");
   assert.equal(Object.keys(store).filter((k) => k.startsWith("profiles/ek/sessions/")).length, 8, "new hunts go only to the shared list");
   assert.equal(p.w.location.hash, "#/plan");
@@ -263,9 +264,13 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   assert.equal(p.$("#saved-" + huntId + "-spot").value, "my-bastion-two-box");
   await p.type("#saved-" + huntId + "-level", "600");
   await p.type("#saved-" + huntId + "-spot", "my-knight-den");
+  await p.type("#saved-" + huntId + "-boosted", "cobra-assassin");
+  await p.type("#saved-" + huntId + "-talisman", "5");
   await p.click("#saved-" + huntId + "-save");
   await until(() => store["hunts/" + huntId].level === 600, "the corrected hunt");
   assert.deepEqual([store["hunts/" + huntId].spotId, store["hunts/" + huntId].spot, store["hunts/" + huntId].vocation], ["my-knight-den", "Knight Den", "Elite Knight"]);
+  assert.deepEqual(store["hunts/" + huntId].boosts, { boosted: "cobra-assassin", prey: [], talisman: 5 }, "the bonuses as corrected");
+  assert.match(p.$("#saved-" + huntId).textContent, /Cobra Assassin boosted/);
   await p.click(".hp-back");
   await p.click("#log-discard");
   assert.equal(Object.keys(store).filter((k) => k.startsWith("hunts/")).length, 12);

@@ -153,3 +153,27 @@ test("the Bounty Talisman's loot reaches the plan's spots and the creature metri
   assert.equal(B.spotValue(B.spotIndex().spots["scout-cave"], { held: { slug: "cobra-assassin", kills: 400 }, diff: "master" }).m.profit, 2e5);
   assert.equal(B.derived.metrics["cobra-assassin"].profit, 2e5);
 });
+
+test("loot bonuses on during a logged hunt are taken out of its numbers, and today's are added once", () => {
+  const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }, { n: "Cobra Scout", c: "M", m: 6 }]);
+  // A hunt with the assassin boosted and a 10% Talisman on its bounty: one creature, so its loot was 2 × 1.1 = 2.2 × base.
+  const hunt = { id: "s", spot: "Scout Cave", hours: 1, rawXp: 1e6, loot: 4.4e5, supplies: 1e5, balance: 3.4e5, by: { pid: "a" }, task: "cobra-assassin",
+    kills: [{ slug: "cobra-assassin", count: 200 }], boosts: { boosted: "cobra-assassin", prey: [], talisman: 10 } };
+  const state = (sessions, today) => ({ catalog, reference: [], pid: "a", profile: { vocation: "Elite Knight", level: 500, talisman: { loot: 10, bestiary: 0 } },
+    sessions, entries: {}, advanced: false, difficulty: "master", expTable: {}, planner: { state: { today: today || {} } } });
+  const M = makeModel(state([hunt]), null, 0), sp = M.spotIndex().spots["scout-cave"];
+  const near = (a, b, why) => assert.ok(Math.abs(a - b) < 1e-6, why + ": " + a + " vs " + b);
+  // Base loot 200k, base profit 100k; the Talisman is added back while the bounty lasts, since this hunt's was taken out.
+  near(M.spotNums(sp).lph, 2e5, "base loot/h");
+  near(M.spotNums(sp).pph, 1e5, "base profit/h");
+  near(M.spotValue(sp, { held: { slug: "cobra-assassin", kills: 400 }, diff: "master" }).m.profit, 1e5 + 2e5 * 0.1, "with the Talisman");
+  near(M.derived.metrics["cobra-assassin"].profit, 1e5 + 2e5 * 0.1, "the creature's metrics too");
+  // Boosted again today (server day of time 0): the loot doubles and the Talisman's chance is of a doubled set.
+  const B = makeModel(state([hunt], { boosted: "cobra-assassin", boostedDay: "1969-12-31" }), null, 0), bsp = B.spotIndex().spots["scout-cave"];
+  const v = B.spotValue(bsp, { held: { slug: "cobra-assassin", kills: 400 }, diff: "master", today: B.today() });
+  near(v.lootBonus, 2e5, "double loot");
+  near(v.talismanLoot, 2e5 * 2 * 0.1, "the Talisman on the boosted creature");
+  // The same hunt without boosts (logged before they were recorded) is taken as it is, Talisman included.
+  const L = makeModel(state([Object.assign({}, hunt, { boosts: undefined })]), null, 0);
+  near(L.spotValue(L.spotIndex().spots["scout-cave"], { held: { slug: "cobra-assassin", kills: 400 }, diff: "master" }).m.profit, 3.4e5, "an older hunt");
+});

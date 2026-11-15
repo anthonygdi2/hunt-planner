@@ -407,7 +407,7 @@ test("log: the saved hunts, their vocation and level filters, and the editor", a
   const VOCS = ["Elite Knight", "Royal Paladin"].map((v) => ({ value: v, label: v }));
   const row = (id, open) => ({ id, title: "Oct 31 · Flimsies Venore -1 & -2", sub: "EK level 615 · by Main · 4.3kk exp/h", label: "Edit the hunt of Oct 31 at Flimsies Venore -1 & -2", open,
     editor: open ? { vocation: "Elite Knight", vocations: VOCS, level: "615", levelOk: true, spotId: "b", spots: [{ value: "a", label: "Flimsies Venore -1 & -2" }, { value: "b", label: "Flimsies Port Hope -1 & -2" }],
-      armed: false, canSave: true } : null });
+      armed: false, canSave: true, boosts: BOOSTS() } : null });
   const view = { text: "", problem: "", read: "", preview: null, duplicate: null,
     saved: { filters: { vocation: "Elite Knight", vocations: [{ value: "all", label: "All vocations" }].concat(VOCS), level: "20",
       levels: [{ value: "any", label: "Any level" }, { value: "20", label: "492–738 (±20%)" }] },
@@ -447,6 +447,104 @@ test("log: the saved hunts, their vocation and level filters, and the editor", a
   assert.equal($("#saved-h2-level").getAttribute("aria-invalid"), "true");
   $("#saved-h2-delete").click();
   assert.deepEqual(s.calls.at(-1), ["deleteHunt", "h2"]);
+});
+
+// The loot bonuses editor's view (app/views.js boostsView) for a hunt that killed Rats and Cave Rats.
+const BOOSTS = (o) => Object.assign({ boosted: "", boostedOptions: [{ value: "", label: "None" }, { value: "rat", label: "Rat" }, { value: "cave-rat", label: "Cave Rat" }],
+  prey: [], pcts: [13, 16, 19, 22, 25, 28, 31, 34, 37, 40].map((x) => ({ value: x, label: "+" + x + "%" })), canAddPrey: true, nextPrey: "rat",
+  talisman: null, talismanOk: true, draft: {}, value: {} }, o || {});
+
+test("log: the loot bonuses on during a hunt, in the preview and the saved hunt's editor", async () => {
+  const log = await import("../../src/ui/screens/log.js");
+  const s = spy(), on = new Proxy({}, { get: (t, k) => s.fn(k) });
+  const saved = { filters: { vocation: "all", vocations: [], level: "any", levels: [] }, count: "", empty: "", more: 0, rows: [] };
+  const creatures = [{ value: "", label: "None" }, { value: "rat", label: "Rat" }, { value: "cave-rat", label: "Cave Rat" }];
+  const view = { text: "x", problem: "", read: "", preview: { hours: 1 }, where: "known", spotId: "a", spots: [{ value: "a", label: "A" }], parents: [], name: "", parentId: "", note: "",
+    nameHint: "", exp: "5kk", profit: "300k", kph: [], raids: null, canSave: true, saved, duplicate: null,
+    boosts: BOOSTS({ boosted: "rat", prey: [{ i: 0, slug: "cave-rat", pct: 25, creatures }], talisman: "7.5" }) };
+  let $ = mount(log.render(view, { leaving: false }, on));
+  assert.equal($("#log-boosts").getAttribute("role"), "group");
+  assert.match($("#log-boosts").textContent, /On during this hunt/);
+  assert.equal($("#log-boosted").value, "rat", "filled from today's boosts");
+  assert.equal($("#log-prey-0").value, "cave-rat");
+  assert.equal($("#log-prey-0-pct").value, "25");
+  assert.equal($("#log-talisman").value, "7.5");
+  $("#log-boosted").value = ""; $("#log-boosted").dispatchEvent(new dom.window.Event("change"));
+  $("#log-prey-0-pct").value = "40"; $("#log-prey-0-pct").dispatchEvent(new dom.window.Event("change"));
+  $("#log-prey-0").value = "rat"; $("#log-prey-0").dispatchEvent(new dom.window.Event("change"));
+  $("#log-prey-0-remove").click();
+  $("#log-prey-add").click();
+  $("#log-talisman").value = "10"; $("#log-talisman").dispatchEvent(new dom.window.Event("change"));
+  assert.deepEqual(s.calls, [["boost", { boosted: "" }], ["boost", { prey: 0, pct: 40 }], ["boost", { prey: 0, slug: "rat" }], ["boost", { removePrey: 0 }],
+    ["boost", { addPrey: "rat" }], ["boost", { talisman: "10" }]]);
+  // Off the bounty there's no Talisman field; a percent that doesn't read says so, and Save waits.
+  $ = mount(log.render(Object.assign({}, view, { boosts: BOOSTS({ canAddPrey: false }) }), { leaving: false }, on));
+  assert.equal($("#log-talisman"), null);
+  assert.equal($("#log-prey-add"), null);
+  $ = mount(log.render(Object.assign({}, view, { canSave: false, boosts: BOOSTS({ talisman: "80", talismanOk: false }) }), { leaving: false }, on));
+  assert.equal($("#log-talisman").getAttribute("aria-invalid"), "true");
+  assert.match(document.body.textContent, /Type a percent from 0 to 50, or leave it empty./);
+  assert.equal($("#log-save").disabled, true);
+  // The saved hunt's editor has the same controls, calling editBoost.
+  s.calls.length = 0;
+  const editor = { vocation: "Elite Knight", vocations: [], level: "615", levelOk: true, spotId: "a", spots: [{ value: "a", label: "A" }], armed: false, canSave: true, boosts: BOOSTS() };
+  $ = mount(log.render({ text: "", problem: "", read: "", preview: null, duplicate: null,
+    saved: Object.assign({}, saved, { rows: [{ id: "h1", title: "t", sub: "s · Rat boosted", label: "l", open: true, editor }] }) }, { leaving: false }, on));
+  $("#saved-h1-boosted").value = "cave-rat"; $("#saved-h1-boosted").dispatchEvent(new dom.window.Event("change"));
+  $("#saved-h1-prey-add").click();
+  assert.deepEqual(s.calls, [["editBoost", { boosted: "cave-rat" }], ["editBoost", { addPrey: "rat" }]]);
+  assert.match($("#saved-h1").textContent, /Rat boosted/);
+});
+
+test("log view: the loot bonuses default from today's boosts and the Talisman, and change through boostsPatch", async () => {
+  const { logView, boostsPatch } = await import("../../src/app/views.js");
+  const { makeCatalog } = await import("../../src/core/catalog.js");
+  const catalog = makeCatalog([{ n: "Rat", c: "E", m: 3 }, { n: "Cave Rat", c: "E", m: 3 }, { n: "Cobra Scout", c: "M", m: 6 }]);
+  const text = ["Session data: From 2026-11-14, 10:00:00 to 2026-11-14, 11:00:00", "Session: 01:00h", "Raw XP Gain: 3,000", "Loot: 50,000", "Balance: 10,000",
+    "Killed Monsters:", "  100x rat", "  50x cave rat"].join("\n");
+  const end = Date.parse("2026-11-14T11:00:00");
+  const model = (o) => Object.assign({ now: end + 60000, spotIndex: () => ({ list: [], spots: {}, idOf: () => null }),
+    bounty: () => ({ mode: "active", active: { slug: "rat" } }),
+    today: () => ({ boosted: "rat", prey: [{ slug: "cave-rat", kind: "loot", pct: 25 }, { slug: "rat", kind: "xp", pct: 40 }, { slug: "cobra-scout", kind: "loot", pct: 40 }], event: 0 }) }, o || {});
+  const state = { pid: "a", profiles: { a: { vocation: "Elite Knight", level: 100, talisman: { loot: 7.5, bestiary: 0 } } }, hunts: [] };
+  const draft = { text, where: "new", name: "Rat Cave" };
+  // Ended this server day: today's boosted creature and loot Preys on creatures killed in it; on the bounty, the Talisman.
+  let v = logView(draft, model(), catalog, false, state);
+  assert.equal(v.boosts.boosted, "rat");
+  assert.deepEqual(v.boosts.prey.map((q) => [q.slug, q.pct]), [["cave-rat", 25]], "the exp Prey and a creature not killed are left out");
+  assert.equal(v.boosts.talisman, "7.5");
+  assert.deepEqual(v.boosts.value, { boosted: "rat", prey: [{ slug: "cave-rat", pct: 25 }], talisman: 7.5 });
+  assert.deepEqual(v.boosts.boostedOptions.map((o) => o.value), ["", "rat", "cave-rat"]);
+  assert.equal(v.boosts.nextPrey, "rat");
+  assert.equal(v.canSave, true);
+  // An older hunt: nothing from today's boosts; off the bounty: no Talisman.
+  v = logView(draft, model({ now: end + 3 * 864e5, bounty: () => ({ mode: "offers", active: null }) }), catalog, false, state);
+  assert.deepEqual(v.boosts.value, { boosted: null, prey: [], talisman: 0 });
+  assert.equal(v.boosts.talisman, null);
+  // Changes go through boostsPatch; a Talisman percent that doesn't read holds Save.
+  let d = boostsPatch(logView(draft, model(), catalog, false, state).boosts.draft, { boosted: "" });
+  d = boostsPatch(d, { prey: 0, pct: 40 });
+  d = boostsPatch(d, { addPrey: "rat" });
+  d = boostsPatch(d, { talisman: "60" });
+  v = logView(Object.assign({}, draft, { boosts: d }), model(), catalog, false, state);
+  assert.deepEqual(v.boosts.prey.map((q) => [q.slug, q.pct]), [["cave-rat", 40], ["rat", 13]]);
+  assert.equal(v.boosts.canAddPrey, false, "every creature killed has a Prey");
+  assert.equal(v.boosts.talismanOk, false);
+  assert.equal(v.boosts.value, null);
+  assert.equal(v.canSave, false);
+  v = logView(Object.assign({}, draft, { boosts: boostsPatch(boostsPatch(d, { talisman: "2,5" }), { removePrey: 0 }) }), model(), catalog, false, state);
+  assert.deepEqual(v.boosts.value, { boosted: null, prey: [{ slug: "rat", pct: 13 }], talisman: 2.5 });
+  // A saved hunt: the boosted creature is badged; the editor of one logged on its bounty before bonuses were recorded shows
+  // the Talisman of the character that logged it, and isn't changed until edited.
+  const hunt = { id: "h1", spot: "Rat Cave", hours: 1, end: "2026-11-01T11:00:00", task: "rat", loot: 5e4, kills: [{ slug: "rat", name: "Rat", count: 100 }], by: { pid: "a" } };
+  const boostedHunt = Object.assign({}, hunt, { id: "h2", task: null, boosts: { boosted: "rat", prey: [], talisman: 0 } });
+  v = logView({ text: "", edit: "h1", editDraft: {}, filterVoc: "all", filterLevel: "any" }, model(), catalog, false, Object.assign({}, state, { hunts: [hunt, boostedHunt] }));
+  const [r1, r2] = ["h1", "h2"].map((id) => v.saved.rows.filter((r) => r.id === id)[0]);
+  assert.match(r2.sub, /Rat boosted/);
+  assert.doesNotMatch(r1.sub, /boosted/);
+  assert.equal(r1.editor.boosts.talisman, "7.5");
+  assert.equal(r1.editor.boostsChanged, false);
+  assert.equal(r1.editor.canSave, true);
 });
 
 test("spots: search, sort, toggles, rows, more, and the badges legend", async () => {

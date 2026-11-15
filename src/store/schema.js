@@ -152,7 +152,20 @@ export function readHunt(id, v) {
   x.vocation = VOCATIONS.indexOf(x.vocation) !== -1 ? x.vocation : null;
   x.level = lvl > 0 && lvl < 10000 ? lvl : null;
   x.by = { pid: typeof by.pid === "string" && by.pid ? by.pid : null, name: typeof by.name === "string" && by.name.trim() ? by.name.trim().slice(0, 40) : null };
+  const b = readBoosts(v.boosts);
+  if (b) x.boosts = b; else delete x.boosts;
   return x;
+}
+// The loot bonuses on during a hunt (since November 14, 2026; hunts logged before have none): {boosted (slug or null),
+// prey [{slug, pct}] (loot Preys, up to PREY_SLOTS), talisman (the logging character's Talisman loot %, 0 when off the
+// bounty or none)}, or null when the hunt has none recorded.
+export function readBoosts(v) {
+  if (!v || typeof v !== "object") return null;
+  const slug = (s) => (typeof s === "string" && s ? s.slice(0, 80) : null), lp = PREY.loot;
+  return { boosted: slug(v.boosted),
+    prey: (Array.isArray(v.prey) ? v.prey : []).filter((q) => q && slug(q.slug)).slice(0, PREY_SLOTS)
+      .map((q) => ({ slug: slug(q.slug), pct: Math.min(lp.hi, Math.max(lp.lo, Math.round(Number(q.pct)) || lp.lo)) })),
+    talisman: plNum(v.talisman, 0, TALISMAN.loot.max) || 0 };
 }
 export function readHunts(docs) {
   const out = [];

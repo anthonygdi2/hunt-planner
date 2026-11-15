@@ -3,7 +3,7 @@
 // #/characters, #/log. With no
 // character yet, First run replaces everything. The whole screen re-renders on every state change, keeping focus.
 import { h, rerender, icon } from "./dom.js";
-import { headerView, firstRunView, charactersPageView, planScreenView, weeklyView, logView, spotsView, spotView, creaturesView, creatureView } from "../app/views.js";
+import { headerView, firstRunView, charactersPageView, planScreenView, weeklyView, logView, boostsPatch, spotsView, spotView, creaturesView, creatureView } from "../app/views.js";
 import * as firstRun from "./screens/firstRun.js";
 import { t, _ } from "../app/lang.js";
 import * as characters from "./screens/characters.js";
@@ -104,10 +104,11 @@ export function mount(root, app, host) {
       const L = ui.log, M = app.model(), v = logView(L, M, app.catalog, s.advanced, s), a = app.actions;
       const leave = () => { ui.log = blankLog(); go(L.back || "plan"); };
       const closeEditor = () => { L.edit = null; L.editDraft = {}; L.armed = null; };
-      const save = () => { a.saveHunt({ preview: v.preview, spot: v.where === "known" ? { id: v.spotId } : { name: L.name, parentId: L.parentId || null, note: L.note }, raidsBy: L.raids }); leave(); };
+      const save = () => { a.saveHunt({ preview: v.preview, spot: v.where === "known" ? { id: v.spotId } : { name: L.name, parentId: L.parentId || null, note: L.note }, raidsBy: L.raids, boosts: v.boosts && v.boosts.value }); leave(); };
       return logScreen.render(v, L, {
-        text: (t) => { L.text = t; L.dupe = false; draw(); }, where: (w) => { L.where = w; draw(); }, spot: (id) => { L.spotId = id; draw(); }, name: (n) => { L.name = n; draw(); },
+        text: (t) => { L.text = t; L.dupe = false; L.boosts = null; draw(); }, where: (w) => { L.where = w; draw(); }, spot: (id) => { L.spotId = id; draw(); }, name: (n) => { L.name = n; draw(); },
         parent: (id) => { L.parentId = id; draw(); }, note: (n) => { L.note = n; draw(); }, raid: (k, n) => { L.raids[k] = n; draw(); },
+        boost: (patch) => { if (!v.boosts) return; L.boosts = boostsPatch(v.boosts.draft, patch); draw(); },
         // A hunt saved before asks first: Save anyway, or Open the existing one (in the saved hunts' editor).
         save: () => { if (!v.canSave) return; if (v.duplicate && !L.dupe) { L.dupe = true; draw(); return; } save(); },
         saveAnyway: () => { if (v.canSave) save(); },
@@ -117,7 +118,8 @@ export function mount(root, app, host) {
         filterVoc: (x) => { L.filterVoc = x; L.limit = 0; draw(); }, filterLevel: (x) => { L.filterLevel = x; L.limit = 0; draw(); }, more: () => { L.limit = (L.limit || 20) + 20; draw(); },
         edit: (id) => { const open = L.edit === id; closeEditor(); if (!open) L.edit = id; draw(); },
         editField: (k, x) => { L.editDraft = Object.assign({}, L.editDraft, { [k]: x }); draw(); },
-        editSave: (row) => { if (!row.editor || !row.editor.canSave) return; a.editHunt(row.id, { vocation: row.editor.vocation, level: row.editor.level, spotId: row.editor.spotId }); closeEditor(); draw(); },
+        editBoost: (patch) => { const r = v.saved.rows.filter((x) => x.editor)[0]; if (!r) return; L.editDraft = Object.assign({}, L.editDraft, { boosts: boostsPatch(r.editor.boosts.draft, patch) }); draw(); },
+        editSave: (row) => { if (!row.editor || !row.editor.canSave) return; a.editHunt(row.id, Object.assign({ vocation: row.editor.vocation, level: row.editor.level, spotId: row.editor.spotId }, row.editor.boostsChanged ? { boosts: row.editor.boosts.value } : {})); closeEditor(); draw(); },
         editCancel: () => { closeEditor(); draw(); },
         arm: (id) => { L.armed = id; draw(); }, deleteHunt: (id) => { closeEditor(); a.deleteSession(id); },
       });
@@ -175,7 +177,7 @@ export function mount(root, app, host) {
   // A spot's page.
   function openSpot(id) { ui.spot = { armed: null, open: {} }; go("spot/" + encodeURIComponent(id)); }
   function blankLog() {
-    return { text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, leaving: false, back: "plan", dupe: false,
+    return { text: "", where: "known", spotId: null, name: "", parentId: "", note: "", raids: {}, boosts: null, leaving: false, back: "plan", dupe: false,
       filterVoc: null, filterLevel: null, limit: 0, edit: null, editDraft: {}, armed: null };
   }
   // Opens Log a clean hunt with some fields preset, returning to `back` afterwards.

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { metrics, bestiaryOf, expShares } from "../../src/core/metrics.js";
+import { metrics, bestiaryOf, expShares, lootMult } from "../../src/core/metrics.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 
 const catalog = makeCatalog([
@@ -94,4 +94,15 @@ test("the Bounty Talisman's more loot raises the profit, unless the hunts were o
   assert.equal(metrics(cobra, rec, Object.assign({}, ctx, { talismanLoot: 0 })).profit, 1e5, "no Talisman");
   assert.equal(metrics(cobra, rec, Object.assign({}, ctx, { spotEco: { "Cobra Bastion": { lph: null } } })).profit, 1e5, "loot/h unknown");
   assert.equal(metrics(cobra, Object.assign({}, rec, { pph: null }), ctx).profit, null);
+});
+
+test("what loot bonuses multiply a spot's loot by", () => {
+  const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-12, a + " vs " + b);
+  const shares = { a: 0.75, b: 0.25 };
+  assert.equal(lootMult({}, "a", { a: 50 }), 1);
+  assert.equal(lootMult(shares, null, {}), 1);
+  // The boosted creature's loot doubles (TibiaWiki); chances add, and multiply the doubled set.
+  near(lootMult(shares, "a", {}), 0.75 * 2 + 0.25);
+  near(lootMult(shares, null, { b: 40 }), 0.75 + 0.25 * 1.4);
+  near(lootMult(shares, "a", { a: 25 + 10, b: 40 }), 0.75 * 2 * 1.35 + 0.25 * 1.4);
 });
