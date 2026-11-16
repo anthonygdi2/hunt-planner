@@ -62,6 +62,7 @@ function oddsSection(v, on) {
       textInput("odds-silver", t("Silver (%)"), v.silver, (x) => on.odds({ silver: x }), { inputmode: "decimal" }),
       textInput("odds-gold", t("Gold (%)"), v.gold, (x) => on.odds({ gold: x }), { inputmode: "decimal" })),
     h("p", { id: "odds-logged", class: "hp-p hp-small hp-muted" }, v.logged),
+    v.slots ? h("p", { id: "odds-slots", class: "hp-p hp-small hp-muted" }, v.slots) : null,
     v.typed ? h("button", { id: "odds-follow", type: "button", class: "hp-btn", onClick: on.followLog }, t("Follow my log")) : null);
 }
 

@@ -179,11 +179,19 @@ test("plan: Silver and Gold odds and Log this board (Advanced mode)", async () =
   $("#bounty-log").click(); $("#odds-follow").click();
   assert.deepEqual(s.calls.splice(0), [["logBoard"], ["followLog"]]);
   // Nothing typed and boards logged: the plan follows the log (the blend the model hands over), and says so.
+  // Boards logged with their lists: the ×5 Preferred weight against them.
+  const tagged = { master: Array.from({ length: 10 }, (_, i) => ({ kind: "normal", pref: i < 3, unw: i === 9, nPool: 100, nPref: 5, nUnw: 5 })) };
+  assert.equal(oddsView(guess, log, true, filled).slots, null, "no offer logged with its lists");
+  o = oddsView(guess, tagged, true, filled);
+  assert.equal(o.slots, "Preferred creatures came up in 3 of 10 offers (30%). The ×5 model expects 21.7%; with no extra weight it would be 5.3%. Too few offers to tell them apart yet. " +
+    "An Unwanted creature was offered 1 time, so Unwanted doesn’t take a creature out of the pool.");
+  $ = mount(plan.render({ goal, bounty: bountyView(filled, catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
+  assert.equal($("#odds-slots").textContent, o.slots);
   o = oddsView({ odds: { silver: 12.9, gold: 3.16 }, typed: false, n: 12 }, log, true, filled);
   assert.equal(o.line, "The plan follows your log: Silver 12.9%, Gold 3.2% per offer. It starts from a guess and moves toward your logged boards as they add up.");
   assert.deepEqual([o.logged, o.board.canLog, o.board.text], ["12 offers logged: Silver 25%, Gold 8.3%.", false, "This board is logged."]);
   $ = mount(plan.render({ goal, bounty: bountyView(filled, catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
-  assert.deepEqual([$("#odds-silver").value, $("#odds-gold").value, $("#odds-follow")], ["12.9", "3.2", null]);
+  assert.deepEqual([$("#odds-silver").value, $("#odds-gold").value, $("#odds-follow"), $("#odds-slots")], ["12.9", "3.2", null, null]);
   // An active bounty: odds, but no board to log.
   const active = { difficulty: "master", tokens: 4, mode: "active", offers: [blank, blank, blank], active: { slug: "cobra-assassin", kills: 450, killsLeft: 400, kind: "normal", exp: null } };
   o = oddsView(guess, {}, false, active);

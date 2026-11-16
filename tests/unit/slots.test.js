@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { slotOdds, slotSuggestions, boardSlotTags } from "../../src/core/slots.js";
+import { preferredCheck, slotOdds, slotSuggestions, boardSlotTags } from "../../src/core/slots.js";
 
 const pool = Array.from({ length: 100 }, (_, i) => ({ slug: "c" + i, name: "Creature " + String(i).padStart(3, "0") }));
 
@@ -38,4 +38,19 @@ test("a logged board's offers: Preferred or Unwanted, and the pool and lists the
   const sizes = { nPool: 100, nPref: 2, nUnw: 1 };
   assert.deepEqual(tags, [Object.assign({ pref: true, unw: false }, sizes), Object.assign({ pref: false, unw: true }, sizes), Object.assign({ pref: false, unw: false }, sizes)]);
   assert.deepEqual(boardSlotTags(["c1"], pool, { preferred: [], unwanted: [] }), [{ pref: false, unw: false, nPool: 100, nPref: 0, nUnw: 0 }]);
+});
+
+test("the ×5 Preferred weight against logged boards", () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, (msg || "") + " " + a + " vs " + b);
+  assert.deepEqual(preferredCheck({}), { n: 0, pref: 0, share: null, expected: null, plain: null, unwanted: 0, tagged: 0 });
+  const tag = (pref, unw, nPool, nPref, nUnw) => ({ kind: "normal", pref, unw, nPool, nPref, nUnw });
+  // 100 creatures in the pool, 5 Preferred, 5 Unwanted: ×5 expects 25 ÷ (95 + 20) per offer, no weight 5 ÷ 95.
+  const log = { master: [tag(true, false, 100, 5, 5), tag(false, false, 100, 5, 5), tag(false, false, 100, 5, 5), tag(false, true, 100, 5, 5), { kind: "normal" }],
+    expert: [tag(false, false, 200, 0, 0), tag(true, false, 50, 2, 0)] };
+  const c = preferredCheck(log);
+  assert.deepEqual([c.n, c.pref, c.unwanted, c.tagged], [5, 2, 1, 6], "an offer logged before tags and a board with no Preferred list aren't counted");
+  near(c.share, 40);
+  near(c.expected, (4 * 25 / 115 + 10 / 58) / 5 * 100);
+  near(c.plain, (4 * 5 / 95 + 2 / 50) / 5 * 100);
+  near(preferredCheck(log, 3).expected, (4 * 15 / 105 + 6 / 54) / 5 * 100, "another weight");
 });

@@ -659,4 +659,8 @@ export default {
   "Prey at {spot}:": "Prey na {spot}:",
   "The game’s Prey list is random unless you use a wildcard.": "Lista Prey w grze jest losowa, chyba że użyjesz wildcarda.",
   "Best for a Prey:": "Najlepszy na Prey:",
+  "Preferred creatures came up in {pref} of {n} offer ({share}%).": { one: "Potwory Preferred pojawiły się w {pref} z {n} oferty ({share}%).", few: "Potwory Preferred pojawiły się w {pref} z {n} ofert ({share}%).", many: "Potwory Preferred pojawiły się w {pref} z {n} ofert ({share}%).", other: "Potwory Preferred pojawiły się w {pref} z {n} oferty ({share}%)." },
+  "The ×{weight} model expects {expected}%; with no extra weight it would be {plain}%.": "Model ×{weight} przewiduje {expected}%; bez dodatkowej wagi byłoby {plain}%.",
+  "Too few offers to tell them apart yet.": "Na razie za mało ofert, żeby je odróżnić.",
+  "An Unwanted creature was offered {n} time, so Unwanted doesn’t take a creature out of the pool.": { one: "Potwór Unwanted został zaoferowany {n} raz, więc Unwanted nie usuwa potwora z puli.", few: "Potwory Unwanted zostały zaoferowane {n} razy, więc Unwanted nie usuwa potwora z puli.", many: "Potwory Unwanted zostały zaoferowane {n} razy, więc Unwanted nie usuwa potwora z puli.", other: "Potwory Unwanted zostały zaoferowane {n} raza, więc Unwanted nie usuwa potwora z puli." },
 };

@@ -40,6 +40,30 @@ export function boardSlotTags(offers, pool, slots) {
   return offers.map((slug) => ({ pref: pref.indexOf(slug) !== -1, unw: unw.indexOf(slug) !== -1, nPool: pool.length, nPref: pref.length, nUnw: unw.length }));
 }
 
+// The slot model against the logged boards: how often a Preferred creature came up, and how often the model expects
+// one. log {diff: [{pref, unw, nPool, nPref, nUnw}]} (the tags boardSlotTags gave each offer; offers logged before
+// them are skipped, and so are boards with an empty Preferred list). Per offer the model expects weight × nPref ÷
+// (nPool − nUnw + (weight − 1) × nPref), the sum slotOdds uses (it leaves out that a board doesn't repeat a creature).
+// weight: SLOTS.preferredWeight unless given. Returns {n (offers counted), pref (Preferred among them), share and
+// expected (percent of offers; null with none), plain (expected with no extra weight), unwanted (Unwanted creatures
+// offered: any at all says Unwanted doesn't take a creature out), tagged (offers that carry tags)}.
+export function preferredCheck(log, weight) {
+  const w = weight > 0 ? weight : SLOTS.preferredWeight;
+  let n = 0, pref = 0, exp = 0, plain = 0, unwanted = 0, tagged = 0;
+  Object.keys(log || {}).forEach((d) => (log[d] || []).forEach((o) => {
+    if (!o || !(o.nPool > 0) || typeof o.pref !== "boolean") return;
+    tagged++;
+    if (o.unw) unwanted++;
+    const left = o.nPool - (o.nUnw || 0);
+    if (!(o.nPref > 0) || !(left > 0)) return;
+    n++;
+    if (o.pref) pref++;
+    exp += w * o.nPref / (left + (w - 1) * o.nPref);
+    plain += o.nPref / left;
+  }));
+  return { n, pref, share: n ? pref / n * 100 : null, expected: n ? exp / n * 100 : null, plain: n ? plain / n * 100 : null, unwanted, tagged };
+}
+
 // Creatures to suggest for a list, best first, at most n: [{it, key, why}]. pool: creatures [{slug, name}]; taken:
 // slugs already in either list; info(it) → {avoided, locked, minLevel, score: {tier, rel} or undefined}. Preferred: S, A
 // or B creatures that aren't avoided or above level, by score. Unwanted: avoided, then above level, then D creatures

@@ -658,4 +658,8 @@ export default {
   "Prey at {spot}:": "Prey en {spot}:",
   "The game’s Prey list is random unless you use a wildcard.": "La lista de Prey del juego es aleatoria salvo que uses un wildcard.",
   "Best for a Prey:": "Lo mejor para un Prey:",
+  "Preferred creatures came up in {pref} of {n} offer ({share}%).": { one: "Las criaturas Preferred salieron en {pref} de {n} oferta ({share}%).", many: "Las criaturas Preferred salieron en {pref} de {n} ofertas ({share}%).", other: "Las criaturas Preferred salieron en {pref} de {n} ofertas ({share}%)." },
+  "The ×{weight} model expects {expected}%; with no extra weight it would be {plain}%.": "El modelo ×{weight} espera {expected}%; sin peso extra sería {plain}%.",
+  "Too few offers to tell them apart yet.": "Aún son pocas ofertas para distinguirlos.",
+  "An Unwanted creature was offered {n} time, so Unwanted doesn’t take a creature out of the pool.": { one: "Se ofreció una criatura Unwanted {n} vez, así que Unwanted no saca una criatura del pool.", many: "Se ofrecieron criaturas Unwanted {n} veces, así que Unwanted no saca una criatura del pool.", other: "Se ofrecieron criaturas Unwanted {n} veces, así que Unwanted no saca una criatura del pool." },
 };

@@ -19,6 +19,7 @@ import { weekKey, serverDay, weeklyDifficulties } from "../core/weekly.js";
 import { markAge, markActive } from "../core/occupancy.js";
 import { isChallengingMaster } from "../core/rewards.js";
 import { loggedOdds } from "../core/reroll.js";
+import { preferredCheck } from "../core/slots.js";
 import { t, _, translator, locale } from "./lang.js";
 import { LANGS } from "../core/i18n.js";
 
@@ -98,6 +99,18 @@ export function difficultyAdvice(cmp) {
   };
 }
 
+// "Preferred creatures came up in 12 of 60 offers (20%). The ×5 model expects 18.2%; with no extra weight it would be
+// 4.1%. Too few offers to tell them apart yet." from core/slots.js preferredCheck; null with nothing to count.
+const CHECK_ENOUGH = 300;
+export function slotsCheckText(c) {
+  if (!c || !c.n) return c && c.unwanted ? unwantedSeen(c.unwanted) : null;
+  return [t.n(c.n, "Preferred creatures came up in {pref} of {n} offer ({share}%).", "Preferred creatures came up in {pref} of {n} offers ({share}%).", { pref: c.pref, share: pct1(c.share) }),
+    t("The ×{weight} model expects {expected}%; with no extra weight it would be {plain}%.", { weight: SLOTS.preferredWeight, expected: pct1(c.expected), plain: pct1(c.plain) }),
+    c.n < CHECK_ENOUGH ? t("Too few offers to tell them apart yet.") : null, c.unwanted ? unwantedSeen(c.unwanted) : null].filter(Boolean).join(" ");
+}
+const unwantedSeen = (n) => t.n(n, "An Unwanted creature was offered {n} time, so Unwanted doesn’t take a creature out of the pool.",
+  "Unwanted creatures were offered {n} times, so Unwanted doesn’t take a creature out of the pool.");
+
 // Silver and Gold odds (Advanced mode): what the plan uses, the logged offers, and logging this board.
 // o: model.offerOdds() {odds, typed, n (offers the blend counts)}; log: model.offerLog(); logged: model.boardLogged(); b: the bounty.
 const pct1 = (x) => String(Math.round(x * 10) / 10);
@@ -111,6 +124,8 @@ export function oddsView(o, log, logged, b) {
       : t("The plan uses a guess: Silver {silver}%, Gold {gold}% per offer. The real odds aren’t published.", vals),
     logged: (L.n ? t.n(L.n, "{n} offer logged: Silver {silver}%, Gold {gold}%.", "{n} offers logged: Silver {silver}%, Gold {gold}%.", { silver: pct1(L.silver), gold: pct1(L.gold) })
       : t("No boards logged yet.")) + (o.typed ? " " + t("Typed odds win over your log.") : ""),
+    // The ×5 Preferred weight against the logged boards (those logged with their lists), once any counts.
+    slots: slotsCheckText(preferredCheck(log)),
     board: !(b.mode === "active" && b.active) ? { canLog: filled && !logged,
       text: logged ? t("This board is logged.") : !filled ? t("Fill in all three offers to log this board.") : t("Picking an offer or rerolling here logs the board by itself. Use this if you won’t.") } : null,
   };
