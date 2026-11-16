@@ -52,8 +52,8 @@ function difficultyAdvice(a) {
       h("p", { class: "hp-p hp-caption" }, a.note)));
 }
 
-// Silver and Gold odds (Advanced mode): what the plan uses, the two odds, the logged offers, and the buttons to take
-// their shares or go back to the guess. v: bountyView's odds.
+// Silver and Gold odds (Advanced mode): what the plan uses (the guess blended with the logged offers, or typed odds),
+// the two odds, the logged offers, and with typed odds the button back to following the log. v: bountyView's odds.
 function oddsSection(v, on) {
   return h("div", { id: "bounty-odds", class: "hp-offer", role: "group", "aria-label": t("Silver and Gold odds") },
     h("b", null, t("Silver and Gold odds")),
@@ -62,15 +62,13 @@ function oddsSection(v, on) {
       textInput("odds-silver", t("Silver (%)"), v.silver, (x) => on.odds({ silver: x }), { inputmode: "decimal" }),
       textInput("odds-gold", t("Gold (%)"), v.gold, (x) => on.odds({ gold: x }), { inputmode: "decimal" })),
     h("p", { id: "odds-logged", class: "hp-p hp-small hp-muted" }, v.logged),
-    v.canUse || v.typed ? h("div", { class: "hp-grid2" },
-      v.canUse ? h("button", { id: "odds-use", type: "button", class: "hp-btn", onClick: on.useLoggedOdds }, t("Use my logged shares")) : null,
-      v.typed ? h("button", { id: "odds-guess", type: "button", class: "hp-btn", onClick: on.useGuessOdds }, t("Use the guess")) : null) : null);
+    v.typed ? h("button", { id: "odds-follow", type: "button", class: "hp-btn", onClick: on.followLog }, t("Follow my log")) : null);
 }
 
 // The Bounty editor: difficulty and tokens, then the three offers while choosing, or the active bounty; in Advanced
 // mode, Log this board and the Silver and Gold odds.
 // view: app/views.js bountyView. on: {difficulty(d), tokens(n), offer(i, patch), pick(i), active(patch), finished(), rerolled(), lists(),
-// logBoard(), odds(patch), useLoggedOdds(), useGuessOdds(), done()}.
+// logBoard(), odds(patch), followLog(), done()}.
 export function bountyEditor(view, on) {
   const KINDS = kinds();
   const offerCard = (o) => h("div", { class: "hp-offer", role: "group", "aria-label": t("Offer {letter}", { letter: o.letter }) },

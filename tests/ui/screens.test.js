@@ -149,39 +149,41 @@ test("plan: Silver and Gold odds and Log this board (Advanced mode)", async () =
   const board = (offers) => ({ difficulty: "master", tokens: 4, mode: "offers", active: null, offers });
   const goal = { chip: { label: "Goal", value: "Exp", set: true } };
   const s = spy(), bounty = {};
-  ["logBoard", "odds", "useLoggedOdds", "useGuessOdds"].forEach((k) => { bounty[k] = s.fn(k); });
-  const guess = { odds: { silver: 10, gold: 2 }, typed: false };
+  ["logBoard", "odds", "followLog"].forEach((k) => { bounty[k] = s.fn(k); });
+  const guess = { odds: { silver: 10, gold: 2 }, typed: false, n: 0 };
   // Basic mode: none of it.
   let $ = mount(plan.render({ goal, bounty: bountyView(board([full, blank, blank]), catalog) }, { open: "bounty" }, { toggle() {}, bounty }));
   assert.equal($("#bounty-odds"), null);
   assert.equal($("#bounty-log"), null);
   // The guess, nothing logged, a board not filled in.
   let o = oddsView(guess, {}, false, board([full, blank, blank]));
-  assert.deepEqual([o.silver, o.gold, o.typed, o.canUse], ["10", "2", false, false]);
-  assert.equal(o.logged, "No boards logged yet. Your shares can be used once 10 offers are logged.");
+  assert.deepEqual([o.silver, o.gold, o.typed], ["10", "2", false]);
+  assert.equal(o.logged, "No boards logged yet.");
   $ = mount(plan.render({ goal, bounty: bountyView(board([full, blank, blank]), catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
   assert.equal($("#odds-line").textContent, "The plan uses a guess: Silver 10%, Gold 2% per offer. The real odds aren’t published.");
   assert.equal($("#odds-silver").value, "10");
   assert.equal($("#bounty-log").disabled, true);
-  assert.equal($("#odds-use"), null);
-  assert.equal($("#odds-guess"), null);
+  assert.equal($("#odds-follow"), null, "nothing typed: already following the log");
   $("#odds-silver").value = "12.5"; $("#odds-silver").dispatchEvent(new dom.window.Event("change"));
   $("#odds-gold").value = "3"; $("#odds-gold").dispatchEvent(new dom.window.Event("change"));
   assert.deepEqual(s.calls.splice(0), [["odds", { silver: "12.5" }], ["odds", { gold: "3" }]]);
   // Typed odds, twelve offers logged, a full board not logged yet.
   const log = { master: Array.from({ length: 12 }, (_, i) => ({ kind: i < 3 ? "silver" : i < 4 ? "gold" : "normal" })) };
   const filled = board([full, Object.assign({}, full, { slug: "gorerilla" }), full]);
-  o = oddsView({ odds: { silver: 12.5, gold: 3 }, typed: true }, log, false, filled);
+  o = oddsView({ odds: { silver: 12.5, gold: 3 }, typed: true, n: 0 }, log, false, filled);
   assert.equal(o.line, "The plan uses your odds: Silver 12.5%, Gold 3% per offer.");
-  assert.equal(o.logged, "12 offers logged: Silver 25%, Gold 8.3%.");
+  assert.equal(o.logged, "12 offers logged: Silver 25%, Gold 8.3%. Typed odds win over your log.");
   $ = mount(plan.render({ goal, bounty: bountyView(filled, catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
   assert.equal($("#bounty-log").disabled, false);
   assert.equal($("#bounty-log-note").textContent, "Picking an offer or rerolling here logs the board by itself. Use this if you won’t.");
-  $("#bounty-log").click(); $("#odds-use").click(); $("#odds-guess").click();
-  assert.deepEqual(s.calls.splice(0), [["logBoard"], ["useLoggedOdds"], ["useGuessOdds"]]);
-  // Logged already; the shares already in use: no Use button.
-  o = oddsView({ odds: { silver: 25, gold: 8.3 }, typed: true }, log, true, filled);
-  assert.deepEqual([o.canUse, o.board.canLog, o.board.text], [false, false, "This board is logged."]);
+  $("#bounty-log").click(); $("#odds-follow").click();
+  assert.deepEqual(s.calls.splice(0), [["logBoard"], ["followLog"]]);
+  // Nothing typed and boards logged: the plan follows the log (the blend the model hands over), and says so.
+  o = oddsView({ odds: { silver: 12.9, gold: 3.16 }, typed: false, n: 12 }, log, true, filled);
+  assert.equal(o.line, "The plan follows your log: Silver 12.9%, Gold 3.2% per offer. It starts from a guess and moves toward your logged boards as they add up.");
+  assert.deepEqual([o.logged, o.board.canLog, o.board.text], ["12 offers logged: Silver 25%, Gold 8.3%.", false, "This board is logged."]);
+  $ = mount(plan.render({ goal, bounty: bountyView(filled, catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
+  assert.deepEqual([$("#odds-silver").value, $("#odds-gold").value, $("#odds-follow")], ["12.9", "3.2", null]);
   // An active bounty: odds, but no board to log.
   const active = { difficulty: "master", tokens: 4, mode: "active", offers: [blank, blank, blank], active: { slug: "cobra-assassin", kills: 450, killsLeft: 400, kind: "normal", exp: null } };
   o = oddsView(guess, {}, false, active);

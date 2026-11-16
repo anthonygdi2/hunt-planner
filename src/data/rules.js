@@ -28,9 +28,11 @@ export const TASK = deepFreeze({
 // includes the bonus (TibiaWiki Task Board).
 export const KIND_MULT = deepFreeze({ normal: 1, silver: 2, gold: 4 });
 // The chance of a Silver or a Gold offer, in percent per offer. Not published anywhere: the maintainer's starting guess
-// (November 13, 2026), used until the player types their own odds or takes the shares of the boards they log
-// (Advanced mode).
+// (November 13, 2026). With no odds typed the plan blends it with the character's logged boards: the guess counts as
+// OFFER_ODDS_PRIOR logged offers, so a few boards barely move it and a few hundred mostly replace it (50 is a choice,
+// November 15, 2026, that needs the maintainer's OK).
 export const OFFER_ODDS = deepFreeze({ silver: 10, gold: 2 });
+export const OFFER_ODDS_PRIOR = 50;
 
 // Exp paid per required kill, before Silver or Gold. Master (Hard creatures) is exactly 1,875: ten logged offers at
 // levels 612-613, no level effect seen. Expert 510, Adept 97.5 and Beginner 15 follow the open-source Canary server

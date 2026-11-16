@@ -335,10 +335,9 @@ test("Advanced mode: log a board, and the Silver and Gold odds", async () => {
   if (p.$("#active-name")) await p.click("#bounty-rerolled");
   await until(() => p.$("#offer-0-name"), "the offers");
   // The guess, and the fixture's three logged offers (one of each kind): too few to use.
-  assert.equal(p.$("#odds-line").textContent, "The plan uses a guess: Silver 10%, Gold 2% per offer. The real odds aren’t published.");
-  assert.equal(p.$("#odds-logged").textContent, "3 offers logged: Silver 33.3%, Gold 33.3%. Your shares can be used once 10 offers are logged.");
-  assert.equal(p.$("#odds-use"), null);
-  assert.equal(p.$("#odds-guess"), null, "already the guess");
+  assert.equal(p.$("#odds-line").textContent, "The plan follows your log: Silver 11.3%, Gold 3.8% per offer. It starts from a guess and moves toward your logged boards as they add up.");
+  assert.equal(p.$("#odds-logged").textContent, "3 offers logged: Silver 33.3%, Gold 33.3%.");
+  assert.equal(p.$("#odds-follow"), null, "nothing typed: already following the log");
   assert.equal(p.$("#bounty-log").disabled, true);
   assert.equal(p.$("#bounty-log-note").textContent, "Fill in all three offers to log this board.");
   // A board: logged once.
@@ -360,14 +359,15 @@ test("Advanced mode: log a board, and the Silver and Gold odds", async () => {
   assert.match(p.$("#odds-logged").textContent, /^6 offers logged: Silver 33\.3%, Gold 16\.7%\./);
   // Typed odds, then back to the guess.
   await p.type("#odds-silver", "15");
-  await until(() => JSON.stringify(store["profiles/ek"].offerOdds) === '{"silver":15,"gold":2}', "the typed odds");
+  await until(() => JSON.stringify(store["profiles/ek"].offerOdds) === '{"silver":15,"gold":3.6}', "the typed odds (Gold as the plan had it: the guess and six logged offers)");
   await wait(30);
-  assert.equal(p.$("#odds-line").textContent, "The plan uses your odds: Silver 15%, Gold 2% per offer.");
+  assert.equal(p.$("#odds-line").textContent, "The plan uses your odds: Silver 15%, Gold 3.6% per offer.");
   await p.type("#odds-gold", "95");
   await wait(30);
-  assert.equal(store["profiles/ek"].offerOdds.gold, 2, "more than 100 together: not saved");
-  await p.click("#odds-guess");
-  await until(() => store["profiles/ek"].offerOdds === null, "back to the guess");
+  assert.equal(store["profiles/ek"].offerOdds.gold, 3.6, "more than 100 together: not saved");
+  await p.click("#odds-follow");
+  await until(() => store["profiles/ek"].offerOdds === null, "following the log again");
+  assert.match(p.$("#odds-line").textContent, /^The plan follows your log: Silver 12\.5%, Gold 3\.6% per offer\./);
   // Picking an offer from the board logged by hand marks the pick; no rows are added.
   await p.click("#offer-1-pick");
   await until(() => store["profiles/ek"].rewardObs.master[4].picked === true, "the pick");

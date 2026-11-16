@@ -9,7 +9,6 @@ import { NUM_FIELDS } from "../core/numbers.js";
 import { isChallengingMaster, learnChallenging } from "../core/rewards.js";
 import { makeCatalog } from "../core/catalog.js";
 import { PRESETS, readWeights } from "../core/score.js";
-import { loggedOdds, MIN_BOARD_OBS } from "../core/reroll.js";
 import { boardSlotTags } from "../core/slots.js";
 import { makeRepo } from "../store/repo.js";
 import { PREF } from "../store/prefs.js";
@@ -387,10 +386,11 @@ export function createApp({ data, prefs, now, browserLang }) {
     confirmNoTokens() { saveBounty({ zeroChecked: serverDay(now()) }); },
     // Silver and Gold (Advanced mode). Log this board, for a board not picked or rerolled here (those log themselves).
     logBoard() { logOffers(-1); },
-    // The character's own odds in percent ({silver, gold}, either one typed; the other stays as the plan has it).
+    // The character's own odds in percent ({silver, gold}, either one typed; the other stays as the plan has it, to one
+    // decimal). They then win over the log until Follow my log.
     // Nothing changes when a value isn't a number or the two add up to more than 100.
     setOfferOdds(patch) {
-      const now0 = model().offerOdds(), next = Object.assign({}, now0.odds);
+      const now0 = model().offerOdds(), next = { silver: Math.round(now0.odds.silver * 10) / 10, gold: Math.round(now0.odds.gold * 10) / 10 };
       ["silver", "gold"].forEach((k) => {
         if (!(k in patch)) return;
         const raw = String(patch[k]).trim().replace("%", "").replace(",", "."), n = Number(raw);
@@ -398,13 +398,8 @@ export function createApp({ data, prefs, now, browserLang }) {
       });
       if (readOfferOdds(next) && (!now0.typed || next.silver !== now0.odds.silver || next.gold !== now0.odds.gold)) updateCharacter({ offerOdds: next });
     },
-    // The shares of the logged offers (once there are enough) become the character's odds.
-    useLoggedOdds() {
-      const L = loggedOdds(model().offerLog());
-      if (L.n >= MIN_BOARD_OBS) updateCharacter({ offerOdds: { silver: Math.round(L.silver * 10) / 10, gold: Math.round(L.gold * 10) / 10 } });
-    },
-    // Back to the guess (OFFER_ODDS).
-    useGuessOdds() { updateCharacter({ offerOdds: null }); },
+    // Typed odds cleared: the plan follows the log again (the guess blended with the logged offers).
+    followLoggedOdds() { updateCharacter({ offerOdds: null }); },
     // The Bounty Talisman's bonuses as the game shows them, in percent ({loot}, {bestiary}, {damage} or {leech}, typed;
     // empty is 0, no Talisman). Written as talisman {loot, bestiary, damage, leech} with bestiaryBonus kept in step,
     // so older builds still read the bestiary bonus. Nothing changes when a value isn't a number in range.

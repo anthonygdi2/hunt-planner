@@ -1,13 +1,13 @@
 // The app's model of one character at one moment: compute()'s result plus the functions screens and view models need
 // on top of it (numbers per creature, the reroll model, weekly tasks, the planner). Everything is a function of the
 // state, the derived values and `now`, so the same model backs the screens, the view models and the golden capture.
-import { VOCATIONS, SLOTS, DIFFICULTIES, OFFER_ODDS } from "../data/rules.js";
+import { VOCATIONS, SLOTS, DIFFICULTIES } from "../data/rules.js";
 import { compute, ownHunts } from "./compute.js";
 import { readSources, readSettings, readGoal, readBounty, readOfferOdds, readOfferLog, readTalisman } from "../store/schema.js";
 import { norm } from "../core/text.js";
 import { effective } from "../core/numbers.js";
 import { metrics } from "../core/metrics.js";
-import { poolModel as corePoolModel, readReroll, solvePlan, planKey, commonMax } from "../core/reroll.js";
+import { poolModel as corePoolModel, readReroll, solvePlan, planKey, commonMax, blendedOdds } from "../core/reroll.js";
 import { compareDifficulties } from "../core/difficulty.js";
 import { scoringWeights } from "../core/score.js";
 import { weeklyBonus as coreWeeklyBonus, serverDay } from "../core/weekly.js";
@@ -55,8 +55,14 @@ export function makeModel(state, derived, now, opts) {
   };
   // Reroll settings: tokens from the bounty; hours per day and the unknown-creature assumption from the profile.
   const rerollSettings = () => { const b = bounty(); return readReroll(Object.assign({}, p.reroll, { left: b.tokens })); };
-  // Silver and Gold: the character's own odds, else the guess (typed: whether they're its own); the logged offers.
-  const offerOdds = () => { const o = readOfferOdds(p.offerOdds); return { odds: o || OFFER_ODDS, typed: !!o }; };
+  // Silver and Gold: the character's own odds (typed), else the guess blended with its logged offers (n of them; 0:
+  // the guess as it is); the logged offers.
+  const offerOdds = () => {
+    const o = readOfferOdds(p.offerOdds);
+    if (o) return { odds: o, typed: true, n: 0 };
+    const b = blendedOdds(readOfferLog(p.rewardObs));
+    return { odds: { silver: b.silver, gold: b.gold }, typed: false, n: b.n };
+  };
   const offerLog = () => readOfferLog(p.rewardObs);
   // Whether the board's three offers are the last three logged for its difficulty (a board is logged once).
   const boardLogged = () => {

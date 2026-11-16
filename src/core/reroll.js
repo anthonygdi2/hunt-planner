@@ -1,13 +1,11 @@
 // The reroll model: what a fresh Task board is worth with s tokens left, and whether to take an offer or reroll.
 // Values are goal scores per hour (score.js weightedValue against the pool's best metrics); a task's value is earned
 // over its hours, and future hours are discounted by RHO per hour.
-import { TASK, TOKEN_CAP, SLOTS, KIND_MULT, OFFER_ODDS } from "../data/rules.js";
+import { TASK, TOKEN_CAP, SLOTS, KIND_MULT, OFFER_ODDS, OFFER_ODDS_PRIOR } from "../data/rules.js";
 import { GOAL_KEYS, weightedValue } from "./score.js";
 
 // Discount rate per hour of hunting: how much less a task finished later is worth.
 export const RHO = 1 / 40;
-// Logged offers give odds worth using once there are this many.
-export const MIN_BOARD_OBS = 10;
 const MULTS = [KIND_MULT.normal, KIND_MULT.silver, KIND_MULT.gold];
 
 // The stored reroll settings ({left, hpd, unknown}) read: tokens left (0..TOKEN_CAP), hours played per day (default 3),
@@ -32,6 +30,16 @@ export function loggedOdds(log) {
   let n = 0, s = 0, g = 0;
   Object.keys(log || {}).forEach((d) => (log[d] || []).forEach((o) => { n++; if (o.kind === "silver") s++; else if (o.kind === "gold") g++; }));
   return { n, silver: n ? s / n * 100 : null, gold: n ? g / n * 100 : null };
+}
+
+// The odds the plan uses with none typed: the guess blended with the logged offers, each kind's chance = (guess × K +
+// that kind's logged offers) ÷ (K + offers logged), the guess counting as K offers (rules.js OFFER_ODDS_PRIOR).
+// log {diff: [{kind}]} → {silver, gold} in percent and n, the offers logged (0: the guess as it is).
+export function blendedOdds(log, guess, prior) {
+  const g = guess || OFFER_ODDS, K = prior > 0 ? prior : OFFER_ODDS_PRIOR, L = loggedOdds(log);
+  if (!L.n) return { silver: g.silver, gold: g.gold, n: 0 };
+  const mix = (k) => (g[k] * K + L[k] * L.n) / (K + L.n);
+  return { silver: mix("silver"), gold: mix("gold"), n: L.n };
 }
 
 // Three kill counts standing in for an offer's unknown size: the middle of each third of the range.

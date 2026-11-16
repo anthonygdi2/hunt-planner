@@ -56,7 +56,7 @@
            }
           ]
          },
-         "planH": {"$set":[34.3617076293,34.361712206,34.3617138517,34.3617154961,34.3617171392,34.361718781,34.3617204215,34.3617220607,34.3617236985,34.3617253351,34.3617269703]}
+         "planH": {"$set":[34.3618589776,34.3618638886,34.3618662184,34.3618685459,34.3618708711,34.3618731939,34.3618755143,34.3618778324,34.3618801482,34.3618824617,34.3618847729]}
         },
         "creatures": {"midnight-asura":{"score":{"$del":1},"tier":{"$del":1}},"silencer":{"score":{"$set":1},"tier":{"$set":"S"}},"werehyaena":{"score":{"$set":0.973921742243},"tier":{"$set":"S"}}},
         "planner": {
@@ -64,16 +64,16 @@
          "cutoff": {"$set":"druid-only-spot"},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",7.53776484196,0.859042887403,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",6.36395512611,0.859042887403,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",5.60789842425,0.859042887403,"free",0.717171717172],
-           ["my-bastion-lure","held cobra-assassin",1.90735323541,0.85903831998,null,0.363636363636],
-           ["nightmare-isles","held cobra-assassin",1.35135219318,0.859042887403,"taken",null],
-           ["cobra-bastion-1","held cobra-assassin",1.311476508,0.859039666791,null,0.555844155844],
-           ["feru-way","held cobra-assassin",1.03082712684,0.859042887403,null,0.363636363636],
-           ["warzone-2","held cobra-assassin",1.02576333795,0.859042887403,null,0.363636363636],
-           ["druid-only-spot","held cobra-assassin",0.832675690886,0.859042887403,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0.801532673355,0.859042887403,null,null]
+           ["my-knight-den","held cobra-assassin",7.53776484196,0.859046713648,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",6.36395512611,0.859046713648,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",5.60789842425,0.859046713648,"free",0.717171717172],
+           ["my-bastion-lure","held cobra-assassin",1.90735323541,0.859040251258,null,0.363636363636],
+           ["nightmare-isles","held cobra-assassin",1.35135219318,0.859046713648,"taken",null],
+           ["cobra-bastion-1","held cobra-assassin",1.311476508,0.859042156913,null,0.555844155844],
+           ["feru-way","held cobra-assassin",1.03082712684,0.859046713648,null,0.363636363636],
+           ["warzone-2","held cobra-assassin",1.02576333795,0.859046713648,null,0.363636363636],
+           ["druid-only-spot","held cobra-assassin",0.832675690886,0.859046713648,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.801532673355,0.859046713648,null,null]
           ]
          },
          "pool": {"known":{"$set":2}},
@@ -159,7 +159,7 @@
            }
           ]
          },
-         "planH": {"$set":[27.3887686454,27.3906357067,27.3923271449,27.3939601605,27.395581161,27.3972020109,27.3988227099,27.4004432551,27.4020635993,27.4036816103,27.4052799975]}
+         "planH": {"$set":[27.4808365178,27.483097292,27.4851450112,27.4871215286,27.4890833162,27.4910449151,27.4930063253,27.4949675427,27.4969285072,27.4988865496,27.5008203098]}
         },
         "creatures": {"silencer":{"score":{"$set":0.673758865248},"tier":{"$set":"B"}},"werehyaena":{"score":{"$set":0.641843971631}}},
         "planner": {
@@ -168,17 +168,17 @@
          "notes": {"$set":[]},
          "options": {
           "$set": [
-           ["my-bastion-lure","held cobra-assassin",0.32928064843,0.680340874164,null,null],
-           ["cobra-bastion-1","held cobra-assassin",0.22045127024,0.681670037021,null,null],
-           ["nightmare-isles","held cobra-assassin",0,0.684849004012,"taken",null],
-           ["feru-way","held cobra-assassin",0,0.684849004012,null,null],
-           ["warzone-2","held cobra-assassin",0,0.684849004012,null,null],
-           ["druid-only-spot","held cobra-assassin",0,0.684849004012,null,null],
-           ["roshamuul-west","held cobra-assassin",0,0.684849004012,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0,0.684849004012,null,null],
-           ["asura-mirror","held cobra-assassin",0,0.684849004012,null,null],
-           ["my-knight-den","held cobra-assassin",0,0.684849004012,null,null],
-           ["test-hideout","held cobra-assassin",0,0.684849004012,"free",null]
+           ["my-bastion-lure","held cobra-assassin",0.32928064843,0.681722164674,null,null],
+           ["cobra-bastion-1","held cobra-assassin",0.22045127024,0.683330758203,null,null],
+           ["nightmare-isles","held cobra-assassin",0,0.687178038216,"taken",null],
+           ["feru-way","held cobra-assassin",0,0.687178038216,null,null],
+           ["warzone-2","held cobra-assassin",0,0.687178038216,null,null],
+           ["druid-only-spot","held cobra-assassin",0,0.687178038216,null,null],
+           ["roshamuul-west","held cobra-assassin",0,0.687178038216,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0,0.687178038216,null,null],
+           ["asura-mirror","held cobra-assassin",0,0.687178038216,null,null],
+           ["my-knight-den","held cobra-assassin",0,0.687178038216,null,null],
+           ["test-hideout","held cobra-assassin",0,0.687178038216,"free",null]
           ]
          },
          "skipped": {"$set":[]},
@@ -235,7 +235,7 @@
            }
           ]
          },
-         "planH": {"$set":[25.9142417329,25.9149511906,25.9156001431,25.9162310944,25.9168607484,25.9174903658,25.9181199469,25.9187494914,25.9193789946,25.9200080663,25.9206329535]}
+         "planH": {"$set":[25.9142417336,25.9149511912,25.9156001438,25.9162310951,25.916860749,25.9174903665,25.9181199475,25.918749492,25.9193789952,25.920008067,25.9206329542]}
         },
         "creatures": {
          "silencer": {
@@ -268,17 +268,17 @@
          "notes": {"$set":[]},
          "options": {
           "$set": [
-           ["bookworld-chapter-iv","held cobra-assassin",1.00248048118,0.647905777361,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",0.806516519266,0.647905777361,null,0.363636363636],
-           ["asura-mirror","held cobra-assassin",0.780810095762,0.647905777361,null,0.363636363636],
-           ["nightmare-isles","held cobra-assassin",0.584227035392,0.647905777361,"taken",null],
-           ["my-bastion-lure","held cobra-assassin",0.543913681432,0.646154618672,null,null],
-           ["test-hideout","held cobra-assassin",0.535128913597,0.647905777361,"free",null],
-           ["warzone-2","held cobra-assassin",0.451448163712,0.647905777361,null,null],
-           ["cobra-bastion-1","held cobra-assassin",0.406405846594,0.646670921631,null,null],
-           ["feru-way","held cobra-assassin",0.403346464995,0.647905777361,null,null],
-           ["my-knight-den","held cobra-assassin",0.385447278761,0.647905777361,null,null],
-           ["druid-only-spot","held cobra-assassin",0.291370222627,0.647905777361,null,null]
+           ["bookworld-chapter-iv","held cobra-assassin",1.00248048118,0.647905777377,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",0.806516519266,0.647905777377,null,0.363636363636],
+           ["asura-mirror","held cobra-assassin",0.780810095762,0.647905777377,null,0.363636363636],
+           ["nightmare-isles","held cobra-assassin",0.584227035392,0.647905777377,"taken",null],
+           ["my-bastion-lure","held cobra-assassin",0.543913681432,0.646154618688,null,null],
+           ["test-hideout","held cobra-assassin",0.535128913597,0.647905777377,"free",null],
+           ["warzone-2","held cobra-assassin",0.451448163712,0.647905777377,null,null],
+           ["cobra-bastion-1","held cobra-assassin",0.406405846594,0.646670921647,null,null],
+           ["feru-way","held cobra-assassin",0.403346464995,0.647905777377,null,null],
+           ["my-knight-den","held cobra-assassin",0.385447278761,0.647905777377,null,null],
+           ["druid-only-spot","held cobra-assassin",0.291370222627,0.647905777377,null,null]
           ]
          },
          "skipped": {"$set":[]},
@@ -299,7 +299,16 @@
        "exp": {
         "board": {
          "diff": "adept",
-         "model": {"best":1,"fallback":0.820773579179,"keys":["xp"],"kinds":[0.88,0.1,0.02],"known":3,"levels":[116.666666667,150,183.333333333],"max":{"xp":4674919},"medKph":380},
+         "model": {
+          "best": 1,
+          "fallback": 0.820773579179,
+          "keys": ["xp"],
+          "kinds": [0.849056603774,0.11320754717,0.0377358490566],
+          "known": 3,
+          "levels": [116.666666667,150,183.333333333],
+          "max": {"xp":4674919},
+          "medKph": 380
+         },
          "offers": [
           {
            "i": 0,
@@ -345,7 +354,7 @@
            "value": 0.977360677265
           }
          ],
-         "planH": [32.9228158385,32.9231763239,32.9235019088,32.9238249526,32.9241479055,32.9244707685,32.9247935427,32.9251162289,32.9254388251,32.925761102,32.9260809785],
+         "planH": [32.923395002,32.9237584638,32.9240868334,32.9244125879,32.9247382488,32.9250638172,32.9253892943,32.925714681,32.9260399748,32.9263649355,32.9266874092],
          "settings": {"hasLeft":true,"hpd":3,"left":4,"unknown":"average"}
         },
         "creatures": {
@@ -436,17 +445,17 @@
          "hours": null,
          "notes": ["Skipped Nightmare Isles: marked taken 20 min ago."],
          "options": [
-          ["my-knight-den","held cobra-assassin",11.6312319615,0.823095623816,null,0.363636363636],
-          ["roshamuul-west","held cobra-assassin",11.5320133744,0.823095623816,null,0.363636363636],
-          ["test-hideout","held cobra-assassin",8.97510000619,0.823095623816,"free",0.717171717172],
-          ["nightmare-isles","held cobra-assassin",1.6121455755,0.823095623816,"taken",null],
-          ["feru-way","held cobra-assassin",1.18588477226,0.823095623816,null,0.363636363636],
-          ["my-bastion-lure","held cobra-assassin",1.12393849574,0.822197579035,null,0.363636363636],
-          ["asura-mirror","held cobra-assassin",0.988237310217,0.823095623816,null,0.363636363636],
-          ["warzone-2","held cobra-assassin",0.855629798078,0.823095623816,null,0.363636363636],
-          ["bookworld-chapter-iv","held cobra-assassin",0.855629798078,0.823095623816,null,0.363636363636],
-          ["cobra-bastion-1","held cobra-assassin",0.815180328802,0.822462364223,null,null],
-          ["druid-only-spot","held cobra-assassin",0.6653518923,0.823095623816,null,null]
+          ["my-knight-den","held cobra-assassin",11.6312319615,0.823110314698,null,0.363636363636],
+          ["roshamuul-west","held cobra-assassin",11.5320133744,0.823110314698,null,0.363636363636],
+          ["test-hideout","held cobra-assassin",8.97510000619,0.823110314698,"free",0.717171717172],
+          ["nightmare-isles","held cobra-assassin",1.6121455755,0.823110314698,"taken",null],
+          ["feru-way","held cobra-assassin",1.18588477226,0.823110314698,null,0.363636363636],
+          ["my-bastion-lure","held cobra-assassin",1.12393849574,0.822204743038,null,0.363636363636],
+          ["asura-mirror","held cobra-assassin",0.988237310217,0.823110314698,null,0.363636363636],
+          ["warzone-2","held cobra-assassin",0.855629798078,0.823110314698,null,0.363636363636],
+          ["bookworld-chapter-iv","held cobra-assassin",0.855629798078,0.823110314698,null,0.363636363636],
+          ["cobra-bastion-1","held cobra-assassin",0.815180328802,0.82247174776,null,null],
+          ["druid-only-spot","held cobra-assassin",0.6653518923,0.823110314698,null,null]
          ],
          "pool": {"known":3,"size":450},
          "skipped": [{"id":"nightmare-isles","mins":20,"name":"Nightmare Isles"}],
@@ -528,7 +537,7 @@
            }
           ]
          },
-         "planH": {"$set":[33.8563322139,33.8563381927,33.8563403876,33.8563425807,33.856344772,33.8563469616,33.8563491494,33.8563513355,33.8563535199,33.8563557025,33.8563578833]}
+         "planH": {"$set":[33.8564082016,33.8564145971,33.8564177044,33.8564208087,33.8564239099,33.8564270079,33.8564301029,33.8564331947,33.8564362834,33.856439369,33.8564424515]}
         },
         "creatures": {"midnight-asura":{"score":{"$del":1},"tier":{"$del":1}},"silencer":{"score":{"$set":1},"tier":{"$set":"S"}},"werehyaena":{"score":{"$set":0.924101365779},"tier":{"$set":"S"}}},
         "planner": {
@@ -536,16 +545,16 @@
          "cutoff": {"$set":"bookworld-chapter-iv"},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",8.9022538818,0.846408564516,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",8.08664120887,0.846408564516,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",6.73029895156,0.846408564516,"free",0.717171717172],
-           ["my-bastion-lure","held cobra-assassin",1.64621498885,0.846402473135,null,0.363636363636],
-           ["nightmare-isles","held cobra-assassin",1.43828332062,0.846408564516,"taken",null],
-           ["cobra-bastion-1","held cobra-assassin",1.14604444826,0.846404269321,null,0.555844155844],
-           ["feru-way","held cobra-assassin",1.08251300865,0.846408564516,null,0.363636363636],
-           ["warzone-2","held cobra-assassin",0.969052157989,0.846408564516,null,0.363636363636],
-           ["bookworld-chapter-iv","held cobra-assassin",0.819565048263,0.846408564516,null,null],
-           ["druid-only-spot","held cobra-assassin",0.776901091357,0.846408564516,null,null]
+           ["my-knight-den","held cobra-assassin",8.9022538818,0.846410520218,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",8.08664120887,0.846410520218,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",6.73029895156,0.846410520218,"free",0.717171717172],
+           ["my-bastion-lure","held cobra-assassin",1.64621498885,0.846401900956,null,0.363636363636],
+           ["nightmare-isles","held cobra-assassin",1.43828332062,0.846410520218,"taken",null],
+           ["cobra-bastion-1","held cobra-assassin",1.14604444826,0.846404442638,null,0.555844155844],
+           ["feru-way","held cobra-assassin",1.08251300865,0.846410520218,null,0.363636363636],
+           ["warzone-2","held cobra-assassin",0.969052157989,0.846410520218,null,0.363636363636],
+           ["bookworld-chapter-iv","held cobra-assassin",0.819565048263,0.846410520218,null,null],
+           ["druid-only-spot","held cobra-assassin",0.776901091357,0.846410520218,null,null]
           ]
          },
          "pool": {"known":{"$set":2}},
@@ -631,7 +640,7 @@
            }
           ]
          },
-         "planH": {"$set":[40.009487534,40.0094924455,40.009493912,40.0094943509,40.0094944822,40.0094945215,40.0094945333,40.0094945368,40.0094945379,40.0094945382,40.0094945383]}
+         "planH": {"$set":[40.0094875341,40.0094924456,40.0094939121,40.009494351,40.0094944823,40.0094945216,40.0094945334,40.0094945369,40.009494538,40.0094945383,40.0094945384]}
         },
         "creatures": {"midnight-asura":{"score":{"$del":1},"tier":{"$del":1}},"silencer":{"score":{"$set":0.896922658359}},"werehyaena":{"score":{"$set":1},"tier":{"$set":"S"}}},
         "planner": {
@@ -640,7 +649,7 @@
          "options": {
           "$set": [
            ["my-knight-den","held cobra-assassin",3.44429772243,1.00023735877,null,0.363636363636],
-           ["my-bastion-lure","held cobra-assassin",2.69076797508,1.00023714573,null,0.363636363636],
+           ["my-bastion-lure","held cobra-assassin",2.69076797508,1.00023714574,null,0.363636363636],
            ["test-hideout","held cobra-assassin",2.24069684231,1.00023735877,"free",0.717171717172],
            ["cobra-bastion-1","held cobra-assassin",1.80777268719,1.00023721558,null,0.555844155844],
            ["warzone-2","held cobra-assassin",1.19589687781,1.00023735877,null,0.363636363636],
@@ -723,7 +732,7 @@
            }
           ]
          },
-         "planH": {"$set":[26.1844001824,26.2340926228,26.2799236331,26.3252641245,26.3700940187,26.4143584316,26.4579292781,26.5004888182,26.5412964338,26.5783702817,26.6102261043]}
+         "planH": {"$set":[26.2402217225,26.2908828938,26.3376157068,26.3838419701,26.4295413201,26.4746568832,26.5190561098,26.5624125523,26.6039686171,26.641707338,26.674113713]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.481532300945},"tier":{"$set":"C"}},
@@ -787,7 +796,7 @@
            }
           ]
          },
-         "planH": {"$set":[16.4596307622,16.5487088651,16.6305936461,16.71186435,16.79250047,16.8724404178,16.9515154708,17.0292523207,17.1045718228,17.1736298322,17.2317183157]}
+         "planH": {"$set":[17.0612367672,17.160904302,17.2525599642,17.3435036408,17.4337112983,17.5231151733,17.6115232735,17.6983870878,17.7824910846,17.8595382201,17.9242562402]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.450649350649},"tier":{"$set":"C"}},
@@ -873,7 +882,7 @@
            }
           ]
          },
-         "planH": {"$set":[19.0165033633,19.0515003142,19.0836154945,19.11553313,19.1472483419,19.1787449687,19.2099766273,19.2408026372,19.2708710722,19.2987231168,19.3228495078]}
+         "planH": {"$set":[19.0165033633,19.0515003142,19.0836154944,19.11553313,19.1472483419,19.1787449687,19.2099766273,19.2408026372,19.2708710722,19.2987231168,19.3228495078]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.517975834901},"tier":{"$set":"C"}},
@@ -924,7 +933,7 @@
        "exp": {
         "board": {
          "diff": "master",
-         "model": {"best":1,"fallback":0.724696356275,"keys":["xp"],"kinds":[0.88,0.1,0.02],"known":17,"levels":[350,450,550],"max":{"xp":6175000},"medKph":220},
+         "model": {"best":1,"fallback":0.724696356275,"keys":["xp"],"kinds":[0.849056603774,0.11320754717,0.0377358490566],"known":17,"levels":[350,450,550],"max":{"xp":6175000},"medKph":220},
          "offers": [
           {
            "i": 0,
@@ -959,7 +968,7 @@
            "value": 1.30642947368
           }
          ],
-         "planH": [31.8236634607,31.873686539,31.9197718273,31.9654000361,32.0105500714,32.0551673765,32.0991215768,32.1420802345,32.1832729049,32.2206201241,32.25188146],
+         "planH": [31.9450499504,31.997189757,32.0452397584,32.0928026011,32.1398555016,32.1863402474,32.232117391,32.2768345263,32.3196837097,32.3584908005,32.390930852],
          "settings": {"hasLeft":true,"hpd":3,"left":4,"unknown":"average"}
         },
         "creatures": {
@@ -1499,7 +1508,7 @@
            }
           ]
          },
-         "planH": {"$set":[28.6920926366,28.7333746118,28.771327868,28.8089619894,28.8462654485,28.8832053416,28.9196917294,28.9554987062,28.990067801,29.0217809102,29.0487693157]}
+         "planH": {"$set":[28.7642735873,28.8068171857,28.8459392698,28.8847262935,28.9231667294,28.9612248582,28.9988056179,29.03567142,29.0712419049,29.1038375668,29.1315423862]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.543277512371},"tier":{"$set":"C"}},
@@ -1946,7 +1955,7 @@
            }
           ]
          },
-         "planH": {"$set":[25.4183590103,25.4359540298,25.4519214598,25.4675396665,25.4831170361,25.4986528329,25.5141434947,25.5295714765,25.5448733408,25.5596488814,25.5733021954]}
+         "planH": {"$set":[25.4284353461,25.4461150911,25.4621599032,25.4778552119,25.4935091764,25.5091210319,25.5246871793,25.5401897573,25.5555643871,25.5704071228,25.5841160211]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.478317988546},"tier":{"$set":"C"}},
@@ -1974,16 +1983,16 @@
          "chosen": {"$set":["test-hideout","my-knight-den","roshamuul-west","my-bastion-lure","cobra-bastion-1"]},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",5.44677182349,0.636688491662,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",4.98796942081,0.636688491662,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",4.12543864765,0.636688491662,"free",0.717171717172],
-           ["my-bastion-lure","held cobra-assassin",0.98479767978,0.593443436877,null,0.363636363636],
-           ["nightmare-isles","held cobra-assassin",0.868887348298,0.636688491662,"taken",null],
-           ["cobra-bastion-1","held cobra-assassin",0.686406240193,0.606199770472,null,0.555844155844],
-           ["feru-way","held cobra-assassin",0.652817525228,0.636688491662,null,0.363636363636],
-           ["warzone-2","held cobra-assassin",0.575821821947,0.636688491662,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0.492488488614,0.636688491662,null,null],
-           ["druid-only-spot","held cobra-assassin",0.460785361774,0.636688491662,null,null]
+           ["my-knight-den","held cobra-assassin",5.44677182349,0.636946380297,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",4.98796942081,0.636946380297,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",4.12543864765,0.636946380297,"free",0.717171717172],
+           ["my-bastion-lure","held cobra-assassin",0.98479767978,0.593489318834,null,0.363636363636],
+           ["nightmare-isles","held cobra-assassin",0.868887348298,0.636946380297,"taken",null],
+           ["cobra-bastion-1","held cobra-assassin",0.686406240193,0.606308239248,null,0.555844155844],
+           ["feru-way","held cobra-assassin",0.652817525228,0.636946380297,null,0.363636363636],
+           ["warzone-2","held cobra-assassin",0.575821821947,0.636946380297,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.492488488614,0.636946380297,null,null],
+           ["druid-only-spot","held cobra-assassin",0.460785361774,0.636946380297,null,null]
           ]
          },
          "pool": {"known":{"$set":17}},
@@ -2069,7 +2078,7 @@
            }
           ]
          },
-         "planH": {"$set":[20.6830072298,20.7061100764,20.7270818532,20.7475854288,20.7680495705,20.7884735055,20.8088534472,20.8291702585,20.84934375,20.8688976231,20.8865401007]}
+         "planH": {"$set":[21.1244381401,21.1513692872,21.1758178987,21.199725553,21.2235855342,21.2473968698,21.2711548611,21.2948360855,21.3183441288,21.3411128848,21.3616335957]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.450649350649},"tier":{"$set":"C"}},
@@ -2120,17 +2129,17 @@
          "notes": {"$set":[]},
          "options": {
           "$set": [
-           ["my-bastion-lure","held cobra-assassin",0.482374768089,0.461850725223,null,0.363636363636],
-           ["cobra-bastion-1","held cobra-assassin",0.322946795884,0.47861478884,null,null],
-           ["nightmare-isles","held cobra-assassin",0,0.518689635721,"taken",null],
-           ["feru-way","held cobra-assassin",0,0.518689635721,null,null],
-           ["warzone-2","held cobra-assassin",0,0.518689635721,null,null],
-           ["druid-only-spot","held cobra-assassin",0,0.518689635721,null,null],
-           ["roshamuul-west","held cobra-assassin",0,0.518689635721,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0,0.518689635721,null,null],
-           ["asura-mirror","held cobra-assassin",0,0.518689635721,null,null],
-           ["my-knight-den","held cobra-assassin",0,0.518689635721,null,null],
-           ["test-hideout","held cobra-assassin",0,0.518689635721,"free",null]
+           ["my-bastion-lure","held cobra-assassin",0.482374768089,0.463725749884,null,0.363636363636],
+           ["cobra-bastion-1","held cobra-assassin",0.322946795884,0.483270929156,null,null],
+           ["nightmare-isles","held cobra-assassin",0,0.529993138825,"taken",null],
+           ["feru-way","held cobra-assassin",0,0.529993138825,null,null],
+           ["warzone-2","held cobra-assassin",0,0.529993138825,null,null],
+           ["druid-only-spot","held cobra-assassin",0,0.529993138825,null,null],
+           ["roshamuul-west","held cobra-assassin",0,0.529993138825,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0,0.529993138825,null,null],
+           ["asura-mirror","held cobra-assassin",0,0.529993138825,null,null],
+           ["my-knight-den","held cobra-assassin",0,0.529993138825,null,null],
+           ["test-hideout","held cobra-assassin",0,0.529993138825,"free",null]
           ]
          },
          "pool": {"known":{"$set":20}},
@@ -2197,7 +2206,7 @@
            }
           ]
          },
-         "planH": {"$set":[18.8356669538,18.849401269,18.861886925,18.8741517361,18.8863898,18.8986005788,18.9107816096,18.9229208112,18.9349720566,18.9466548456,18.9573802798]}
+         "planH": {"$set":[18.8356669537,18.8494012688,18.8618869249,18.874151736,18.8863897998,18.8986005787,18.9107816094,18.9229208111,18.9349720565,18.9466548454,18.9573802796]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.517975834901},"tier":{"$set":"C"}},
@@ -2249,17 +2258,17 @@
          "notes": {"$set":[]},
          "options": {
           "$set": [
-           ["bookworld-chapter-iv","held cobra-assassin",0.807502231427,0.471853793403,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",0.649652438341,0.471853793403,null,0.363636363636],
-           ["asura-mirror","held cobra-assassin",0.628945806411,0.471853793403,null,0.363636363636],
-           ["nightmare-isles","held cobra-assassin",0.470597326924,0.471853793403,"taken",null],
-           ["my-bastion-lure","held cobra-assassin",0.438124751259,0.437868892031,null,null],
-           ["test-hideout","held cobra-assassin",0.431048583929,0.471853793403,"free",null],
-           ["warzone-2","held cobra-assassin",0.363643388987,0.471853793403,null,null],
-           ["cobra-bastion-1","held cobra-assassin",0.327361613667,0.447892880598,null,null],
-           ["feru-way","held cobra-assassin",0.32489726896,0.471853793403,null,null],
-           ["my-knight-den","held cobra-assassin",0.310479399389,0.471853793403,null,null],
-           ["druid-only-spot","held cobra-assassin",0.234699936168,0.471853793403,null,null]
+           ["bookworld-chapter-iv","held cobra-assassin",0.807502231427,0.471853793399,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",0.649652438341,0.471853793399,null,0.363636363636],
+           ["asura-mirror","held cobra-assassin",0.628945806411,0.471853793399,null,0.363636363636],
+           ["nightmare-isles","held cobra-assassin",0.470597326924,0.471853793399,"taken",null],
+           ["my-bastion-lure","held cobra-assassin",0.438124751259,0.437868892027,null,null],
+           ["test-hideout","held cobra-assassin",0.431048583929,0.471853793399,"free",null],
+           ["warzone-2","held cobra-assassin",0.363643388987,0.471853793399,null,null],
+           ["cobra-bastion-1","held cobra-assassin",0.327361613667,0.447892880595,null,null],
+           ["feru-way","held cobra-assassin",0.32489726896,0.471853793399,null,null],
+           ["my-knight-den","held cobra-assassin",0.310479399389,0.471853793399,null,null],
+           ["druid-only-spot","held cobra-assassin",0.234699936168,0.471853793399,null,null]
           ]
          },
          "pool": {"known":{"$set":20}},
@@ -2285,7 +2294,16 @@
        "exp": {
         "board": {
          "diff": "expert",
-         "model": {"best":1,"fallback":0.729741173933,"keys":["xp"],"kinds":[0.88,0.1,0.02],"known":19,"levels":[233.333333333,300,366.666666667],"max":{"xp":5656115},"medKph":347},
+         "model": {
+          "best": 1,
+          "fallback": 0.729741173933,
+          "keys": ["xp"],
+          "kinds": [0.849056603774,0.11320754717,0.0377358490566],
+          "known": 19,
+          "levels": [233.333333333,300,366.666666667],
+          "max": {"xp":5656115},
+          "medKph": 347
+         },
          "offers": [
           {
            "i": 0,
@@ -2331,7 +2349,7 @@
            "value": 0.951338860684
           }
          ],
-         "planH": [31.1194464981,31.1361976793,31.151402556,31.1662848373,31.1811268656,31.1959275331,31.2106820444,31.2253695794,31.2399125472,31.2539078755,31.2665288294],
+         "planH": [31.1440067681,31.1609679817,31.1763643335,31.1914354414,31.2064653819,31.2214530049,31.2363933599,31.2512650386,31.2659887345,31.2801535865,31.2929204383],
          "settings": {"hasLeft":true,"hpd":3,"left":4,"unknown":"average"}
         },
         "creatures": {
@@ -2870,17 +2888,17 @@
          "hours": null,
          "notes": ["Skipped Nightmare Isles: marked taken 20 min ago."],
          "options": [
-          ["my-knight-den","held cobra-assassin",9.61350101442,0.779157120931,null,0.363636363636],
-          ["roshamuul-west","held cobra-assassin",9.53149439717,0.779157120931,null,0.363636363636],
-          ["test-hideout","held cobra-assassin",7.41814223116,0.779157120931,"free",0.717171717172],
-          ["nightmare-isles","held cobra-assassin",1.3324782084,0.779157120931,"taken",null],
-          ["feru-way","held cobra-assassin",0.980163107301,0.779157120931,null,0.363636363636],
-          ["my-bastion-lure","held cobra-assassin",0.969595359561,0.737957244106,null,0.363636363636],
-          ["asura-mirror","held cobra-assassin",0.816802589418,0.779157120931,null,0.363636363636],
-          ["warzone-2","held cobra-assassin",0.707199199451,0.779157120931,null,null],
-          ["bookworld-chapter-iv","held cobra-assassin",0.707199199451,0.779157120931,null,null],
-          ["cobra-bastion-1","held cobra-assassin",0.700969830282,0.75011068119,null,null],
-          ["druid-only-spot","held cobra-assassin",0.54992980217,0.779157120931,null,null]
+          ["my-knight-den","held cobra-assassin",9.61350101442,0.779785886036,null,0.363636363636],
+          ["roshamuul-west","held cobra-assassin",9.53149439717,0.779785886036,null,0.363636363636],
+          ["test-hideout","held cobra-assassin",7.41814223116,0.779785886036,"free",0.717171717172],
+          ["nightmare-isles","held cobra-assassin",1.3324782084,0.779785886036,"taken",null],
+          ["feru-way","held cobra-assassin",0.980163107301,0.779785886036,null,0.363636363636],
+          ["my-bastion-lure","held cobra-assassin",0.969595359561,0.738065232899,null,0.363636363636],
+          ["asura-mirror","held cobra-assassin",0.816802589418,0.779785886036,null,0.363636363636],
+          ["warzone-2","held cobra-assassin",0.707199199451,0.779785886036,null,null],
+          ["bookworld-chapter-iv","held cobra-assassin",0.707199199451,0.779785886036,null,null],
+          ["cobra-bastion-1","held cobra-assassin",0.700969830282,0.750372363619,null,null],
+          ["druid-only-spot","held cobra-assassin",0.54992980217,0.779785886036,null,null]
          ],
          "pool": {"known":19,"size":497},
          "skipped": [{"id":"nightmare-isles","mins":20,"name":"Nightmare Isles"}],
@@ -2962,7 +2980,7 @@
            }
           ]
          },
-         "planH": {"$set":[27.1875993377,27.2042844371,27.21942953,27.2342523016,27.2490343063,27.2637746223,27.2784691582,27.293099176,27.3075973489,27.321572838,27.3343889376]}
+         "planH": {"$set":[27.2021383001,27.2189469218,27.234204633,27.2491389731,27.2640318587,27.2788823353,27.2936861943,27.3084242436,27.3230278837,27.3371003859,27.3499992439]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.5403885036},"tier":{"$set":"C"}},
@@ -2990,16 +3008,16 @@
          "chosen": {"$set":["test-hideout","my-knight-den","roshamuul-west","my-bastion-lure","feru-way"]},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",6.8356815538,0.680856307541,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",6.50247774626,0.680856307541,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",5.22300650882,0.680856307541,"free",0.717171717172],
-           ["nightmare-isles","held cobra-assassin",1.023417635,0.680856307541,"taken",null],
-           ["my-bastion-lure","held cobra-assassin",0.979730239707,0.63982375764,null,0.363636363636],
-           ["feru-way","held cobra-assassin",0.761932719253,0.680856307541,null,0.363636363636],
-           ["cobra-bastion-1","held cobra-assassin",0.691260770223,0.651927841087,null,0.555844155844],
-           ["warzone-2","held cobra-assassin",0.619614281115,0.680856307541,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0.56405872556,0.680856307541,null,null],
-           ["druid-only-spot","held cobra-assassin",0.490500175239,0.680856307541,null,null]
+           ["my-knight-den","held cobra-assassin",6.8356815538,0.681228474328,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",6.50247774626,0.681228474328,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",5.22300650882,0.681228474328,"free",0.717171717172],
+           ["nightmare-isles","held cobra-assassin",1.023417635,0.681228474328,"taken",null],
+           ["my-bastion-lure","held cobra-assassin",0.979730239707,0.639888933443,null,0.363636363636],
+           ["feru-way","held cobra-assassin",0.761932719253,0.681228474328,null,0.363636363636],
+           ["cobra-bastion-1","held cobra-assassin",0.691260770223,0.652083642218,null,0.555844155844],
+           ["warzone-2","held cobra-assassin",0.619614281115,0.681228474328,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.56405872556,0.681228474328,null,null],
+           ["druid-only-spot","held cobra-assassin",0.490500175239,0.681228474328,null,null]
           ]
          },
          "pool": {"known":{"$set":17}},
@@ -3081,7 +3099,7 @@
            }
           ]
          },
-         "planH": {"$set":[20.5427691168,20.5669964855,20.5889537498,20.6103241447,20.6316645473,20.6529747937,20.6742537024,20.6954941401,20.7166575448,20.7374354446,20.7573468973]}
+         "planH": {"$set":[20.5427691168,20.5669964856,20.5889537499,20.6103241448,20.6316645474,20.6529747938,20.6742537025,20.6954941401,20.7166575448,20.7374354446,20.7573468973]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.296296666667},"tier":{"$set":"D"}},
@@ -3110,16 +3128,16 @@
          "notes": {"$set":[]},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",1.28004263256,0.515258103618,null,0.363636363636],
-           ["my-bastion-lure","held cobra-assassin",1,0.455962278231,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",0.83273506414,0.515258103618,"free",0.717171717172],
-           ["cobra-bastion-1","held cobra-assassin",0.671842650104,0.473449028127,null,0.555844155844],
-           ["warzone-2","held cobra-assassin",0.444444444444,0.515258103618,null,null],
-           ["roshamuul-west","held cobra-assassin",0.444444444444,0.515258103618,null,null],
-           ["nightmare-isles","held cobra-assassin",0.405296488198,0.515258103618,"taken",null],
-           ["druid-only-spot","held cobra-assassin",0.371640921378,0.515258103618,null,null],
-           ["feru-way","held cobra-assassin",0.325471943155,0.515258103618,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0.277777777778,0.515258103618,null,null]
+           ["my-knight-den","held cobra-assassin",1.28004263256,0.515258103619,null,0.363636363636],
+           ["my-bastion-lure","held cobra-assassin",1,0.455962278232,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",0.83273506414,0.515258103619,"free",0.717171717172],
+           ["cobra-bastion-1","held cobra-assassin",0.671842650104,0.473449028128,null,0.555844155844],
+           ["warzone-2","held cobra-assassin",0.444444444444,0.515258103619,null,null],
+           ["roshamuul-west","held cobra-assassin",0.444444444444,0.515258103619,null,null],
+           ["nightmare-isles","held cobra-assassin",0.405296488198,0.515258103619,"taken",null],
+           ["druid-only-spot","held cobra-assassin",0.371640921378,0.515258103619,null,null],
+           ["feru-way","held cobra-assassin",0.325471943155,0.515258103619,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.277777777778,0.515258103619,null,null]
           ]
          },
          "pool": {"known":{"$set":17}},
@@ -3198,7 +3216,7 @@
            }
           ]
          },
-         "planH": {"$set":[26.1844001824,26.2340926228,26.2799236331,26.3252641245,26.3700940187,26.4143584316,26.4579292781,26.5004888182,26.5412964338,26.5783702817,26.6102261043]}
+         "planH": {"$set":[26.2402217225,26.2908828938,26.3376157068,26.3838419701,26.4295413201,26.4746568832,26.5190561098,26.5624125523,26.6039686171,26.641707338,26.674113713]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.481532300945},"tier":{"$set":"C"}},
@@ -3224,16 +3242,16 @@
          "cutoff": {"$set":"feru-way"},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",5.04286077297,0.658131603112,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",4.58750387666,0.658131603112,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",3.81376555197,0.658131603112,"free",0.717171717172],
-           ["my-bastion-lure","held cobra-assassin",1.00563909774,0.534556820302,null,0.363636363636],
-           ["nightmare-isles","held cobra-assassin",0.812903303345,0.658131603112,"taken",null],
-           ["cobra-bastion-1","held cobra-assassin",0.698181715038,0.571084003714,null,0.555844155844],
-           ["feru-way","held cobra-assassin",0.611635992116,0.658131603112,null,null],
-           ["warzone-2","held cobra-assassin",0.546108861898,0.658131603112,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0.462775528565,0.658131603112,null,null],
-           ["druid-only-spot","held cobra-assassin",0.437680072268,0.658131603112,null,null]
+           ["my-knight-den","held cobra-assassin",5.04286077297,0.659596049252,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",4.58750387666,0.659596049252,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",3.81376555197,0.659596049252,"free",0.717171717172],
+           ["my-bastion-lure","held cobra-assassin",1.00563909774,0.533639079302,null,0.363636363636],
+           ["nightmare-isles","held cobra-assassin",0.812903303345,0.659596049252,"taken",null],
+           ["cobra-bastion-1","held cobra-assassin",0.698181715038,0.570871661008,null,0.555844155844],
+           ["feru-way","held cobra-assassin",0.611635992116,0.659596049252,null,null],
+           ["warzone-2","held cobra-assassin",0.546108861898,0.659596049252,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.462775528565,0.659596049252,null,null],
+           ["druid-only-spot","held cobra-assassin",0.437680072268,0.659596049252,null,null]
           ]
          },
          "pool": {"known":{"$set":16}},
@@ -3312,7 +3330,7 @@
            }
           ]
          },
-         "planH": {"$set":[16.4596307622,16.5487088651,16.6305936461,16.71186435,16.79250047,16.8724404178,16.9515154708,17.0292523207,17.1045718228,17.1736298322,17.2317183157]}
+         "planH": {"$set":[17.0612367672,17.160904302,17.2525599642,17.3435036408,17.4337112983,17.5231151733,17.6115232735,17.6983870878,17.7824910846,17.8595382201,17.9242562402]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.450649350649},"tier":{"$set":"C"}},
@@ -3361,24 +3379,24 @@
          "notes": {"$set":[]},
          "options": {
           "$set": [
-           ["my-bastion-lure","held cobra-assassin",0.723562152134,0.194895461155,null,0.363636363636],
-           ["cobra-bastion-1","held cobra-assassin",0.484420193826,0.260729877513,null,0.555844155844],
-           ["nightmare-isles","held cobra-assassin",0,0.41779660875,"taken",null],
-           ["feru-way","held cobra-assassin",0,0.41779660875,null,null],
-           ["warzone-2","held cobra-assassin",0,0.41779660875,null,null],
-           ["druid-only-spot","held cobra-assassin",0,0.41779660875,null,null],
-           ["roshamuul-west","held cobra-assassin",0,0.41779660875,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0,0.41779660875,null,null],
-           ["asura-mirror","held cobra-assassin",0,0.41779660875,null,null],
-           ["my-knight-den","held cobra-assassin",0,0.41779660875,null,null],
-           ["test-hideout","held cobra-assassin",0,0.41779660875,"free",null]
+           ["my-bastion-lure","held cobra-assassin",0.723562152134,0.184276155511,null,0.363636363636],
+           ["cobra-bastion-1","held cobra-assassin",0.484420193826,0.257914835082,null,0.555844155844],
+           ["nightmare-isles","held cobra-assassin",0,0.433587591019,"taken",null],
+           ["feru-way","held cobra-assassin",0,0.433587591019,null,null],
+           ["warzone-2","held cobra-assassin",0,0.433587591019,null,null],
+           ["druid-only-spot","held cobra-assassin",0,0.433587591019,null,null],
+           ["roshamuul-west","held cobra-assassin",0,0.433587591019,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0,0.433587591019,null,null],
+           ["asura-mirror","held cobra-assassin",0,0.433587591019,null,null],
+           ["my-knight-den","held cobra-assassin",0,0.433587591019,null,null],
+           ["test-hideout","held cobra-assassin",0,0.433587591019,"free",null]
           ]
          },
          "pool": {"known":{"$set":18}},
          "skipped": {"$set":[]},
          "steps": {
           "$set": [
-           {"kind":"go","text":"Go to Bastion lure","why":"Scores 72: 33.4 bounty points/h. Bounty done in about 48 min here. A reroll is worth 19 with 4 tokens left."},
+           {"kind":"go","text":"Go to Bastion lure","why":"Scores 72: 33.4 bounty points/h. Bounty done in about 48 min here. A reroll is worth 18 with 4 tokens left."},
            {
             "kind": "go",
             "text": "Taken? → Cobra Bastion -1",
@@ -3387,7 +3405,7 @@
            {
             "kind": "reroll",
             "text": "Taken? → Reroll and re-plan",
-            "why": "The next spot, Nightmare Isles (0), is worth less than a reroll (42). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+            "why": "The next spot, Nightmare Isles (0), is worth less than a reroll (43). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
            }
           ]
          }
@@ -3432,7 +3450,7 @@
            }
           ]
          },
-         "planH": {"$set":[19.0165033633,19.0515003142,19.0836154945,19.11553313,19.1472483419,19.1787449687,19.2099766273,19.2408026372,19.2708710722,19.2987231168,19.3228495078]}
+         "planH": {"$set":[19.0165033633,19.0515003142,19.0836154944,19.11553313,19.1472483419,19.1787449687,19.2099766273,19.2408026372,19.2708710722,19.2987231168,19.3228495078]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.517975834901},"tier":{"$set":"C"}},
@@ -3461,17 +3479,17 @@
          "notes": {"$set":[]},
          "options": {
           "$set": [
-           ["bookworld-chapter-iv","held cobra-assassin",0.807502231427,0.477888328251,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",0.649652438341,0.477888328251,null,0.363636363636],
-           ["asura-mirror","held cobra-assassin",0.628945806411,0.477888328251,null,0.363636363636],
-           ["nightmare-isles","held cobra-assassin",0.470597326924,0.477888328251,"taken",null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.807502231427,0.47788832825,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",0.649652438341,0.47788832825,null,0.363636363636],
+           ["asura-mirror","held cobra-assassin",0.628945806411,0.47788832825,null,0.363636363636],
+           ["nightmare-isles","held cobra-assassin",0.470597326924,0.47788832825,"taken",null],
            ["my-bastion-lure","held cobra-assassin",0.438124751259,0.390107740595,null,null],
-           ["test-hideout","held cobra-assassin",0.431048583929,0.477888328251,"free",null],
-           ["warzone-2","held cobra-assassin",0.363643388987,0.477888328251,null,null],
-           ["cobra-bastion-1","held cobra-assassin",0.327361613667,0.416024067204,null,null],
-           ["feru-way","held cobra-assassin",0.32489726896,0.477888328251,null,null],
-           ["my-knight-den","held cobra-assassin",0.310479399389,0.477888328251,null,null],
-           ["druid-only-spot","held cobra-assassin",0.234699936168,0.477888328251,null,null]
+           ["test-hideout","held cobra-assassin",0.431048583929,0.47788832825,"free",null],
+           ["warzone-2","held cobra-assassin",0.363643388987,0.47788832825,null,null],
+           ["cobra-bastion-1","held cobra-assassin",0.327361613667,0.416024067203,null,null],
+           ["feru-way","held cobra-assassin",0.32489726896,0.47788832825,null,null],
+           ["my-knight-den","held cobra-assassin",0.310479399389,0.47788832825,null,null],
+           ["druid-only-spot","held cobra-assassin",0.234699936168,0.47788832825,null,null]
           ]
          },
          "pool": {"known":{"$set":18}},
@@ -3497,7 +3515,7 @@
        "exp": {
         "board": {
          "diff": "master",
-         "model": {"best":1,"fallback":0.724696356275,"keys":["xp"],"kinds":[0.88,0.1,0.02],"known":17,"levels":[350,450,550],"max":{"xp":6175000},"medKph":220},
+         "model": {"best":1,"fallback":0.724696356275,"keys":["xp"],"kinds":[0.849056603774,0.11320754717,0.0377358490566],"known":17,"levels":[350,450,550],"max":{"xp":6175000},"medKph":220},
          "offers": [
           {
            "i": 0,
@@ -3532,7 +3550,7 @@
            "value": 1.30642947368
           }
          ],
-         "planH": [31.8236634607,31.873686539,31.9197718273,31.9654000361,32.0105500714,32.0551673765,32.0991215768,32.1420802345,32.1832729049,32.2206201241,32.25188146],
+         "planH": [31.9450499504,31.997189757,32.0452397584,32.0928026011,32.1398555016,32.1863402474,32.232117391,32.2768345263,32.3196837097,32.3584908005,32.390930852],
          "settings": {"hasLeft":true,"hpd":3,"left":4,"unknown":"average"}
         },
         "creatures": {
@@ -3957,17 +3975,17 @@
          "hours": null,
          "notes": ["Skipped Nightmare Isles: marked taken 20 min ago."],
          "options": [
-          ["my-knight-den","held cobra-assassin",8.80567891339,0.799135000902,null,0.363636363636],
-          ["roshamuul-west","held cobra-assassin",8.73056330887,0.799135000902,null,0.363636363636],
-          ["test-hideout","held cobra-assassin",6.79479603981,0.799135000902,"free",0.717171717172],
-          ["nightmare-isles","held cobra-assassin",1.22051011849,0.799135000902,"taken",null],
-          ["my-bastion-lure","held cobra-assassin",1.01127819549,0.674608824537,null,0.363636363636],
-          ["feru-way","held cobra-assassin",0.897800041077,0.799135000902,null,0.363636363636],
-          ["asura-mirror","held cobra-assassin",0.748166700898,0.799135000902,null,null],
-          ["cobra-bastion-1","held cobra-assassin",0.724520779972,0.711412029718,null,null],
-          ["warzone-2","held cobra-assassin",0.647773279352,0.799135000902,null,null],
-          ["bookworld-chapter-iv","held cobra-assassin",0.647773279352,0.799135000902,null,null],
-          ["druid-only-spot","held cobra-assassin",0.503719223158,0.799135000902,null,null]
+          ["my-knight-den","held cobra-assassin",8.80567891339,0.802320065026,null,0.363636363636],
+          ["roshamuul-west","held cobra-assassin",8.73056330887,0.802320065026,null,0.363636363636],
+          ["test-hideout","held cobra-assassin",6.79479603981,0.802320065026,"free",0.717171717172],
+          ["nightmare-isles","held cobra-assassin",1.22051011849,0.802320065026,"taken",null],
+          ["my-bastion-lure","held cobra-assassin",1.01127819549,0.672571327602,null,0.363636363636],
+          ["feru-way","held cobra-assassin",0.897800041077,0.802320065026,null,0.363636363636],
+          ["asura-mirror","held cobra-assassin",0.748166700898,0.802320065026,null,null],
+          ["cobra-bastion-1","held cobra-assassin",0.724520779972,0.710920261044,null,null],
+          ["warzone-2","held cobra-assassin",0.647773279352,0.802320065026,null,null],
+          ["bookworld-chapter-iv","held cobra-assassin",0.647773279352,0.802320065026,null,null],
+          ["druid-only-spot","held cobra-assassin",0.503719223158,0.802320065026,null,null]
          ],
          "pool": {"known":17,"size":279},
          "skipped": [{"id":"nightmare-isles","mins":20,"name":"Nightmare Isles"}],
@@ -4042,7 +4060,7 @@
            }
           ]
          },
-         "planH": {"$set":[28.6920926366,28.7333746118,28.771327868,28.8089619894,28.8462654485,28.8832053416,28.9196917294,28.9554987062,28.990067801,29.0217809102,29.0487693157]}
+         "planH": {"$set":[28.7642735873,28.8068171857,28.8459392698,28.8847262935,28.9231667294,28.9612248582,28.9988056179,29.03567142,29.0712419049,29.1038375668,29.1315423862]}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":0.543277512371},"tier":{"$set":"C"}},
@@ -4068,16 +4086,16 @@
          "cutoff": {"$set":"feru-way"},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",6.29713348645,0.720224049734,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",5.96852368739,0.720224049734,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",4.80744238125,0.720224049734,"free",0.717171717172],
-           ["my-bastion-lure","held cobra-assassin",1.00751879699,0.617188875777,null,0.363636363636],
-           ["nightmare-isles","held cobra-assassin",0.948772241728,0.720224049734,"taken",null],
-           ["feru-way","held cobra-assassin",0.707024008437,0.720224049734,null,null],
-           ["cobra-bastion-1","held cobra-assassin",0.706961403349,0.647627708507,null,null],
-           ["warzone-2","held cobra-assassin",0.57999700105,0.720224049734,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0.524441445494,0.720224049734,null,null],
-           ["druid-only-spot","held cobra-assassin",0.459693122564,0.720224049734,null,null]
+           ["my-knight-den","held cobra-assassin",6.29713348645,0.722118157337,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",5.96852368739,0.722118157337,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",4.80744238125,0.722118157337,"free",0.717171717172],
+           ["my-bastion-lure","held cobra-assassin",1.00751879699,0.615957790793,null,0.363636363636],
+           ["nightmare-isles","held cobra-assassin",0.948772241728,0.722118157337,"taken",null],
+           ["feru-way","held cobra-assassin",0.707024008437,0.722118157337,null,null],
+           ["cobra-bastion-1","held cobra-assassin",0.706961403349,0.647321209071,null,null],
+           ["warzone-2","held cobra-assassin",0.57999700105,0.722118157337,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.524441445494,0.722118157337,null,null],
+           ["druid-only-spot","held cobra-assassin",0.459693122564,0.722118157337,null,null]
           ]
          },
          "pool": {"known":{"$set":16}},
@@ -4178,16 +4196,16 @@
          "notes": {"$set":[]},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",1.28004263256,0.539518976223,null,0.363636363636],
+           ["my-knight-den","held cobra-assassin",1.28004263256,0.539518976222,null,0.363636363636],
            ["my-bastion-lure","held cobra-assassin",1,0.378096942159,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",0.83273506414,0.539518976223,"free",0.717171717172],
+           ["test-hideout","held cobra-assassin",0.83273506414,0.539518976222,"free",0.717171717172],
            ["cobra-bastion-1","held cobra-assassin",0.671842650104,0.425747876536,null,0.555844155844],
-           ["warzone-2","held cobra-assassin",0.444444444444,0.539518976223,null,null],
-           ["roshamuul-west","held cobra-assassin",0.444444444444,0.539518976223,null,null],
-           ["nightmare-isles","held cobra-assassin",0.405296488198,0.539518976223,"taken",null],
-           ["druid-only-spot","held cobra-assassin",0.371640921378,0.539518976223,null,null],
-           ["feru-way","held cobra-assassin",0.325471943155,0.539518976223,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0.277777777778,0.539518976223,null,null]
+           ["warzone-2","held cobra-assassin",0.444444444444,0.539518976222,null,null],
+           ["roshamuul-west","held cobra-assassin",0.444444444444,0.539518976222,null,null],
+           ["nightmare-isles","held cobra-assassin",0.405296488198,0.539518976222,"taken",null],
+           ["druid-only-spot","held cobra-assassin",0.371640921378,0.539518976222,null,null],
+           ["feru-way","held cobra-assassin",0.325471943155,0.539518976222,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.277777777778,0.539518976222,null,null]
           ]
          },
          "pool": {"known":{"$set":16}},
@@ -6958,7 +6976,7 @@
            ]
           }
          },
-         "planH": {"$set":{"$set":[37.9586250697,37.9586666719,37.9587060552,37.9587453998,37.9587847041,37.9588239676,37.9588631902,37.9589023723,37.9589415139,37.958980609,37.9590196069]}}
+         "planH": {"$set":{"$set":[37.9586745907,37.9587163719,37.9587559968,37.9587955816,37.9588351247,37.9588746255,37.9589140842,37.9589535008,37.9589928756,37.9590322023,37.9590714284]}}
         },
         "creatures": {
          "silencer": {
@@ -6993,16 +7011,16 @@
          "options": {
           "$set": {
            "$set": [
-            ["my-knight-den","held cobra-assassin",5.2251291313,0.948968634994,null,0.363636363636],
-            ["roshamuul-west","held cobra-assassin",4.07104702887,0.948968634994,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",3.82338094152,0.948968634994,"free",0.717171717172],
-            ["my-bastion-lure","held cobra-assassin",1.68388075112,0.948859396704,null,0.363636363636],
-            ["cobra-bastion-1","held cobra-assassin",1.14939435322,0.948891609509,null,0.555844155844],
-            ["nightmare-isles","held cobra-assassin",1.03080958505,0.948968634994,"taken",null],
-            ["warzone-2","held cobra-assassin",0.855638622637,0.948968634994,null,null],
-            ["feru-way","held cobra-assassin",0.795037875789,0.948968634994,null,null],
-            ["druid-only-spot","held cobra-assassin",0.70038389657,0.948968634994,null,null],
-            ["bookworld-chapter-iv","held cobra-assassin",0.631407958047,0.948968634994,null,null]
+            ["my-knight-den","held cobra-assassin",5.2251291313,0.948969889539,null,0.363636363636],
+            ["roshamuul-west","held cobra-assassin",4.07104702887,0.948969889539,null,0.363636363636],
+            ["test-hideout","held cobra-assassin",3.82338094152,0.948969889539,"free",0.717171717172],
+            ["my-bastion-lure","held cobra-assassin",1.68388075112,0.948859989762,null,0.363636363636],
+            ["cobra-bastion-1","held cobra-assassin",1.14939435322,0.948892397796,null,0.555844155844],
+            ["nightmare-isles","held cobra-assassin",1.03080958505,0.948969889539,"taken",null],
+            ["warzone-2","held cobra-assassin",0.855638622637,0.948969889539,null,null],
+            ["feru-way","held cobra-assassin",0.795037875789,0.948969889539,null,null],
+            ["druid-only-spot","held cobra-assassin",0.70038389657,0.948969889539,null,null],
+            ["bookworld-chapter-iv","held cobra-assassin",0.631407958047,0.948969889539,null,null]
            ]
           }
          },
@@ -7230,7 +7248,7 @@
            }
           ]
          },
-         "planH": {"$set":[23.5442886798,23.5459174192,23.5473894643,23.5488152391,23.5502332585,23.5516511057,23.5530687801,23.554486277,23.5559035543,23.5573183241,23.5587202178]}
+         "planH": {"$set":[23.5444229335,23.5460533481,23.547526997,23.5489543535,23.5503739581,23.5517933895,23.553212647,23.554631726,23.5560505835,23.5574669165,23.5588701542]}
         },
         "creatures": {
          "midnight-asura": {"score":{"$set":0.579137459636},"tier":{"$set":"C"}},
@@ -7263,17 +7281,17 @@
          "cutoff": {"$set":"asura-mirror"},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",6.73608213061,0.588720380978,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",6.67862093014,0.588720380978,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",5.19781661756,0.588720380978,"free",0.717171717172],
-           ["nightmare-isles","held cobra-assassin",0.933653893161,0.588720380978,"taken",null],
-           ["feru-way","held cobra-assassin",0.686790294428,0.588720380978,null,0.363636363636],
-           ["my-bastion-lure","held cobra-assassin",0.65091488521,0.584776833918,null,0.363636363636],
-           ["asura-mirror","held cobra-assassin",0.572325245356,0.588720380978,null,null],
-           ["warzone-2","held cobra-assassin",0.495527267647,0.588720380978,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0.495527267647,0.588720380978,null,null],
-           ["cobra-bastion-1","held cobra-assassin",0.472101464767,0.585939542807,null,null],
-           ["druid-only-spot","held cobra-assassin",0.38533020467,0.588720380978,null,null]
+           ["my-knight-den","held cobra-assassin",6.73608213061,0.588723858839,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",6.67862093014,0.588723858839,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",5.19781661756,0.588723858839,"free",0.717171717172],
+           ["nightmare-isles","held cobra-assassin",0.933653893161,0.588723858839,"taken",null],
+           ["feru-way","held cobra-assassin",0.686790294428,0.588723858839,null,0.363636363636],
+           ["my-bastion-lure","held cobra-assassin",0.65091488521,0.584775904891,null,0.363636363636],
+           ["asura-mirror","held cobra-assassin",0.572325245356,0.588723858839,null,null],
+           ["warzone-2","held cobra-assassin",0.495527267647,0.588723858839,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.495527267647,0.588723858839,null,null],
+           ["cobra-bastion-1","held cobra-assassin",0.472101464767,0.585939913218,null,null],
+           ["druid-only-spot","held cobra-assassin",0.38533020467,0.588723858839,null,null]
           ]
          },
          "steps": {
@@ -7356,7 +7374,7 @@
            ]
           }
          },
-         "planH": {"$set":{"$set":[38.6488068882,38.6488632247,38.6489157515,38.6489682406,38.6490206906,38.6490731011,38.6491254721,38.6491778036,38.6492300959,38.6492823392,38.6493344527]}}
+         "planH": {"$set":{"$set":[38.6488758972,38.6489324747,38.6489853245,38.6490381352,38.6490909054,38.6491436345,38.6491963226,38.6492489698,38.6493015763,38.649354132,38.6494065535]}}
         },
         "creatures": {
          "silencer": {
@@ -7392,16 +7410,16 @@
          "options": {
           "$set": {
            "$set": [
-            ["my-knight-den","held cobra-assassin",5.81873960093,0.966224206015,null,0.363636363636],
-            ["roshamuul-west","held cobra-assassin",5.02943041255,0.966224206015,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",4.35094230792,0.966224206015,"free",0.717171717172],
-            ["my-bastion-lure","held cobra-assassin",1.34825167646,0.966078403706,null,0.363636363636],
-            ["nightmare-isles","held cobra-assassin",1.01089317645,0.966224206015,"taken",null],
-            ["cobra-bastion-1","held cobra-assassin",0.929934908564,0.966121396578,null,null],
-            ["feru-way","held cobra-assassin",0.768127340576,0.966224206015,null,null],
-            ["warzone-2","held cobra-assassin",0.742219204245,0.966224206015,null,null],
-            ["druid-only-spot","held cobra-assassin",0.60051203227,0.966224206015,null,null],
-            ["bookworld-chapter-iv","held cobra-assassin",0.592732094518,0.966224206015,null,null]
+            ["my-knight-den","held cobra-assassin",5.81873960093,0.96622595338,null,0.363636363636],
+            ["roshamuul-west","held cobra-assassin",5.02943041255,0.96622595338,null,0.363636363636],
+            ["test-hideout","held cobra-assassin",4.35094230792,0.96622595338,"free",0.717171717172],
+            ["my-bastion-lure","held cobra-assassin",1.34825167646,0.966079263559,null,0.363636363636],
+            ["nightmare-isles","held cobra-assassin",1.01089317645,0.96622595338,"taken",null],
+            ["cobra-bastion-1","held cobra-assassin",0.929934908564,0.96612251831,null,null],
+            ["feru-way","held cobra-assassin",0.768127340576,0.96622595338,null,null],
+            ["warzone-2","held cobra-assassin",0.742219204245,0.96622595338,null,null],
+            ["druid-only-spot","held cobra-assassin",0.60051203227,0.96622595338,null,null],
+            ["bookworld-chapter-iv","held cobra-assassin",0.592732094518,0.96622595338,null,null]
            ]
           }
          },
@@ -7559,7 +7577,7 @@
            ]
           }
          },
-         "planH": {"$set":{"$set":[26.5250047913,26.5692533723,26.6099565915,26.650321333,26.6903417854,26.7299908877,26.769193348,26.8077710361,26.8452336142,26.8801648944,26.9105929999]}}
+         "planH": {"$set":{"$set":[26.5750073026,26.6201257045,26.6616378726,26.7027972726,26.7435977942,26.784013132,26.8239646779,26.8632721895,26.9014267487,26.9369535343,26.9678511847]}}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":{"$set":0.622379855796}},"tier":{"$set":{"$set":"B"}}},
@@ -7708,7 +7726,7 @@
            }
           ]
          },
-         "planH": {"$set":[34.0297175722,34.0576507855,34.0833210052,34.108800307,34.134081902,34.1591454053,34.1839374458,34.2083032026,34.231889679,34.2534323642,34.2714867629]}
+         "planH": {"$set":[34.1348480992,34.1646368155,34.1920164428,34.2191891962,34.2461479292,34.2728717915,34.299301786,34.3252700702,34.3503973206,34.3733347129,34.3925541573]}
         },
         "creatures": {
          "choking-fear": {"m":{"weeklyXph":{"$set":1891250.24444},"xp":{"$set":6008542.24444}},"score":{"$set":0.904836475372},"tier":{"$set":"S"}},
@@ -7775,7 +7793,7 @@
            ]
           }
          },
-         "planH": {"$set":{"$set":[28.1120384456,28.1570441139,28.1984680211,28.2395079771,28.280146095,28.3203351284,28.3599573833,28.3987283053,28.4359812076,28.4698454927,28.498502941]}}
+         "planH": {"$set":{"$set":[28.1806757241,28.2268813178,28.2694174846,28.3115538843,28.3532717112,28.3945215097,28.4351806618,28.4749541398,28.5131540449,28.5478529852,28.5772056906]}}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":{"$set":0.736402641184}},"tier":{"$set":{"$set":"B"}}},
@@ -8218,7 +8236,7 @@
            ]
           }
          },
-         "planH": {"$set":{"$set":[25.257373475,25.2730054628,25.2871882419,25.3010539397,25.3148868472,25.3286863282,25.3424493527,25.3561615274,25.3697660225,25.3829289006,25.3950177815]}}
+         "planH": {"$set":{"$set":[25.2655458252,25.2812476628,25.2954941513,25.3094226892,25.3233181644,25.3371799327,25.3510049305,25.3647786402,25.3784438327,25.3916645185,25.403806259]}}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":{"$set":0.69789941096}},"tier":{"$set":{"$set":"B"}}},
@@ -8244,16 +8262,16 @@
          "options": {
           "$set": {
            "$set": [
-            ["my-knight-den","held cobra-assassin",4.7349742898,0.632526348492,null,0.363636363636],
-            ["roshamuul-west","held cobra-assassin",4.28224377579,0.632526348492,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",3.57618865675,0.632526348492,"free",0.717171717172],
-            ["my-bastion-lure","held cobra-assassin",0.913007435563,0.594117549482,null,0.363636363636],
-            ["nightmare-isles","held cobra-assassin",0.770228732564,0.632526348492,"taken",null],
-            ["cobra-bastion-1","held cobra-assassin",0.634505419083,0.605446780216,null,0.555844155844],
-            ["feru-way","held cobra-assassin",0.580244829668,0.632526348492,null,null],
-            ["warzone-2","held cobra-assassin",0.523459769326,0.632526348492,null,null],
-            ["bookworld-chapter-iv","held cobra-assassin",0.440126435992,0.632526348492,null,null],
-            ["druid-only-spot","held cobra-assassin",0.420067763024,0.632526348492,null,null]
+            ["my-knight-den","held cobra-assassin",4.7349742898,0.632735567229,null,0.363636363636],
+            ["roshamuul-west","held cobra-assassin",4.28224377579,0.632735567229,null,0.363636363636],
+            ["test-hideout","held cobra-assassin",3.57618865675,0.632735567229,"free",0.717171717172],
+            ["my-bastion-lure","held cobra-assassin",0.913007435563,0.594153291311,null,0.363636363636],
+            ["nightmare-isles","held cobra-assassin",0.770228732564,0.632735567229,"taken",null],
+            ["cobra-bastion-1","held cobra-assassin",0.634505419083,0.605533712044,null,0.555844155844],
+            ["feru-way","held cobra-assassin",0.580244829668,0.632735567229,null,null],
+            ["warzone-2","held cobra-assassin",0.523459769326,0.632735567229,null,null],
+            ["bookworld-chapter-iv","held cobra-assassin",0.440126435992,0.632735567229,null,null],
+            ["druid-only-spot","held cobra-assassin",0.420067763024,0.632735567229,null,null]
            ]
           }
          },
@@ -8459,7 +8477,7 @@
            }
           ]
          },
-         "planH": {"$set":[30.8659936368,30.8791560824,30.8911075493,30.9028129619,30.9144841948,30.9261202062,30.9377168275,30.9492564064,30.9606762644,30.9716508905,30.9815799593]}
+         "planH": {"$set":[30.8864835526,30.8998226557,30.9119349106,30.9237984203,30.9356271606,30.9474200609,30.9591728425,30.970867491,30.9824400546,30.9935594919,31.0036140407]}
         },
         "creatures": {
          "choking-fear": {"m":{"weeklyXph":{"$set":2836875.36667},"xp":{"$set":6480512.36667}},"score":{"$set":0.976086824654},"tier":{"$set":"S"}},
@@ -8487,17 +8505,17 @@
          "cutoff": {"$set":"asura-mirror"},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",8.18990594704,0.772570324047,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",8.12004310713,0.772570324047,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",6.31964224936,0.772570324047,"free",0.717171717172],
-           ["nightmare-isles","held cobra-assassin",1.13516097693,0.772570324047,"taken",null],
-           ["feru-way","held cobra-assassin",0.83501771618,0.772570324047,null,0.363636363636],
-           ["my-bastion-lure","held cobra-assassin",0.826014871125,0.740177451187,null,0.363636363636],
-           ["asura-mirror","held cobra-assassin",0.695848096816,0.772570324047,null,null],
-           ["warzone-2","held cobra-assassin",0.602475094207,0.772570324047,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0.602475094207,0.772570324047,null,null],
-           ["cobra-bastion-1","held cobra-assassin",0.597168188063,0.749733360404,null,null],
-           ["druid-only-spot","held cobra-assassin",0.46849460467,0.772570324047,null,null]
+           ["my-knight-den","held cobra-assassin",8.18990594704,0.773094960508,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",8.12004310713,0.773094960508,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",6.31964224936,0.773094960508,"free",0.717171717172],
+           ["nightmare-isles","held cobra-assassin",1.13516097693,0.773094960508,"taken",null],
+           ["feru-way","held cobra-assassin",0.83501771618,0.773094960508,null,0.363636363636],
+           ["my-bastion-lure","held cobra-assassin",0.826014871125,0.740265222254,null,0.363636363636],
+           ["asura-mirror","held cobra-assassin",0.695848096816,0.773094960508,null,null],
+           ["warzone-2","held cobra-assassin",0.602475094207,0.773094960508,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.602475094207,0.773094960508,null,null],
+           ["cobra-bastion-1","held cobra-assassin",0.597168188063,0.749950032652,null,null],
+           ["druid-only-spot","held cobra-assassin",0.46849460467,0.773094960508,null,null]
           ]
          },
          "steps": {
@@ -8584,7 +8602,7 @@
            ]
           }
          },
-         "planH": {"$set":{"$set":[26.3084645605,26.3250582665,26.3401209024,26.3548628725,26.3695655841,26.3842280745,26.3988460736,26.4134004178,26.4278196032,26.4417116899,26.4543211237]}}
+         "planH": {"$set":{"$set":[26.3206574435,26.3373557267,26.3525136336,26.3673494268,26.3821456007,26.3969011775,26.4116118276,26.4262581594,26.4407679007,26.4547458787,26.4674300521]}}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":{"$set":0.849658163444}},"tier":{"$set":{"$set":"A"}}},
@@ -8610,16 +8628,16 @@
          "options": {
           "$set": {
            "$set": [
-            ["my-knight-den","held cobra-assassin",5.88661817554,0.658871571811,null,0.363636363636],
-            ["roshamuul-west","held cobra-assassin",5.56151021957,0.658871571811,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",4.49067318762,0.658871571811,"free",0.717171717172],
-            ["nightmare-isles","held cobra-assassin",0.89187281402,0.658871571811,"taken",null],
-            ["my-bastion-lure","held cobra-assassin",0.884009914083,0.618056847921,null,0.363636363636],
-            ["feru-way","held cobra-assassin",0.665169125172,0.658871571811,null,0.363636363636],
-            ["cobra-bastion-1","held cobra-assassin",0.62205967541,0.630096515844,null,null],
-            ["warzone-2","held cobra-assassin",0.549798210953,0.658871571811,null,null],
-            ["bookworld-chapter-iv","held cobra-assassin",0.494242655397,0.658871571811,null,null],
-            ["druid-only-spot","held cobra-assassin",0.436210043572,0.658871571811,null,null]
+            ["my-knight-den","held cobra-assassin",5.88661817554,0.65918373567,null,0.363636363636],
+            ["roshamuul-west","held cobra-assassin",5.56151021957,0.65918373567,null,0.363636363636],
+            ["test-hideout","held cobra-assassin",4.49067318762,0.65918373567,"free",0.717171717172],
+            ["nightmare-isles","held cobra-assassin",0.89187281402,0.65918373567,"taken",null],
+            ["my-bastion-lure","held cobra-assassin",0.884009914083,0.618109797916,null,0.363636363636],
+            ["feru-way","held cobra-assassin",0.665169125172,0.65918373567,null,0.363636363636],
+            ["cobra-bastion-1","held cobra-assassin",0.62205967541,0.630225950006,null,null],
+            ["warzone-2","held cobra-assassin",0.549798210953,0.65918373567,null,null],
+            ["bookworld-chapter-iv","held cobra-assassin",0.494242655397,0.65918373567,null,null],
+            ["druid-only-spot","held cobra-assassin",0.436210043572,0.65918373567,null,null]
            ]
           }
          },
@@ -8758,7 +8776,7 @@
            ]
           }
          },
-         "planH": {"$set":{"$set":[26.5250047913,26.5692533723,26.6099565915,26.650321333,26.6903417854,26.7299908877,26.769193348,26.8077710361,26.8452336142,26.8801648944,26.9105929999]}}
+         "planH": {"$set":{"$set":[26.5750073026,26.6201257045,26.6616378726,26.7027972726,26.7435977942,26.784013132,26.8239646779,26.8632721895,26.9014267487,26.9369535343,26.9678511847]}}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":{"$set":0.622379855796}},"tier":{"$set":{"$set":"B"}}},
@@ -8784,16 +8802,16 @@
          "options": {
           "$set": {
            "$set": [
-            ["my-knight-den","held cobra-assassin",4.73423770299,0.666258033325,null,0.363636363636],
-            ["roshamuul-west","held cobra-assassin",4.28151347233,0.666258033325,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",3.57562027842,0.666258033325,"free",0.717171717172],
-            ["my-bastion-lure","held cobra-assassin",0.970195631731,0.555676055598,null,0.363636363636],
-            ["nightmare-isles","held cobra-assassin",0.770126638035,0.666258033325,"taken",null],
-            ["cobra-bastion-1","held cobra-assassin",0.672788576181,0.588339643896,null,0.555844155844],
-            ["feru-way","held cobra-assassin",0.580169729534,0.666258033325,null,null],
-            ["warzone-2","held cobra-assassin",0.523405583697,0.666258033325,null,null],
-            ["bookworld-chapter-iv","held cobra-assassin",0.440072250363,0.666258033325,null,null],
-            ["druid-only-spot","held cobra-assassin",0.420025627382,0.666258033325,null,null]
+            ["my-knight-den","held cobra-assassin",4.73423770299,0.667569931816,null,0.363636363636],
+            ["roshamuul-west","held cobra-assassin",4.28151347233,0.667569931816,null,0.363636363636],
+            ["test-hideout","held cobra-assassin",3.57562027842,0.667569931816,"free",0.717171717172],
+            ["my-bastion-lure","held cobra-assassin",0.970195631731,0.554845562721,null,0.363636363636],
+            ["nightmare-isles","held cobra-assassin",0.770126638035,0.667569931816,"taken",null],
+            ["cobra-bastion-1","held cobra-assassin",0.672788576181,0.588143098453,null,0.555844155844],
+            ["feru-way","held cobra-assassin",0.580169729534,0.667569931816,null,null],
+            ["warzone-2","held cobra-assassin",0.523405583697,0.667569931816,null,null],
+            ["bookworld-chapter-iv","held cobra-assassin",0.440072250363,0.667569931816,null,null],
+            ["druid-only-spot","held cobra-assassin",0.420025627382,0.667569931816,null,null]
            ]
           }
          },
@@ -8818,7 +8836,7 @@
             {
              "kind": "go",
              "text": "Taken? → Bastion lure",
-             "why": "Scores 101: 6.24kk exp/h (5.2kk hunting, 1.04kk from the bounty), 900k profit/h. Bounty done in about 48 min here. A reroll is worth 58 with 4 tokens left."
+             "why": "Scores 101: 6.24kk exp/h (5.2kk hunting, 1.04kk from the bounty), 900k profit/h. Bounty done in about 48 min here. A reroll is worth 57 with 4 tokens left."
             },
             {
              "kind": "go",
@@ -8960,7 +8978,7 @@
            }
           ]
          },
-         "planH": {"$set":[34.0297175722,34.0576507855,34.0833210052,34.108800307,34.134081902,34.1591454053,34.1839374458,34.2083032026,34.231889679,34.2534323642,34.2714867629]}
+         "planH": {"$set":[34.1348480992,34.1646368155,34.1920164428,34.2191891962,34.2461479292,34.2728717915,34.299301786,34.3252700702,34.3503973206,34.3733347129,34.3925541573]}
         },
         "creatures": {
          "choking-fear": {"m":{"weeklyXph":{"$set":1891250.24444},"xp":{"$set":6008542.24444}},"score":{"$set":0.904836475372},"tier":{"$set":"S"}},
@@ -8987,17 +9005,17 @@
          "cutoff": {"$set":"feru-way"},
          "options": {
           "$set": [
-           ["my-knight-den","held cobra-assassin",8.18843277343,0.852720007676,null,0.363636363636],
-           ["roshamuul-west","held cobra-assassin",8.11858250022,0.852720007676,null,0.363636363636],
-           ["test-hideout","held cobra-assassin",6.31850549269,0.852720007676,"free",0.717171717172],
-           ["nightmare-isles","held cobra-assassin",1.13495678787,0.852720007676,"taken",null],
-           ["my-bastion-lure","held cobra-assassin",0.940391263461,0.782834317556,null,0.363636363636],
-           ["feru-way","held cobra-assassin",0.834867515913,0.852720007676,null,null],
-           ["asura-mirror","held cobra-assassin",0.695722929927,0.852720007676,null,null],
-           ["cobra-bastion-1","held cobra-assassin",0.673734502258,0.80347525213,null,null],
-           ["warzone-2","held cobra-assassin",0.602366722949,0.852720007676,null,null],
-           ["bookworld-chapter-iv","held cobra-assassin",0.602366722949,0.852720007676,null,null],
-           ["druid-only-spot","held cobra-assassin",0.468410333386,0.852720007676,null,null]
+           ["my-knight-den","held cobra-assassin",8.18843277343,0.855479729905,null,0.363636363636],
+           ["roshamuul-west","held cobra-assassin",8.11858250022,0.855479729905,null,0.363636363636],
+           ["test-hideout","held cobra-assassin",6.31850549269,0.855479729905,"free",0.717171717172],
+           ["nightmare-isles","held cobra-assassin",1.13495678787,0.855479729905,"taken",null],
+           ["my-bastion-lure","held cobra-assassin",0.940391263461,0.780962988059,null,0.363636363636],
+           ["feru-way","held cobra-assassin",0.834867515913,0.855479729905,null,null],
+           ["asura-mirror","held cobra-assassin",0.695722929927,0.855479729905,null,null],
+           ["cobra-bastion-1","held cobra-assassin",0.673734502258,0.802972250385,null,null],
+           ["warzone-2","held cobra-assassin",0.602366722949,0.855479729905,null,null],
+           ["bookworld-chapter-iv","held cobra-assassin",0.602366722949,0.855479729905,null,null],
+           ["druid-only-spot","held cobra-assassin",0.468410333386,0.855479729905,null,null]
           ]
          },
          "steps": {
@@ -9005,17 +9023,17 @@
            {
             "kind": "go",
             "text": "Go to Test Hideout",
-            "why": "Scores 632: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (94), by 538. A reroll is worth 85 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
+            "why": "Scores 632: 41.96kk exp/h (3.47kk hunting, 1.79kk from today’s boosts, 36.7kk from weekly tasks). Today: Choking Fear prey +25% exp and Silencer is boosted (double exp and loot). Cobra Assassin isn’t here, but this beats its best spot, Bastion lure (94), by 538. A reroll is worth 86 with 4 tokens left. Marked free 30 min ago. Free 1 of 1 time you checked around this hour."
            },
            {
             "kind": "go",
             "text": "Taken? → Knight Den",
-            "why": "Scores 819: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 85 with 4 tokens left."
+            "why": "Scores 819: 54.38kk exp/h (3.8kk hunting, 3.16kk from today’s boosts, 47.42kk from weekly tasks). Today: Silencer is boosted (double exp and loot) and Choking Fear prey +25% exp. A reroll is worth 86 with 4 tokens left."
            },
            {
             "kind": "go",
             "text": "Taken? → Roshamuul West",
-            "why": "Scores 812: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp and loot). A reroll is worth 85 with 4 tokens left."
+            "why": "Scores 812: 53.91kk exp/h (3.5kk hunting, 1.36kk from today’s boosts, 49.05kk from weekly tasks). Today: Silencer is boosted (double exp and loot). A reroll is worth 86 with 4 tokens left."
            },
            {
             "kind": "go",
@@ -9025,7 +9043,7 @@
            {
             "kind": "reroll",
             "text": "Taken? → Reroll and re-plan",
-            "why": "The next spot, Feru Way (83), is worth less than a reroll (85). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
+            "why": "The next spot, Feru Way (83), is worth less than a reroll (86). Rerolling drops Cobra Assassin. Counts your lists: 2 Preferred, 1 Unwanted in this pool."
            }
           ]
          }
@@ -9072,7 +9090,7 @@
            ]
           }
          },
-         "planH": {"$set":{"$set":[28.1120384456,28.1570441139,28.1984680211,28.2395079771,28.280146095,28.3203351284,28.3599573833,28.3987283053,28.4359812076,28.4698454927,28.498502941]}}
+         "planH": {"$set":{"$set":[28.1806757241,28.2268813178,28.2694174846,28.3115538843,28.3532717112,28.3945215097,28.4351806618,28.4749541398,28.5131540449,28.5478529852,28.5772056906]}}
         },
         "creatures": {
          "choking-fear": {"score":{"$set":{"$set":0.736402641184}},"tier":{"$set":{"$set":"B"}}},
@@ -9099,16 +9117,16 @@
          "options": {
           "$set": {
            "$set": [
-            ["my-knight-den","held cobra-assassin",5.88563605981,0.705987699429,null,0.363636363636],
-            ["roshamuul-west","held cobra-assassin",5.56053648163,0.705987699429,null,0.363636363636],
-            ["test-hideout","held cobra-assassin",4.48991534984,0.705987699429,"free",0.717171717172],
-            ["my-bastion-lure","held cobra-assassin",0.960260842307,0.593848404706,null,0.363636363636],
-            ["nightmare-isles","held cobra-assassin",0.89173668798,0.705987699429,"taken",null],
-            ["cobra-bastion-1","held cobra-assassin",0.673103884873,0.626986347255,null,0.555844155844],
-            ["feru-way","held cobra-assassin",0.66506899166,0.705987699429,null,null],
-            ["warzone-2","held cobra-assassin",0.549725963448,0.705987699429,null,null],
-            ["bookworld-chapter-iv","held cobra-assassin",0.494170407892,0.705987699429,null,null],
-            ["druid-only-spot","held cobra-assassin",0.436153862717,0.705987699429,null,null]
+            ["my-knight-den","held cobra-assassin",5.88563605981,0.707788847108,null,0.363636363636],
+            ["roshamuul-west","held cobra-assassin",5.56053648163,0.707788847108,null,0.363636363636],
+            ["test-hideout","held cobra-assassin",4.48991534984,0.707788847108,"free",0.717171717172],
+            ["my-bastion-lure","held cobra-assassin",0.960260842307,0.592683952779,null,0.363636363636],
+            ["nightmare-isles","held cobra-assassin",0.89173668798,0.707788847108,"taken",null],
+            ["cobra-bastion-1","held cobra-assassin",0.673103884873,0.626699437857,null,0.555844155844],
+            ["feru-way","held cobra-assassin",0.66506899166,0.707788847108,null,null],
+            ["warzone-2","held cobra-assassin",0.549725963448,0.707788847108,null,null],
+            ["bookworld-chapter-iv","held cobra-assassin",0.494170407892,0.707788847108,null,null],
+            ["druid-only-spot","held cobra-assassin",0.436153862717,0.707788847108,null,null]
            ]
           }
          },

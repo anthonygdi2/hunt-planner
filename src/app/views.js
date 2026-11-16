@@ -18,7 +18,7 @@ import { parseSession, sessionProblems } from "../core/session.js";
 import { weekKey, serverDay, weeklyDifficulties } from "../core/weekly.js";
 import { markAge, markActive } from "../core/occupancy.js";
 import { isChallengingMaster } from "../core/rewards.js";
-import { loggedOdds, MIN_BOARD_OBS } from "../core/reroll.js";
+import { loggedOdds } from "../core/reroll.js";
 import { t, _, translator, locale } from "./lang.js";
 import { LANGS } from "../core/i18n.js";
 
@@ -99,18 +99,18 @@ export function difficultyAdvice(cmp) {
 }
 
 // Silver and Gold odds (Advanced mode): what the plan uses, the logged offers, and logging this board.
-// o: model.offerOdds() {odds, typed}; log: model.offerLog(); logged: model.boardLogged(); b: the bounty.
+// o: model.offerOdds() {odds, typed, n (offers the blend counts)}; log: model.offerLog(); logged: model.boardLogged(); b: the bounty.
 const pct1 = (x) => String(Math.round(x * 10) / 10);
 export function oddsView(o, log, logged, b) {
-  const L = loggedOdds(log), filled = b.offers.every((x) => x.slug), same = L.n && pct1(L.silver) === pct1(o.odds.silver) && pct1(L.gold) === pct1(o.odds.gold);
+  const L = loggedOdds(log), filled = b.offers.every((x) => x.slug);
   const vals = { silver: pct1(o.odds.silver), gold: pct1(o.odds.gold) };
   return {
     silver: vals.silver, gold: vals.gold, typed: o.typed,
     line: o.typed ? t("The plan uses your odds: Silver {silver}%, Gold {gold}% per offer.", vals)
+      : o.n > 0 ? t("The plan follows your log: Silver {silver}%, Gold {gold}% per offer. It starts from a guess and moves toward your logged boards as they add up.", vals)
       : t("The plan uses a guess: Silver {silver}%, Gold {gold}% per offer. The real odds aren’t published.", vals),
     logged: (L.n ? t.n(L.n, "{n} offer logged: Silver {silver}%, Gold {gold}%.", "{n} offers logged: Silver {silver}%, Gold {gold}%.", { silver: pct1(L.silver), gold: pct1(L.gold) })
-      : t("No boards logged yet.")) + (L.n < MIN_BOARD_OBS ? " " + t("Your shares can be used once {n} offers are logged.", { n: MIN_BOARD_OBS }) : ""),
-    canUse: L.n >= MIN_BOARD_OBS && !(o.typed && same),
+      : t("No boards logged yet.")) + (o.typed ? " " + t("Typed odds win over your log.") : ""),
     board: !(b.mode === "active" && b.active) ? { canLog: filled && !logged,
       text: logged ? t("This board is logged.") : !filled ? t("Fill in all three offers to log this board.") : t("Picking an offer or rerolling here logs the board by itself. Use this if you won’t.") } : null,
   };
