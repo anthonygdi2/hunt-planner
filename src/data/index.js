@@ -24,3 +24,8 @@ export const REFERENCE = __BTL_DATA__("reference.json");
 // TibiaWiki base exp per creature (CC BY-SA), a copy of tools/reference/wiki-exp.json for the creatures in DATA
 // (node tools/reference/generate.js --exp). tests/planner.test.js checks every value against that file.
 export const PL_EXP = __BTL_DATA__("creature-exp.json");
+
+// TibiaWiki hit points per creature (CC BY-SA), a copy of tools/reference/wiki-hp.json for the creatures in DATA
+// (node tools/reference/fetch-hp.js, then node tools/reference/generate.js --hp). They split a spot's killing time
+// between its creatures for the damage bonuses. tests/data.test.js checks every value against that file.
+export const PL_HP = __BTL_DATA__("creature-hp.json");

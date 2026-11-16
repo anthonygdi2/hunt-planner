@@ -38,6 +38,18 @@ test("the planner's exp table (PL_EXP) matches tools/reference/wiki-exp.json", (
   assert.deepStrictEqual(Object.keys(exp).filter((k) => exp[k] !== wiki[k]), []);
 });
 
+test("the planner's hit-point table (PL_HP) matches tools/reference/wiki-hp.json and covers every creature", () => {
+  const wiki = JSON.parse(fs.readFileSync(path.join(ROOT, "tools", "reference", "wiki-hp.json"), "utf8")).hp, hp = readData("creature-hp.json");
+  const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  assert.deepStrictEqual(Object.keys(hp).filter((k) => hp[k] !== wiki[k] || !(hp[k] > 0)), []);
+  assert.deepStrictEqual(readData("creatures.json").map((d) => slug(d.n)).filter((s) => !(s in hp)), [], "every creature has hit points");
+  assert.equal(hp["cobra-assassin"], 8200);
+  const { hpOf } = require("../tools/reference/fetch-hp.js");
+  assert.equal(hpOf("{{Infobox Creature\n| name = Rat\n| hp             = 1,250\n| exp = 5"), 1250);
+  assert.equal(hpOf("| hp = ?"), null);
+  assert.equal(hpOf(""), null);
+});
+
 test("the video queue refresh (offline)", () => {
   const vids = require("../tools/reference/refresh-videos.js");
   const qdoc = ["Listed October 24, 2026 from all 3 videos on the channel. Age is as of October 24, 2026.", "", "Status: 1 done, 0 to do, 0 maybe, 1 skipped.", "", "## Queue", "",

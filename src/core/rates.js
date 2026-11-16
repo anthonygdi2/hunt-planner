@@ -1,6 +1,6 @@
 // Rates from logged sessions: per creature and spot, per spot, and the Echo Raid chance.
 import { RAID } from "../data/rules.js";
-import { expShares, lootMult, killMult } from "./metrics.js";
+import { expShares, hpShares, lootMult, killMult } from "./metrics.js";
 
 // A session's length in hours, 0 when unknown.
 export const sessHours = (x) => (x && x.hours > 0 ? x.hours : 0);
@@ -42,9 +42,9 @@ export function huntLootBonus(x, catalog, expTable) {
 }
 // What a logged hunt's damage bonuses multiplied its kill rate by (metrics.js killMult): x.boosts.damage (the Talisman's
 // damage % on its bounty creature x.task) and x.boosts.preyDamage [{slug, pct}], over each creature's share of the
-// hunt's exp. killTime: the share of a hunt there spent killing (null: the default). The hunt's hours times this are
+// hit points killed in the hunt (hpShares over hpTable, else its exp shares). killTime: the share of a hunt there spent killing (null: the default). The hunt's hours times this are
 // the hours the same kills would have taken without them, so its rates become base rates. 1 with none recorded.
-export function huntKillMult(x, catalog, expTable, killTime) {
+export function huntKillMult(x, catalog, expTable, killTime, hpTable) {
   const b = x.boosts, bonuses = {};
   if (!b || typeof b !== "object" || !Array.isArray(x.kills)) return 1;
   if (b.damage > 0 && x.task) bonuses[x.task] = Number(b.damage);
@@ -52,7 +52,7 @@ export function huntKillMult(x, catalog, expTable, killTime) {
   if (!Object.keys(bonuses).length) return 1;
   const kills = {};
   x.kills.forEach((k) => { const key = catalog.killKey(k); kills[key] = (kills[key] || 0) + (k.count || 0); });
-  return killMult(expShares(kills, expTable), bonuses, killTime);
+  return killMult(hpShares(kills, hpTable, expTable), bonuses, killTime);
 }
 // A hunt logged on a bounty before boosts were recorded: its loot includes the Talisman's, and nothing says how much.
 const talismanIn = (x) => !!x.task && !(x.boosts && typeof x.boosts === "object");
@@ -63,8 +63,9 @@ const talismanIn = (x) => !!x.task && !(x.boosts && typeof x.boosts === "object"
 // (the creatures whose bounty any of these sessions was on, logged before boosts were recorded, so they include the
 // Talisman's loot). Loot and profit are without the bonuses each hunt recorded (huntLootBonus over expTable, slug → base
 // exp), and every rate is without its damage bonuses (huntKillMult: its hours count as that many times longer;
-// killTime(session) → the share of a hunt there spent killing, optional). Spots with no clean time are left out.
-export function spotRates(sessions, catalog, keyOf, mode, expTable, killTime) {
+// killTime(session) → the share of a hunt there spent killing, optional; hpTable: slug → hit points, optional).
+// Spots with no clean time are left out.
+export function spotRates(sessions, catalog, keyOf, mode, expTable, killTime, hpTable) {
   const acc = {}, out = {};
   sessions.forEach((x) => {
     const h = sessHours(x);
@@ -78,7 +79,7 @@ export function spotRates(sessions, catalog, keyOf, mode, expTable, killTime) {
     if (x.loot != null) { a.loot += x.loot - extra; a.lootTotal += tot; }
     if (talismanIn(x)) a.tasks[x.task] = true;
     x.kills.forEach((k) => { const key = catalog.killKey(k); a.kills[key] = (a.kills[key] || 0) + (k.count || 0); });
-    if (!x.breaks) { a.cTotal += tot; a.cHours += h * huntKillMult(x, catalog, expTable, killTime ? killTime(x) : null); }
+    if (!x.breaks) { a.cTotal += tot; a.cHours += h * huntKillMult(x, catalog, expTable, killTime ? killTime(x) : null, hpTable); }
   });
   Object.keys(acc).forEach((s) => {
     const a = acc[s];
@@ -97,8 +98,8 @@ export function spotRates(sessions, catalog, keyOf, mode, expTable, killTime) {
 // the session's bounty task at a spot (with clean time), only those sessions count there; taskBonus says their profit
 // includes the Talisman's loot (some were logged before boosts were recorded). Profit is without the loot bonuses each
 // hunt recorded (huntLootBonus over expTable), and every rate without its damage bonuses (huntKillMult; killTime as in
-// spotRates). Creatures with no clean time anywhere are left out.
-export function deriveRates(sessions, { catalog, xpMode, expTable, killTime }) {
+// and hpTable as in spotRates). Creatures with no clean time anywhere are left out.
+export function deriveRates(sessions, { catalog, xpMode, expTable, killTime, hpTable }) {
   const mode = xpField(xpMode), acc = {};
   const blank = () => ({ kills: 0, cKills: 0, total: 0, n: 0, xp: 0, bal: 0, cTotal: 0, cHours: 0, nClean: 0, last: null, talisman: false });
   sessions.forEach((x) => {
@@ -108,7 +109,7 @@ export function deriveRates(sessions, { catalog, xpMode, expTable, killTime }) {
     x.kills.forEach((k) => { total += k.count || 0; });
     if (!total) return;
     const spot = sessionSpot(x), clean = !x.breaks, bal = (x.balance || 0) - huntLootBonus(x, catalog, expTable), tal = talismanIn(x);
-    const hBase = h * huntKillMult(x, catalog, expTable, killTime ? killTime(x) : null);
+    const hBase = h * huntKillMult(x, catalog, expTable, killTime ? killTime(x) : null, hpTable);
     x.kills.forEach((k) => {
       if (!k.slug || !catalog.bySlug[k.slug]) return;
       const c = acc[k.slug] || (acc[k.slug] = {});

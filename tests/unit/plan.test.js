@@ -188,6 +188,8 @@ test("damage bonuses raise every rate of the spot: a damage Prey, and the Talism
   assert.equal(spotValue(SP, nums, { diff: "master", held: { slug: "rat", kills: 100 } }, tctx).m.profit, 1e5);
   assert.equal(spotValue(SP, nums, { diff: "master", held, killTime: 0 }, tctx).m.profit, 1e5);
   assert.equal(spotValue(SP, Object.assign({}, nums, { tasks: ["cobra-assassin"] }), { diff: "master", held }, tctx).m.profit, 1e5);
+  // With hit points the share is of the hit points killed: assassin 300 × 1,000 against scout 200 × 6,000 is one fifth.
+  near(spotValue(SP, nums, { diff: "master", held }, Object.assign({}, tctx, { hpTable: { "cobra-assassin": 1000, "cobra-scout": 6000 } })).killBonus, 1 / (1 - 0.5 * 0.2 * 0.1 / 1.1) - 1);
   // A damage Prey on the scout (1/4 of the spot) counts with or without a bounty, and is named under Today.
   const today = { prey: [{ slug: "cobra-scout", kind: "damage", pct: 25 }, { slug: "rat", kind: "damage", pct: 25 }] };
   const p = spotValue(SP, nums, { diff: "master", today }, ctx), kp = 1 / (1 - 0.5 * 0.25 * 0.25 / 1.25);
@@ -216,6 +218,10 @@ test("which creature to put Prey on: the largest share of the spot, and what the
   near(a.damage.kills, km - 1);
   near(a.damage.xph, 2e6 * (km - 1));
   near(a.damage.pph, 1e5 * (km - 1));
+  // The damage Prey goes by the creature's share of the hit points killed (one fifth here), the others by exp.
+  const h = preyAdvice(NUMS, Object.assign({}, ctx, { hpTable: { "cobra-assassin": 1000, "cobra-scout": 6000 } }), null);
+  near(h.share, 0.75);
+  near(h.damage.kills, 1 / (1 - 0.5 * 0.2 * 0.25 / 1.25) - 1);
   // No loot/h: no loot line. A respawn-limited spot: no damage line.
   const b = preyAdvice(NUMS, ctx, 0);
   assert.deepEqual([b.loot, b.damage], [null, null]);

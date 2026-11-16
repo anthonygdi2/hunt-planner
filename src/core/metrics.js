@@ -33,6 +33,14 @@ export function bestiaryRate(c, rec, kph, hours) {
   return left > 0 ? b.charmPoints * Math.min(1, kph * H / left) / H : 0;
 }
 
+// Each creature's share of the hit points killed at a spot: kph {slug: kills/h} × hit points (hpTable {slug: hit
+// points}), which is its share of the time spent killing; the exp shares stand in when any creature's hit points are
+// unknown (or there's no table). Returns {slug: share}.
+export function hpShares(kph, hpTable, expTable) {
+  const keys = Object.keys(kph || {}), hp = hpTable || {};
+  return keys.length && keys.every((k) => hp[k] > 0) ? expShares(kph, hp) : expShares(kph, expTable);
+}
+
 // What loot bonuses multiply a spot's loot by: each creature's share of the loot (shares: expShares, an estimate) × 2
 // when it's the boosted creature (rules.js BOOSTED_LOOT_MULT) × (1 + the sum of its loot chances / 100: loot Preys and
 // the Talisman add their chances, rules.js TALISMAN). boosted: a slug or null; chances: {slug: percent}. 1 when nothing
@@ -47,7 +55,7 @@ export function lootMult(shares, boosted, chances) {
 
 // What damage bonuses multiply a spot's kill rate by (rules.js KILL_TIME): only the time spent killing a creature gets
 // shorter, by d / (1 + d) for a bonus of d on it, so the rate is 1 / (1 - killTime x the sum of share x d / (1 + d)).
-// shares: each creature's share of the hit points killed (expShares stands in: there's no hit-point data); bonuses:
+// shares: each creature's share of the hit points killed (hpShares); bonuses:
 // {slug: percent} (the Talisman's damage and damage Preys, added per creature); killTime: the share of the hunt spent
 // killing (null: KILL_TIME; 0 where respawn is the limit). 1 with no bonus.
 export function killMult(shares, bonuses, killTime) {
@@ -80,6 +88,7 @@ const wardenShare = (entry) => (entry.bestiaryDone ? RAID.wardenShareDone : RAID
 //                  and profit with it, are raised by killMult (its share of that spot), unless its numbers come from
 //                  hunts logged on its bounty before bonuses were recorded (rec.taskBonus)
 //   killTime    (spot name) -> the share of a hunt there spent killing, or null for the default (killMult)
+//   hpTable     slug -> hit points, for the creature's share of the killing at its spot (hpShares)
 //   catalog     makeCatalog(...), for those other creatures' classes and rarity
 //   weeklyXph   (spot, hours, slug, kills) → weekly reward share per hour, or null when there are no weekly tasks
 // Returns {hours, rewardXph, weeklyXph, xp, profit, talismanLoot, killBonus? (what the Talisman's damage adds to the
@@ -90,7 +99,7 @@ export function metrics(c, rec, ctx) {
   const diff = ctx.diff, t = TASK[diff], m = {};
   // The Talisman's damage on this creature: faster kills at its spot, by its share of what dies there.
   const td = Number(ctx.talismanDamage) || 0, at0 = rec.spot && ctx.spotKph && ctx.spotKph[rec.spot];
-  const dShare = at0 && at0[c.slug] > 0 ? expShares(at0, ctx.expTable)[c.slug] : rec.share;
+  const dShare = at0 && at0[c.slug] > 0 ? hpShares(at0, ctx.hpTable, ctx.expTable)[c.slug] : rec.share;
   const km = td > 0 && !rec.taskBonus && rec.kph > 0 && dShare > 0 ? killMult({ [c.slug]: dShare }, { [c.slug]: td }, ctx.killTime ? ctx.killTime(rec.spot) : null) : 1;
   if (km > 1) { rec = Object.assign({}, rec, { kph: rec.kph * km, xph: rec.xph != null ? rec.xph * km : rec.xph, pph: rec.pph != null ? rec.pph * km : rec.pph }); m.killBonus = km - 1; }
   const kph = rec.kph;

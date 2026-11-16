@@ -109,7 +109,8 @@ export const PREY = deepFreeze({
 export const TALISMAN = deepFreeze({ loot: { max: 50 }, bestiary: { max: 100 }, damage: { max: 50 }, leech: { max: 50 } });
 
 // Damage bonuses (the Talisman's on the bounty creature, a damage Prey on its creature): more damage shortens only the
-// time spent killing that creature, so the kill rate rises by 1 / (1 - KILL_TIME x its share of the spot x d / (1 + d)).
+// time spent killing that creature, so the kill rate rises by 1 / (1 - KILL_TIME x its share of the spot x d / (1 + d)),
+// its share being its share of the hit points killed there (TibiaWiki hit points, src/data/creature-hp.json).
 // KILL_TIME, the share of a hunt spent killing rather than walking, luring or waiting for respawn, isn't published or
 // measured yet: 0.5 is a guess (November 15, 2026, needs the maintainer's OK), 0 at a spot switched to respawn-limited.
 // How the Talisman's damage stacks with a damage Prey isn't published either: their percents are added.

@@ -2,7 +2,7 @@
 import { norm } from "./text.js";
 import { creatureInPool } from "./catalog.js";
 import { taskReward, kindMult } from "./rewards.js";
-import { bestiaryOf, bestiaryRate, expShares, lootMult, killMult } from "./metrics.js";
+import { bestiaryOf, bestiaryRate, expShares, hpShares, lootMult, killMult } from "./metrics.js";
 import { GOAL_KEYS, weightedValue } from "./score.js";
 import { RHO, taskShape, rateThreshold } from "./reroll.js";
 import { markAge, markActive, occOdds, orderByOdds } from "./occupancy.js";
@@ -65,7 +65,8 @@ export function heldTask(held, diff, ctx) {
 // own hunts include some on that bounty logged before bonuses were recorded). killBonus is what they add, as a fraction.
 // nums: spotNumbers(sp). opts: {hours, held, diff, today, travel (spot id → the character's minutes), weekly (open
 // weeklies), killTime (the share of a hunt here spent killing; null for the default)}. ctx: {catalog, chalRates,
-// entries, bestiaryBonus, talismanLoot, talismanDamage, raidP, expTable}.
+// entries, bestiaryBonus, talismanLoot, talismanDamage, raidP, expTable, hpTable (slug → hit points: each creature's
+// share of the killing, for the damage bonuses)}.
 export function spotValue(sp, nums, opts, ctx) {
   if (!nums) return null;
   // Travel: the character's own minutes for this spot, else the spot's meta.
@@ -73,7 +74,7 @@ export function spotValue(sp, nums, opts, ctx) {
   const rate = !(opts.hours > 0), H = rate ? 1 : opts.hours, travel = tm > 0 ? tm : 0;
   const Hh = rate ? 1 : Math.max(0, H - travel / 60), diff = opts.diff, held = heldTask(opts.held, diff, ctx);
   // Damage bonuses: faster kills, so every rate of the spot rises together.
-  const share = expShares(nums.kph, ctx.expTable), dmg = {}, dmgNotes = [], t = ctx.t || EN;
+  const share = hpShares(nums.kph, ctx.hpTable, ctx.expTable), dmg = {}, dmgNotes = [], t = ctx.t || EN;
   ((opts.today && opts.today.prey) || []).forEach((p) => {
     if (p.kind !== "damage" || !(p.pct > 0) || !(nums.kph[p.slug] > 0)) return;
     dmg[p.slug] = (dmg[p.slug] || 0) + p.pct;
@@ -140,8 +141,8 @@ export function spotValue(sp, nums, opts, ctx) {
 }
 
 // Which creature a Prey is worth most on at a spot: the one with the largest share of its exp (and so, as estimated,
-// of its loot and of the time spent killing), with what the biggest Prey of each kind would add there. nums:
-// spotNumbers(sp); ctx: {expTable}; killTime: the share of a hunt there spent killing (null for the default).
+// of its loot), with what the biggest Prey of each kind would add there (the damage Prey by its share of the hit
+// points killed). nums: spotNumbers(sp); ctx: {expTable, hpTable}; killTime: the share of a hunt there spent killing (null for the default).
 // Returns {slug, share, xp {pct, xph}, loot {pct, pph} (null when the spot's loot/h is unknown), damage {pct, kills
 // (the fraction more kills), xph, pph} (null where more damage adds nothing)}, or null when nothing dies there.
 export function preyAdvice(nums, ctx, killTime) {
@@ -150,7 +151,7 @@ export function preyAdvice(nums, ctx, killTime) {
   if (!keys.length) return null;
   let top = keys[0];
   keys.forEach((k) => { if (share[k] > share[top]) top = k; });
-  const s = share[top], km = killMult({ [top]: s }, { [top]: PREY.damage.hi }, killTime);
+  const s = share[top], hs = hpShares(nums.kph, ctx.hpTable, ctx.expTable)[top] || 0, km = killMult({ [top]: hs }, { [top]: PREY.damage.hi }, killTime);
   return { slug: top, share: s, xp: { pct: PREY.xp.hi, xph: nums.xph * s * PREY.xp.hi / 100 },
     loot: nums.lph > 0 ? { pct: PREY.loot.hi, pph: nums.lph * s * PREY.loot.hi / 100 } : null,
     damage: km > 1 ? { pct: PREY.damage.hi, kills: km - 1, xph: nums.xph * (km - 1), pph: nums.pph != null ? nums.pph * (km - 1) : null } : null };

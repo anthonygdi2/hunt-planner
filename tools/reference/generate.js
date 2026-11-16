@@ -4,6 +4,7 @@
 //   node tools/reference/generate.js          rewrite src/data/reference.json
 //   node tools/reference/generate.js --check  exit 1 if it doesn't match the readings
 //   node tools/reference/generate.js --exp    rewrite src/data/creature-exp.json (the planner's PL_EXP) from wiki-exp.json
+//   node tools/reference/generate.js --hp     rewrite src/data/creature-hp.json (the planner's PL_HP) from wiki-hp.json
 // Rules (see docs/REFERENCE_DB_PLAN.md): session length = XP gain / XP per hour (raw if read, else boosted; the
 // analyser's "0:15h" is rounded down, so it's only a sanity check); kills/h = kills / length; profit/h = balance / length;
 // loot/h = loot / length (when the loot was read; today's loot bonuses apply to it, not to the balance);
@@ -17,6 +18,8 @@ const { readData, formatList, formatMap, DATA_DIR } = require("../assemble.js");
 
 const OUT = path.join(DATA_DIR, "reference.json");
 const EXP_OUT = path.join(DATA_DIR, "creature-exp.json");
+const WIKI_HP = path.join(__dirname, "wiki-hp.json");
+const HP_OUT = path.join(DATA_DIR, "creature-hp.json");
 const READINGS = path.join(__dirname, "readings.json");
 const WIKI_EXP = path.join(__dirname, "wiki-exp.json");
 const MIN_KILLS = 5;
@@ -89,6 +92,14 @@ function expTable() {
   return formatMap(out);
 }
 
+// The planner's TibiaWiki hit-point table: wiki-hp.json's values (tools/reference/fetch-hp.js) for the creatures in
+// DATA, sorted by slug.
+function hpTable() {
+  const wiki = JSON.parse(fs.readFileSync(WIKI_HP, "utf8")).hp, known = dataSlugs(), out = {};
+  Object.keys(wiki).sort().forEach((k) => { if (known.has(k)) out[k] = wiki[k]; });
+  return formatMap(out);
+}
+
 // Writes text with the line endings the file already has (git autocrlf on Windows); compares ignoring them.
 const lf = (t) => t.replace(/\r\n/g, "\n");
 function writeKeeping(file, text) {
@@ -103,6 +114,10 @@ if (require.main === module) {
     console.log(writeKeeping(EXP_OUT, expTable()) ? "Wrote src/data/creature-exp.json from tools/reference/wiki-exp.json" : "src/data/creature-exp.json already up to date");
     process.exit(0);
   }
+  if (process.argv.includes("--hp")) {
+    console.log(writeKeeping(HP_OUT, hpTable()) ? "Wrote src/data/creature-hp.json from tools/reference/wiki-hp.json" : "src/data/creature-hp.json already up to date");
+    process.exit(0);
+  }
   const readings = JSON.parse(fs.readFileSync(READINGS, "utf8")), res = build(readings);
   res.warnings.forEach((w) => console.warn("warning: " + w));
   if (res.errors.length) { res.errors.forEach((e) => console.error("error: " + e)); process.exit(1); }
@@ -112,4 +127,4 @@ if (require.main === module) {
   } else console.log(writeKeeping(OUT, res.text) ? "Wrote " + res.entries.length + " entries (" + readings.length + " readings) to src/data/reference.json" : "src/data/reference.json already up to date");
 }
 
-module.exports = { build, derive, slugify, expTable, writeKeeping, MIN_KILLS, REBALANCE, OUT };
+module.exports = { build, derive, slugify, expTable, hpTable, writeKeeping, MIN_KILLS, REBALANCE, OUT };

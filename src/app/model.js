@@ -26,7 +26,7 @@ export const ASSUMED_TOKENS = 5;
 export function makePlanCache() { return { key: "", plan: null, diffs: {} }; }
 
 // state: compute()'s state plus {creatures (shared creature settings), planner {state, marks, occupancy}, spotMeta,
-// expTable (PL_EXP)}. derived: compute(state, now), or null to compute it here. opts.planCache: makePlanCache().
+// expTable (PL_EXP), hpTable (PL_HP)}. derived: compute(state, now), or null to compute it here. opts.planCache: makePlanCache().
 export function makeModel(state, derived, now, opts) {
   const d = derived || compute(state, now), p = state.profile || {}, catalog = state.catalog, entries = state.entries, t = state.t || EN;
   const cache = (opts && opts.planCache) || makePlanCache(), at = new Date(now);
@@ -141,17 +141,17 @@ export function makeModel(state, derived, now, opts) {
   // The share of a hunt at a spot spent killing: 0 where the character says respawn is the limit, else the default.
   const killTime = (sp) => (plState.respawnLimit && plState.respawnLimit[sp.id] ? 0 : null);
   const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost, expTable: state.expTable,
-    killTime: killTime(sp) });
+    killTime: killTime(sp), hpTable: state.hpTable });
   const heldTask = (h, diff) => coreHeldTask(h, diff, { catalog, chalRates: chalRates() });
   // Which creature to put Prey on at a spot, and what the biggest Prey of each kind adds there.
-  const preyAdvice = (sp) => corePreyAdvice(spotNums(sp), { expTable: state.expTable }, killTime(sp));
+  const preyAdvice = (sp) => corePreyAdvice(spotNums(sp), { expTable: state.expTable, hpTable: state.hpTable }, killTime(sp));
   const tal = readTalisman(p);
   const spotValue = (sp, o) => {
     o = o || {};
     const nums = spotNums(sp);
     if (!nums) return null;
     return coreSpotValue(sp, nums, { hours: o.hours, held: o.held, diff: o.diff || boardDiff(), today: o.today, travel: o.travel, weekly: o.weekly || openWeeklies(), killTime: killTime(sp) },
-      { catalog, chalRates: chalRates(), entries, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, talismanDamage: tal.damage, raidP: d.raidP, expTable: state.expTable, t });
+      { catalog, chalRates: chalRates(), entries, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, talismanDamage: tal.damage, raidP: d.raidP, expTable: state.expTable, hpTable: state.hpTable, t });
   };
   const scaleArgs = (diff) => { const w = weights(); return { weights: w, model: GOAL_KEYS.some((k) => w[k] > 0) ? poolModel(diff) : null }; };
   const plScale = (values, diff) => scaleSpots(values, scaleArgs(diff));

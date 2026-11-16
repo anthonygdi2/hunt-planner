@@ -20,7 +20,7 @@ import { makeModel, makePlanCache } from "./model.js";
 import { pickLang } from "../core/i18n.js";
 import { setLang, translator, t } from "./lang.js";
 
-// data: {creatures, reference, expTable}; prefs: store/prefs.js; now() → ms.
+// data: {creatures, reference, expTable, hpTable}; prefs: store/prefs.js; now() → ms.
 // browserLang: the browser's language (navigator.language), for the first choice of language.
 export function createApp({ data, prefs, now, browserLang }) {
   const catalog = makeCatalog(data.creatures), known = (slug) => !!catalog.bySlug[slug];
@@ -607,7 +607,7 @@ export function createApp({ data, prefs, now, browserLang }) {
   // The active character's model (app/model.js), rebuilt after each change; its tiers are for Master tasks. modelFor
   // gives one whose tiers are for another difficulty (or "all"), for the Creatures screen.
   const modelState = (difficulty) => ({ t: translator(), catalog, reference: data.reference, profile: profile() || {}, pid: state.pid, sessions: state.hunts, entries: state.entries, advanced: state.advanced,
-    difficulty, creatures: state.creatures, planner: state.planner, spotMeta: {}, expTable: data.expTable, userSpots: state.userSpots });
+    difficulty, creatures: state.creatures, planner: state.planner, spotMeta: {}, expTable: data.expTable, hpTable: data.hpTable, userSpots: state.userSpots });
   function model() {
     if (!cachedModel) cachedModel = makeModel(modelState("master"), null, now(), { planCache });
     return cachedModel;

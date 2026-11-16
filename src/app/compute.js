@@ -52,7 +52,7 @@ export function compute(state, now) {
   const respawn = flagged(plSt.respawnLimit), killTime = (spot) => (respawn(spot) ? 0 : null), huntKillTime = (x) => killTime(sessionSpot(x));
 
   // Spot rates: the character's logged spots, then the reference spots it hasn't logged.
-  const logged = spotRates(sessions, catalog, sessionSpot, xpField(p.xpMode), state.expTable, huntKillTime), spotKph = {}, spotEco = {}, refSpotSrc = {};
+  const logged = spotRates(sessions, catalog, sessionSpot, xpField(p.xpMode), state.expTable, huntKillTime, state.hpTable), spotKph = {}, spotEco = {}, refSpotSrc = {};
   Object.keys(logged).forEach((s) => { spotKph[s] = logged[s].kph; spotEco[s] = { xph: logged[s].xph, pph: logged[s].pph, lph: logged[s].lph }; });
   const refActive = referenceSpots({ picks, calib: cal.calib, calibOther: cal.calibOther, sessions, loggedSpots: spotKph, vocation, otherOn,
     xpMode: p.xpMode, xpBoost: cal.xpBoost, catalog });
@@ -69,7 +69,7 @@ export function compute(state, now) {
   const weights = scoringWeights(readGoal(p)), chalRates = p.chalRates && typeof p.chalRates === "object" ? p.chalRates : {};
   const weeklyXph = weeklyNow.length ? (spot, hours, slug, kills) => weeklyBonus(weeklyNow, spot && spotKph[spot], hours, slug, kills) : null;
   const tal = readTalisman(p);
-  const ctx = (diff) => ({ diff, chalRates, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, talismanDamage: tal.damage, killTime, raidP: raid.p, spotKph, spotEco, expTable: state.expTable, entries, catalog, weeklyXph });
+  const ctx = (diff) => ({ diff, chalRates, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, talismanDamage: tal.damage, killTime, hpTable: state.hpTable, raidP: raid.p, spotKph, spotEco, expTable: state.expTable, entries, catalog, weeklyXph });
   const diffFor = (c) => (difficulty !== "all" ? difficulty : topPool(c));
   const choose = (c, spots, pin) => { const d = diffFor(c); return pickSpot(spots, pin, { metricFor: (x) => metrics(c, x, ctx(d)), weights }); };
 
@@ -77,7 +77,7 @@ export function compute(state, now) {
   const blocked = flagged(plSt.noAccess), canGo = (rec) => !blocked(rec.spot);
 
   // Each creature's numbers: its logged spots, else reference spots.
-  const rates = deriveRates(sessions, { catalog, xpMode: p.xpMode, expTable: state.expTable, killTime: huntKillTime }), derived = {};
+  const rates = deriveRates(sessions, { catalog, xpMode: p.xpMode, expTable: state.expTable, killTime: huntKillTime, hpTable: state.hpTable }), derived = {};
   Object.keys(rates).forEach((slug) => { rates[slug] = rates[slug].filter(canGo); if (!rates[slug].length) delete rates[slug]; });
   Object.keys(rates).forEach((slug) => { derived[slug] = choose(catalog.bySlug[slug], rates[slug], (entries[slug] || {}).pinSpot); });
   const ref = referenceUse(refActive.filter((a) => canGo(a.e)), derived, entries);

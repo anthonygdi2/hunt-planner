@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { metrics, bestiaryOf, bestiaryRate, expShares, lootMult, killMult } from "../../src/core/metrics.js";
+import { metrics, bestiaryOf, bestiaryRate, expShares, hpShares, lootMult, killMult } from "../../src/core/metrics.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 
 const catalog = makeCatalog([
@@ -150,4 +150,18 @@ test("a typed bestiary kill count: each kill left is worth charm points ÷ kills
   const m = metrics(cobra, rec, Object.assign({}, base, at, { bestiaryBonus: 20 }));
   near(m.bestiaryCharm, 300 * 1.2 * 50 / 1000);
   near(m.otherCharm, 25, "the Scout (Medium: 1,000 kills, 25 points) has 100 left at 100/h: all 25");
+});
+
+test("a creature's share of the killing: kills/h × hit points, the exp shares when hit points are missing", () => {
+  const kph = { a: 300, b: 100 }, exp = { a: 1000, b: 1000 };
+  assert.deepEqual(hpShares(kph, { a: 1000, b: 9000 }, exp), { a: 0.25, b: 0.75 }, "the tank is most of the killing though a quarter of the kills");
+  assert.deepEqual(hpShares(kph, { a: 1000 }, exp), { a: 0.75, b: 0.25 }, "b's hit points unknown: exp shares");
+  assert.deepEqual(hpShares(kph, null, exp), { a: 0.75, b: 0.25 });
+  assert.deepEqual(hpShares({}, { a: 1 }, exp), {});
+  // The Talisman's damage in the metrics goes by the hit-point share.
+  const near = (x, y) => assert.ok(Math.abs(x - y) < 1e-9, x + " vs " + y);
+  const rec = { kph: 300, xph: 3e6, pph: 2e5, spot: "Bastion" };
+  const ctx = Object.assign({}, base, { spotKph: { Bastion: { "cobra-assassin": 300, "cobra-scout": 300 } }, expTable: { "cobra-assassin": 1000, "cobra-scout": 1000 },
+    hpTable: { "cobra-assassin": 9000, "cobra-scout": 1000 }, talismanDamage: 10 });
+  near(metrics(cobra, rec, ctx).killBonus, 1 / (1 - 0.5 * 0.9 * 0.1 / 1.1) - 1);
 });

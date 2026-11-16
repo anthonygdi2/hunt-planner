@@ -112,6 +112,9 @@ test("damage bonuses on during a hunt are taken out of its rates", () => {
   assert.equal(huntKillMult(tal, catalog, exp, 0), 1, "a respawn-limited spot");
   const prey = Object.assign({}, hunt, { task: null, boosts: { boosted: null, prey: [], talisman: 0, preyDamage: [{ slug: "cobra-scout", pct: 25 }] } });
   near(huntKillMult(prey, catalog, exp), 1 / (1 - 0.5 * 0.5 * 0.25 / 1.25), "a damage Prey");
+  // With hit points: the assassin (9,000) is nine tenths of the killing, the scout (1,000) one tenth.
+  near(huntKillMult(tal, catalog, exp, null, { "cobra-assassin": 9000, "cobra-scout": 1000 }), 1 / (1 - 0.5 * 0.9 * 0.1 / 1.1), "by hit-point share");
+  near(spotRates([tal], catalog, sessionSpot, "rawXp", exp, null, { "cobra-assassin": 9000, "cobra-scout": 1000 }).Bastion.xph, 4e6 * (1 - 0.5 * 0.9 * 0.1 / 1.1));
   // The spot's rates: the same kills over km times the hours.
   const r = spotRates([tal], catalog, sessionSpot, "rawXp", exp).Bastion, plain = spotRates([hunt], catalog, sessionSpot, "rawXp", exp).Bastion;
   near(r.kph["cobra-assassin"], 200 / km);
