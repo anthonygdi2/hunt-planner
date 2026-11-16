@@ -52,6 +52,7 @@ test("planner state: defaults and every field checked", () => {
   // Spots the character can't go to: valid spot ids set to true.
   assert.deepEqual(S.readPlState({ noAccess: { "cobra-bastion": true, "my-den": true, "asura-palace": false, "Bad Id!": true } }, known).noAccess, { "cobra-bastion": true, "my-den": true });
   assert.deepEqual(S.readPlState({ noAccess: "x" }, known).noAccess, {});
+  assert.deepEqual(S.readPlState({ respawnLimit: { "cobra-bastion": true, "x y": true, den: 1 } }, known).respawnLimit, { "cobra-bastion": true });
   assert.equal(S.readPlState({ held: { slug: "bear" } }, known).held, null, "unknown creature");
   assert.equal(S.plNum("", 0, 1), null);
   assert.equal(S.plNum("0.5", 0, 1), 0.5);
@@ -94,6 +95,9 @@ test("the loot bonuses on during a hunt", () => {
   // The Talisman's damage and life leech: kept when above 0 and in range.
   assert.deepEqual(S.readBoosts({ talisman: 5, damage: "12.5", leech: 3 }), { boosted: null, prey: [], talisman: 5, damage: 12.5, leech: 3 });
   assert.deepEqual(S.readBoosts({ damage: 60, leech: 0 }), { boosted: null, prey: [], talisman: 0 });
+  // Damage Preys: 7–25%, kept only when there are any.
+  assert.deepEqual(S.readBoosts({ preyDamage: [{ slug: "rat", pct: 40 }, { pct: 9 }, { slug: "bat", pct: 9 }] }).preyDamage, [{ slug: "rat", pct: 25 }, { slug: "bat", pct: 9 }]);
+  assert.equal("preyDamage" in S.readBoosts({ preyDamage: [] }), false);
   // On a hunt: kept when there, left out when not (hunts logged before they were recorded).
   assert.deepEqual(S.readHunt("h", { hours: 1, kills: [], boosts: { boosted: "rat" } }).boosts, { boosted: "rat", prey: [], talisman: 0 });
   assert.equal("boosts" in S.readHunt("h", { hours: 1, kills: [], boosts: 3 }), false);

@@ -196,6 +196,13 @@ test("a spot the character can't go to stays out of its plan and its creatures' 
   assert.equal(M.derived.derived["cobra-assassin"].best.spot, "Open Cave");
   assert.equal(M.derived.derived["cobra-scout"].best.spot, "Scout Cave", "its own hunts are at a spot it can't go to: the reference spot");
   assert.deepEqual(M.planChain(M.plannerCtx({ marks: {} })).steps.filter((x) => x.kind === "go").map((x) => x.option.id).filter((id) => id === "locked-lair" || id === "my-den"), [], "no step sends it there");
+  // Where respawn is the limit, the Talisman's damage adds nothing; elsewhere it raises the creature's numbers.
+  const dmg = (respawnLimit) => { const s = state(); s.profile.talisman = { damage: 10 }; s.planner.state.respawnLimit = respawnLimit; return makeModel(s, null, 0); };
+  const xpAt = (m) => m.spotValue(m.spotIndex().spots["locked-lair"], { held: { slug: "cobra-assassin", kills: 400 }, diff: "master" }).parts.hunt;
+  assert.ok(Math.abs(xpAt(dmg({})) / xpAt(dmg({ "locked-lair": true })) - 1 / (1 - 0.5 * 0.1 / 1.1)) < 1e-9, "the only creature there: half the time is killing");
+  assert.equal(xpAt(dmg({ "locked-lair": true })), xpAt(makeModel(state(), null, 0)));
+  assert.ok(dmg({}).derived.metrics["cobra-assassin"].killBonus > 0);
+  assert.equal("killBonus" in dmg({ "locked-lair": true }).derived.metrics["cobra-assassin"], false);
   // The Spots list still values them (blocked: null).
   assert.equal(M.planOptions(M.plannerCtx({ blocked: null })).options.length, 4);
 });

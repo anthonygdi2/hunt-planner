@@ -155,3 +155,37 @@ test("options and the chain", () => {
   assert.deepEqual(none.steps.map((s) => s.kind), ["claim", "go", "go", "seeSpots"]);
   assert.ok(MAX_STEPS >= 2);
 });
+
+test("damage bonuses raise every rate of the spot: a damage Prey, and the Talisman while the bounty lasts", () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-6 * Math.max(1, Math.abs(b)), (msg || "") + " " + a + " vs " + b);
+  const nums = Object.assign({ lph: 4e5, tasks: [] }, NUMS), held = { slug: "cobra-assassin", kills: 300 };
+  const plain = spotValue(SP, nums, { diff: "master", held }, ctx);
+  assert.equal("killBonus" in plain, false);
+  // The assassin is 3/4 of the spot's exp; half the hunt is killing: 1 / (1 − 0.5 × 0.75 × 0.1 / 1.1).
+  const km = 1 / (1 - 0.5 * 0.75 * 0.1 / 1.1), tctx = Object.assign({}, ctx, { talismanDamage: 10 });
+  const v = spotValue(SP, nums, { diff: "master", held }, tctx);
+  near(v.killBonus, km - 1);
+  near(v.kph["cobra-assassin"], 300 * km);
+  near(v.parts.hunt, 2e6 * km);
+  near(v.parts.held, plain.parts.held * km, "the bounty is done sooner");
+  near(v.m.profit, 1e5 * km);
+  near(v.m.charm, plain.m.charm * km);
+  // Not without the bounty, not where its creature doesn't die, not at a respawn-limited spot, and not when the spot's
+  // own hunts on that bounty were logged before bonuses were recorded.
+  assert.equal(spotValue(SP, nums, { diff: "master" }, tctx).m.profit, 1e5);
+  assert.equal(spotValue(SP, nums, { diff: "master", held: { slug: "rat", kills: 100 } }, tctx).m.profit, 1e5);
+  assert.equal(spotValue(SP, nums, { diff: "master", held, killTime: 0 }, tctx).m.profit, 1e5);
+  assert.equal(spotValue(SP, Object.assign({}, nums, { tasks: ["cobra-assassin"] }), { diff: "master", held }, tctx).m.profit, 1e5);
+  // A damage Prey on the scout (1/4 of the spot) counts with or without a bounty, and is named under Today.
+  const today = { prey: [{ slug: "cobra-scout", kind: "damage", pct: 25 }, { slug: "rat", kind: "damage", pct: 25 }] };
+  const p = spotValue(SP, nums, { diff: "master", today }, ctx), kp = 1 / (1 - 0.5 * 0.25 * 0.25 / 1.25);
+  near(p.killBonus, kp - 1);
+  near(p.m.xp, 2e6 * kp);
+  assert.deepEqual(p.today, ["Cobra Scout prey +25% damage"]);
+  // Both on one creature add their percents.
+  const b = spotValue(SP, nums, { diff: "master", held, today: { prey: [{ slug: "cobra-assassin", kind: "damage", pct: 15 }] } }, tctx);
+  near(b.killBonus, 1 / (1 - 0.5 * 0.75 * 0.25 / 1.25) - 1);
+  // A session that finishes the bounty: the Talisman counts only for the share of the hunting time it lasts.
+  const s = spotValue(SP, nums, { diff: "master", held: { slug: "cobra-assassin", kills: 300 }, hours: 2 }, tctx), on = 300 / (300 * km * 2);
+  near(s.killBonus, (km - 1) * on);
+});

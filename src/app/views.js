@@ -319,31 +319,39 @@ export function weeklyView(w, rows, catalog, now, level) {
 }
 
 // ---------- The loot bonuses on during a hunt (the Log preview and the saved-hunt editor) ----------
-// The editor's draft {boosted (slug or null), prey [{slug, pct}] (loot Preys), talisman (the percent as typed)} from
+// The editor's draft {boosted (slug or null), prey [{slug, pct, kind "loot" | "damage"}], talisman, damage, leech (the
+// Talisman's percents as typed)} from
 // stored boosts (store/schema.js readBoosts) and the Talisman percent to show.
 // tal: the Talisman to show, {loot, damage, leech} in percent (readTalisman's, or a hunt's boosts as talismanOf reads them).
 const pctText = (n) => (n > 0 ? String(n) : "");
-export const boostsDraft = (b, tal) => ({ boosted: (b && b.boosted) || null, prey: ((b && b.prey) || []).map((q) => ({ slug: q.slug, pct: q.pct })),
+export const boostsDraft = (b, tal) => ({ boosted: (b && b.boosted) || null,
+  prey: ((b && b.prey) || []).map((q) => ({ slug: q.slug, pct: q.pct, kind: q.kind === "damage" ? "damage" : "loot" }))
+    .concat(((b && b.preyDamage) || []).map((q) => ({ slug: q.slug, pct: q.pct, kind: "damage" }))).slice(0, PREY_SLOTS),
   talisman: pctText(tal && tal.loot), damage: pctText(tal && tal.damage), leech: pctText(tal && tal.leech) });
 // The Talisman percents a hunt's stored boosts carry, in boostsDraft's shape.
 const talismanOf = (b) => ({ loot: b.talisman, damage: b.damage, leech: b.leech });
-// A change to the draft: {boosted}, {prey: i, slug and/or pct}, {addPrey: slug}, {removePrey: i}, {talisman}, {damage} or {leech}.
+// A change to the draft: {boosted}, {prey: i, slug and/or pct and/or kind}, {addPrey: slug}, {removePrey: i}, {talisman},
+// {damage} or {leech}. A Prey's size stays within its kind's range.
 export function boostsPatch(d, patch) {
   const out = { boosted: d.boosted, prey: d.prey.map((q) => Object.assign({}, q)), talisman: d.talisman, damage: d.damage || "", leech: d.leech || "" };
   if ("boosted" in patch) out.boosted = patch.boosted || null;
   if ("prey" in patch && out.prey[patch.prey]) {
     if ("slug" in patch) out.prey[patch.prey].slug = patch.slug || null;
-    if ("pct" in patch) out.prey[patch.prey].pct = Number(patch.pct) || PREY.loot.lo;
+    const q = out.prey[patch.prey];
+    if ("kind" in patch) q.kind = patch.kind === "damage" ? "damage" : "loot";
+    const r = PREY[q.kind === "damage" ? "damage" : "loot"];
+    if ("pct" in patch) q.pct = Number(patch.pct) || r.lo;
+    q.pct = Math.min(r.hi, Math.max(r.lo, q.pct));
   }
-  if ("addPrey" in patch && out.prey.length < PREY_SLOTS) out.prey.push({ slug: patch.addPrey || null, pct: PREY.loot.lo });
+  if ("addPrey" in patch && out.prey.length < PREY_SLOTS) out.prey.push({ slug: patch.addPrey || null, pct: PREY.loot.lo, kind: "loot" });
   if ("removePrey" in patch) out.prey.splice(patch.removePrey, 1);
   ["talisman", "damage", "leech"].forEach((k) => { if (k in patch) out[k] = String(patch[k] == null ? "" : patch[k]); });
   return out;
 }
-const preyPcts = () => { const r = PREY.loot, out = []; for (let x = r.lo; x <= r.hi; x += r.step) out.push({ value: x, label: "+" + x + "%" }); return out; };
+const preyPcts = (kind) => { const r = PREY[kind === "damage" ? "damage" : "loot"], out = []; for (let x = r.lo; x <= r.hi; x += r.step) out.push({ value: x, label: "+" + x + "%" }); return out; };
 // The editor for draft d on a hunt whose kills are `kills` ([{slug, name}]); onBounty: the hunt was on its bounty, so
-// the Talisman applies (its loot bonus, and its damage and life leech, which are only kept with the hunt). value: the
-// boosts to store, or null while a Talisman percent doesn't read.
+// the Talisman applies (its loot and damage bonuses, and its life leech, which is only kept with the hunt). value: the
+// boosts to store (loot Preys as prey, damage Preys as preyDamage), or null while a Talisman percent doesn't read.
 function boostsView(d, kills, onBounty) {
   const seen = {}, killed = [];
   (kills || []).forEach((k) => { if (k && k.slug && !seen[k.slug]) { seen[k.slug] = true; killed.push({ value: k.slug, label: k.name || k.slug }); } });
@@ -351,13 +359,16 @@ function boostsView(d, kills, onBounty) {
   const pct = (v) => { const raw = String(v || "").trim().replace(",", "."); return raw === "" ? 0 : /^\d+(\.\d+)?$/.test(raw) && Number(raw) <= 50 ? Number(raw) : null; };
   const talisman = pct(d.talisman), damage = pct(d.damage), leech = pct(d.leech);
   const talismanOk = !onBounty || talisman != null, damageOk = !onBounty || damage != null, leechOk = !onBounty || leech != null;
-  const value = { boosted: null, prey: d.prey.filter((q) => q.slug && seen[q.slug]).map((q) => ({ slug: q.slug, pct: q.pct })), talisman: onBounty ? talisman : 0 };
+  const live = d.prey.filter((q) => q.slug && seen[q.slug]), isDamage = (q) => q.kind === "damage", pair = (q) => ({ slug: q.slug, pct: q.pct });
+  const value = { boosted: null, prey: live.filter((q) => !isDamage(q)).map(pair), talisman: onBounty ? talisman : 0 };
+  if (live.some(isDamage)) value.preyDamage = live.filter(isDamage).map(pair);
   if (onBounty && damage > 0) value.damage = damage;
   if (onBounty && leech > 0) value.leech = leech;
   const boosted = d.boosted && seen[d.boosted] ? d.boosted : null, free = killed.filter((c) => !d.prey.some((q) => q.slug === c.value));
   return {
     boosted: boosted || "", boostedOptions: none.concat(killed),
-    prey: d.prey.map((q, i) => ({ i, slug: q.slug && seen[q.slug] ? q.slug : "", pct: q.pct, creatures: none.concat(killed) })), pcts: preyPcts(),
+    prey: d.prey.map((q, i) => ({ i, slug: q.slug && seen[q.slug] ? q.slug : "", pct: q.pct, kind: isDamage(q) ? "damage" : "loot", creatures: none.concat(killed), pcts: preyPcts(q.kind) })),
+    kinds: [{ value: "loot", label: t("Loot") }, { value: "damage", label: t("Damage") }],
     canAddPrey: d.prey.length < PREY_SLOTS && free.length > 0, nextPrey: free.length ? free[0].value : null,
     talisman: onBounty ? String(d.talisman || "") : null, talismanOk,
     damage: onBounty ? String(d.damage || "") : null, damageOk, leech: onBounty ? String(d.leech || "") : null, leechOk,
@@ -410,13 +421,13 @@ export function logView(draft, model, catalog, advanced, state) {
   if (editing && rows.indexOf(editing) === -1) rows.unshift(editing);
   const ed = draft.editDraft || {}, nameOf = (s) => (catalog.bySlug[s] ? catalog.bySlug[s].name : s);
   // The loot bonuses on during the previewed hunt: as changed, else today's boosts when it ended on this server day (the
-  // boosted creature and loot Preys on creatures killed in it), and on the active bounty the character's Talisman (its
+  // boosted creature and loot and damage Preys on creatures killed in it), and on the active bounty the character's Talisman (its
   // loot, damage and life leech percents).
   let boosts = null;
   if (ok) {
     const b = model.bounty(), active = b.mode === "active" && b.active ? b.active.slug : null, on = (s) => !!s && p.kills.some((k) => k.slug === s);
     const onBounty = on(active), end = Date.parse(p.end || ""), today = !(end > 0) || serverDay(end) === serverDay(model.now), td = model.today();
-    boosts = boostsView(draft.boosts || boostsDraft(today ? { boosted: on(td.boosted) ? td.boosted : null, prey: (td.prey || []).filter((q) => q.kind === "loot" && on(q.slug)) } : null,
+    boosts = boostsView(draft.boosts || boostsDraft(today ? { boosted: on(td.boosted) ? td.boosted : null, prey: (td.prey || []).filter((q) => (q.kind === "loot" || q.kind === "damage") && on(q.slug)) } : null,
       onBounty ? readTalisman(me) : null), p.kills, onBounty);
   }
   const saved = {
@@ -659,8 +670,9 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
     badges: o ? sourceBadges(o, ns, huntsWho(sp.sessions)) : nums ? sourceBadges(nums, ns, huntsWho(sp.sessions)) : [],
     taken: taken[id] ? takenText(taken[id]) : null,
     // For this character: whether it can go there (off keeps the spot out of its plan), and its own travel minutes.
+    // and whether killing faster helps there (off: respawn is the limit, so damage bonuses add nothing).
     access: { who: displayName(p), blocked: !!plSt.noAccess && !!plSt.noAccess[id], travel: plSt.travel && plSt.travel[id] ? String(plSt.travel[id]) : "",
-      timed: model.plannerCtx().hours > 0 },
+      timed: model.plannerCtx().hours > 0, respawnLimit: !!plSt.respawnLimit && !!plSt.respawnLimit[id] },
     creatures, sources: { hunts, reference, skipped },
     variations: sp.parentId ? null : variations.map(varRow), canVary: !sp.parentId,
     sessions, emptySessions: t("No hunts logged here."),

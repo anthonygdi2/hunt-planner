@@ -37,7 +37,7 @@ export function render(view, ui, on) {
           field({ id: "ch-damage", label: t("Talisman damage bonus (%)"), value: c.talisman.damage, inputmode: "decimal", disabled: ro, onCommit: (v) => on.talisman({ damage: v }) }),
           field({ id: "ch-leech", label: t("Talisman life leech (%)"), value: c.talisman.leech, inputmode: "decimal", disabled: ro, onCommit: (v) => on.talisman({ leech: v }) })),
         h("p", { class: "hp-p hp-caption" }, t("Your Bounty Talisman’s bonuses as the game shows them, 0 without one. They count on your bounty’s creature only.")),
-        h("p", { class: "hp-p hp-caption" }, t("Damage and life leech are kept with each hunt you log on a bounty. The plan doesn’t count them yet.")),
+        h("p", { class: "hp-p hp-caption" }, t("Damage counts as faster kills. Life leech is kept with each hunt you log on a bounty; the plan doesn’t count it yet.")),
         confirmButton({ id: "ch-delete", label: t("Delete this character…"), confirmLabel: t("Tap again to delete {name}. Its logged hunts stay for your other characters.", { name: c.displayName }), armed: ui.armed,
           disabled: ro, onArm: () => on.arm(true), onConfirm: on.deleteCharacter })) : null),
     c ? section("src-h", t("Numbers from"),

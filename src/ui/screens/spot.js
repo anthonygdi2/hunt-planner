@@ -29,7 +29,7 @@ function detailsPanel(d) {
 
 // view: app/views.js spotView (null: no such spot). on: {back(), taken(), free(), log(), vary(), open(id),
 // arm(id | "spot" | null), deleteSession(id), details(key), raid(sessionId, name, value), rename(name), deleteSpot(),
-// access(canGo), travel(minutes)}.
+// access(canGo), travel(minutes), respawnLimit(limited)}.
 export function render(view, on) {
   const back = h("div", null, h("a", { href: "#/spots", class: "hp-back", onClick: (e) => { e.preventDefault(); on.back(); } }, icon("back", 20), t("Spots")));
   if (!view) return h("div", { class: "hp-section hp-narrow" }, back, h("p", { class: "hp-p hp-muted" }, t("That spot isn’t in the list any more.")));
@@ -55,6 +55,9 @@ export function render(view, on) {
       h("div", { class: "hp-card" },
         settingRow(t("I can go there"), view.access.blocked ? t("Off: this spot stays out of the plan, and its creatures are valued at other spots.") : t("Turn off for a spot you have no access to. It then stays out of the plan."),
           switchCtl({ id: "spot-access", label: t("I can go there"), on: !view.access.blocked, onToggle: on.access })),
+        settingRow(t("More damage means more kills here"), view.access.respawnLimit ? t("Off: the Talisman’s damage and a damage Prey add nothing here.")
+          : t("Turn off where respawn is the limit, or creatures die in one hit anyway."),
+          switchCtl({ id: "spot-damage", label: t("More damage means more kills here"), on: !view.access.respawnLimit, onToggle: (x) => on.respawnLimit(!x) })),
         field({ id: "spot-travel", label: t("Travel time (minutes)"), value: view.access.travel, inputmode: "numeric", maxlength: 3, onCommit: on.travel }),
         h("span", { class: "hp-caption" }, view.access.timed ? t("Comes out of your session’s hunting time. Empty for none.")
           : t("Counts once you set a session length (Time on the Plan). Empty for none.")))),

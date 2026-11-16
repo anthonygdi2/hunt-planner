@@ -159,7 +159,8 @@ export function readHunt(id, v) {
 // The loot bonuses on during a hunt (since November 14, 2026; hunts logged before have none): {boosted (slug or null),
 // prey [{slug, pct}] (loot Preys, up to PREY_SLOTS), talisman (the logging character's Talisman loot %, 0 when off the
 // bounty or none)}, or null when the hunt has none recorded. Since November 15, 2026 also damage and leech: that
-// Talisman's damage and life leech percents on a hunt on the bounty, present only when above 0.
+// Talisman's damage and life leech percents on a hunt on the bounty, present only when above 0, and preyDamage
+// [{slug, pct}] (damage Preys), present only when there are any.
 export function readBoosts(v) {
   if (!v || typeof v !== "object") return null;
   const slug = (s) => (typeof s === "string" && s ? s.slice(0, 80) : null), lp = PREY.loot;
@@ -168,6 +169,9 @@ export function readBoosts(v) {
       .map((q) => ({ slug: slug(q.slug), pct: Math.min(lp.hi, Math.max(lp.lo, Math.round(Number(q.pct)) || lp.lo)) })),
     talisman: plNum(v.talisman, 0, TALISMAN.loot.max) || 0 };
   ["damage", "leech"].forEach((k) => { const n = plNum(v[k], 0, TALISMAN[k].max); if (n > 0) out[k] = n; });
+  const dp = PREY.damage, pd = (Array.isArray(v.preyDamage) ? v.preyDamage : []).filter((q) => q && slug(q.slug)).slice(0, PREY_SLOTS)
+    .map((q) => ({ slug: slug(q.slug), pct: Math.min(dp.hi, Math.max(dp.lo, Math.round(Number(q.pct)) || dp.lo)) }));
+  if (pd.length) out.preyDamage = pd;
   return out;
 }
 export function readHunts(docs) {
@@ -192,11 +196,11 @@ export function readCreatureDocs(docs) {
 
 // ---------- planner: profiles/{pid}/planner/state ----------
 export function plDefaults() {
-  return { fixedHours: null, diff: "master", held: null, today: { boosted: null, boostedDay: null, prey: [], event: 0 }, lens: {}, active: null, travel: {}, noAccess: {}, world: null };
+  return { fixedHours: null, diff: "master", held: null, today: { boosted: null, boostedDay: null, prey: [], event: 0 }, lens: {}, active: null, travel: {}, noAccess: {}, respawnLimit: {}, world: null };
 }
 // A number within lo..hi, else null.
 export function plNum(v, lo, hi) { const n = Number(v); return v != null && v !== "" && isFinite(n) && n >= lo && n <= hi ? n : null; }
-// The planner state {fixedHours, diff, held, today, world, travel, noAccess, lens, active}; known(slug) says whether a creature
+// The planner state {fixedHours, diff, held, today, world, travel, noAccess, respawnLimit, lens, active}; known(slug) says whether a creature
 // exists. fixedHours: a session length the player picked; none means hourly rates. (An older sessionHours field held a
 // default that was saved whether or not it was chosen, so it's ignored.)
 export function readPlState(v, known) {
@@ -220,6 +224,9 @@ export function readPlState(v, known) {
   if (v.travel && typeof v.travel === "object") Object.keys(v.travel).forEach((k) => { const m = plNum(v.travel[k], 1, 600); if (validSpotId(k) && m) s.travel[k] = m; });
   // Spots the character can't go to (spot id → true, since November 15, 2026): kept out of its plan and its creatures' numbers.
   if (v.noAccess && typeof v.noAccess === "object") Object.keys(v.noAccess).forEach((k) => { if (validSpotId(k) && v.noAccess[k] === true) s.noAccess[k] = true; });
+  // Spots where killing faster adds nothing for the character (respawn is the limit, or creatures die in one hit): damage
+  // bonuses count for nothing there.
+  if (v.respawnLimit && typeof v.respawnLimit === "object") Object.keys(v.respawnLimit).forEach((k) => { if (validSpotId(k) && v.respawnLimit[k] === true) s.respawnLimit[k] = true; });
   if (v.lens && typeof v.lens === "object") s.lens = v.lens;
   // The bounty is checked by readBounty, which also migrates the fields above; keep it as stored.
   if (v.bounty && typeof v.bounty === "object") s.bounty = v.bounty;

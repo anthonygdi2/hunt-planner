@@ -46,7 +46,7 @@ test("characters page: what it shows", () => {
   assert.equal($("#ch-name").value, "Main EK");
   assert.equal($("#ch-voc").value, "Elite Knight");
   assert.deepEqual([$("#ch-loot").value, $("#ch-bonus").value, $("#ch-damage").value, $("#ch-leech").value], ["12.5", "20", "10.25", "0"], "the Talisman's four bonuses");
-  assert.match(document.body.textContent, /Damage and life leech are kept with each hunt you log on a bounty/);
+  assert.match(document.body.textContent, /Damage counts as faster kills\. Life leech is kept with each hunt/);
   assert.match(document.body.textContent, /bonuses as the game shows them, 0 without one/);
   assert.equal($("#src-ref").getAttribute("aria-checked"), "true");
   assert.equal($("#src-other").getAttribute("aria-checked"), "false", "refOtherOff migrates to the switch");
@@ -454,7 +454,7 @@ test("log: the saved hunts, their vocation and level filters, and the editor", a
 
 // The loot bonuses editor's view (app/views.js boostsView) for a hunt that killed Rats and Cave Rats.
 const BOOSTS = (o) => Object.assign({ boosted: "", boostedOptions: [{ value: "", label: "None" }, { value: "rat", label: "Rat" }, { value: "cave-rat", label: "Cave Rat" }],
-  prey: [], pcts: [13, 16, 19, 22, 25, 28, 31, 34, 37, 40].map((x) => ({ value: x, label: "+" + x + "%" })), canAddPrey: true, nextPrey: "rat",
+  prey: [], kinds: [{ value: "loot", label: "Loot" }, { value: "damage", label: "Damage" }], canAddPrey: true, nextPrey: "rat",
   talisman: null, talismanOk: true, damage: null, damageOk: true, leech: null, leechOk: true, draft: {}, value: {} }, o || {});
 
 test("log: the loot bonuses on during a hunt, in the preview and the saved hunt's editor", async () => {
@@ -464,24 +464,26 @@ test("log: the loot bonuses on during a hunt, in the preview and the saved hunt'
   const creatures = [{ value: "", label: "None" }, { value: "rat", label: "Rat" }, { value: "cave-rat", label: "Cave Rat" }];
   const view = { text: "x", problem: "", read: "", preview: { hours: 1 }, where: "known", spotId: "a", spots: [{ value: "a", label: "A" }], parents: [], name: "", parentId: "", note: "",
     nameHint: "", exp: "5kk", profit: "300k", kph: [], raids: null, canSave: true, saved, duplicate: null,
-    boosts: BOOSTS({ boosted: "rat", prey: [{ i: 0, slug: "cave-rat", pct: 25, creatures }], talisman: "7.5", damage: "10", leech: "" }) };
+    boosts: BOOSTS({ boosted: "rat", prey: [{ i: 0, slug: "cave-rat", pct: 25, kind: "loot", creatures, pcts: [13, 16, 19, 22, 25, 28, 31, 34, 37, 40].map((x) => ({ value: x, label: "+" + x + "%" })) }], talisman: "7.5", damage: "10", leech: "" }) };
   let $ = mount(log.render(view, { leaving: false }, on));
   assert.equal($("#log-boosts").getAttribute("role"), "group");
   assert.match($("#log-boosts").textContent, /On during this hunt/);
   assert.equal($("#log-boosted").value, "rat", "filled from today's boosts");
   assert.equal($("#log-prey-0").value, "cave-rat");
   assert.equal($("#log-prey-0-pct").value, "25");
+  assert.equal($("#log-prey-0-kind").value, "loot");
   assert.equal($("#log-talisman").value, "7.5");
   assert.deepEqual([$("#log-damage").value, $("#log-leech").value], ["10", ""], "the Talisman's damage and life leech");
-  assert.match($("#log-boosts").textContent, /kept with the hunt/);
+  assert.match($("#log-boosts").textContent, /Life leech is only kept with the hunt/);
   $("#log-boosted").value = ""; $("#log-boosted").dispatchEvent(new dom.window.Event("change"));
   $("#log-prey-0-pct").value = "40"; $("#log-prey-0-pct").dispatchEvent(new dom.window.Event("change"));
   $("#log-prey-0").value = "rat"; $("#log-prey-0").dispatchEvent(new dom.window.Event("change"));
+  $("#log-prey-0-kind").value = "damage"; $("#log-prey-0-kind").dispatchEvent(new dom.window.Event("change"));
   $("#log-prey-0-remove").click();
   $("#log-prey-add").click();
   $("#log-talisman").value = "10"; $("#log-talisman").dispatchEvent(new dom.window.Event("change"));
   $("#log-leech").value = "4"; $("#log-leech").dispatchEvent(new dom.window.Event("change"));
-  assert.deepEqual(s.calls, [["boost", { boosted: "" }], ["boost", { prey: 0, pct: 40 }], ["boost", { prey: 0, slug: "rat" }], ["boost", { removePrey: 0 }],
+  assert.deepEqual(s.calls, [["boost", { boosted: "" }], ["boost", { prey: 0, pct: 40 }], ["boost", { prey: 0, slug: "rat" }], ["boost", { prey: 0, kind: "damage" }], ["boost", { removePrey: 0 }],
     ["boost", { addPrey: "rat" }], ["boost", { talisman: "10" }], ["boost", { leech: "4" }]]);
   // Off the bounty there's no Talisman field; a percent that doesn't read says so, and Save waits.
   $ = mount(log.render(Object.assign({}, view, { boosts: BOOSTS({ canAddPrey: false }) }), { leaving: false }, on));
@@ -513,6 +515,7 @@ test("log view: the loot bonuses default from today's boosts and the Talisman, a
   const model = (o) => Object.assign({ now: end + 60000, spotIndex: () => ({ list: [], spots: {}, idOf: () => null }),
     bounty: () => ({ mode: "active", active: { slug: "rat" } }),
     today: () => ({ boosted: "rat", prey: [{ slug: "cave-rat", kind: "loot", pct: 25 }, { slug: "rat", kind: "xp", pct: 40 }, { slug: "cobra-scout", kind: "loot", pct: 40 }], event: 0 }) }, o || {});
+  const dmgToday = () => ({ boosted: null, prey: [{ slug: "rat", kind: "damage", pct: 15 }, { slug: "cave-rat", kind: "loot", pct: 25 }], event: 0 });
   const state = { pid: "a", profiles: { a: { vocation: "Elite Knight", level: 100, talisman: { loot: 7.5, bestiary: 0, damage: 10.25, leech: 0 } } }, hunts: [] };
   const draft = { text, where: "new", name: "Rat Cave" };
   // Ended this server day: today's boosted creature and loot Preys on creatures killed in it; on the bounty, the Talisman.
@@ -525,6 +528,15 @@ test("log view: the loot bonuses default from today's boosts and the Talisman, a
   assert.deepEqual(v.boosts.boostedOptions.map((o) => o.value), ["", "rat", "cave-rat"]);
   assert.equal(v.boosts.nextPrey, "rat");
   assert.equal(v.canSave, true);
+  // A damage Prey on a creature killed is filled in too, and stored apart from the loot Preys; changing a Prey's bonus
+  // keeps its size within that bonus's range.
+  v = logView(draft, model({ today: dmgToday }), catalog, false, state);
+  assert.deepEqual(v.boosts.prey.map((q) => [q.slug, q.kind, q.pct, q.pcts.length]), [["rat", "damage", 15, 10], ["cave-rat", "loot", 25, 10]]);
+  assert.deepEqual(v.boosts.prey[0].pcts.map((o) => o.value), [7, 9, 11, 13, 15, 17, 19, 21, 23, 25]);
+  assert.deepEqual([v.boosts.value.prey, v.boosts.value.preyDamage], [[{ slug: "cave-rat", pct: 25 }], [{ slug: "rat", pct: 15 }]]);
+  const swapped = boostsPatch(boostsPatch(v.boosts.draft, { prey: 1, kind: "damage" }), { prey: 0, kind: "loot" });
+  assert.deepEqual(swapped.prey.map((q) => [q.kind, q.pct]), [["loot", 15], ["damage", 25]]);
+  assert.deepEqual(boostsPatch(boostsPatch(v.boosts.draft, { prey: 1, pct: 40 }), { prey: 1, kind: "damage" }).prey[1], { slug: "cave-rat", pct: 25, kind: "damage" });
   // An older hunt: nothing from today's boosts; off the bounty: no Talisman.
   v = logView(draft, model({ now: end + 3 * 864e5, bounty: () => ({ mode: "offers", active: null }) }), catalog, false, state);
   assert.deepEqual(v.boosts.value, { boosted: null, prey: [], talisman: 0 });
@@ -589,7 +601,7 @@ test("spots: search, sort, toggles, rows, more, and the badges legend", async ()
 test("spot page: sections, Mark taken, logs, variations, delete a hunt inline, advanced controls", async () => {
   const spot = await import("../../src/ui/screens/spot.js");
   const view = { id: "cobra-bastion", name: "Cobra Bastion", sub: null, parentId: null, scoreLine: "Score 96 for Main EK · Mostly exp, some profit", exp: "7.8kk", profit: "300k",
-    badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: null, access: { who: "Main EK", blocked: false, travel: "12", timed: false },
+    badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: null, access: { who: "Main EK", blocked: false, travel: "12", timed: false, respawnLimit: false },
     creatures: [{ slug: "cobra-assassin", name: "Cobra Assassin", perHour: "≈ 400/h", tag: "Your bounty", gold: true }, { slug: "cobra-scout", name: "Cobra Scout", perHour: "≈ 90/h", tag: "Weekly task", gold: false }],
     sources: { hunts: "None yet.", reference: { who: "Elite Knight, level 500+, from Kusnier’s video (Sep 2026)", url: "https://example.org/v", recorded: "As recorded: 9.1kk", adjusted: "Adjusted to you: 7.8kk",
       details: { key: "ref-cb", open: false, caption: "Recorded over 15 min.", amounts: [{ label: "Raw exp", total: "2.28kk", perHour: "9.1kk" }],
@@ -602,19 +614,23 @@ test("spot page: sections, Mark taken, logs, variations, delete a hunt inline, a
         kills: [{ name: "Cobra Assassin", count: "520", perHour: "520/h" }], counts: true, notes: null, url: null } }],
     emptySessions: "No sessions.", own: { name: "Cobra Bastion", armed: false, deleteText: "Deletes this spot." } };
   const s = spy(), on = {};
-  ["back", "taken", "free", "log", "vary", "open", "arm", "deleteSession", "details", "raid", "rename", "deleteSpot", "access", "travel"].forEach((k) => { on[k] = s.fn(k); });
+  ["back", "taken", "free", "log", "vary", "open", "arm", "deleteSession", "details", "raid", "rename", "deleteSpot", "access", "travel", "respawnLimit"].forEach((k) => { on[k] = s.fn(k); });
   let $ = mount(spot.render(view, on));
   // For this character: whether it can go there, and its travel minutes.
   assert.match(document.body.textContent, /For Main EK/);
   assert.deepEqual([$("#spot-access").getAttribute("role"), $("#spot-access").getAttribute("aria-checked"), $("#spot-travel").value], ["switch", "true", "12"]);
   assert.equal($("#spot-blocked"), null);
   assert.match(document.body.textContent, /Counts once you set a session length/);
+  assert.equal($("#spot-damage").getAttribute("aria-checked"), "true", "more damage means more kills, unless switched off");
   $("#spot-access").click();
   $("#spot-travel").value = "20"; $("#spot-travel").dispatchEvent(new dom.window.Event("change"));
-  assert.deepEqual(s.calls, [["access", false], ["travel", "20"]]);
+  $("#spot-damage").click();
+  assert.deepEqual(s.calls, [["access", false], ["travel", "20"], ["respawnLimit", true]]);
   s.calls.length = 0;
-  $ = mount(spot.render(Object.assign({}, view, { access: { who: "Main EK", blocked: true, travel: "", timed: true } }), on));
+  $ = mount(spot.render(Object.assign({}, view, { access: { who: "Main EK", blocked: true, travel: "", timed: true, respawnLimit: true } }), on));
   assert.equal($("#spot-access").getAttribute("aria-checked"), "false");
+  assert.equal($("#spot-damage").getAttribute("aria-checked"), "false");
+  assert.match(document.body.textContent, /Off: the Talisman’s damage and a damage Prey add nothing here/);
   assert.equal($("#spot-blocked").textContent, "Can’t go there");
   assert.match(document.body.textContent, /Off: this spot stays out of the plan.*Comes out of your session’s hunting time/);
   $("#spot-access").click();

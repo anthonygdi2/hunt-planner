@@ -150,6 +150,8 @@ export function createApp({ data, prefs, now, browserLang }) {
     const v = readBoosts(b || {});
     const out = { boosted: known(v.boosted) ? v.boosted : null, prey: v.prey.filter((q) => known(q.slug)), talisman: task ? v.talisman : 0 };
     if (task) ["damage", "leech"].forEach((k) => { if (v[k] > 0) out[k] = v[k]; });
+    const pd = (v.preyDamage || []).filter((q) => known(q.slug));
+    if (pd.length) out.preyDamage = pd;
     return out;
   }
   function newSpotId(name) {
@@ -426,6 +428,12 @@ export function createApp({ data, prefs, now, browserLang }) {
       const next = Object.assign({}, state.planner.state.noAccess);
       if (canGo) delete next[spotId]; else next[spotId] = true;
       actions.savePlanner({ noAccess: next });
+    },
+    // A spot where killing faster adds nothing for the character (respawn is the limit): damage bonuses count for nothing there.
+    setRespawnLimit(spotId, limited) {
+      const next = Object.assign({}, state.planner.state.respawnLimit);
+      if (limited) next[spotId] = true; else delete next[spotId];
+      actions.savePlanner({ respawnLimit: next });
     },
     // The character's own travel time to a spot in minutes (1 to 600; anything else clears it). It comes out of the
     // hunting time when a session length is set.

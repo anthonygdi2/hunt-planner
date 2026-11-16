@@ -132,15 +132,18 @@ export function makeModel(state, derived, now, opts) {
       skip: key ? (x, sp) => huntCheck(x, sp, d.huntCtx, lens) : (x) => d.hunts.why.get(x) || "" });
     return indexes[key];
   };
-  const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost, expTable: state.expTable });
+  // The share of a hunt at a spot spent killing: 0 where the character says respawn is the limit, else the default.
+  const killTime = (sp) => (plState.respawnLimit && plState.respawnLimit[sp.id] ? 0 : null);
+  const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost, expTable: state.expTable,
+    killTime: killTime(sp) });
   const heldTask = (h, diff) => coreHeldTask(h, diff, { catalog, chalRates: chalRates() });
   const tal = readTalisman(p);
   const spotValue = (sp, o) => {
     o = o || {};
     const nums = spotNums(sp);
     if (!nums) return null;
-    return coreSpotValue(sp, nums, { hours: o.hours, held: o.held, diff: o.diff || boardDiff(), today: o.today, travel: o.travel, weekly: o.weekly || openWeeklies() },
-      { catalog, chalRates: chalRates(), entries, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, raidP: d.raidP, expTable: state.expTable, t });
+    return coreSpotValue(sp, nums, { hours: o.hours, held: o.held, diff: o.diff || boardDiff(), today: o.today, travel: o.travel, weekly: o.weekly || openWeeklies(), killTime: killTime(sp) },
+      { catalog, chalRates: chalRates(), entries, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, talismanDamage: tal.damage, raidP: d.raidP, expTable: state.expTable, t });
   };
   const scaleArgs = (diff) => { const w = weights(); return { weights: w, model: GOAL_KEYS.some((k) => w[k] > 0) ? poolModel(diff) : null }; };
   const plScale = (values, diff) => scaleSpots(values, scaleArgs(diff));

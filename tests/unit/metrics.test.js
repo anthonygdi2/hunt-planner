@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { metrics, bestiaryOf, expShares, lootMult } from "../../src/core/metrics.js";
+import { metrics, bestiaryOf, expShares, lootMult, killMult } from "../../src/core/metrics.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 
 const catalog = makeCatalog([
@@ -105,4 +105,29 @@ test("what loot bonuses multiply a spot's loot by", () => {
   near(lootMult(shares, "a", {}), 0.75 * 2 + 0.25);
   near(lootMult(shares, null, { b: 40 }), 0.75 + 0.25 * 1.4);
   near(lootMult(shares, "a", { a: 25 + 10, b: 40 }), 0.75 * 2 * 1.35 + 0.25 * 1.4);
+});
+
+test("damage bonuses: faster kills by the creature's share of the spot and the time spent killing", () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, (msg || "") + " " + a + " vs " + b);
+  assert.equal(killMult({ a: 1 }, {}, null), 1);
+  assert.equal(killMult({ a: 1 }, { a: 10 }, 0), 1, "respawn is the limit: nothing gained");
+  near(killMult({ a: 1 }, { a: 10 }, 1), 1.1, "all the time is spent killing the one creature: +10%");
+  near(killMult({ a: 0.5, b: 0.5 }, { a: 10 }, 1), 1 / (1 - 0.5 * 0.1 / 1.1), "half the spot");
+  near(killMult({ a: 0.5, b: 0.5 }, { a: 10 }, null), 1 / (1 - 0.5 * 0.5 * 0.1 / 1.1), "the default: half the hunt is killing");
+  near(killMult({ a: 0.5, b: 0.5 }, { a: 10, b: 25, c: 30 }, 1), 1 / (1 - 0.5 * 0.1 / 1.1 - 0.5 * 0.25 / 1.25), "each creature's own bonus; one that isn't there adds nothing");
+  // In the metrics: the Talisman's damage on the creature raises its kill rate at its spot, and exp and profit with it.
+  const rec = { kph: 300, xph: 3e6, pph: 2e5, spot: "Bastion" }, at = { spotKph: { Bastion: { "cobra-assassin": 300, "cobra-scout": 300 } }, expTable: { "cobra-assassin": 1000, "cobra-scout": 1000 } };
+  const plain = metrics(cobra, rec, Object.assign({}, base, at)), m = metrics(cobra, rec, Object.assign({}, base, at, { talismanDamage: 10 }));
+  const km = 1 / (1 - 0.5 * 0.5 * 0.1 / 1.1);
+  assert.equal("killBonus" in plain, false);
+  near(m.killBonus, km - 1);
+  near(m.profit, 2e5 * km);
+  near(m.hours, plain.hours / km, "the task is done sooner");
+  near(m.xp, plain.xp * km, "hunting exp and the task reward per hour both rise");
+  near(m.bounty, plain.bounty * km);
+  // Respawn-limited spot: nothing. Numbers from hunts on its bounty logged before bonuses were recorded: nothing added.
+  assert.equal(metrics(cobra, rec, Object.assign({}, base, at, { talismanDamage: 10, killTime: (spot) => (spot === "Bastion" ? 0 : null) })).profit, 2e5);
+  assert.equal(metrics(cobra, Object.assign({ taskBonus: true }, rec), Object.assign({}, base, at, { talismanDamage: 10 })).profit, 2e5);
+  // No spot rates: the record's own kill share stands in.
+  near(metrics(cobra, { kph: 300, xph: 3e6, pph: 2e5, share: 1 }, Object.assign({}, base, { talismanDamage: 10 })).profit, 2e5 / (1 - 0.5 * 0.1 / 1.1));
 });

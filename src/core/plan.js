@@ -2,7 +2,7 @@
 import { norm } from "./text.js";
 import { creatureInPool } from "./catalog.js";
 import { taskReward, kindMult } from "./rewards.js";
-import { bestiaryOf, expShares, lootMult } from "./metrics.js";
+import { bestiaryOf, expShares, lootMult, killMult } from "./metrics.js";
 import { GOAL_KEYS, weightedValue } from "./score.js";
 import { RHO, taskShape, rateThreshold } from "./reroll.js";
 import { markAge, markActive, occOdds, orderByOdds } from "./occupancy.js";
@@ -60,14 +60,38 @@ export function heldTask(held, diff, ctx) {
 // on that bounty without the bonuses on during them (nums.tasks: they include it; hunts with boosts have it taken out,
 // rates.js huntLootBonus). With no session length
 // (the default): hourly rates, every remaining kill worth reward / kills left with no cap, and no travel.
+// Damage bonuses raise the spot's kill rate, and every rate with it (killMult in metrics.js): today's damage Preys on
+// creatures that die here, and the Talisman's damage on the held creature while the bounty lasts (not when the spot's
+// own hunts include some on that bounty logged before bonuses were recorded). killBonus is what they add, as a fraction.
 // nums: spotNumbers(sp). opts: {hours, held, diff, today, travel (spot id → the character's minutes), weekly (open
-// weeklies)}. ctx: {catalog, chalRates, entries, bestiaryBonus, talismanLoot, raidP, expTable}.
+// weeklies), killTime (the share of a hunt here spent killing; null for the default)}. ctx: {catalog, chalRates,
+// entries, bestiaryBonus, talismanLoot, talismanDamage, raidP, expTable}.
 export function spotValue(sp, nums, opts, ctx) {
   if (!nums) return null;
   // Travel: the character's own minutes for this spot, else the spot's meta.
   const own = opts.travel && opts.travel[sp.id], tm = own > 0 ? own : sp.meta.travelMin;
-  const rate = !(opts.hours > 0), H = rate ? 1 : opts.hours, travel = tm > 0 ? tm : 0, tf = todayFactor(nums.kph, opts.today, ctx);
+  const rate = !(opts.hours > 0), H = rate ? 1 : opts.hours, travel = tm > 0 ? tm : 0;
   const Hh = rate ? 1 : Math.max(0, H - travel / 60), diff = opts.diff, held = heldTask(opts.held, diff, ctx);
+  // Damage bonuses: faster kills, so every rate of the spot rises together.
+  const share = expShares(nums.kph, ctx.expTable), dmg = {}, dmgNotes = [], t = ctx.t || EN;
+  ((opts.today && opts.today.prey) || []).forEach((p) => {
+    if (p.kind !== "damage" || !(p.pct > 0) || !(nums.kph[p.slug] > 0)) return;
+    dmg[p.slug] = (dmg[p.slug] || 0) + p.pct;
+    dmgNotes.push(t("{creature} prey +{pct}% damage", { creature: ctx.catalog.bySlug[p.slug] ? ctx.catalog.bySlug[p.slug].name : p.slug, pct: p.pct }));
+  });
+  const kmPrey = killMult(share, dmg, opts.killTime), td = Number(ctx.talismanDamage) || 0;
+  let km = kmPrey;
+  if (td > 0 && held && held.left > 0 && nums.kph[held.slug] > 0 && !(nums.src === "own" && (nums.tasks || []).indexOf(held.slug) !== -1)) {
+    const both = Object.assign({}, dmg, { [held.slug]: (dmg[held.slug] || 0) + td }), kmAll = killMult(share, both, opts.killTime), hk = nums.kph[held.slug] * kmAll;
+    // Only for the share of the hunting time the bounty is still on.
+    km = kmPrey + (kmAll - kmPrey) * (rate || !(hk * Hh > 0) ? 1 : Math.min(1, held.left / (hk * Hh)));
+  }
+  if (km > 1) {
+    const kph = {};
+    Object.keys(nums.kph).forEach((k) => { kph[k] = nums.kph[k] * km; });
+    nums = Object.assign({}, nums, { kph, xph: nums.xph * km, pph: nums.pph != null ? nums.pph * km : nums.pph, lph: nums.lph != null ? nums.lph * km : nums.lph });
+  }
+  const tf = todayFactor(nums.kph, opts.today, ctx);
   const v = { id: sp.id, name: sp.name, src: nums.src, entry: nums.entry, profitStale: !!nums.profitStale, hours: rate ? null : H, huntHours: rate ? null : Hh,
     travelMin: travel, kph: nums.kph, xph: nums.xph, pph: nums.pph, held: null, weekly: [], today: tf.notes,
     parts: { hunt: nums.xph * Hh / H, today: nums.xph * (tf.mult - 1) * Hh / H, held: 0, weekly: 0 } };
@@ -75,6 +99,7 @@ export function spotValue(sp, nums, opts, ctx) {
   const lootOn = nums.pph != null && nums.lph > 0 && tf.loot > 1;
   v.lootBonus = lootOn ? nums.lph * (tf.loot - 1) * Hh / H : 0;
   if (lootOn) v.today = tf.notes.concat(tf.lootNotes);
+  if (km > 1) { v.killBonus = km - 1; if (kmPrey > 1) v.today = v.today.concat(dmgNotes); }
   let bounty = 0;
   v.talismanLoot = 0;
   if (held && held.left > 0 && nums.kph[held.slug] > 0) {
