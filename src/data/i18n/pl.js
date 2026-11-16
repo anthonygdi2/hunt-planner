@@ -633,4 +633,12 @@ export default {
   "Damage and life leech are kept with each hunt you log on a bounty. The plan doesn’t count them yet.": "Obrażenia i life leech są zapisywane z każdym huntem na bounty. Plan jeszcze ich nie liczy.",
   "Loot bonuses are taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.": "Bonusy do lootu są odejmowane od lootu z tego huntu, żeby dzisiejsze bonusy nie liczyły się dwa razy.",
   "Damage and life leech are kept with the hunt. They don’t change any number yet.": "Obrażenia i life leech są zapisywane z huntem. Na razie nie zmieniają żadnej liczby.",
+  "Can’t go there": "Nie mogę tam iść",
+  "For {name}": "Dla: {name}",
+  "I can go there": "Mogę tam iść",
+  "Off: this spot stays out of the plan, and its creatures are valued at other spots.": "Wyłączone: ten spot nie trafia do planu, a jego potwory są wyceniane na innych spotach.",
+  "Turn off for a spot you have no access to. It then stays out of the plan.": "Wyłącz dla spotu, do którego nie masz dostępu. Nie trafi wtedy do planu.",
+  "Travel time (minutes)": "Czas dojścia (minuty)",
+  "Comes out of your session’s hunting time. Empty for none.": "Odejmowany od czasu huntu w sesji. Puste, jeśli brak.",
+  "Counts once you set a session length (Time on the Plan). Empty for none.": "Liczy się, gdy ustawisz długość sesji (Czas w Planie). Puste, jeśli brak.",
 };

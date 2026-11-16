@@ -153,7 +153,7 @@ export function makeModel(state, derived, now, opts) {
     const diff = o.diff || boardDiff(), H = o.hours > 0 ? o.hours : null, wk = o.weekly || openWeeklies();
     const offers = planOffers(o.offers || boardOffers(), o.held, diff), idx = o.index || spotIndex();
     const po = corePlanOptions({ index: idx, offers, hours: H, team: o.team,
-      inLens: (sp) => lensCheck(sp, o.lens),
+      inLens: (sp) => (o.blocked && o.blocked[sp.id] ? "blocked" : lensCheck(sp, o.lens)),
       valueAt: (sp, offer) => spotValue(sp, { hours: H, held: offer, diff, weekly: wk, today: o.today, travel: o.travel }),
       scale: (all) => plScale(all, diff) });
     po.diff = diff;
@@ -166,9 +166,10 @@ export function makeModel(state, derived, now, opts) {
       tokensUnknown: o.tokensUnknown, hpd: set.hpd, solve: rerollPlan, occupancy: o.occupancy, world: o.world, markMinutes: settings.takenMinutes });
   };
   // The planner's own context for planChain and planOptions: its saved session length, difficulty, held offer, today's
-  // bonuses, travel times, occupancy and world (from the character settings).
+  // bonuses, travel times, the spots it can't go to (blocked: left out of the options), occupancy and world (from the
+  // character settings).
   const plannerCtx = (extra) => Object.assign({ hours: plState.fixedHours, tokensUnknown: !rerollSettings().hasLeft, diff: bounty().difficulty, held: held(), today: today(),
-    travel: plState.travel, occupancy: pl.occupancy, world: settings.world }, extra || {});
+    travel: plState.travel, blocked: plState.noAccess, occupancy: pl.occupancy, world: settings.world }, extra || {});
 
   return { derived: d, now, sources, settings, bounty, weights, chalRates, slots, minLevelFor, lockedFor, ratingOf, eff, metricsFor, boardDiff, rerollSettings, offerOdds, offerLog, boardLogged, poolModel, rerollPlan, difficultyCompare,
     boardOffers, weekly, weeklyRows, openWeeklies, weeklyBonus, held, today, todayFactor, spotIndex, spotNums, heldTask, spotValue, plScale, spotScores,

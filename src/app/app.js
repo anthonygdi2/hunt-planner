@@ -421,6 +421,19 @@ export function createApp({ data, prefs, now, browserLang }) {
     markFree(spotId) { mark(spotId, "free"); },
     startHunting(spotId) { mark(spotId, "free"); actions.savePlanner({ hunting: { spotId, at: iso() } }); },
     stopHunting() { actions.savePlanner({ hunting: null }); },
+    // A spot the character can't go to (no access quest, say): out of its plan and its creatures' numbers until allowed again.
+    setSpotAccess(spotId, canGo) {
+      const next = Object.assign({}, state.planner.state.noAccess);
+      if (canGo) delete next[spotId]; else next[spotId] = true;
+      actions.savePlanner({ noAccess: next });
+    },
+    // The character's own travel time to a spot in minutes (1 to 600; anything else clears it). It comes out of the
+    // hunting time when a session length is set.
+    setTravel(spotId, minutes) {
+      const next = Object.assign({}, state.planner.state.travel), m = Math.round(Number(String(minutes == null ? "" : minutes).trim()));
+      if (m >= 1 && m <= 600) next[spotId] = m; else delete next[spotId];
+      actions.savePlanner({ travel: next });
+    },
     // Time: a session length in hours, or null for no limit.
     setFixedHours(h) { actions.savePlanner({ fixedHours: Number(h) > 0 ? Number(h) : null }); },
     // Today's boosts: they count only on the server day they were set.

@@ -111,7 +111,7 @@ Reached from Hunting now, a spot page, a variation button, or Spots → "Log a c
 
 **Shows:** name, score for this character and goal, exp/h, profit/h, source badge. Creatures here with kills/h, marked "Your bounty", "Bounty offer B" or "Weekly task". Where the numbers come from: your hunts, the reference as recorded and as adjusted, sources skipped and why. Your variations (name, score, numbers, note, hunts). Your sessions (date, length, exp/h, profit/h; its details show the vocation and level it was logged at and which character logged it; a hunt that doesn’t count for this character says why: logged as another vocation, below the spot’s level, or too far from the character’s level).
 
-**You can:** **Mark taken** / Free again; **Log a clean hunt** here; **Log a hunt as a new variation** (opens Log with New spot and this spot as parent); open a variation; open a creature; delete one of your sessions (inline confirm). Advanced mode: type your own numbers for this spot; **[Decision]** rename or delete a spot you created; edit a session's Echo Raid counts.
+**You can:** **Mark taken** / Free again; switch **I can go there** off for a spot this character has no access to (it leaves the plan; badged “Can’t go there” here and in Spots) and type its travel minutes; **Log a clean hunt** here; **Log a hunt as a new variation** (opens Log with New spot and this spot as parent); open a variation; open a creature; delete one of your sessions (inline confirm). Advanced mode: type your own numbers for this spot; **[Decision]** rename or delete a spot you created; edit a session's Echo Raid counts.
 
 ## 7. Creatures (was Classic view)
 

@@ -2,7 +2,7 @@
 // come from, the character's variations of it, and the hunts logged here (delete with an inline confirm; Echo Raid
 // counts in Advanced). Advanced mode also renames or deletes a spot the character made.
 import { h, icon } from "../dom.js";
-import { badges, confirmButton } from "../components.js";
+import { badges, confirmButton, switchCtl, settingRow, field } from "../components.js";
 import { t } from "../../app/lang.js";
 
 // A hunt's details (view: spotView's details): a Show details toggle and, when open, the amounts in total and per
@@ -28,7 +28,8 @@ function detailsPanel(d) {
 }
 
 // view: app/views.js spotView (null: no such spot). on: {back(), taken(), free(), log(), vary(), open(id),
-// arm(id | "spot" | null), deleteSession(id), details(key), raid(sessionId, name, value), rename(name), deleteSpot()}.
+// arm(id | "spot" | null), deleteSession(id), details(key), raid(sessionId, name, value), rename(name), deleteSpot(),
+// access(canGo), travel(minutes)}.
 export function render(view, on) {
   const back = h("div", null, h("a", { href: "#/spots", class: "hp-back", onClick: (e) => { e.preventDefault(); on.back(); } }, icon("back", 20), t("Spots")));
   if (!view) return h("div", { class: "hp-section hp-narrow" }, back, h("p", { class: "hp-p hp-muted" }, t("That spot isn’t in the list any more.")));
@@ -44,11 +45,19 @@ export function render(view, on) {
       h("div", null, h("div", { class: "hp-stat" }, view.exp), h("div", { class: "hp-caption" }, t("exp/h"))),
       h("div", null, h("div", { class: "hp-stat" }, view.profit), h("div", { class: "hp-caption" }, t("profit/h")))),
     badges(view.badges, true),
-    view.taken ? h("p", { class: "hp-p hp-badges" }, h("span", { class: "hp-badge taken" }, view.taken)) : null,
+    view.taken || view.access.blocked ? h("p", { class: "hp-p hp-badges" }, view.taken ? h("span", { class: "hp-badge taken" }, view.taken) : null,
+      view.access.blocked ? h("span", { id: "spot-blocked", class: "hp-badge taken" }, t("Can’t go there")) : null) : null,
     h("div", { class: "hp-grid2" },
       view.taken ? h("button", { id: "spot-free", type: "button", class: "hp-btn", onClick: on.free }, t("Free again"))
         : h("button", { id: "spot-taken", type: "button", class: "hp-btn", onClick: on.taken }, t("Mark taken")),
       h("button", { id: "spot-log", type: "button", class: "hp-btn", onClick: on.log }, t("Log a clean hunt"))),
+    section("acc-h", t("For {name}", { name: view.access.who }),
+      h("div", { class: "hp-card" },
+        settingRow(t("I can go there"), view.access.blocked ? t("Off: this spot stays out of the plan, and its creatures are valued at other spots.") : t("Turn off for a spot you have no access to. It then stays out of the plan."),
+          switchCtl({ id: "spot-access", label: t("I can go there"), on: !view.access.blocked, onToggle: on.access })),
+        field({ id: "spot-travel", label: t("Travel time (minutes)"), value: view.access.travel, inputmode: "numeric", maxlength: 3, onCommit: on.travel }),
+        h("span", { class: "hp-caption" }, view.access.timed ? t("Comes out of your session’s hunting time. Empty for none.")
+          : t("Counts once you set a session length (Time on the Plan). Empty for none.")))),
     section("cr-h", t("Creatures here"),
       view.creatures.length ? h("div", { class: "hp-card flush" }, view.creatures.map((c) => h("div", { class: "hp-line" },
         h("span", null, h("b", null, c.name), c.tag ? [h("br"), h("span", { class: "hp-caption" + (c.gold ? " gold" : "") }, c.tag)] : null),

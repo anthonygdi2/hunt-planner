@@ -140,6 +140,7 @@ export function mount(root, app, host) {
         arm: (x) => { U.armed = x; draw(); }, deleteSession: (x) => { U.armed = null; a.deleteSession(x); },
         details: (k) => { U.open = Object.assign({}, U.open, { [k]: !(U.open || {})[k] }); draw(); },
         raid: (x, name, n) => { const ses = v.sessions.filter((y) => y.id === x)[0]; if (ses) a.setSessionRaids(x, Object.assign({}, ses.raidsBy, { [name]: n })); },
+        access: (canGo) => a.setSpotAccess(id, canGo), travel: (m) => a.setTravel(id, m),
         rename: (n) => a.renameSpot(id, n), deleteSpot: () => { U.armed = null; a.deleteSpot(id); go("spots"); },
       });
     }

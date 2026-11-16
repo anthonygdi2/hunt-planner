@@ -49,6 +49,9 @@ test("planner state: defaults and every field checked", () => {
   assert.deepEqual(s.lens, { anyLevel: true });
   assert.deepEqual(s.active, { spot: "cobra-bastion", name: "cobra-bastion", at: "2026-10-21T17:00:00Z", slug: null });
   assert.equal(S.readPlState({ fixedHours: 2, held: { slug: "bear" } }, known).fixedHours, 2);
+  // Spots the character can't go to: valid spot ids set to true.
+  assert.deepEqual(S.readPlState({ noAccess: { "cobra-bastion": true, "my-den": true, "asura-palace": false, "Bad Id!": true } }, known).noAccess, { "cobra-bastion": true, "my-den": true });
+  assert.deepEqual(S.readPlState({ noAccess: "x" }, known).noAccess, {});
   assert.equal(S.readPlState({ held: { slug: "bear" } }, known).held, null, "unknown creature");
   assert.equal(S.plNum("", 0, 1), null);
   assert.equal(S.plNum("0.5", 0, 1), 0.5);

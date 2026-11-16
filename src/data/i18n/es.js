@@ -632,4 +632,12 @@ export default {
   "Damage and life leech are kept with each hunt you log on a bounty. The plan doesn’t count them yet.": "El daño y el life leech se guardan con cada caza que registras en un bounty. El plan aún no los cuenta.",
   "Loot bonuses are taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.": "Los bonus de loot se descuentan del loot de esta hunt, para que los bonus de hoy no se cuenten dos veces.",
   "Damage and life leech are kept with the hunt. They don’t change any number yet.": "El daño y el life leech se guardan con la caza. Aún no cambian ningún número.",
+  "Can’t go there": "No puedo ir",
+  "For {name}": "Para {name}",
+  "I can go there": "Puedo ir allí",
+  "Off: this spot stays out of the plan, and its creatures are valued at other spots.": "Desactivado: este spot queda fuera del plan y sus criaturas se valoran en otros spots.",
+  "Turn off for a spot you have no access to. It then stays out of the plan.": "Desactívalo en un spot al que no tienes acceso. Así queda fuera del plan.",
+  "Travel time (minutes)": "Tiempo de viaje (minutos)",
+  "Comes out of your session’s hunting time. Empty for none.": "Se descuenta del tiempo de caza de tu sesión. Vacío si no hay.",
+  "Counts once you set a session length (Time on the Plan). Empty for none.": "Cuenta cuando eliges una duración de sesión (Tiempo en el Plan). Vacío si no hay.",
 };

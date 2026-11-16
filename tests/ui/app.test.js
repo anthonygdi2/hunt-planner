@@ -429,6 +429,19 @@ test("Spots and a spot page over the golden fixture: search, a variation, Taken,
   assert.ok([...p.d.querySelectorAll(".hp-spot b")].some((b) => b.textContent === "Knight Den"), "a creature finds the spots it lives in");
   // The parent spot lists its variation.
   await p.go("spot/cobra-bastion-1");
+  // Can't go there: stored for this character, badged here and in the list, and out of the plan; travel minutes too.
+  await p.click("#spot-access");
+  await until(() => ((store["profiles/ek/planner/state"] || {}).noAccess || {})["cobra-bastion-1"] === true, "the spot marked as one it can't go to");
+  assert.equal(p.$("#spot-blocked").textContent, "Can’t go there");
+  await p.type("#spot-travel", "15");
+  await until(() => (store["profiles/ek/planner/state"].travel || {})["cobra-bastion-1"] === 15, "the travel minutes");
+  await p.go("plan");
+  assert.doesNotMatch(p.d.body.textContent, /Go to Cobra Bastion -1/, "not in the plan");
+  await p.go("spot/cobra-bastion-1");
+  await p.type("#spot-travel", "");
+  await p.click("#spot-access");
+  await until(() => !("cobra-bastion-1" in store["profiles/ek/planner/state"].noAccess) && !("cobra-bastion-1" in store["profiles/ek/planner/state"].travel), "allowed again, no travel time");
+  assert.equal(p.$("#spot-blocked"), null);
   assert.match(p.d.body.textContent, /Your variations.*Bastion lure\d*.*Lure two boxes · Yours · 1 hunt · low sample/);
   // The reference hunt's details: its kills/h per creature.
   const refToggle = p.d.querySelector('.hp-sep [id^="ref-"][id$="-toggle"]');

@@ -567,13 +567,14 @@ test("spots: search, sort, toggles, rows, more, and the badges legend", async ()
     toggles: [{ key: "allVocations", label: "All vocations", on: false }, { key: "anyLevel", label: "Any level", on: true }, { key: "hideTaken", label: "Hide taken", on: false }],
     count: "2 spots", more: 3, empty: "", legend: BADGE_LEGEND,
     rows: [{ id: "cobra-bastion", name: "Cobra Bastion", sub: null, score: "96", numbers: "7.8kk exp/h · 300k profit/h", none: null, creatures: "Cobra Assassin (your bounty)", badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: "Taken · clears in 25 min" },
-      { id: "my-lure", name: "Lure", sub: "Your variation of Cobra Bastion", score: null, numbers: null, none: "Not enough data for your vocation", creatures: "", badges: [], taken: null }] };
+      { id: "my-lure", name: "Lure", sub: "Your variation of Cobra Bastion", score: null, numbers: null, none: "Not enough data for your vocation", creatures: "", badges: [], taken: null, blocked: "Can’t go there" }] };
   const s = spy(), on = {};
   ["query", "sort", "toggle", "open", "logNew", "more"].forEach((k) => { on[k] = s.fn(k); });
   const $ = mount(spots.render(view, on));
   assert.equal(document.querySelectorAll(".hp-spot").length, 2);
   assert.match(document.querySelector(".hp-spot.taken").textContent, /Cobra Bastion96.*Taken · clears in 25 min/);
   assert.match(document.body.textContent, /Your variation of Cobra BastionNo score/);
+  assert.match(document.querySelectorAll(".hp-spot")[1].textContent, /Can’t go there/, "a spot the character can't go to is badged");
   assert.equal($("#spots-anyLevel").getAttribute("aria-pressed"), "true");
   assert.equal(document.querySelectorAll(".hp-legend li").length, 6);
   $("#spots-q").value = "cob"; $("#spots-q").dispatchEvent(new dom.window.Event("input"));
@@ -588,7 +589,7 @@ test("spots: search, sort, toggles, rows, more, and the badges legend", async ()
 test("spot page: sections, Mark taken, logs, variations, delete a hunt inline, advanced controls", async () => {
   const spot = await import("../../src/ui/screens/spot.js");
   const view = { id: "cobra-bastion", name: "Cobra Bastion", sub: null, parentId: null, scoreLine: "Score 96 for Main EK · Mostly exp, some profit", exp: "7.8kk", profit: "300k",
-    badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: null,
+    badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: null, access: { who: "Main EK", blocked: false, travel: "12", timed: false },
     creatures: [{ slug: "cobra-assassin", name: "Cobra Assassin", perHour: "≈ 400/h", tag: "Your bounty", gold: true }, { slug: "cobra-scout", name: "Cobra Scout", perHour: "≈ 90/h", tag: "Weekly task", gold: false }],
     sources: { hunts: "None yet.", reference: { who: "Elite Knight, level 500+, from Kusnier’s video (Sep 2026)", url: "https://example.org/v", recorded: "As recorded: 9.1kk", adjusted: "Adjusted to you: 7.8kk",
       details: { key: "ref-cb", open: false, caption: "Recorded over 15 min.", amounts: [{ label: "Raw exp", total: "2.28kk", perHour: "9.1kk" }],
@@ -601,8 +602,25 @@ test("spot page: sections, Mark taken, logs, variations, delete a hunt inline, a
         kills: [{ name: "Cobra Assassin", count: "520", perHour: "520/h" }], counts: true, notes: null, url: null } }],
     emptySessions: "No sessions.", own: { name: "Cobra Bastion", armed: false, deleteText: "Deletes this spot." } };
   const s = spy(), on = {};
-  ["back", "taken", "free", "log", "vary", "open", "arm", "deleteSession", "details", "raid", "rename", "deleteSpot"].forEach((k) => { on[k] = s.fn(k); });
+  ["back", "taken", "free", "log", "vary", "open", "arm", "deleteSession", "details", "raid", "rename", "deleteSpot", "access", "travel"].forEach((k) => { on[k] = s.fn(k); });
   let $ = mount(spot.render(view, on));
+  // For this character: whether it can go there, and its travel minutes.
+  assert.match(document.body.textContent, /For Main EK/);
+  assert.deepEqual([$("#spot-access").getAttribute("role"), $("#spot-access").getAttribute("aria-checked"), $("#spot-travel").value], ["switch", "true", "12"]);
+  assert.equal($("#spot-blocked"), null);
+  assert.match(document.body.textContent, /Counts once you set a session length/);
+  $("#spot-access").click();
+  $("#spot-travel").value = "20"; $("#spot-travel").dispatchEvent(new dom.window.Event("change"));
+  assert.deepEqual(s.calls, [["access", false], ["travel", "20"]]);
+  s.calls.length = 0;
+  $ = mount(spot.render(Object.assign({}, view, { access: { who: "Main EK", blocked: true, travel: "", timed: true } }), on));
+  assert.equal($("#spot-access").getAttribute("aria-checked"), "false");
+  assert.equal($("#spot-blocked").textContent, "Can’t go there");
+  assert.match(document.body.textContent, /Off: this spot stays out of the plan.*Comes out of your session’s hunting time/);
+  $("#spot-access").click();
+  assert.deepEqual(s.calls, [["access", true]]);
+  s.calls.length = 0;
+  $ = mount(spot.render(view, on));
   assert.match(document.body.textContent, /Creatures here.*Cobra AssassinYour bounty≈ 400\/h/);
   assert.match(document.body.textContent, /Other sources not used here.*skipped: an Elite Knight hunt exists/);
   assert.doesNotMatch(document.body.textContent, /Doesn’t count/);

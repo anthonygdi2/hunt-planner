@@ -192,11 +192,11 @@ export function readCreatureDocs(docs) {
 
 // ---------- planner: profiles/{pid}/planner/state ----------
 export function plDefaults() {
-  return { fixedHours: null, diff: "master", held: null, today: { boosted: null, boostedDay: null, prey: [], event: 0 }, lens: {}, active: null, travel: {}, world: null };
+  return { fixedHours: null, diff: "master", held: null, today: { boosted: null, boostedDay: null, prey: [], event: 0 }, lens: {}, active: null, travel: {}, noAccess: {}, world: null };
 }
 // A number within lo..hi, else null.
 export function plNum(v, lo, hi) { const n = Number(v); return v != null && v !== "" && isFinite(n) && n >= lo && n <= hi ? n : null; }
-// The planner state {fixedHours, diff, held, today, world, travel, lens, active}; known(slug) says whether a creature
+// The planner state {fixedHours, diff, held, today, world, travel, noAccess, lens, active}; known(slug) says whether a creature
 // exists. fixedHours: a session length the player picked; none means hourly rates. (An older sessionHours field held a
 // default that was saved whether or not it was chosen, so it's ignored.)
 export function readPlState(v, known) {
@@ -218,6 +218,8 @@ export function readPlState(v, known) {
     }), event: plNum(t.event, 0, 100) || 0 };
   if (typeof v.world === "string" && v.world.trim()) s.world = v.world.trim().slice(0, 30);
   if (v.travel && typeof v.travel === "object") Object.keys(v.travel).forEach((k) => { const m = plNum(v.travel[k], 1, 600); if (validSpotId(k) && m) s.travel[k] = m; });
+  // Spots the character can't go to (spot id → true, since November 15, 2026): kept out of its plan and its creatures' numbers.
+  if (v.noAccess && typeof v.noAccess === "object") Object.keys(v.noAccess).forEach((k) => { if (validSpotId(k) && v.noAccess[k] === true) s.noAccess[k] = true; });
   if (v.lens && typeof v.lens === "object") s.lens = v.lens;
   // The bounty is checked by readBounty, which also migrates the fields above; keep it as stored.
   if (v.bounty && typeof v.bounty === "object") s.bounty = v.bounty;

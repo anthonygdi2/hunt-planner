@@ -479,7 +479,8 @@ function spotOptions(model, lens, keepHunts) {
   let m = spotsMemo.get(model);
   if (!m) { m = {}; spotsMemo.set(model, m); }
   if (!m[key]) {
-    const po = model.planOptions(model.plannerCtx({ lens, index: model.spotIndex(wide && !keepHunts ? lens : null) })), byId = {};
+    // Spots the character can't go to keep their numbers here (they're badged); only the plan leaves them out.
+    const po = model.planOptions(model.plannerCtx({ lens, blocked: null, index: model.spotIndex(wide && !keepHunts ? lens : null) })), byId = {};
     po.options.forEach((o) => { byId[o.id] = o; });
     m[key] = { idx: po.idx, byId };
   }
@@ -516,6 +517,7 @@ const takenText = (min) => t("Taken · clears in {min} min", { min });
 export function spotsView(state, model, catalog, ui, now) {
   const lens = { allVocations: !!ui.allVocations, anyLevel: !!ui.anyLevel }, sort = ui.sort || "score";
   const { idx, byId } = spotOptions(model, lens), taken = takenLeft(state, now), tags = creatureTags(model), q = norm(ui.query || "");
+  const noAccess = ((state.planner || {}).state || {}).noAccess || {};
   const name = (slug) => (catalog.bySlug[slug] ? catalog.bySlug[slug].name : slug);
   const matches = (sp) => !q || norm(sp.name).indexOf(q) !== -1 || sp.aliases.some((a) => norm(a).indexOf(q) !== -1) ||
     Object.keys(sp.creatures).some((s) => norm(name(s)).indexOf(q) !== -1);
@@ -530,7 +532,7 @@ export function spotsView(state, model, catalog, ui, now) {
       score: o && o.score != null ? String(o.score) : null, numbers: o ? perHourPair(o) : null,
       none: o ? null : teamOnly(sp) ? t("Only duo or team hunts recorded here") : t("Not enough data for your vocation"),
       creatures: cr.join(", "), badges: o ? sourceBadges(o, sp.sessions.length, huntsWho(sp.sessions)) : [],
-      taken: taken[sp.id] ? takenText(taken[sp.id]) : null };
+      taken: taken[sp.id] ? takenText(taken[sp.id]) : null, blocked: noAccess[sp.id] ? t("Can’t go there") : null };
   });
   return {
     query: ui.query || "", sort, sorts: SORTS.map(([value, label]) => ({ value, label: t(label) })),
@@ -566,7 +568,7 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
   const p = state.profiles[state.pid] || {}, o = opts.byId[id] || null, nums = model.spotNums(sp), d = model.derived;
   const vocation = p.vocation || VOCATIONS[0], tags = creatureTags(model), taken = takenLeft(state, now);
   const name = (slug) => (catalog.bySlug[slug] ? catalog.bySlug[slug].name : slug);
-  const parent = sp.parentId && idx.spots[sp.parentId], goal = goalMixView(readGoal(p)).chip.value;
+  const parent = sp.parentId && idx.spots[sp.parentId], goal = goalMixView(readGoal(p)).chip.value, plSt = (state.planner || {}).state || {};
 
   const scoreLine = o && o.score != null ? t("Score {score} for {name} · {goal}", { score: o.score, name: displayName(p), goal })
     : o ? t("No score: this spot is missing a number your goal mix weighs ({goal}).", { goal })
@@ -656,6 +658,9 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
     profit: o ? (o.m.profit != null ? fmtBig(o.m.profit) : "–") : nums && nums.pph != null ? fmtBig(nums.pph) : "–",
     badges: o ? sourceBadges(o, ns, huntsWho(sp.sessions)) : nums ? sourceBadges(nums, ns, huntsWho(sp.sessions)) : [],
     taken: taken[id] ? takenText(taken[id]) : null,
+    // For this character: whether it can go there (off keeps the spot out of its plan), and its own travel minutes.
+    access: { who: displayName(p), blocked: !!plSt.noAccess && !!plSt.noAccess[id], travel: plSt.travel && plSt.travel[id] ? String(plSt.travel[id]) : "",
+      timed: model.plannerCtx().hours > 0 },
     creatures, sources: { hunts, reference, skipped },
     variations: sp.parentId ? null : variations.map(varRow), canVary: !sp.parentId,
     sessions, emptySessions: t("No hunts logged here."),
