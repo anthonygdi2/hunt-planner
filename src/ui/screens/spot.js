@@ -65,7 +65,8 @@ export function render(view, on) {
       view.creatures.length ? h("div", { class: "hp-card flush" }, view.creatures.map((c) => h("div", { class: "hp-line" },
         h("span", null, h("b", null, c.name), c.tag ? [h("br"), h("span", { class: "hp-caption" + (c.gold ? " gold" : "") }, c.tag)] : null),
         h("span", { class: "hp-muted" }, c.perHour))))
-        : h("p", { class: "hp-p hp-muted" }, t("No creatures known here yet."))),
+        : h("p", { class: "hp-p hp-muted" }, t("No creatures known here yet.")),
+      view.prey ? h("p", { id: "spot-prey", class: "hp-p hp-caption" }, t("Best for a Prey:") + " " + view.prey) : null),
     section("src-h", t("Where the numbers come from"),
       h("div", { class: "hp-card" },
         h("div", { class: "hp-stack" }, h("b", null, t("Your hunts here")), h("span", { class: "hp-small hp-muted" }, src.hunts)),

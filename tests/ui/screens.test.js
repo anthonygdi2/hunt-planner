@@ -604,6 +604,7 @@ test("spot page: sections, Mark taken, logs, variations, delete a hunt inline, a
   const spot = await import("../../src/ui/screens/spot.js");
   const view = { id: "cobra-bastion", name: "Cobra Bastion", sub: null, parentId: null, scoreLine: "Score 96 for Main EK · Mostly exp, some profit", exp: "7.8kk", profit: "300k",
     badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: null, access: { who: "Main EK", blocked: false, travel: "12", timed: false, respawnLimit: false },
+    prey: "Cobra Assassin, about 75% of the exp here. Biggest Prey: +1.2kk exp/h (40% exp).",
     creatures: [{ slug: "cobra-assassin", name: "Cobra Assassin", perHour: "≈ 400/h", tag: "Your bounty", gold: true }, { slug: "cobra-scout", name: "Cobra Scout", perHour: "≈ 90/h", tag: "Weekly task", gold: false }],
     sources: { hunts: "None yet.", reference: { who: "Elite Knight, level 500+, from Kusnier’s video (Sep 2026)", url: "https://example.org/v", recorded: "As recorded: 9.1kk", adjusted: "Adjusted to you: 7.8kk",
       details: { key: "ref-cb", open: false, caption: "Recorded over 15 min.", amounts: [{ label: "Raw exp", total: "2.28kk", perHour: "9.1kk" }],
@@ -640,6 +641,7 @@ test("spot page: sections, Mark taken, logs, variations, delete a hunt inline, a
   s.calls.length = 0;
   $ = mount(spot.render(view, on));
   assert.match(document.body.textContent, /Creatures here.*Cobra AssassinYour bounty≈ 400\/h/);
+  assert.equal($("#spot-prey").textContent, "Best for a Prey: Cobra Assassin, about 75% of the exp here. Biggest Prey: +1.2kk exp/h (40% exp).");
   assert.match(document.body.textContent, /Other sources not used here.*skipped: an Elite Knight hunt exists/);
   assert.doesNotMatch(document.body.textContent, /Doesn’t count/);
   mount(spot.render(Object.assign({}, view, { sessions: [Object.assign({}, view.sessions[0], { skipped: "Doesn’t count: logged as Elite Knight." })] }), on));
@@ -751,4 +753,20 @@ test("creature page: numbers and sources, lists and Avoid, bestiary, notes, adva
   assert.equal(document.querySelector("#cr-num-kph"), null);
   mount(creature.render(null, on));
   assert.match(document.body.textContent, /no creature by that name/);
+});
+
+test("plan: Today's boosts says which creature to put Prey on at the first spot", async () => {
+  const plan = await import("../../src/ui/screens/plan.js");
+  const { preyAdviceText } = await import("../../src/app/views.js");
+  const name = (s) => ({ "cobra-assassin": "Cobra Assassin" })[s] || s;
+  assert.equal(preyAdviceText(null, name), null);
+  const text = preyAdviceText({ slug: "cobra-assassin", share: 0.754, xp: { pct: 40, xph: 1.2e6 }, loot: { pct: 40, pph: 1.2e5 }, damage: { pct: 25, kills: 0.0452, xph: 9e4, pph: 4e3 } }, name);
+  assert.equal(text, "Cobra Assassin, about 75% of the exp here. Biggest Prey: +1.2kk exp/h (40% exp) · +120k profit/h (40% loot) · +4.5% kills (25% damage).");
+  assert.equal(preyAdviceText({ slug: "cobra-assassin", share: 1, xp: { pct: 40, xph: 4e5 }, loot: null, damage: null }, name), "Cobra Assassin, about 100% of the exp here. Biggest Prey: +400k exp/h (40% exp).");
+  const today = { chip: { set: false, value: "" }, boosted: "", prey: [], canAddPrey: true, event: 0, events: [{ value: 0, label: "No exp event" }], names: [], advice: { spot: "Cobra Bastion", text } };
+  const view = { goal: { chip: { label: "Goal", value: "Exp", set: true } }, today };
+  let $ = mount(plan.render(view, { open: "today" }, { toggle() {}, today: {} }));
+  assert.equal($("#prey-advice").textContent, "Prey at Cobra Bastion: " + text + " The game’s Prey list is random unless you use a wildcard.");
+  $ = mount(plan.render(Object.assign({}, view, { today: Object.assign({}, today, { advice: null }) }), { open: "today" }, { toggle() {}, today: {} }));
+  assert.equal($("#prey-advice"), null);
 });

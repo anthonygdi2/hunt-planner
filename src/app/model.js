@@ -15,7 +15,7 @@ import { weeklyState, weeklyTaskRows, openWeeklyTasks } from "./weekly.js";
 import { spotIndex as coreSpotIndex, spotNumbers, lensCheck as coreLensCheck, huntCheck } from "../core/spots.js";
 import { noNumsWhy as coreNoNumsWhy } from "../core/explain.js";
 import { heldTask as coreHeldTask, spotValue as coreSpotValue, scaleSpots, spotScores as coreSpotScores, planOffers as corePlanOffers,
-  planOptions as corePlanOptions, planChain as corePlanChain, todayFactor as coreTodayFactor } from "../core/plan.js";
+  planOptions as corePlanOptions, planChain as corePlanChain, todayFactor as coreTodayFactor, preyAdvice as corePreyAdvice } from "../core/plan.js";
 import { GOAL_KEYS } from "../core/score.js";
 import { EN } from "../core/i18n.js";
 
@@ -143,6 +143,8 @@ export function makeModel(state, derived, now, opts) {
   const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost, expTable: state.expTable,
     killTime: killTime(sp) });
   const heldTask = (h, diff) => coreHeldTask(h, diff, { catalog, chalRates: chalRates() });
+  // Which creature to put Prey on at a spot, and what the biggest Prey of each kind adds there.
+  const preyAdvice = (sp) => corePreyAdvice(spotNums(sp), { expTable: state.expTable }, killTime(sp));
   const tal = readTalisman(p);
   const spotValue = (sp, o) => {
     o = o || {};
@@ -182,5 +184,5 @@ export function makeModel(state, derived, now, opts) {
 
   return { derived: d, now, sources, settings, bounty, weights, chalRates, slots, minLevelFor, lockedFor, ratingOf, eff, metricsFor, boardDiff, rerollSettings, offerOdds, offerLog, boardLogged, poolModel, rerollPlan, difficultyCompare,
     boardOffers, weekly, weeklyRows, openWeeklies, weeklyBonus, held, today, todayFactor, spotIndex, spotNums, heldTask, spotValue, plScale, spotScores,
-    planOffers, lensCheck, noNumsWhy, planOptions, planChain, plannerCtx };
+    planOffers, lensCheck, noNumsWhy, planOptions, planChain, plannerCtx, preyAdvice };
 }

@@ -651,4 +651,12 @@ export default {
   "Updated today.": "Zaktualizowano dzisiaj.",
   "Updated {n} day ago.": { one: "Zaktualizowano {n} dzień temu.", few: "Zaktualizowano {n} dni temu.", many: "Zaktualizowano {n} dni temu.", other: "Zaktualizowano {n} dnia temu." },
   "Bestiary kills so far": "Kille w bestiary do tej pory",
+  "+{amount} exp/h ({pct}% exp)": "+{amount} exp/h ({pct}% exp)",
+  "+{amount} profit/h ({pct}% loot)": "+{amount} profit/h ({pct}% loot)",
+  "+{kills}% kills ({pct}% damage)": "+{kills}% killi ({pct}% obrażeń)",
+  "{creature}, about {share}% of the exp here.": "{creature}, około {share}% expa tutaj.",
+  "Biggest Prey: {gains}.": "Największy Prey: {gains}.",
+  "Prey at {spot}:": "Prey na {spot}:",
+  "The game’s Prey list is random unless you use a wildcard.": "Lista Prey w grze jest losowa, chyba że użyjesz wildcarda.",
+  "Best for a Prey:": "Najlepszy na Prey:",
 };

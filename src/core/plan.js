@@ -9,7 +9,7 @@ import { markAge, markActive, occOdds, orderByOdds } from "./occupancy.js";
 import { offerLetter, goWhy, rerollWhy, seeSpotsWhy } from "./explain.js";
 import { EN } from "./i18n.js";
 import { ANY_CREATURE, allKph } from "./weekly.js";
-import { BOOSTED_EXP_MULT, BOOSTED_LOOT_MULT, RAID, TASK, TOKEN_CAP } from "../data/rules.js";
+import { BOOSTED_EXP_MULT, BOOSTED_LOOT_MULT, PREY, RAID, TASK, TOKEN_CAP } from "../data/rules.js";
 
 // The chain shows at most this many spots.
 export const MAX_STEPS = 5;
@@ -137,6 +137,23 @@ export function spotValue(sp, nums, opts, ctx) {
   v.m = { xp: v.parts.hunt + v.parts.today + v.parts.held + v.parts.weekly, profit: nums.pph != null ? nums.pph * Hh / H + v.lootBonus + v.talismanLoot : null,
     charm: charm * Hh / H, bounty };
   return v;
+}
+
+// Which creature a Prey is worth most on at a spot: the one with the largest share of its exp (and so, as estimated,
+// of its loot and of the time spent killing), with what the biggest Prey of each kind would add there. nums:
+// spotNumbers(sp); ctx: {expTable}; killTime: the share of a hunt there spent killing (null for the default).
+// Returns {slug, share, xp {pct, xph}, loot {pct, pph} (null when the spot's loot/h is unknown), damage {pct, kills
+// (the fraction more kills), xph, pph} (null where more damage adds nothing)}, or null when nothing dies there.
+export function preyAdvice(nums, ctx, killTime) {
+  if (!nums) return null;
+  const share = expShares(nums.kph, ctx.expTable), keys = Object.keys(share);
+  if (!keys.length) return null;
+  let top = keys[0];
+  keys.forEach((k) => { if (share[k] > share[top]) top = k; });
+  const s = share[top], km = killMult({ [top]: s }, { [top]: PREY.damage.hi }, killTime);
+  return { slug: top, share: s, xp: { pct: PREY.xp.hi, xph: nums.xph * s * PREY.xp.hi / 100 },
+    loot: nums.lph > 0 ? { pct: PREY.loot.hi, pph: nums.lph * s * PREY.loot.hi / 100 } : null,
+    damage: km > 1 ? { pct: PREY.damage.hi, kills: km - 1, xph: nums.xph * (km - 1), pph: nums.pph != null ? nums.pph * (km - 1) : null } : null };
 }
 
 // Puts spot values (each with m) on the Score's scale: each goal's factor over the best creature in the task pool

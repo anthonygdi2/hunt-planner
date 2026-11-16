@@ -269,7 +269,7 @@ export function planScreenView(state, model, catalog, now, compare) {
   const anyTask = wk.current && wk.any && (wk.any.killsLeft != null || wk.any.done) ? { left: wk.any.killsLeft, done: wk.any.done } : null;
   const weekly = { chip: (rows.length || anyTask) && wk.current ? { set: true, value: t("{done} of {slots} done", { done: done.length, slots: wk.slots }) } : { set: false, value: "" },
     rows: wk.current ? rows.map((r) => ({ i: r.i, name: r.name, left: r.killsLeft, done: r.done })) : [], any: anyTask };
-  const td = model.today(), prey = (td.prey || []).filter((q) => q.slug);
+  const td = model.today(), prey = (td.prey || []).filter((q) => q.slug), adviceSpot = go.length ? model.spotIndex().spots[go[0].id] : null;
   const todayParts = [td.boosted ? t("{creature} boosted", { creature: name(td.boosted) }) : null, prey.length ? t.n(prey.length, "{n} prey", "{n} preys") : null,
     td.event ? t("+{pct}% event", { pct: td.event }) : null].filter(Boolean);
   const today = { chip: todayParts.length ? { set: true, value: todayParts.join(" · ") } : { set: false, value: "" },
@@ -277,7 +277,9 @@ export function planScreenView(state, model, catalog, now, compare) {
       kinds: PREY_KINDS.map(([value, label]) => ({ value, label: t(label) })), sizes: preySizes(q.kind) })),
     canAddPrey: ((st.today || {}).prey || []).length < PREY_SLOTS, event: td.event || 0,
     events: [{ value: 0, label: t("No exp event") }, { value: EXP_EVENTS.double, label: t("Double experience (+{pct}%)", { pct: EXP_EVENTS.double }) }]
-      .concat(EXP_EVENTS.world.map((x) => ({ value: x, label: t("World bonus +{pct}%", { pct: x }) }))), names: catalog.list.map((c) => c.name) };
+      .concat(EXP_EVENTS.world.map((x) => ({ value: x, label: t("World bonus +{pct}%", { pct: x }) }))), names: catalog.list.map((c) => c.name),
+    // Which creature to put Prey on, for the spot the plan sends the character to first.
+    advice: adviceSpot && preyAdviceText(model.preyAdvice(adviceSpot), name) ? { spot: adviceSpot.name, text: preyAdviceText(model.preyAdvice(adviceSpot), name) } : null };
   const hourLabel = (h) => { const x = HOURS.filter((y) => y[0] === h)[0]; return x ? t(x[1]) : h + " h"; };
   const time = { chip: st.fixedHours ? { set: true, value: hourLabel(st.fixedHours) } : { set: false, value: "" },
     value: st.fixedHours || null, options: HOURS.map(([value, label]) => ({ value, label: t(label) })) };
@@ -286,6 +288,15 @@ export function planScreenView(state, model, catalog, now, compare) {
     presets: ["mine", "reference", "everything"].map((value) => ({ value, label: t(SOURCE_LABELS[value]), switches: SOURCE_PRESETS[value] })) };
 
   return Object.assign(base, { weekly, today, time, data, steps: { first, fallbacks: go.slice(1), end, notices, tokenCheck, refNote, notes: ch.notes }, taken, hunting: huntingView });
+}
+// "Cobra Assassin, about 75% of the exp here. Biggest Prey: +1.2kk exp/h (40% exp) · +120k profit/h (40% loot) · +4.5%
+// kills (25% damage)." from model.preyAdvice(sp); null when there's none.
+export function preyAdviceText(a, name) {
+  if (!a) return null;
+  const parts = [t("+{amount} exp/h ({pct}% exp)", { amount: fmtBig(a.xp.xph), pct: a.xp.pct }),
+    a.loot ? t("+{amount} profit/h ({pct}% loot)", { amount: fmtBig(a.loot.pph), pct: a.loot.pct }) : null,
+    a.damage ? t("+{kills}% kills ({pct}% damage)", { kills: Math.round(a.damage.kills * 1000) / 10, pct: a.damage.pct }) : null].filter(Boolean);
+  return t("{creature}, about {share}% of the exp here.", { creature: name(a.slug), share: Math.round(a.share * 100) }) + " " + t("Biggest Prey: {gains}.", { gains: parts.join(" · ") });
 }
 function preySizes(kind) { const r = PREY[kind] || PREY.xp, out = []; for (let v = r.lo; v <= r.hi; v += r.step) out.push({ value: v, label: v + "%" }); return out; }
 
@@ -671,6 +682,7 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
     taken: taken[id] ? takenText(taken[id]) : null,
     // For this character: whether it can go there (off keeps the spot out of its plan), and its own travel minutes.
     // and whether killing faster helps there (off: respawn is the limit, so damage bonuses add nothing).
+    prey: preyAdviceText(model.preyAdvice(sp), name),
     access: { who: displayName(p), blocked: !!plSt.noAccess && !!plSt.noAccess[id], travel: plSt.travel && plSt.travel[id] ? String(plSt.travel[id]) : "",
       timed: model.plannerCtx().hours > 0, respawnLimit: !!plSt.respawnLimit && !!plSt.respawnLimit[id] },
     creatures, sources: { hunts, reference, skipped },

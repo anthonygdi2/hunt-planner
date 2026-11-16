@@ -142,6 +142,8 @@ function todayEditor(v, planLine, on) {
         selectField({ id: "prey-" + q.i + "-pct", label: t("Size"), value: q.pct, options: q.sizes, onPick: (x) => on.prey(q.i, { pct: Number(x) }) })),
       h("button", { id: "prey-" + q.i + "-remove", type: "button", class: "hp-linkbtn", onClick: () => on.removePrey(q.i) }, t("Remove")))),
     v.canAddPrey ? h("button", { id: "prey-add", type: "button", class: "hp-btn dashed", onClick: on.addPrey }, t("+ Add a prey")) : null,
+    v.advice ? h("p", { id: "prey-advice", class: "hp-p hp-caption" }, t("Prey at {spot}:", { spot: v.advice.spot }) + " " + v.advice.text + " " +
+      t("The game’s Prey list is random unless you use a wildcard.")) : null,
     selectField({ id: "today-event", label: t("Exp event"), value: v.event, options: v.events, onPick: (x) => on.event(Number(x)) })], on.done);
 }
 function timeEditor(v, planLine, on) {

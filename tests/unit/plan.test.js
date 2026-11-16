@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { todayFactor, heldTask, spotValue, scaleSpots, byValue, spotScores, planOffers, planOptions, planChain, MAX_STEPS } from "../../src/core/plan.js";
+import { todayFactor, heldTask, spotValue, scaleSpots, byValue, spotScores, planOffers, planOptions, planChain, preyAdvice, MAX_STEPS } from "../../src/core/plan.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 import { readWeights } from "../../src/core/score.js";
 
@@ -200,4 +200,23 @@ test("damage bonuses raise every rate of the spot: a damage Prey, and the Talism
   // A session that finishes the bounty: the Talisman counts only for the share of the hunting time it lasts.
   const s = spotValue(SP, nums, { diff: "master", held: { slug: "cobra-assassin", kills: 300 }, hours: 2 }, tctx), on = 300 / (300 * km * 2);
   near(s.killBonus, (km - 1) * on);
+});
+
+test("which creature to put Prey on: the largest share of the spot, and what the biggest Prey of each kind adds", () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-6 * Math.max(1, Math.abs(b)), (msg || "") + " " + a + " vs " + b);
+  assert.equal(preyAdvice(null, ctx), null);
+  assert.equal(preyAdvice({ kph: {}, xph: 0 }, ctx), null);
+  // The assassin is 3/4 of the spot's exp. Exp 40%, loot 40% (needs the spot's loot/h), damage 25%.
+  const a = preyAdvice(Object.assign({ lph: 4e5 }, NUMS), ctx, null), km = 1 / (1 - 0.5 * 0.75 * 0.25 / 1.25);
+  assert.equal(a.slug, "cobra-assassin");
+  near(a.share, 0.75);
+  assert.deepEqual([a.xp.pct, a.loot.pct, a.damage.pct], [40, 40, 25]);
+  near(a.xp.xph, 2e6 * 0.75 * 0.4);
+  near(a.loot.pph, 4e5 * 0.75 * 0.4);
+  near(a.damage.kills, km - 1);
+  near(a.damage.xph, 2e6 * (km - 1));
+  near(a.damage.pph, 1e5 * (km - 1));
+  // No loot/h: no loot line. A respawn-limited spot: no damage line.
+  const b = preyAdvice(NUMS, ctx, 0);
+  assert.deepEqual([b.loot, b.damage], [null, null]);
 });
