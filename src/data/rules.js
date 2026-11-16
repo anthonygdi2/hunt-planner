@@ -101,7 +101,9 @@ export const PREY = deepFreeze({
 // a chance of a kill counting twice for the bestiary, up to 100% (community-reported, TibiaQA, December 2025). How more
 // loot stacks with Prey isn't published: each bonus is taken as its own chance of one more set of loot, so the expected
 // loot is 1 + the sum of the chances (an assumption, maintainer's OK November 14, 2026).
-export const TALISMAN = deepFreeze({ loot: { max: 50 }, bestiary: { max: 100 } });
+// Damage and life leech (each up to 50%, TibiaQA, community-reported; life leech replaced the Bounty Ring's damage
+// reduction) are entered and recorded with each hunt on a bounty; nothing is computed from them yet.
+export const TALISMAN = deepFreeze({ loot: { max: 50 }, bestiary: { max: 100 }, damage: { max: 50 }, leech: { max: 50 } });
 
 // Exp events in percent (TibiaWiki, Experience Point): Double Experience (+100%, about 6 a year) and world-quest
 // bonuses (+10% to +50%, some limited to certain creatures).

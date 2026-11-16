@@ -3,7 +3,8 @@ import { norm, toInt } from "./text.js";
 import { EN } from "./i18n.js";
 
 // text: what the player pasted. catalog: makeCatalog(...), to match kill names to creatures.
-// Returns {kills [{count, name, slug?}], start?, end?, minutes?, hours, rawXp?, xp?, loot?, supplies?, balance?}.
+// Returns {kills [{count, name, slug?}], start?, end?, minutes?, hours, rawXp?, xp?, loot?, supplies?, balance?, damage?,
+// healing?} (damage and healing: the Analyser's Damage and Healing totals).
 // Kills whose name matches a creature get its slug and canonical name. hours comes from the Session data line (end −
 // start), else the Session line's h:mm; null when neither is there. A missing balance is loot − supplies.
 // Never throws: sessionProblems() says what's missing.
@@ -30,6 +31,8 @@ export function parseSession(text, catalog) {
     else if (key === "loot") out.loot = toInt(val);
     else if (key === "supplies") out.supplies = toInt(val);
     else if (key === "balance") out.balance = toInt(val);
+    else if (key === "damage") out.damage = toInt(val);
+    else if (key === "healing") out.healing = toInt(val);
   });
   let h = null;
   if (out.start && out.end) { const a = new Date(out.start), b = new Date(out.end); if (!isNaN(a) && !isNaN(b) && b > a) h = (b - a) / 3.6e6; }

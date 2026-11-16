@@ -158,14 +158,17 @@ export function readHunt(id, v) {
 }
 // The loot bonuses on during a hunt (since November 14, 2026; hunts logged before have none): {boosted (slug or null),
 // prey [{slug, pct}] (loot Preys, up to PREY_SLOTS), talisman (the logging character's Talisman loot %, 0 when off the
-// bounty or none)}, or null when the hunt has none recorded.
+// bounty or none)}, or null when the hunt has none recorded. Since November 15, 2026 also damage and leech: that
+// Talisman's damage and life leech percents on a hunt on the bounty, present only when above 0.
 export function readBoosts(v) {
   if (!v || typeof v !== "object") return null;
   const slug = (s) => (typeof s === "string" && s ? s.slice(0, 80) : null), lp = PREY.loot;
-  return { boosted: slug(v.boosted),
+  const out = { boosted: slug(v.boosted),
     prey: (Array.isArray(v.prey) ? v.prey : []).filter((q) => q && slug(q.slug)).slice(0, PREY_SLOTS)
       .map((q) => ({ slug: slug(q.slug), pct: Math.min(lp.hi, Math.max(lp.lo, Math.round(Number(q.pct)) || lp.lo)) })),
     talisman: plNum(v.talisman, 0, TALISMAN.loot.max) || 0 };
+  ["damage", "leech"].forEach((k) => { const n = plNum(v[k], 0, TALISMAN[k].max); if (n > 0) out[k] = n; });
+  return out;
 }
 export function readHunts(docs) {
   const out = [];
@@ -325,13 +328,14 @@ export function readOfferLog(v) {
 }
 
 // ---------- the Bounty Talisman: the profile's talisman and bestiaryBonus ----------
-// {loot, bestiary}: the Talisman's more-loot and double-bestiary chances in percent (0 for none or bad values).
+// {loot, bestiary, damage, leech}: the Talisman's more-loot and double-bestiary chances and its damage and life leech
+// bonuses in percent (0 for none or bad values; damage and leech since November 15, 2026).
 // bestiary is the older bestiaryBonus field, kept in step with talisman.bestiary, so an older build's edit of it wins.
 export function readTalisman(p) {
   const tl = p && p.talisman && typeof p.talisman === "object" ? p.talisman : {};
   const pct = (v, max) => { const n = Number(v); return v != null && v !== "" && n >= 0 && n <= max ? n : null; };
   const bOld = pct(p && p.bestiaryBonus, TALISMAN.bestiary.max), b = bOld != null ? bOld : pct(tl.bestiary, TALISMAN.bestiary.max);
-  return { loot: pct(tl.loot, TALISMAN.loot.max) || 0, bestiary: b || 0 };
+  return { loot: pct(tl.loot, TALISMAN.loot.max) || 0, bestiary: b || 0, damage: pct(tl.damage, TALISMAN.damage.max) || 0, leech: pct(tl.leech, TALISMAN.leech.max) || 0 };
 }
 
 // ---------- marks and occupancy: profiles/{pid}/marks/{spotId}, profiles/{pid}/occupancy/{spotId} ----------

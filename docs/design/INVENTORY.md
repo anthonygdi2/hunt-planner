@@ -127,7 +127,7 @@ Reached from Hunting now, a spot page, a variation button, or Spots → "Log a c
 
 ## 9. Characters and settings (full page)
 
-**Shows:** character pills; this character's name, vocation, level, Talisman bestiary bonus. Numbers from: preset plus switches for reference hunts, other vocations, older hunts, and your hunts as other vocations (outside the presets); how near the character's level a hunt must be to count (Any, ±10%, ±20%, ±35%); calibration status in plain words. World; how long a Taken mark lasts. Advanced mode. Theme. Backup. Credits.
+**Shows:** character pills; this character's name, vocation, level, Talisman loot, bestiary, damage and life leech bonuses. Numbers from: preset plus switches for reference hunts, other vocations, older hunts, and your hunts as other vocations (outside the presets); how near the character's level a hunt must be to count (Any, ±10%, ±20%, ±35%); calibration status in plain words. World; how long a Taken mark lasts. Advanced mode. Theme. Backup. Credits.
 
 **You can:** switch, add or delete a character (inline confirm, which says the hunts it logged stay); choose Mine only / + Reference / Everything, or flip each switch (the preset shows "Custom" when switches don't match one); set world and Taken length (30 min, 45 min default, 1 h, 2 h); turn on Advanced mode; Theme System / Dark / Light; Download backup, Restore. **[Decision]** Advanced mode adds: Raw or boosted exp, hunting hours per day (reroll model), logging boards for Silver/Gold odds, full score breakdown in Why?
 

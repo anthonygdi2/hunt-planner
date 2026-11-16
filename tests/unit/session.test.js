@@ -14,6 +14,10 @@ XP Gain: 1,982,610
 Loot: 323,387
 Supplies: 48,278
 Balance: 275,109
+Damage: 1,203,551
+Damage/h: 4,629,042
+Healing: 88,402
+Healing/h: 340,007
 Killed Monsters:
   125x choking fear
   113x retching horror
@@ -34,6 +38,7 @@ test("reads a full analyser export", () => {
   assert.equal(s.loot, 323387);
   assert.equal(s.supplies, 48278);
   assert.equal(s.balance, 275109, "lines under Looted Items are ignored");
+  assert.deepEqual([s.damage, s.healing], [1203551, 88402], "the Damage and Healing totals, not the per-hour lines");
   assert.deepEqual(s.kills, [
     { count: 125, name: "Choking Fear", slug: "choking-fear" },
     { count: 113, name: "Retching Horror", slug: "retching-horror" },

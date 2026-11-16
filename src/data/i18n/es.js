@@ -624,8 +624,12 @@ export default {
   "Use the guess": "Usar la estimación",
   "Log this board": "Registrar este tablero",
   "On during this hunt": "Activo durante esta hunt",
-  "Loot bonuses only. They’re taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.": "Solo bonus de loot. Se descuentan del loot de esta hunt, para que los bonus de hoy no se cuenten dos veces.",
   "Loot Prey {n}": "Prey de loot {n}",
   "+ Add a loot Prey": "+ Añadir un prey de loot",
   "Type a percent from 0 to 50, or leave it empty.": "Escribe un porcentaje de 0 a 50 o déjalo vacío.",
+  "Talisman damage bonus (%)": "Bonus de daño del Talisman (%)",
+  "Talisman life leech (%)": "Life leech del Talisman (%)",
+  "Damage and life leech are kept with each hunt you log on a bounty. The plan doesn’t count them yet.": "El daño y el life leech se guardan con cada caza que registras en un bounty. El plan aún no los cuenta.",
+  "Loot bonuses are taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.": "Los bonus de loot se descuentan del loot de esta hunt, para que los bonus de hoy no se cuenten dos veces.",
+  "Damage and life leech are kept with the hunt. They don’t change any number yet.": "El daño y el life leech se guardan con la caza. Aún no cambian ningún número.",
 };

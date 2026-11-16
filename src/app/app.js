@@ -144,10 +144,13 @@ export function createApp({ data, prefs, now, browserLang }) {
   }
   // A new spot's id: "my-" and its name as a slug, made unique.
   // The loot bonuses stored on a hunt (store/schema.js readBoosts): creatures the catalog knows, the Talisman only when
-  // the hunt was on its bounty (task). None given stores none on, so the hunt reads as base rates.
+  // the hunt was on its bounty (task), with its damage and life leech when it has them. None given stores none on, so
+  // the hunt reads as base rates.
   function huntBoosts(b, task) {
     const v = readBoosts(b || {});
-    return { boosted: known(v.boosted) ? v.boosted : null, prey: v.prey.filter((q) => known(q.slug)), talisman: task ? v.talisman : 0 };
+    const out = { boosted: known(v.boosted) ? v.boosted : null, prey: v.prey.filter((q) => known(q.slug)), talisman: task ? v.talisman : 0 };
+    if (task) ["damage", "leech"].forEach((k) => { if (v[k] > 0) out[k] = v[k]; });
+    return out;
   }
   function newSpotId(name) {
     const base = "my-" + (slugify(name) || "spot"), taken = model().spotIndex().spots;
@@ -400,8 +403,8 @@ export function createApp({ data, prefs, now, browserLang }) {
     },
     // Back to the guess (OFFER_ODDS).
     useGuessOdds() { updateCharacter({ offerOdds: null }); },
-    // The Bounty Talisman's more-loot and double-bestiary chances as the game shows them, in percent ({loot} or
-    // {bestiary}, typed; empty is 0, no Talisman). Written as talisman {loot, bestiary} with bestiaryBonus kept in step,
+    // The Bounty Talisman's bonuses as the game shows them, in percent ({loot}, {bestiary}, {damage} or {leech}, typed;
+    // empty is 0, no Talisman). Written as talisman {loot, bestiary, damage, leech} with bestiaryBonus kept in step,
     // so older builds still read the bestiary bonus. Nothing changes when a value isn't a number in range.
     setTalisman(patch) {
       const cur = readTalisman(profile() || {}), next = Object.assign({}, cur);
@@ -411,7 +414,7 @@ export function createApp({ data, prefs, now, browserLang }) {
         const raw = String(patch[k] == null ? "" : patch[k]).trim().replace("%", "").replace(",", "."), n = raw === "" ? 0 : Number(raw);
         if (n >= 0 && n <= TALISMAN[k].max) { next[k] = Math.round(n * 100) / 100; ok = true; }
       });
-      if (ok && (next.loot !== cur.loot || next.bestiary !== cur.bestiary)) updateCharacter({ talisman: next, bestiaryBonus: next.bestiary });
+      if (ok && Object.keys(TALISMAN).some((k) => next[k] !== cur[k])) updateCharacter({ talisman: next, bestiaryBonus: next.bestiary });
     },
     // Plan: Free and Taken marks (each counted once per 15 minutes toward how often the spot is free), Hunting now.
     markTaken(spotId) { mark(spotId, "taken"); },
@@ -486,6 +489,7 @@ export function createApp({ data, prefs, now, browserLang }) {
       const body = { spot: name, spotId, task, start: preview.start || null, end: preview.end || iso().slice(0, 19), hours: Math.round(preview.hours * 10000) / 10000,
         rawXp: preview.rawXp != null ? preview.rawXp : null, xp: preview.xp != null ? preview.xp : null, loot: preview.loot != null ? preview.loot : null,
         supplies: preview.supplies != null ? preview.supplies : null, balance: preview.balance != null ? preview.balance : null,
+        damage: preview.damage != null ? preview.damage : null, healing: preview.healing != null ? preview.healing : null,
         kills: preview.kills.map((k) => (k.slug ? { slug: k.slug, name: k.name, count: k.count } : { name: k.name, count: k.count })), level: Number(p.level) || null, vocation: p.vocation || VOCATIONS[0],
         by: { pid, name: p.name ? String(p.name).trim().slice(0, 40) : null }, boosts: huntBoosts(boosts, task), createdAt: iso() };
       const raids = {};

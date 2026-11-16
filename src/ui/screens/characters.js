@@ -11,7 +11,7 @@ const ext = (href, text) => h("a", { href, target: "_blank", rel: "noopener nore
 const THEME_LABELS = { system: _("System"), dark: _("Dark"), light: _("Light") };
 
 // view: app/views.js charactersPageView. ui: this page's own state {armed (delete), status (backup/restore line)}.
-// on: {back(), switchCharacter(id), add(), update(patch), talisman({loot} | {bestiary}), setSources(s), setOtherVocationHunts(b), setLevelWindow(w), setWorld(w), setTakenMinutes(m), setAdvanced(b),
+// on: {back(), switchCharacter(id), add(), update(patch), talisman({loot} | {bestiary} | {damage} | {leech}), setSources(s), setOtherVocationHunts(b), setLevelWindow(w), setWorld(w), setTakenMinutes(m), setAdvanced(b),
 //      setTheme(t), setLang(l), deleteCharacter(), arm(b), download(), restore()}.
 export function render(view, ui, on) {
   const ro = !view.canWrite, c = view.character, sw = view.sources.switches;
@@ -33,7 +33,11 @@ export function render(view, ui, on) {
         h("div", { class: "hp-grid2" },
           field({ id: "ch-loot", label: t("Talisman loot bonus (%)"), value: c.talisman.loot, inputmode: "decimal", disabled: ro, onCommit: (v) => on.talisman({ loot: v }) }),
           field({ id: "ch-bonus", label: t("Talisman bestiary bonus (%)"), value: c.talisman.bestiary, inputmode: "decimal", disabled: ro, onCommit: (v) => on.talisman({ bestiary: v }) })),
+        h("div", { class: "hp-grid2" },
+          field({ id: "ch-damage", label: t("Talisman damage bonus (%)"), value: c.talisman.damage, inputmode: "decimal", disabled: ro, onCommit: (v) => on.talisman({ damage: v }) }),
+          field({ id: "ch-leech", label: t("Talisman life leech (%)"), value: c.talisman.leech, inputmode: "decimal", disabled: ro, onCommit: (v) => on.talisman({ leech: v }) })),
         h("p", { class: "hp-p hp-caption" }, t("Your Bounty Talisman’s bonuses as the game shows them, 0 without one. They count on your bounty’s creature only.")),
+        h("p", { class: "hp-p hp-caption" }, t("Damage and life leech are kept with each hunt you log on a bounty. The plan doesn’t count them yet.")),
         confirmButton({ id: "ch-delete", label: t("Delete this character…"), confirmLabel: t("Tap again to delete {name}. Its logged hunts stay for your other characters.", { name: c.displayName }), armed: ui.armed,
           disabled: ro, onArm: () => on.arm(true), onConfirm: on.deleteCharacter })) : null),
     c ? section("src-h", t("Numbers from"),

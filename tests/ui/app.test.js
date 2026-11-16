@@ -88,11 +88,15 @@ test("browser storage: first run, characters and settings, no page errors", asyn
   await p.type("#ch-loot", "12,5");
   await p.type("#ch-bonus", "20");
   await until(() => (p.local()[path] || {}).bestiaryBonus === 20, "the Talisman saved");
-  assert.deepEqual([p.local()[path].talisman, p.local()[path].bestiaryBonus], [{ loot: 12.5, bestiary: 20 }, 20]);
+  assert.deepEqual([p.local()[path].talisman, p.local()[path].bestiaryBonus], [{ loot: 12.5, bestiary: 20, damage: 0, leech: 0 }, 20]);
   await p.type("#ch-loot", "60");
   await p.type("#ch-bonus", "");
   await until(() => p.local()[path].bestiaryBonus === 0, "empty is no Talisman");
-  assert.deepEqual(p.local()[path].talisman, { loot: 12.5, bestiary: 0 }, "60% is more than the Talisman gives");
+  assert.deepEqual(p.local()[path].talisman, { loot: 12.5, bestiary: 0, damage: 0, leech: 0 }, "60% is more than the Talisman gives");
+  await p.type("#ch-damage", "10.25");
+  await p.type("#ch-leech", "7,5");
+  await until(() => p.local()[path].talisman.leech === 7.5, "damage and life leech saved");
+  assert.deepEqual(p.local()[path].talisman, { loot: 12.5, bestiary: 0, damage: 10.25, leech: 7.5 });
   assert.equal(p.$("#ch-loot").value, "12.5");
   assert.equal(p.$('[aria-label="Numbers from"] button[aria-pressed="true"]'), null, "custom mix of switches: no preset pressed");
   // Theme is per device.
@@ -231,7 +235,7 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   await p.click("#hunt-log");
   assert.equal(p.w.location.hash, "#/log");
   await p.type("#log-text", ["Session data: From 2026-10-21, 16:00:00 to 2026-10-21, 17:00:00", "Session: 01:00h", "Raw XP Gain: 3,000,000",
-    "Balance: 100,000", "Killed Monsters:", "  450x cobra assassin"].join("\n"), "input");
+    "Balance: 100,000", "Damage: 2,500,000", "Damage/h: 2,500,000", "Healing: 300,000", "Healing/h: 300,000", "Killed Monsters:", "  450x cobra assassin"].join("\n"), "input");
   assert.match(p.d.body.textContent, /Read it: 1 h, 1 creature type\./);
   await p.click('[aria-label="Where did you hunt"] button:nth-child(2)');
   await p.type("#log-name", "Bastion two-box");
@@ -245,6 +249,7 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   const hunt = store[logged[0]], huntId = logged[0].slice("hunts/".length);
   assert.equal(hunt.task, "cobra-assassin", "the active bounty's creature was killed: the hunt's task");
   assert.deepEqual(hunt.boosts, { boosted: null, prey: [], talisman: 0 }, "no loot bonuses on (the boosted Silencer wasn't killed; no Talisman), recorded as none");
+  assert.deepEqual([hunt.damage, hunt.healing], [2500000, 300000], "the Analyser's Damage and Healing totals are kept");
   assert.deepEqual([hunt.vocation, hunt.level, hunt.by], ["Elite Knight", 615, { pid: "ek", name: "Test Knight" }], "shared: who logged it, as what, at what level");
   assert.equal(Object.keys(store).filter((k) => k.startsWith("profiles/ek/sessions/")).length, 8, "new hunts go only to the shared list");
   assert.equal(p.w.location.hash, "#/plan");
@@ -266,10 +271,11 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   await p.type("#saved-" + huntId + "-spot", "my-knight-den");
   await p.type("#saved-" + huntId + "-boosted", "cobra-assassin");
   await p.type("#saved-" + huntId + "-talisman", "5");
+  await p.type("#saved-" + huntId + "-damage", "10");
   await p.click("#saved-" + huntId + "-save");
   await until(() => store["hunts/" + huntId].level === 600, "the corrected hunt");
   assert.deepEqual([store["hunts/" + huntId].spotId, store["hunts/" + huntId].spot, store["hunts/" + huntId].vocation], ["my-knight-den", "Knight Den", "Elite Knight"]);
-  assert.deepEqual(store["hunts/" + huntId].boosts, { boosted: "cobra-assassin", prey: [], talisman: 5 }, "the bonuses as corrected");
+  assert.deepEqual(store["hunts/" + huntId].boosts, { boosted: "cobra-assassin", prey: [], talisman: 5, damage: 10 }, "the bonuses as corrected, with the Talisman's damage");
   assert.match(p.$("#saved-" + huntId).textContent, /Cobra Assassin boosted/);
   await p.click(".hp-back");
   await p.click("#log-discard");
