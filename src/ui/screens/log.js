@@ -7,23 +7,30 @@ import { h, icon } from "../dom.js";
 import { segmented, selectField, confirmButton } from "../components.js";
 import { t } from "../../app/lang.js";
 
-// The loot bonuses on during a hunt (b: logView's boosts, or a saved hunt's editor.boosts), ids under `pre`; onBoost(patch)
+// The loot and damage bonuses on during a hunt (b: logView's boosts, or a saved hunt's editor.boosts), ids under `pre`; onBoost(patch)
 // with app/views.js boostsPatch's patches.
+const pctField = (id, label, value, ok, onCommit) => h("label", { class: "hp-field" }, label,
+  h("input", { id, class: "hp-input", value: value || "", inputmode: "decimal", maxlength: 5, autocomplete: "off", "aria-invalid": ok === false ? "true" : null,
+    onChange: (e) => onCommit(e.target.value) }));
 function boostsCard(pre, b, onBoost) {
   return h("div", { id: pre + "boosts", class: "hp-card hp-stack", role: "group", "aria-labelledby": pre + "boosts-h" },
     h("b", { id: pre + "boosts-h" }, t("On during this hunt")),
-    h("span", { class: "hp-caption" }, t("Loot bonuses only. They’re taken out of this hunt’s loot, so today’s bonuses aren’t counted twice.")),
+    h("span", { class: "hp-caption" }, t("Loot and damage bonuses are taken out of this hunt’s numbers, so today’s bonuses aren’t counted twice.")),
     selectField({ id: pre + "boosted", label: t("Boosted creature"), value: b.boosted, options: b.boostedOptions, onPick: (x) => onBoost({ boosted: x }) }),
-    b.prey.map((q) => h("div", { class: "hp-offer", role: "group", "aria-label": t("Loot Prey {n}", { n: q.i + 1 }) },
+    b.prey.map((q) => h("div", { class: "hp-offer", role: "group", "aria-label": t("Prey {n}", { n: q.i + 1 }) },
+      selectField({ id: pre + "prey-" + q.i, label: t("Prey {n}", { n: q.i + 1 }), value: q.slug, options: q.creatures, onPick: (x) => onBoost({ prey: q.i, slug: x }) }),
       h("div", { class: "hp-grid2" },
-        selectField({ id: pre + "prey-" + q.i, label: t("Loot Prey {n}", { n: q.i + 1 }), value: q.slug, options: q.creatures, onPick: (x) => onBoost({ prey: q.i, slug: x }) }),
-        selectField({ id: pre + "prey-" + q.i + "-pct", label: t("Size"), value: q.pct, options: b.pcts, onPick: (x) => onBoost({ prey: q.i, pct: Number(x) }) })),
+        selectField({ id: pre + "prey-" + q.i + "-kind", label: t("Bonus"), value: q.kind, options: b.kinds, onPick: (x) => onBoost({ prey: q.i, kind: x }) }),
+        selectField({ id: pre + "prey-" + q.i + "-pct", label: t("Size"), value: q.pct, options: q.pcts, onPick: (x) => onBoost({ prey: q.i, pct: Number(x) }) })),
       h("button", { id: pre + "prey-" + q.i + "-remove", type: "button", class: "hp-linkbtn hp-tap", onClick: () => onBoost({ removePrey: q.i }) }, t("Remove")))),
-    b.canAddPrey ? h("button", { id: pre + "prey-add", type: "button", class: "hp-btn dashed", onClick: () => onBoost({ addPrey: b.nextPrey }) }, t("+ Add a loot Prey")) : null,
-    b.talisman != null ? h("label", { class: "hp-field" }, t("Talisman loot bonus (%)"),
-      h("input", { id: pre + "talisman", class: "hp-input", value: b.talisman, inputmode: "decimal", maxlength: 5, autocomplete: "off", "aria-invalid": b.talismanOk ? null : "true",
-        onChange: (e) => onBoost({ talisman: e.target.value }) })) : null,
-    b.talismanOk ? null : h("span", { class: "hp-caption", role: "alert" }, t("Type a percent from 0 to 50, or leave it empty.")));
+    b.canAddPrey ? h("button", { id: pre + "prey-add", type: "button", class: "hp-btn dashed", onClick: () => onBoost({ addPrey: b.nextPrey }) }, t("+ Add a loot or damage Prey")) : null,
+    b.talisman != null ? pctField(pre + "talisman", t("Talisman loot bonus (%)"), b.talisman, b.talismanOk, (v) => onBoost({ talisman: v })) : null,
+    b.talisman != null ? [
+      h("div", { class: "hp-grid2" },
+        pctField(pre + "damage", t("Talisman damage bonus (%)"), b.damage, b.damageOk, (v) => onBoost({ damage: v })),
+        pctField(pre + "leech", t("Talisman life leech (%)"), b.leech, b.leechOk, (v) => onBoost({ leech: v }))),
+      h("span", { class: "hp-caption" }, t("Life leech is only kept with the hunt. It doesn’t change any number yet."))] : null,
+    b.talismanOk && b.damageOk !== false && b.leechOk !== false ? null : h("span", { class: "hp-caption", role: "alert" }, t("Type a percent from 0 to 50, or leave it empty.")));
 }
 
 // The saved hunts (view.saved: logView's), each with its editor when open.

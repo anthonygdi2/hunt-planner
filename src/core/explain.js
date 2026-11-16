@@ -64,6 +64,7 @@ export function partsWhy(o, ctx) {
   });
   let s = bits.length ? t("Scores {score}: {parts}.", { score: ctx.pct(o.v), parts: bits.join(", ") }) : t("Scores {score}.", { score: ctx.pct(o.v) });
   if (o.today && o.today.length) s += " " + t("Today: {boosts}.", { boosts: t.and(o.today) });
+  if (o.killBonus > 0 && Math.round(o.killBonus * 1000) > 0) s += " " + t("Damage bonuses: about +{pct}% kills.", { pct: Math.round(o.killBonus * 1000) / 10 });
   if (o.travelMin && o.hours) s += " " + t("Includes {min} min of travel.", { min: o.travelMin });
   if (o.held) s += " " + (!o.hours ? t("Bounty done in about {time} here.", { time: fmtHours(o.held.hoursLeft) }) :
     o.held.finishes ? t("Finishes the bounty this session.") : t("About {kills} of {left} bounty kills this session.", { kills: Math.round(o.held.kills), left: Math.round(o.held.left) }));

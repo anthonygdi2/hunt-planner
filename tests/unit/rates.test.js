@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { sessHours, sessionSpot, xpField, raidRate, spotRates, deriveRates, huntLootBonus } from "../../src/core/rates.js";
+import { sessHours, sessionSpot, xpField, raidRate, spotRates, deriveRates, huntLootBonus, huntKillMult } from "../../src/core/rates.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 
 const catalog = makeCatalog([{ n: "Cobra Assassin", c: "H", m: 12 }, { n: "Cobra Scout", c: "M", m: 6 }, { n: "Cobra Vizier", c: "H", m: 12, r: 1 }]);
@@ -98,4 +98,33 @@ test("the loot a hunt's recorded bonuses added comes out of its loot and profit"
   assert.equal(d.pph, Math.round(1e5 - extra));
   assert.equal(d.taskBonus, false);
   assert.equal(deriveRates([Object.assign({}, plain, { task: "cobra-assassin" })], { catalog, expTable: exp })["cobra-assassin"][0].taskBonus, true);
+});
+
+test("damage bonuses on during a hunt are taken out of its rates", () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-6 * Math.max(1, Math.abs(b)), (msg || "") + " " + a + " vs " + b);
+  const exp = { "cobra-assassin": 1000, "cobra-scout": 1000 };
+  const hunt = S({ spot: "Bastion", task: "cobra-assassin", rawXp: 4e6, balance: 2e5, loot: 4e5, kills: [{ slug: "cobra-assassin", count: 200 }, { slug: "cobra-scout", count: 200 }] });
+  assert.equal(huntKillMult(hunt, catalog, exp), 1, "none recorded");
+  assert.equal(huntKillMult(Object.assign({}, hunt, { boosts: { boosted: null, prey: [], talisman: 5 } }), catalog, exp), 1, "loot bonuses only");
+  const tal = Object.assign({}, hunt, { boosts: { boosted: null, prey: [], talisman: 0, damage: 10 } }), km = 1 / (1 - 0.5 * 0.5 * 0.1 / 1.1);
+  near(huntKillMult(tal, catalog, exp), km, "the Talisman on half the hunt's exp, half the time spent killing");
+  assert.equal(huntKillMult(Object.assign({}, tal, { task: null }), catalog, exp), 1, "off the bounty the Talisman's damage is nothing");
+  assert.equal(huntKillMult(tal, catalog, exp, 0), 1, "a respawn-limited spot");
+  const prey = Object.assign({}, hunt, { task: null, boosts: { boosted: null, prey: [], talisman: 0, preyDamage: [{ slug: "cobra-scout", pct: 25 }] } });
+  near(huntKillMult(prey, catalog, exp), 1 / (1 - 0.5 * 0.5 * 0.25 / 1.25), "a damage Prey");
+  // With hit points: the assassin (9,000) is nine tenths of the killing, the scout (1,000) one tenth.
+  near(huntKillMult(tal, catalog, exp, null, { "cobra-assassin": 9000, "cobra-scout": 1000 }), 1 / (1 - 0.5 * 0.9 * 0.1 / 1.1), "by hit-point share");
+  near(spotRates([tal], catalog, sessionSpot, "rawXp", exp, null, { "cobra-assassin": 9000, "cobra-scout": 1000 }).Bastion.xph, 4e6 * (1 - 0.5 * 0.9 * 0.1 / 1.1));
+  // The spot's rates: the same kills over km times the hours.
+  const r = spotRates([tal], catalog, sessionSpot, "rawXp", exp).Bastion, plain = spotRates([hunt], catalog, sessionSpot, "rawXp", exp).Bastion;
+  near(r.kph["cobra-assassin"], 200 / km);
+  near(r.xph, plain.xph / km);
+  near(r.pph, plain.pph / km);
+  near(r.lph, plain.lph / km);
+  near(spotRates([tal], catalog, sessionSpot, "rawXp", exp, () => 0).Bastion.xph, plain.xph, "respawn-limited: taken as it is");
+  // The creature's rates, the same way.
+  const d = deriveRates([tal], { catalog, xpMode: "raw", expTable: exp })["cobra-assassin"][0], d0 = deriveRates([hunt], { catalog, xpMode: "raw", expTable: exp })["cobra-assassin"][0];
+  near(d.kph, Math.round(200 / km));
+  near(d.xph, Math.round(d0.xph / km));
+  assert.equal(d.taskBonus, false, "recorded bonuses are taken out, so the plan adds today's back");
 });

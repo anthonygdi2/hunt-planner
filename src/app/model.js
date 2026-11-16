@@ -1,13 +1,13 @@
 // The app's model of one character at one moment: compute()'s result plus the functions screens and view models need
 // on top of it (numbers per creature, the reroll model, weekly tasks, the planner). Everything is a function of the
 // state, the derived values and `now`, so the same model backs the screens, the view models and the golden capture.
-import { VOCATIONS, SLOTS, DIFFICULTIES, OFFER_ODDS } from "../data/rules.js";
+import { VOCATIONS, SLOTS, DIFFICULTIES } from "../data/rules.js";
 import { compute, ownHunts } from "./compute.js";
 import { readSources, readSettings, readGoal, readBounty, readOfferOdds, readOfferLog, readTalisman } from "../store/schema.js";
 import { norm } from "../core/text.js";
 import { effective } from "../core/numbers.js";
 import { metrics } from "../core/metrics.js";
-import { poolModel as corePoolModel, readReroll, solvePlan, planKey, commonMax } from "../core/reroll.js";
+import { poolModel as corePoolModel, readReroll, solvePlan, planKey, commonMax, blendedOdds } from "../core/reroll.js";
 import { compareDifficulties } from "../core/difficulty.js";
 import { scoringWeights } from "../core/score.js";
 import { weeklyBonus as coreWeeklyBonus, serverDay } from "../core/weekly.js";
@@ -15,7 +15,7 @@ import { weeklyState, weeklyTaskRows, openWeeklyTasks } from "./weekly.js";
 import { spotIndex as coreSpotIndex, spotNumbers, lensCheck as coreLensCheck, huntCheck } from "../core/spots.js";
 import { noNumsWhy as coreNoNumsWhy } from "../core/explain.js";
 import { heldTask as coreHeldTask, spotValue as coreSpotValue, scaleSpots, spotScores as coreSpotScores, planOffers as corePlanOffers,
-  planOptions as corePlanOptions, planChain as corePlanChain, todayFactor as coreTodayFactor } from "../core/plan.js";
+  planOptions as corePlanOptions, planChain as corePlanChain, todayFactor as coreTodayFactor, preyAdvice as corePreyAdvice } from "../core/plan.js";
 import { GOAL_KEYS } from "../core/score.js";
 import { EN } from "../core/i18n.js";
 
@@ -26,7 +26,7 @@ export const ASSUMED_TOKENS = 5;
 export function makePlanCache() { return { key: "", plan: null, diffs: {} }; }
 
 // state: compute()'s state plus {creatures (shared creature settings), planner {state, marks, occupancy}, spotMeta,
-// expTable (PL_EXP)}. derived: compute(state, now), or null to compute it here. opts.planCache: makePlanCache().
+// expTable (PL_EXP), hpTable (PL_HP)}. derived: compute(state, now), or null to compute it here. opts.planCache: makePlanCache().
 export function makeModel(state, derived, now, opts) {
   const d = derived || compute(state, now), p = state.profile || {}, catalog = state.catalog, entries = state.entries, t = state.t || EN;
   const cache = (opts && opts.planCache) || makePlanCache(), at = new Date(now);
@@ -55,8 +55,14 @@ export function makeModel(state, derived, now, opts) {
   };
   // Reroll settings: tokens from the bounty; hours per day and the unknown-creature assumption from the profile.
   const rerollSettings = () => { const b = bounty(); return readReroll(Object.assign({}, p.reroll, { left: b.tokens })); };
-  // Silver and Gold: the character's own odds, else the guess (typed: whether they're its own); the logged offers.
-  const offerOdds = () => { const o = readOfferOdds(p.offerOdds); return { odds: o || OFFER_ODDS, typed: !!o }; };
+  // Silver and Gold: the character's own odds (typed), else the guess blended with its logged offers (n of them; 0:
+  // the guess as it is); the logged offers.
+  const offerOdds = () => {
+    const o = readOfferOdds(p.offerOdds);
+    if (o) return { odds: o, typed: true, n: 0 };
+    const b = blendedOdds(readOfferLog(p.rewardObs));
+    return { odds: { silver: b.silver, gold: b.gold }, typed: false, n: b.n };
+  };
   const offerLog = () => readOfferLog(p.rewardObs);
   // Whether the board's three offers are the last three logged for its difficulty (a board is logged once).
   const boardLogged = () => {
@@ -132,15 +138,20 @@ export function makeModel(state, derived, now, opts) {
       skip: key ? (x, sp) => huntCheck(x, sp, d.huntCtx, lens) : (x) => d.hunts.why.get(x) || "" });
     return indexes[key];
   };
-  const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost, expTable: state.expTable });
+  // The share of a hunt at a spot spent killing: 0 where the character says respawn is the limit, else the default.
+  const killTime = (sp) => (plState.respawnLimit && plState.respawnLimit[sp.id] ? 0 : null);
+  const spotNums = (sp) => spotNumbers(sp, { catalog, xpMode: p.xpMode, refOn, otherOn, picks: d.picks, calib: d.calib, calibOther: d.calibOther, vocation, xpBoost: d.xpBoost, expTable: state.expTable,
+    killTime: killTime(sp), hpTable: state.hpTable });
   const heldTask = (h, diff) => coreHeldTask(h, diff, { catalog, chalRates: chalRates() });
+  // Which creature to put Prey on at a spot, and what the biggest Prey of each kind adds there.
+  const preyAdvice = (sp) => corePreyAdvice(spotNums(sp), { expTable: state.expTable, hpTable: state.hpTable }, killTime(sp));
   const tal = readTalisman(p);
   const spotValue = (sp, o) => {
     o = o || {};
     const nums = spotNums(sp);
     if (!nums) return null;
-    return coreSpotValue(sp, nums, { hours: o.hours, held: o.held, diff: o.diff || boardDiff(), today: o.today, travel: o.travel, weekly: o.weekly || openWeeklies() },
-      { catalog, chalRates: chalRates(), entries, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, raidP: d.raidP, expTable: state.expTable, t });
+    return coreSpotValue(sp, nums, { hours: o.hours, held: o.held, diff: o.diff || boardDiff(), today: o.today, travel: o.travel, weekly: o.weekly || openWeeklies(), killTime: killTime(sp) },
+      { catalog, chalRates: chalRates(), entries, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, talismanDamage: tal.damage, raidP: d.raidP, expTable: state.expTable, hpTable: state.hpTable, t });
   };
   const scaleArgs = (diff) => { const w = weights(); return { weights: w, model: GOAL_KEYS.some((k) => w[k] > 0) ? poolModel(diff) : null }; };
   const plScale = (values, diff) => scaleSpots(values, scaleArgs(diff));
@@ -153,7 +164,7 @@ export function makeModel(state, derived, now, opts) {
     const diff = o.diff || boardDiff(), H = o.hours > 0 ? o.hours : null, wk = o.weekly || openWeeklies();
     const offers = planOffers(o.offers || boardOffers(), o.held, diff), idx = o.index || spotIndex();
     const po = corePlanOptions({ index: idx, offers, hours: H, team: o.team,
-      inLens: (sp) => lensCheck(sp, o.lens),
+      inLens: (sp) => (o.blocked && o.blocked[sp.id] ? "blocked" : lensCheck(sp, o.lens)),
       valueAt: (sp, offer) => spotValue(sp, { hours: H, held: offer, diff, weekly: wk, today: o.today, travel: o.travel }),
       scale: (all) => plScale(all, diff) });
     po.diff = diff;
@@ -166,11 +177,12 @@ export function makeModel(state, derived, now, opts) {
       tokensUnknown: o.tokensUnknown, hpd: set.hpd, solve: rerollPlan, occupancy: o.occupancy, world: o.world, markMinutes: settings.takenMinutes });
   };
   // The planner's own context for planChain and planOptions: its saved session length, difficulty, held offer, today's
-  // bonuses, travel times, occupancy and world (from the character settings).
+  // bonuses, travel times, the spots it can't go to (blocked: left out of the options), occupancy and world (from the
+  // character settings).
   const plannerCtx = (extra) => Object.assign({ hours: plState.fixedHours, tokensUnknown: !rerollSettings().hasLeft, diff: bounty().difficulty, held: held(), today: today(),
-    travel: plState.travel, occupancy: pl.occupancy, world: settings.world }, extra || {});
+    travel: plState.travel, blocked: plState.noAccess, occupancy: pl.occupancy, world: settings.world }, extra || {});
 
   return { derived: d, now, sources, settings, bounty, weights, chalRates, slots, minLevelFor, lockedFor, ratingOf, eff, metricsFor, boardDiff, rerollSettings, offerOdds, offerLog, boardLogged, poolModel, rerollPlan, difficultyCompare,
     boardOffers, weekly, weeklyRows, openWeeklies, weeklyBonus, held, today, todayFactor, spotIndex, spotNums, heldTask, spotValue, plScale, spotScores,
-    planOffers, lensCheck, noNumsWhy, planOptions, planChain, plannerCtx };
+    planOffers, lensCheck, noNumsWhy, planOptions, planChain, plannerCtx, preyAdvice };
 }

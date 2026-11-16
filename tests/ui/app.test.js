@@ -88,11 +88,15 @@ test("browser storage: first run, characters and settings, no page errors", asyn
   await p.type("#ch-loot", "12,5");
   await p.type("#ch-bonus", "20");
   await until(() => (p.local()[path] || {}).bestiaryBonus === 20, "the Talisman saved");
-  assert.deepEqual([p.local()[path].talisman, p.local()[path].bestiaryBonus], [{ loot: 12.5, bestiary: 20 }, 20]);
+  assert.deepEqual([p.local()[path].talisman, p.local()[path].bestiaryBonus], [{ loot: 12.5, bestiary: 20, damage: 0, leech: 0 }, 20]);
   await p.type("#ch-loot", "60");
   await p.type("#ch-bonus", "");
   await until(() => p.local()[path].bestiaryBonus === 0, "empty is no Talisman");
-  assert.deepEqual(p.local()[path].talisman, { loot: 12.5, bestiary: 0 }, "60% is more than the Talisman gives");
+  assert.deepEqual(p.local()[path].talisman, { loot: 12.5, bestiary: 0, damage: 0, leech: 0 }, "60% is more than the Talisman gives");
+  await p.type("#ch-damage", "10.25");
+  await p.type("#ch-leech", "7,5");
+  await until(() => p.local()[path].talisman.leech === 7.5, "damage and life leech saved");
+  assert.deepEqual(p.local()[path].talisman, { loot: 12.5, bestiary: 0, damage: 10.25, leech: 7.5 });
   assert.equal(p.$("#ch-loot").value, "12.5");
   assert.equal(p.$('[aria-label="Numbers from"] button[aria-pressed="true"]'), null, "custom mix of switches: no preset pressed");
   // Theme is per device.
@@ -231,7 +235,7 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   await p.click("#hunt-log");
   assert.equal(p.w.location.hash, "#/log");
   await p.type("#log-text", ["Session data: From 2026-10-21, 16:00:00 to 2026-10-21, 17:00:00", "Session: 01:00h", "Raw XP Gain: 3,000,000",
-    "Balance: 100,000", "Killed Monsters:", "  450x cobra assassin"].join("\n"), "input");
+    "Balance: 100,000", "Damage: 2,500,000", "Damage/h: 2,500,000", "Healing: 300,000", "Healing/h: 300,000", "Killed Monsters:", "  450x cobra assassin"].join("\n"), "input");
   assert.match(p.d.body.textContent, /Read it: 1 h, 1 creature type\./);
   await p.click('[aria-label="Where did you hunt"] button:nth-child(2)');
   await p.type("#log-name", "Bastion two-box");
@@ -245,6 +249,7 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   const hunt = store[logged[0]], huntId = logged[0].slice("hunts/".length);
   assert.equal(hunt.task, "cobra-assassin", "the active bounty's creature was killed: the hunt's task");
   assert.deepEqual(hunt.boosts, { boosted: null, prey: [], talisman: 0 }, "no loot bonuses on (the boosted Silencer wasn't killed; no Talisman), recorded as none");
+  assert.deepEqual([hunt.damage, hunt.healing], [2500000, 300000], "the Analyser's Damage and Healing totals are kept");
   assert.deepEqual([hunt.vocation, hunt.level, hunt.by], ["Elite Knight", 615, { pid: "ek", name: "Test Knight" }], "shared: who logged it, as what, at what level");
   assert.equal(Object.keys(store).filter((k) => k.startsWith("profiles/ek/sessions/")).length, 8, "new hunts go only to the shared list");
   assert.equal(p.w.location.hash, "#/plan");
@@ -266,10 +271,11 @@ test("the golden fixture's documents (old shapes): the Plan screen, Free, Taken 
   await p.type("#saved-" + huntId + "-spot", "my-knight-den");
   await p.type("#saved-" + huntId + "-boosted", "cobra-assassin");
   await p.type("#saved-" + huntId + "-talisman", "5");
+  await p.type("#saved-" + huntId + "-damage", "10");
   await p.click("#saved-" + huntId + "-save");
   await until(() => store["hunts/" + huntId].level === 600, "the corrected hunt");
   assert.deepEqual([store["hunts/" + huntId].spotId, store["hunts/" + huntId].spot, store["hunts/" + huntId].vocation], ["my-knight-den", "Knight Den", "Elite Knight"]);
-  assert.deepEqual(store["hunts/" + huntId].boosts, { boosted: "cobra-assassin", prey: [], talisman: 5 }, "the bonuses as corrected");
+  assert.deepEqual(store["hunts/" + huntId].boosts, { boosted: "cobra-assassin", prey: [], talisman: 5, damage: 10 }, "the bonuses as corrected, with the Talisman's damage");
   assert.match(p.$("#saved-" + huntId).textContent, /Cobra Assassin boosted/);
   await p.click(".hp-back");
   await p.click("#log-discard");
@@ -329,10 +335,9 @@ test("Advanced mode: log a board, and the Silver and Gold odds", async () => {
   if (p.$("#active-name")) await p.click("#bounty-rerolled");
   await until(() => p.$("#offer-0-name"), "the offers");
   // The guess, and the fixture's three logged offers (one of each kind): too few to use.
-  assert.equal(p.$("#odds-line").textContent, "The plan uses a guess: Silver 10%, Gold 2% per offer. The real odds aren’t published.");
-  assert.equal(p.$("#odds-logged").textContent, "3 offers logged: Silver 33.3%, Gold 33.3%. Your shares can be used once 10 offers are logged.");
-  assert.equal(p.$("#odds-use"), null);
-  assert.equal(p.$("#odds-guess"), null, "already the guess");
+  assert.equal(p.$("#odds-line").textContent, "The plan follows your log: Silver 11.3%, Gold 3.8% per offer. It starts from a guess and moves toward your logged boards as they add up.");
+  assert.equal(p.$("#odds-logged").textContent, "3 offers logged: Silver 33.3%, Gold 33.3%.");
+  assert.equal(p.$("#odds-follow"), null, "nothing typed: already following the log");
   assert.equal(p.$("#bounty-log").disabled, true);
   assert.equal(p.$("#bounty-log-note").textContent, "Fill in all three offers to log this board.");
   // A board: logged once.
@@ -354,14 +359,15 @@ test("Advanced mode: log a board, and the Silver and Gold odds", async () => {
   assert.match(p.$("#odds-logged").textContent, /^6 offers logged: Silver 33\.3%, Gold 16\.7%\./);
   // Typed odds, then back to the guess.
   await p.type("#odds-silver", "15");
-  await until(() => JSON.stringify(store["profiles/ek"].offerOdds) === '{"silver":15,"gold":2}', "the typed odds");
+  await until(() => JSON.stringify(store["profiles/ek"].offerOdds) === '{"silver":15,"gold":3.6}', "the typed odds (Gold as the plan had it: the guess and six logged offers)");
   await wait(30);
-  assert.equal(p.$("#odds-line").textContent, "The plan uses your odds: Silver 15%, Gold 2% per offer.");
+  assert.equal(p.$("#odds-line").textContent, "The plan uses your odds: Silver 15%, Gold 3.6% per offer.");
   await p.type("#odds-gold", "95");
   await wait(30);
-  assert.equal(store["profiles/ek"].offerOdds.gold, 2, "more than 100 together: not saved");
-  await p.click("#odds-guess");
-  await until(() => store["profiles/ek"].offerOdds === null, "back to the guess");
+  assert.equal(store["profiles/ek"].offerOdds.gold, 3.6, "more than 100 together: not saved");
+  await p.click("#odds-follow");
+  await until(() => store["profiles/ek"].offerOdds === null, "following the log again");
+  assert.match(p.$("#odds-line").textContent, /^The plan follows your log: Silver 12\.5%, Gold 3\.6% per offer\./);
   // Picking an offer from the board logged by hand marks the pick; no rows are added.
   await p.click("#offer-1-pick");
   await until(() => store["profiles/ek"].rewardObs.master[4].picked === true, "the pick");
@@ -423,6 +429,19 @@ test("Spots and a spot page over the golden fixture: search, a variation, Taken,
   assert.ok([...p.d.querySelectorAll(".hp-spot b")].some((b) => b.textContent === "Knight Den"), "a creature finds the spots it lives in");
   // The parent spot lists its variation.
   await p.go("spot/cobra-bastion-1");
+  // Can't go there: stored for this character, badged here and in the list, and out of the plan; travel minutes too.
+  await p.click("#spot-access");
+  await until(() => ((store["profiles/ek/planner/state"] || {}).noAccess || {})["cobra-bastion-1"] === true, "the spot marked as one it can't go to");
+  assert.equal(p.$("#spot-blocked").textContent, "Can’t go there");
+  await p.type("#spot-travel", "15");
+  await until(() => (store["profiles/ek/planner/state"].travel || {})["cobra-bastion-1"] === 15, "the travel minutes");
+  await p.go("plan");
+  assert.doesNotMatch(p.d.body.textContent, /Go to Cobra Bastion -1/, "not in the plan");
+  await p.go("spot/cobra-bastion-1");
+  await p.type("#spot-travel", "");
+  await p.click("#spot-access");
+  await until(() => !("cobra-bastion-1" in store["profiles/ek/planner/state"].noAccess) && !("cobra-bastion-1" in store["profiles/ek/planner/state"].travel), "allowed again, no travel time");
+  assert.equal(p.$("#spot-blocked"), null);
   assert.match(p.d.body.textContent, /Your variations.*Bastion lure\d*.*Lure two boxes · Yours · 1 hunt · low sample/);
   // The reference hunt's details: its kills/h per creature.
   const refToggle = p.d.querySelector('.hp-sep [id^="ref-"][id$="-toggle"]');
@@ -485,6 +504,22 @@ test("Creatures over the golden fixture: tiers, a creature page's writes, and th
   await until(() => store["profiles/ek"].slots.preferred.indexOf("cobra-assassin") !== -1 && store["profiles/ek"].slots.unwanted.indexOf("cobra-assassin") === -1, "Preferred again, off Unwanted");
   await p.click("#cr-avoid");
   await until(() => (store["profiles/ek/entries/cobra-assassin"] || {}).rating === "X", "Avoid");
+  // The bestiary kill count: typed, with kills left and when; reaching the total finishes the bestiary, and switching
+  // that back off drops the count.
+  assert.match(p.$("#cr-bkills-hint").textContent, /^Optional: your kill count/);
+  await p.type("#cr-bkills", "1,500");
+  await until(() => (store["profiles/ek/entries/cobra-assassin"] || {}).bestiaryKills === 1500, "the kill count");
+  assert.equal(typeof store["profiles/ek/entries/cobra-assassin"].bestiaryKillsAt, "string");
+  assert.equal(p.$("#cr-bkills-hint").textContent, "1,000 kills left of 2,500. Updated today.");
+  await p.type("#cr-bkills", "abc");
+  await wait(30);
+  assert.equal(store["profiles/ek/entries/cobra-assassin"].bestiaryKills, 1500, "not a number: nothing changes");
+  await p.type("#cr-bkills", "9999");
+  await until(() => store["profiles/ek/entries/cobra-assassin"].bestiaryDone === true, "the total reached: finished");
+  assert.equal(store["profiles/ek/entries/cobra-assassin"].bestiaryKills, 2500);
+  assert.equal(p.$("#cr-bestiary").getAttribute("aria-checked"), "true");
+  await p.click("#cr-bestiary");
+  await until(() => !("bestiaryKills" in store["profiles/ek/entries/cobra-assassin"]) && !store["profiles/ek/entries/cobra-assassin"].bestiaryDone, "unfinished again, the count dropped");
   await p.click("#cr-bestiary");
   await until(() => store["profiles/ek/entries/cobra-assassin"].bestiaryDone === true, "bestiary done");
   await p.type("#cr-notes", "Lure two boxes");

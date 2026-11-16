@@ -28,9 +28,11 @@ export const TASK = deepFreeze({
 // includes the bonus (TibiaWiki Task Board).
 export const KIND_MULT = deepFreeze({ normal: 1, silver: 2, gold: 4 });
 // The chance of a Silver or a Gold offer, in percent per offer. Not published anywhere: the maintainer's starting guess
-// (November 13, 2026), used until the player types their own odds or takes the shares of the boards they log
-// (Advanced mode).
+// (November 13, 2026). With no odds typed the plan blends it with the character's logged boards: the guess counts as
+// OFFER_ODDS_PRIOR logged offers, so a few boards barely move it and a few hundred mostly replace it (50 is a choice,
+// November 15, 2026, that needs the maintainer's OK).
 export const OFFER_ODDS = deepFreeze({ silver: 10, gold: 2 });
+export const OFFER_ODDS_PRIOR = 50;
 
 // Exp paid per required kill, before Silver or Gold. Master (Hard creatures) is exactly 1,875: ten logged offers at
 // levels 612-613, no level effect seen. Expert 510, Adept 97.5 and Beginner 15 follow the open-source Canary server
@@ -101,7 +103,18 @@ export const PREY = deepFreeze({
 // a chance of a kill counting twice for the bestiary, up to 100% (community-reported, TibiaQA, December 2025). How more
 // loot stacks with Prey isn't published: each bonus is taken as its own chance of one more set of loot, so the expected
 // loot is 1 + the sum of the chances (an assumption, maintainer's OK November 14, 2026).
-export const TALISMAN = deepFreeze({ loot: { max: 50 }, bestiary: { max: 100 } });
+// Damage and life leech (each up to 50%, TibiaQA, community-reported; life leech replaced the Bounty Ring's damage
+// reduction) are entered and recorded with each hunt on a bounty. Damage counts as faster kills (KILL_TIME below);
+// nothing is computed from life leech yet.
+export const TALISMAN = deepFreeze({ loot: { max: 50 }, bestiary: { max: 100 }, damage: { max: 50 }, leech: { max: 50 } });
+
+// Damage bonuses (the Talisman's on the bounty creature, a damage Prey on its creature): more damage shortens only the
+// time spent killing that creature, so the kill rate rises by 1 / (1 - KILL_TIME x its share of the spot x d / (1 + d)),
+// its share being its share of the hit points killed there (TibiaWiki hit points, src/data/creature-hp.json).
+// KILL_TIME, the share of a hunt spent killing rather than walking, luring or waiting for respawn, isn't published or
+// measured yet: 0.5 is a guess (November 15, 2026, needs the maintainer's OK), 0 at a spot switched to respawn-limited.
+// How the Talisman's damage stacks with a damage Prey isn't published either: their percents are added.
+export const KILL_TIME = 0.5;
 
 // Exp events in percent (TibiaWiki, Experience Point): Double Experience (+100%, about 6 a year) and world-quest
 // bonuses (+10% to +50%, some limited to certain creatures).

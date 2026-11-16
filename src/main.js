@@ -1,6 +1,6 @@
 // Boot: creates the app over the embedded data, mounts the UI, and connects the db (the Claude artifact's shared db,
 // else browser storage). The browser's objects (window, storage, location, downloads, files) are handed in from here.
-import { DATA, REFERENCE, PL_EXP } from "./data/index.js";
+import { DATA, REFERENCE, PL_EXP, PL_HP } from "./data/index.js";
 import { createApp } from "./app/app.js";
 import { mount } from "./ui/shell.js";
 import { claudeDb, localDb, LOCAL_KEY } from "./store/db.js";
@@ -8,7 +8,7 @@ import { makePrefs } from "./store/prefs.js";
 import { t } from "./app/lang.js";
 
 const w = window, host = w.claude, hasHost = !!(host && typeof host.use === "function");
-const app = createApp({ data: { creatures: DATA, reference: REFERENCE, expTable: PL_EXP }, prefs: makePrefs(w.localStorage), now: () => Date.now(),
+const app = createApp({ data: { creatures: DATA, reference: REFERENCE, expTable: PL_EXP, hpTable: PL_HP }, prefs: makePrefs(w.localStorage), now: () => Date.now(),
   browserLang: w.navigator && w.navigator.language });
 
 function download(name, text) {

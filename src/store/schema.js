@@ -99,7 +99,8 @@ export const readTheme = (v) => (THEMES.indexOf(v) !== -1 ? v : "system");
 // ---------- entries: profiles/{pid}/entries/{slug} ----------
 export const RATINGS = ["S", "A", "B", "C", "D", "X"];
 const NUM_FIELDS = ["kph", "xph", "pph"];
-// {rating?, kph?, xph?, pph?, notes? (≤ 2000), bestiaryDone?, wardenDone?, updatedAt?, numsAt?, pinSpot?}
+// {rating?, kph?, xph?, pph?, notes? (≤ 2000), bestiaryDone?, bestiaryKills? (the kill count the game's Bestiary shows,
+// typed; since November 15, 2026), bestiaryKillsAt? (when it was typed), wardenDone?, updatedAt?, numsAt?, pinSpot?}
 export function readRecord(v) {
   const r = {};
   if (!v) return r;
@@ -107,6 +108,8 @@ export function readRecord(v) {
   NUM_FIELDS.forEach((k) => { if (typeof v[k] === "number" && isFinite(v[k])) r[k] = v[k]; });
   if (typeof v.notes === "string" && v.notes) r.notes = v.notes.slice(0, 2000);
   if (v.bestiaryDone === true) r.bestiaryDone = true;
+  if (typeof v.bestiaryKills === "number" && v.bestiaryKills >= 0 && v.bestiaryKills <= 100000) r.bestiaryKills = Math.floor(v.bestiaryKills);
+  if (r.bestiaryKills != null && typeof v.bestiaryKillsAt === "string") r.bestiaryKillsAt = v.bestiaryKillsAt;
   if (v.wardenDone === true) r.wardenDone = true;
   if (typeof v.updatedAt === "string") r.updatedAt = v.updatedAt;
   if (typeof v.numsAt === "string") r.numsAt = v.numsAt;
@@ -158,14 +161,21 @@ export function readHunt(id, v) {
 }
 // The loot bonuses on during a hunt (since November 14, 2026; hunts logged before have none): {boosted (slug or null),
 // prey [{slug, pct}] (loot Preys, up to PREY_SLOTS), talisman (the logging character's Talisman loot %, 0 when off the
-// bounty or none)}, or null when the hunt has none recorded.
+// bounty or none)}, or null when the hunt has none recorded. Since November 15, 2026 also damage and leech: that
+// Talisman's damage and life leech percents on a hunt on the bounty, present only when above 0, and preyDamage
+// [{slug, pct}] (damage Preys), present only when there are any.
 export function readBoosts(v) {
   if (!v || typeof v !== "object") return null;
   const slug = (s) => (typeof s === "string" && s ? s.slice(0, 80) : null), lp = PREY.loot;
-  return { boosted: slug(v.boosted),
+  const out = { boosted: slug(v.boosted),
     prey: (Array.isArray(v.prey) ? v.prey : []).filter((q) => q && slug(q.slug)).slice(0, PREY_SLOTS)
       .map((q) => ({ slug: slug(q.slug), pct: Math.min(lp.hi, Math.max(lp.lo, Math.round(Number(q.pct)) || lp.lo)) })),
     talisman: plNum(v.talisman, 0, TALISMAN.loot.max) || 0 };
+  ["damage", "leech"].forEach((k) => { const n = plNum(v[k], 0, TALISMAN[k].max); if (n > 0) out[k] = n; });
+  const dp = PREY.damage, pd = (Array.isArray(v.preyDamage) ? v.preyDamage : []).filter((q) => q && slug(q.slug)).slice(0, PREY_SLOTS)
+    .map((q) => ({ slug: slug(q.slug), pct: Math.min(dp.hi, Math.max(dp.lo, Math.round(Number(q.pct)) || dp.lo)) }));
+  if (pd.length) out.preyDamage = pd;
+  return out;
 }
 export function readHunts(docs) {
   const out = [];
@@ -189,11 +199,11 @@ export function readCreatureDocs(docs) {
 
 // ---------- planner: profiles/{pid}/planner/state ----------
 export function plDefaults() {
-  return { fixedHours: null, diff: "master", held: null, today: { boosted: null, boostedDay: null, prey: [], event: 0 }, lens: {}, active: null, travel: {}, world: null };
+  return { fixedHours: null, diff: "master", held: null, today: { boosted: null, boostedDay: null, prey: [], event: 0 }, lens: {}, active: null, travel: {}, noAccess: {}, respawnLimit: {}, world: null };
 }
 // A number within lo..hi, else null.
 export function plNum(v, lo, hi) { const n = Number(v); return v != null && v !== "" && isFinite(n) && n >= lo && n <= hi ? n : null; }
-// The planner state {fixedHours, diff, held, today, world, travel, lens, active}; known(slug) says whether a creature
+// The planner state {fixedHours, diff, held, today, world, travel, noAccess, respawnLimit, lens, active}; known(slug) says whether a creature
 // exists. fixedHours: a session length the player picked; none means hourly rates. (An older sessionHours field held a
 // default that was saved whether or not it was chosen, so it's ignored.)
 export function readPlState(v, known) {
@@ -215,6 +225,11 @@ export function readPlState(v, known) {
     }), event: plNum(t.event, 0, 100) || 0 };
   if (typeof v.world === "string" && v.world.trim()) s.world = v.world.trim().slice(0, 30);
   if (v.travel && typeof v.travel === "object") Object.keys(v.travel).forEach((k) => { const m = plNum(v.travel[k], 1, 600); if (validSpotId(k) && m) s.travel[k] = m; });
+  // Spots the character can't go to (spot id → true, since November 15, 2026): kept out of its plan and its creatures' numbers.
+  if (v.noAccess && typeof v.noAccess === "object") Object.keys(v.noAccess).forEach((k) => { if (validSpotId(k) && v.noAccess[k] === true) s.noAccess[k] = true; });
+  // Spots where killing faster adds nothing for the character (respawn is the limit, or creatures die in one hit): damage
+  // bonuses count for nothing there.
+  if (v.respawnLimit && typeof v.respawnLimit === "object") Object.keys(v.respawnLimit).forEach((k) => { if (validSpotId(k) && v.respawnLimit[k] === true) s.respawnLimit[k] = true; });
   if (v.lens && typeof v.lens === "object") s.lens = v.lens;
   // The bounty is checked by readBounty, which also migrates the fields above; keep it as stored.
   if (v.bounty && typeof v.bounty === "object") s.bounty = v.bounty;
@@ -325,13 +340,14 @@ export function readOfferLog(v) {
 }
 
 // ---------- the Bounty Talisman: the profile's talisman and bestiaryBonus ----------
-// {loot, bestiary}: the Talisman's more-loot and double-bestiary chances in percent (0 for none or bad values).
+// {loot, bestiary, damage, leech}: the Talisman's more-loot and double-bestiary chances and its damage and life leech
+// bonuses in percent (0 for none or bad values; damage and leech since November 15, 2026).
 // bestiary is the older bestiaryBonus field, kept in step with talisman.bestiary, so an older build's edit of it wins.
 export function readTalisman(p) {
   const tl = p && p.talisman && typeof p.talisman === "object" ? p.talisman : {};
   const pct = (v, max) => { const n = Number(v); return v != null && v !== "" && n >= 0 && n <= max ? n : null; };
   const bOld = pct(p && p.bestiaryBonus, TALISMAN.bestiary.max), b = bOld != null ? bOld : pct(tl.bestiary, TALISMAN.bestiary.max);
-  return { loot: pct(tl.loot, TALISMAN.loot.max) || 0, bestiary: b || 0 };
+  return { loot: pct(tl.loot, TALISMAN.loot.max) || 0, bestiary: b || 0, damage: pct(tl.damage, TALISMAN.damage.max) || 0, leech: pct(tl.leech, TALISMAN.leech.max) || 0 };
 }
 
 // ---------- marks and occupancy: profiles/{pid}/marks/{spotId}, profiles/{pid}/occupancy/{spotId} ----------

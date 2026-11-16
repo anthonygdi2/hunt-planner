@@ -18,7 +18,8 @@ import { parseSession, sessionProblems } from "../core/session.js";
 import { weekKey, serverDay, weeklyDifficulties } from "../core/weekly.js";
 import { markAge, markActive } from "../core/occupancy.js";
 import { isChallengingMaster } from "../core/rewards.js";
-import { loggedOdds, MIN_BOARD_OBS } from "../core/reroll.js";
+import { loggedOdds } from "../core/reroll.js";
+import { preferredCheck } from "../core/slots.js";
 import { t, _, translator, locale } from "./lang.js";
 import { LANGS } from "../core/i18n.js";
 
@@ -98,19 +99,33 @@ export function difficultyAdvice(cmp) {
   };
 }
 
+// "Preferred creatures came up in 12 of 60 offers (20%). The ×5 model expects 18.2%; with no extra weight it would be
+// 4.1%. Too few offers to tell them apart yet." from core/slots.js preferredCheck; null with nothing to count.
+const CHECK_ENOUGH = 300;
+export function slotsCheckText(c) {
+  if (!c || !c.n) return c && c.unwanted ? unwantedSeen(c.unwanted) : null;
+  return [t.n(c.n, "Preferred creatures came up in {pref} of {n} offer ({share}%).", "Preferred creatures came up in {pref} of {n} offers ({share}%).", { pref: c.pref, share: pct1(c.share) }),
+    t("The ×{weight} model expects {expected}%; with no extra weight it would be {plain}%.", { weight: SLOTS.preferredWeight, expected: pct1(c.expected), plain: pct1(c.plain) }),
+    c.n < CHECK_ENOUGH ? t("Too few offers to tell them apart yet.") : null, c.unwanted ? unwantedSeen(c.unwanted) : null].filter(Boolean).join(" ");
+}
+const unwantedSeen = (n) => t.n(n, "An Unwanted creature was offered {n} time, so Unwanted doesn’t take a creature out of the pool.",
+  "Unwanted creatures were offered {n} times, so Unwanted doesn’t take a creature out of the pool.");
+
 // Silver and Gold odds (Advanced mode): what the plan uses, the logged offers, and logging this board.
-// o: model.offerOdds() {odds, typed}; log: model.offerLog(); logged: model.boardLogged(); b: the bounty.
+// o: model.offerOdds() {odds, typed, n (offers the blend counts)}; log: model.offerLog(); logged: model.boardLogged(); b: the bounty.
 const pct1 = (x) => String(Math.round(x * 10) / 10);
 export function oddsView(o, log, logged, b) {
-  const L = loggedOdds(log), filled = b.offers.every((x) => x.slug), same = L.n && pct1(L.silver) === pct1(o.odds.silver) && pct1(L.gold) === pct1(o.odds.gold);
+  const L = loggedOdds(log), filled = b.offers.every((x) => x.slug);
   const vals = { silver: pct1(o.odds.silver), gold: pct1(o.odds.gold) };
   return {
     silver: vals.silver, gold: vals.gold, typed: o.typed,
     line: o.typed ? t("The plan uses your odds: Silver {silver}%, Gold {gold}% per offer.", vals)
+      : o.n > 0 ? t("The plan follows your log: Silver {silver}%, Gold {gold}% per offer. It starts from a guess and moves toward your logged boards as they add up.", vals)
       : t("The plan uses a guess: Silver {silver}%, Gold {gold}% per offer. The real odds aren’t published.", vals),
     logged: (L.n ? t.n(L.n, "{n} offer logged: Silver {silver}%, Gold {gold}%.", "{n} offers logged: Silver {silver}%, Gold {gold}%.", { silver: pct1(L.silver), gold: pct1(L.gold) })
-      : t("No boards logged yet.")) + (L.n < MIN_BOARD_OBS ? " " + t("Your shares can be used once {n} offers are logged.", { n: MIN_BOARD_OBS }) : ""),
-    canUse: L.n >= MIN_BOARD_OBS && !(o.typed && same),
+      : t("No boards logged yet.")) + (o.typed ? " " + t("Typed odds win over your log.") : ""),
+    // The ×5 Preferred weight against the logged boards (those logged with their lists), once any counts.
+    slots: slotsCheckText(preferredCheck(log)),
     board: !(b.mode === "active" && b.active) ? { canLog: filled && !logged,
       text: logged ? t("This board is logged.") : !filled ? t("Fill in all three offers to log this board.") : t("Picking an offer or rerolling here logs the board by itself. Use this if you won’t.") } : null,
   };
@@ -269,7 +284,7 @@ export function planScreenView(state, model, catalog, now, compare) {
   const anyTask = wk.current && wk.any && (wk.any.killsLeft != null || wk.any.done) ? { left: wk.any.killsLeft, done: wk.any.done } : null;
   const weekly = { chip: (rows.length || anyTask) && wk.current ? { set: true, value: t("{done} of {slots} done", { done: done.length, slots: wk.slots }) } : { set: false, value: "" },
     rows: wk.current ? rows.map((r) => ({ i: r.i, name: r.name, left: r.killsLeft, done: r.done })) : [], any: anyTask };
-  const td = model.today(), prey = (td.prey || []).filter((q) => q.slug);
+  const td = model.today(), prey = (td.prey || []).filter((q) => q.slug), adviceSpot = go.length ? model.spotIndex().spots[go[0].id] : null;
   const todayParts = [td.boosted ? t("{creature} boosted", { creature: name(td.boosted) }) : null, prey.length ? t.n(prey.length, "{n} prey", "{n} preys") : null,
     td.event ? t("+{pct}% event", { pct: td.event }) : null].filter(Boolean);
   const today = { chip: todayParts.length ? { set: true, value: todayParts.join(" · ") } : { set: false, value: "" },
@@ -277,7 +292,9 @@ export function planScreenView(state, model, catalog, now, compare) {
       kinds: PREY_KINDS.map(([value, label]) => ({ value, label: t(label) })), sizes: preySizes(q.kind) })),
     canAddPrey: ((st.today || {}).prey || []).length < PREY_SLOTS, event: td.event || 0,
     events: [{ value: 0, label: t("No exp event") }, { value: EXP_EVENTS.double, label: t("Double experience (+{pct}%)", { pct: EXP_EVENTS.double }) }]
-      .concat(EXP_EVENTS.world.map((x) => ({ value: x, label: t("World bonus +{pct}%", { pct: x }) }))), names: catalog.list.map((c) => c.name) };
+      .concat(EXP_EVENTS.world.map((x) => ({ value: x, label: t("World bonus +{pct}%", { pct: x }) }))), names: catalog.list.map((c) => c.name),
+    // Which creature to put Prey on, for the spot the plan sends the character to first.
+    advice: adviceSpot && preyAdviceText(model.preyAdvice(adviceSpot), name) ? { spot: adviceSpot.name, text: preyAdviceText(model.preyAdvice(adviceSpot), name) } : null };
   const hourLabel = (h) => { const x = HOURS.filter((y) => y[0] === h)[0]; return x ? t(x[1]) : h + " h"; };
   const time = { chip: st.fixedHours ? { set: true, value: hourLabel(st.fixedHours) } : { set: false, value: "" },
     value: st.fixedHours || null, options: HOURS.map(([value, label]) => ({ value, label: t(label) })) };
@@ -286,6 +303,15 @@ export function planScreenView(state, model, catalog, now, compare) {
     presets: ["mine", "reference", "everything"].map((value) => ({ value, label: t(SOURCE_LABELS[value]), switches: SOURCE_PRESETS[value] })) };
 
   return Object.assign(base, { weekly, today, time, data, steps: { first, fallbacks: go.slice(1), end, notices, tokenCheck, refNote, notes: ch.notes }, taken, hunting: huntingView });
+}
+// "Cobra Assassin, about 75% of the exp here. Biggest Prey: +1.2kk exp/h (40% exp) · +120k profit/h (40% loot) · +4.5%
+// kills (25% damage)." from model.preyAdvice(sp); null when there's none.
+export function preyAdviceText(a, name) {
+  if (!a) return null;
+  const parts = [t("+{amount} exp/h ({pct}% exp)", { amount: fmtBig(a.xp.xph), pct: a.xp.pct }),
+    a.loot ? t("+{amount} profit/h ({pct}% loot)", { amount: fmtBig(a.loot.pph), pct: a.loot.pct }) : null,
+    a.damage ? t("+{kills}% kills ({pct}% damage)", { kills: Math.round(a.damage.kills * 1000) / 10, pct: a.damage.pct }) : null].filter(Boolean);
+  return t("{creature}, about {share}% of the exp here.", { creature: name(a.slug), share: Math.round(a.share * 100) }) + " " + t("Biggest Prey: {gains}.", { gains: parts.join(" · ") });
 }
 function preySizes(kind) { const r = PREY[kind] || PREY.xp, out = []; for (let v = r.lo; v <= r.hi; v += r.step) out.push({ value: v, label: v + "%" }); return out; }
 
@@ -319,39 +345,61 @@ export function weeklyView(w, rows, catalog, now, level) {
 }
 
 // ---------- The loot bonuses on during a hunt (the Log preview and the saved-hunt editor) ----------
-// The editor's draft {boosted (slug or null), prey [{slug, pct}] (loot Preys), talisman (the percent as typed)} from
+// The editor's draft {boosted (slug or null), prey [{slug, pct, kind "loot" | "damage"}], talisman, damage, leech (the
+// Talisman's percents as typed)} from
 // stored boosts (store/schema.js readBoosts) and the Talisman percent to show.
-export const boostsDraft = (b, talisman) => ({ boosted: (b && b.boosted) || null, prey: ((b && b.prey) || []).map((q) => ({ slug: q.slug, pct: q.pct })),
-  talisman: talisman > 0 ? String(talisman) : "" });
-// A change to the draft: {boosted}, {prey: i, slug and/or pct}, {addPrey: slug}, {removePrey: i} or {talisman}.
+// tal: the Talisman to show, {loot, damage, leech} in percent (readTalisman's, or a hunt's boosts as talismanOf reads them).
+const pctText = (n) => (n > 0 ? String(n) : "");
+export const boostsDraft = (b, tal) => ({ boosted: (b && b.boosted) || null,
+  prey: ((b && b.prey) || []).map((q) => ({ slug: q.slug, pct: q.pct, kind: q.kind === "damage" ? "damage" : "loot" }))
+    .concat(((b && b.preyDamage) || []).map((q) => ({ slug: q.slug, pct: q.pct, kind: "damage" }))).slice(0, PREY_SLOTS),
+  talisman: pctText(tal && tal.loot), damage: pctText(tal && tal.damage), leech: pctText(tal && tal.leech) });
+// The Talisman percents a hunt's stored boosts carry, in boostsDraft's shape.
+const talismanOf = (b) => ({ loot: b.talisman, damage: b.damage, leech: b.leech });
+// A change to the draft: {boosted}, {prey: i, slug and/or pct and/or kind}, {addPrey: slug}, {removePrey: i}, {talisman},
+// {damage} or {leech}. A Prey's size stays within its kind's range.
 export function boostsPatch(d, patch) {
-  const out = { boosted: d.boosted, prey: d.prey.map((q) => Object.assign({}, q)), talisman: d.talisman };
+  const out = { boosted: d.boosted, prey: d.prey.map((q) => Object.assign({}, q)), talisman: d.talisman, damage: d.damage || "", leech: d.leech || "" };
   if ("boosted" in patch) out.boosted = patch.boosted || null;
   if ("prey" in patch && out.prey[patch.prey]) {
     if ("slug" in patch) out.prey[patch.prey].slug = patch.slug || null;
-    if ("pct" in patch) out.prey[patch.prey].pct = Number(patch.pct) || PREY.loot.lo;
+    const q = out.prey[patch.prey];
+    if ("kind" in patch) q.kind = patch.kind === "damage" ? "damage" : "loot";
+    const r = PREY[q.kind === "damage" ? "damage" : "loot"];
+    if ("pct" in patch) q.pct = Number(patch.pct) || r.lo;
+    q.pct = Math.min(r.hi, Math.max(r.lo, q.pct));
   }
-  if ("addPrey" in patch && out.prey.length < PREY_SLOTS) out.prey.push({ slug: patch.addPrey || null, pct: PREY.loot.lo });
+  if ("addPrey" in patch && out.prey.length < PREY_SLOTS) out.prey.push({ slug: patch.addPrey || null, pct: PREY.loot.lo, kind: "loot" });
   if ("removePrey" in patch) out.prey.splice(patch.removePrey, 1);
-  if ("talisman" in patch) out.talisman = String(patch.talisman == null ? "" : patch.talisman);
+  ["talisman", "damage", "leech"].forEach((k) => { if (k in patch) out[k] = String(patch[k] == null ? "" : patch[k]); });
   return out;
 }
-const preyPcts = () => { const r = PREY.loot, out = []; for (let x = r.lo; x <= r.hi; x += r.step) out.push({ value: x, label: "+" + x + "%" }); return out; };
+const preyPcts = (kind) => { const r = PREY[kind === "damage" ? "damage" : "loot"], out = []; for (let x = r.lo; x <= r.hi; x += r.step) out.push({ value: x, label: "+" + x + "%" }); return out; };
 // The editor for draft d on a hunt whose kills are `kills` ([{slug, name}]); onBounty: the hunt was on its bounty, so
-// the Talisman applies. value: the boosts to store, or null while the Talisman percent doesn't read.
+// the Talisman applies (its loot and damage bonuses, and its life leech, which is only kept with the hunt). value: the
+// boosts to store (loot Preys as prey, damage Preys as preyDamage), or null while a Talisman percent doesn't read.
 function boostsView(d, kills, onBounty) {
   const seen = {}, killed = [];
   (kills || []).forEach((k) => { if (k && k.slug && !seen[k.slug]) { seen[k.slug] = true; killed.push({ value: k.slug, label: k.name || k.slug }); } });
-  const none = [{ value: "", label: t("None") }], raw = String(d.talisman || "").trim().replace(",", ".");
-  const talisman = raw === "" ? 0 : /^\d+(\.\d+)?$/.test(raw) && Number(raw) <= 50 ? Number(raw) : null, talismanOk = !onBounty || talisman != null;
+  const none = [{ value: "", label: t("None") }];
+  const pct = (v) => { const raw = String(v || "").trim().replace(",", "."); return raw === "" ? 0 : /^\d+(\.\d+)?$/.test(raw) && Number(raw) <= 50 ? Number(raw) : null; };
+  const talisman = pct(d.talisman), damage = pct(d.damage), leech = pct(d.leech);
+  const talismanOk = !onBounty || talisman != null, damageOk = !onBounty || damage != null, leechOk = !onBounty || leech != null;
+  const live = d.prey.filter((q) => q.slug && seen[q.slug]), isDamage = (q) => q.kind === "damage", pair = (q) => ({ slug: q.slug, pct: q.pct });
+  const value = { boosted: null, prey: live.filter((q) => !isDamage(q)).map(pair), talisman: onBounty ? talisman : 0 };
+  if (live.some(isDamage)) value.preyDamage = live.filter(isDamage).map(pair);
+  if (onBounty && damage > 0) value.damage = damage;
+  if (onBounty && leech > 0) value.leech = leech;
   const boosted = d.boosted && seen[d.boosted] ? d.boosted : null, free = killed.filter((c) => !d.prey.some((q) => q.slug === c.value));
   return {
     boosted: boosted || "", boostedOptions: none.concat(killed),
-    prey: d.prey.map((q, i) => ({ i, slug: q.slug && seen[q.slug] ? q.slug : "", pct: q.pct, creatures: none.concat(killed) })), pcts: preyPcts(),
+    prey: d.prey.map((q, i) => ({ i, slug: q.slug && seen[q.slug] ? q.slug : "", pct: q.pct, kind: isDamage(q) ? "damage" : "loot", creatures: none.concat(killed), pcts: preyPcts(q.kind) })),
+    kinds: [{ value: "loot", label: t("Loot") }, { value: "damage", label: t("Damage") }],
     canAddPrey: d.prey.length < PREY_SLOTS && free.length > 0, nextPrey: free.length ? free[0].value : null,
     talisman: onBounty ? String(d.talisman || "") : null, talismanOk,
+    damage: onBounty ? String(d.damage || "") : null, damageOk, leech: onBounty ? String(d.leech || "") : null, leechOk,
     draft: d,
-    value: talismanOk ? { boosted, prey: d.prey.filter((q) => q.slug && seen[q.slug]).map((q) => ({ slug: q.slug, pct: q.pct })), talisman: onBounty ? talisman : 0 } : null,
+    value: talismanOk && damageOk && leechOk ? Object.assign(value, { boosted }) : null,
   };
 }
 // A hunt's boosted-creature badge text, or null: its kill rate may be high (the boosted creature respawns twice as fast).
@@ -399,13 +447,14 @@ export function logView(draft, model, catalog, advanced, state) {
   if (editing && rows.indexOf(editing) === -1) rows.unshift(editing);
   const ed = draft.editDraft || {}, nameOf = (s) => (catalog.bySlug[s] ? catalog.bySlug[s].name : s);
   // The loot bonuses on during the previewed hunt: as changed, else today's boosts when it ended on this server day (the
-  // boosted creature and loot Preys on creatures killed in it), and on the active bounty the character's Talisman loot %.
+  // boosted creature and loot and damage Preys on creatures killed in it), and on the active bounty the character's Talisman (its
+  // loot, damage and life leech percents).
   let boosts = null;
   if (ok) {
     const b = model.bounty(), active = b.mode === "active" && b.active ? b.active.slug : null, on = (s) => !!s && p.kills.some((k) => k.slug === s);
     const onBounty = on(active), end = Date.parse(p.end || ""), today = !(end > 0) || serverDay(end) === serverDay(model.now), td = model.today();
-    boosts = boostsView(draft.boosts || boostsDraft(today ? { boosted: on(td.boosted) ? td.boosted : null, prey: (td.prey || []).filter((q) => q.kind === "loot" && on(q.slug)) } : null,
-      onBounty ? readTalisman(me).loot : 0), p.kills, onBounty);
+    boosts = boostsView(draft.boosts || boostsDraft(today ? { boosted: on(td.boosted) ? td.boosted : null, prey: (td.prey || []).filter((q) => (q.kind === "loot" || q.kind === "damage") && on(q.slug)) } : null,
+      onBounty ? readTalisman(me) : null), p.kills, onBounty);
   }
   const saved = {
     filters: {
@@ -420,7 +469,7 @@ export function logView(draft, model, catalog, advanced, state) {
       const H = Number(x.hours) || 0, xp = x.rawXp != null ? x.rawXp : x.xp, open = !!editing && editing === x;
       // A hunt logged before bonuses were recorded shows, on its bounty, the Talisman of the character that logged it.
       const by = x.by && x.by.pid && (state.profiles || {})[x.by.pid];
-      const bv = open ? boostsView(ed.boosts || boostsDraft(x.boosts, x.boosts ? x.boosts.talisman : x.task && by ? readTalisman(by).loot : 0), x.kills, !!x.task) : null;
+      const bv = open ? boostsView(ed.boosts || boostsDraft(x.boosts, x.boosts ? talismanOf(x.boosts) : x.task && by ? readTalisman(by) : null), x.kills, !!x.task) : null;
       const level = ed.level != null ? ed.level : x.level != null ? String(x.level) : "", lvlOk = level === "" || (/^\d+$/.test(String(level)) && Number(level) > 0 && Number(level) < 10000);
       return { id: x.id, title: dayOf(x) + " · " + spotLabel(x),
         sub: [huntAt(x), t("by {name}", { name: byName(state, x.by) }), t("{amount} exp/h", { amount: H && xp != null ? fmtBig(xp / H) : "–" }), boostedBadge(x, nameOf)].filter(Boolean).join(" · "),
@@ -467,7 +516,8 @@ function spotOptions(model, lens, keepHunts) {
   let m = spotsMemo.get(model);
   if (!m) { m = {}; spotsMemo.set(model, m); }
   if (!m[key]) {
-    const po = model.planOptions(model.plannerCtx({ lens, index: model.spotIndex(wide && !keepHunts ? lens : null) })), byId = {};
+    // Spots the character can't go to keep their numbers here (they're badged); only the plan leaves them out.
+    const po = model.planOptions(model.plannerCtx({ lens, blocked: null, index: model.spotIndex(wide && !keepHunts ? lens : null) })), byId = {};
     po.options.forEach((o) => { byId[o.id] = o; });
     m[key] = { idx: po.idx, byId };
   }
@@ -504,6 +554,7 @@ const takenText = (min) => t("Taken · clears in {min} min", { min });
 export function spotsView(state, model, catalog, ui, now) {
   const lens = { allVocations: !!ui.allVocations, anyLevel: !!ui.anyLevel }, sort = ui.sort || "score";
   const { idx, byId } = spotOptions(model, lens), taken = takenLeft(state, now), tags = creatureTags(model), q = norm(ui.query || "");
+  const noAccess = ((state.planner || {}).state || {}).noAccess || {};
   const name = (slug) => (catalog.bySlug[slug] ? catalog.bySlug[slug].name : slug);
   const matches = (sp) => !q || norm(sp.name).indexOf(q) !== -1 || sp.aliases.some((a) => norm(a).indexOf(q) !== -1) ||
     Object.keys(sp.creatures).some((s) => norm(name(s)).indexOf(q) !== -1);
@@ -518,7 +569,7 @@ export function spotsView(state, model, catalog, ui, now) {
       score: o && o.score != null ? String(o.score) : null, numbers: o ? perHourPair(o) : null,
       none: o ? null : teamOnly(sp) ? t("Only duo or team hunts recorded here") : t("Not enough data for your vocation"),
       creatures: cr.join(", "), badges: o ? sourceBadges(o, sp.sessions.length, huntsWho(sp.sessions)) : [],
-      taken: taken[sp.id] ? takenText(taken[sp.id]) : null };
+      taken: taken[sp.id] ? takenText(taken[sp.id]) : null, blocked: noAccess[sp.id] ? t("Can’t go there") : null };
   });
   return {
     query: ui.query || "", sort, sorts: SORTS.map(([value, label]) => ({ value, label: t(label) })),
@@ -554,7 +605,7 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
   const p = state.profiles[state.pid] || {}, o = opts.byId[id] || null, nums = model.spotNums(sp), d = model.derived;
   const vocation = p.vocation || VOCATIONS[0], tags = creatureTags(model), taken = takenLeft(state, now);
   const name = (slug) => (catalog.bySlug[slug] ? catalog.bySlug[slug].name : slug);
-  const parent = sp.parentId && idx.spots[sp.parentId], goal = goalMixView(readGoal(p)).chip.value;
+  const parent = sp.parentId && idx.spots[sp.parentId], goal = goalMixView(readGoal(p)).chip.value, plSt = (state.planner || {}).state || {};
 
   const scoreLine = o && o.score != null ? t("Score {score} for {name} · {goal}", { score: o.score, name: displayName(p), goal })
     : o ? t("No score: this spot is missing a number your goal mix weighs ({goal}).", { goal })
@@ -644,6 +695,11 @@ export function spotView(state, model, catalog, id, ui, now, advanced) {
     profit: o ? (o.m.profit != null ? fmtBig(o.m.profit) : "–") : nums && nums.pph != null ? fmtBig(nums.pph) : "–",
     badges: o ? sourceBadges(o, ns, huntsWho(sp.sessions)) : nums ? sourceBadges(nums, ns, huntsWho(sp.sessions)) : [],
     taken: taken[id] ? takenText(taken[id]) : null,
+    // For this character: whether it can go there (off keeps the spot out of its plan), and its own travel minutes.
+    // and whether killing faster helps there (off: respawn is the limit, so damage bonuses add nothing).
+    prey: preyAdviceText(model.preyAdvice(sp), name),
+    access: { who: displayName(p), blocked: !!plSt.noAccess && !!plSt.noAccess[id], travel: plSt.travel && plSt.travel[id] ? String(plSt.travel[id]) : "",
+      timed: model.plannerCtx().hours > 0, respawnLimit: !!plSt.respawnLimit && !!plSt.respawnLimit[id] },
     creatures, sources: { hunts, reference, skipped },
     variations: sp.parentId ? null : variations.map(varRow), canVary: !sp.parentId,
     sessions, emptySessions: t("No hunts logged here."),
@@ -753,7 +809,8 @@ export function creatureView(state, model, catalog, slug, diff, ui, advanced) {
   // Its own task difficulty when the list shows all tasks, or when it isn't in that pool.
   const cdiff = diff !== "all" && creatureInPool(c, diff) ? diff : topPool(c), m = model.metricsFor(c, e, cdiff) || {};
   const idx = model.spotIndex(), dash = "–", tag = tags[c.slug];
-  const b = bestiaryOf(c);
+  const b = bestiaryOf(c), bk = typeof entry.bestiaryKills === "number" ? entry.bestiaryKills : null, bkAt = Date.parse(entry.bestiaryKillsAt || "");
+  const bkDays = bk != null && bkAt > 0 && model.now >= bkAt ? Math.floor((model.now - bkAt) / 864e5) : null;
   const bestiary = t("{kills} kills · {charm} charm points", { kills: b.kills.toLocaleString(locale()), charm: b.charmPoints }) +
     (c.r ? " · " + t("rare: no Echo Raids") : " · " + t("Echo Warden +{points}", { points: b.warden }));
 
@@ -795,6 +852,11 @@ export function creatureView(state, model, catalog, slug, diff, ui, advanced) {
     preferred: sl.preferred.indexOf(slug) !== -1, unwanted: sl.unwanted.indexOf(slug) !== -1, avoid: model.ratingOf(c) === "X",
     listsNote: t("Avoid keeps it out of your tiers and the plan."),
     bestiary, bestiaryDone: !!entry.bestiaryDone, wardenDone: !!entry.wardenDone, rare: !!c.r,
+    // The typed bestiary kill count: each kill left is then worth charm points ÷ kills left.
+    bestiaryKills: { value: bk != null ? String(bk) : "", hint: bk == null ? t("Optional: your kill count from the game’s Bestiary. Each kill left then counts for more as you near the end.")
+      : bk >= b.kills ? t("All {total} kills done.", { total: b.kills.toLocaleString(locale()) })
+      : t.n(b.kills - bk, "{left} kill left of {total}.", "{left} kills left of {total}.", { left: (b.kills - bk).toLocaleString(locale()), total: b.kills.toLocaleString(locale()) }) + (bkDays != null ? " " + (bkDays < 1 ? t("Updated today.")
+        : t.n(bkDays, "Updated {n} day ago.", "Updated {n} days ago.")) : "") },
     notes: ui.notes != null ? ui.notes : entry.notes || "",
     advanced: advanced ? {
       nums: NUM_FIELDS.map((k) => ({ key: k, label: k === "kph" ? t("Kills/h") : k === "xph" ? t("Exp/h") : t("Profit/h"), value: fmtField(k, entry[k]) })),

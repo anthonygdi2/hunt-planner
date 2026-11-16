@@ -96,7 +96,7 @@ export function mount(root, app, host) {
         preset: a.applyPreset,
         weight: (key, n) => { const w = {}; v.goal.rows.forEach((row) => { w[row.key] = row.value; }); w[key] = n; a.setWeights(w); },
         bounty: { difficulty: a.setDifficulty, tokens: a.setTokens, offer: a.setOffer, pick: a.pickOffer, active: a.setActive, finished: a.finishedBounty, rerolled: a.rerolled,
-          logBoard: a.logBoard, odds: a.setOfferOdds, useLoggedOdds: a.useLoggedOdds, useGuessOdds: a.useGuessOdds,
+          logBoard: a.logBoard, odds: a.setOfferOdds, followLog: a.followLoggedOdds,
           lists: () => { ui.creatures.lists = true; go("creatures"); } },
       });
     }
@@ -140,6 +140,7 @@ export function mount(root, app, host) {
         arm: (x) => { U.armed = x; draw(); }, deleteSession: (x) => { U.armed = null; a.deleteSession(x); },
         details: (k) => { U.open = Object.assign({}, U.open, { [k]: !(U.open || {})[k] }); draw(); },
         raid: (x, name, n) => { const ses = v.sessions.filter((y) => y.id === x)[0]; if (ses) a.setSessionRaids(x, Object.assign({}, ses.raidsBy, { [name]: n })); },
+        access: (canGo) => a.setSpotAccess(id, canGo), travel: (m) => a.setTravel(id, m), respawnLimit: (x) => a.setRespawnLimit(id, x),
         rename: (n) => a.renameSpot(id, n), deleteSpot: () => { U.armed = null; a.deleteSpot(id); go("spots"); },
       });
     }
@@ -156,7 +157,7 @@ export function mount(root, app, host) {
       return creatureScreen.render(creatureView(s, M, app.catalog, slug, diff, U, s.advanced), {
         back: () => go("creatures"), spot: openSpot,
         preferred: (on) => a.setPreferred(slug, on), unwanted: (on) => a.setUnwanted(slug, on), avoid: (on) => a.setAvoid(slug, on),
-        bestiary: (on) => a.setBestiaryDone(slug, on), warden: (on) => a.setWardenDone(slug, on),
+        bestiary: (on) => a.setBestiaryDone(slug, on), bestiaryKills: (v) => a.setBestiaryKills(slug, v), warden: (on) => a.setWardenDone(slug, on),
         notesDraft: (t) => { U.notes = t; }, notes: (t) => { U.notes = null; a.setNotes(slug, t); },
         nums: (k, x) => { if (!a.setCreatureNumbers(slug, { [k]: x })) { s.notice = t("That isn’t a number. Type it like 450, 3.2kk or 800k."); draw(); } },
         pin: (spot) => a.pinSpot(slug, spot), minLevel: (t) => a.setMinLevel(slug, t),

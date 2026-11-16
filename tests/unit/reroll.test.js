@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { RHO, readReroll, killLevels, kindOdds, loggedOdds, MIN_BOARD_OBS, poolModel, taskShape, takeValue, planKey, solvePlan, beatChance, rateThreshold, commonMax } from "../../src/core/reroll.js";
+import { RHO, readReroll, killLevels, kindOdds, loggedOdds, blendedOdds, poolModel, taskShape, takeValue, planKey, solvePlan, beatChance, rateThreshold, commonMax } from "../../src/core/reroll.js";
 import { readWeights } from "../../src/core/score.js";
 
 test("reading reroll settings", () => {
@@ -71,7 +71,15 @@ test("Silver and Gold odds", () => {
   assert.deepEqual(loggedOdds(undefined), { n: 0, silver: null, gold: null });
   const log = { master: [{ kind: "normal" }, { kind: "silver" }, { kind: "gold" }, { kind: "normal" }], expert: [{ kind: "silver" }] };
   assert.deepEqual(loggedOdds(log), { n: 5, silver: 40, gold: 20 });
-  assert.equal(MIN_BOARD_OBS, 10);
+  // With none typed the plan blends the guess with the log: the guess counts as 50 offers.
+  assert.deepEqual(blendedOdds({}), { silver: 10, gold: 2, n: 0 });
+  assert.deepEqual(blendedOdds(null, { silver: 20, gold: 5 }), { silver: 20, gold: 5, n: 0 });
+  const fifty = { master: Array.from({ length: 30 }, (_, i) => ({ kind: i < 6 ? "silver" : "normal" })), expert: Array.from({ length: 20 }, () => ({ kind: "normal" })) };
+  const b = blendedOdds(fifty);
+  assert.equal(b.n, 50);
+  assert.ok(Math.abs(b.silver - (10 * 50 + 6 * 100) / 100) < 1e-9, "6 Silver in 50 offers and the guess's 5 in 50: 11%");
+  assert.ok(Math.abs(b.gold - (2 * 50 + 0) / 100) < 1e-9, "no Gold logged halves the guess: 1%");
+  assert.ok(Math.abs(blendedOdds(fifty, null, 450).silver - (10 * 450 + 600) / 500) < 1e-9, "a heavier guess moves less");
 });
 
 test("more Silver and Gold make rerolling worth more", () => {

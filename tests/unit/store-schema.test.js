@@ -49,6 +49,10 @@ test("planner state: defaults and every field checked", () => {
   assert.deepEqual(s.lens, { anyLevel: true });
   assert.deepEqual(s.active, { spot: "cobra-bastion", name: "cobra-bastion", at: "2026-10-21T17:00:00Z", slug: null });
   assert.equal(S.readPlState({ fixedHours: 2, held: { slug: "bear" } }, known).fixedHours, 2);
+  // Spots the character can't go to: valid spot ids set to true.
+  assert.deepEqual(S.readPlState({ noAccess: { "cobra-bastion": true, "my-den": true, "asura-palace": false, "Bad Id!": true } }, known).noAccess, { "cobra-bastion": true, "my-den": true });
+  assert.deepEqual(S.readPlState({ noAccess: "x" }, known).noAccess, {});
+  assert.deepEqual(S.readPlState({ respawnLimit: { "cobra-bastion": true, "x y": true, den: 1 } }, known).respawnLimit, { "cobra-bastion": true });
   assert.equal(S.readPlState({ held: { slug: "bear" } }, known).held, null, "unknown creature");
   assert.equal(S.plNum("", 0, 1), null);
   assert.equal(S.plNum("0.5", 0, 1), 0.5);
@@ -88,19 +92,34 @@ test("the loot bonuses on during a hunt", () => {
   assert.deepEqual(S.readBoosts({ boosted: "rat", prey: [{ slug: "rat", pct: 99 }, { pct: 20 }, { slug: "a", pct: "x" }, { slug: "b", pct: 25 }, { slug: "c", pct: 25 }], talisman: 70 }),
     { boosted: "rat", prey: [{ slug: "rat", pct: 40 }, { slug: "a", pct: 13 }, { slug: "b", pct: 25 }], talisman: 0 });
   assert.equal(S.readBoosts({ talisman: "7.5" }).talisman, 7.5);
+  // The Talisman's damage and life leech: kept when above 0 and in range.
+  assert.deepEqual(S.readBoosts({ talisman: 5, damage: "12.5", leech: 3 }), { boosted: null, prey: [], talisman: 5, damage: 12.5, leech: 3 });
+  assert.deepEqual(S.readBoosts({ damage: 60, leech: 0 }), { boosted: null, prey: [], talisman: 0 });
+  // Damage Preys: 7–25%, kept only when there are any.
+  assert.deepEqual(S.readBoosts({ preyDamage: [{ slug: "rat", pct: 40 }, { pct: 9 }, { slug: "bat", pct: 9 }] }).preyDamage, [{ slug: "rat", pct: 25 }, { slug: "bat", pct: 9 }]);
+  assert.equal("preyDamage" in S.readBoosts({ preyDamage: [] }), false);
   // On a hunt: kept when there, left out when not (hunts logged before they were recorded).
   assert.deepEqual(S.readHunt("h", { hours: 1, kills: [], boosts: { boosted: "rat" } }).boosts, { boosted: "rat", prey: [], talisman: 0 });
   assert.equal("boosts" in S.readHunt("h", { hours: 1, kills: [], boosts: 3 }), false);
 });
 
+test("an entry's typed bestiary kill count", () => {
+  assert.deepEqual(S.readRecord({ bestiaryKills: 1234.9, bestiaryKillsAt: "2026-11-15T10:00:00.000Z" }), { bestiaryKills: 1234, bestiaryKillsAt: "2026-11-15T10:00:00.000Z" });
+  assert.deepEqual(S.readRecord({ bestiaryKills: 0 }), { bestiaryKills: 0 });
+  assert.deepEqual(S.readRecord({ bestiaryKills: -1, bestiaryKillsAt: "x" }), {}, "a bad count, and no date without one");
+  assert.deepEqual(S.readRecord({ bestiaryKills: "12" }), {});
+});
+
 test("the Bounty Talisman: loot and bestiary chances, the bestiary kept in step with bestiaryBonus", () => {
-  assert.deepEqual(S.readTalisman({}), { loot: 0, bestiary: 0 });
-  assert.deepEqual(S.readTalisman(undefined), { loot: 0, bestiary: 0 });
-  assert.deepEqual(S.readTalisman({ bestiaryBonus: 12 }), { loot: 0, bestiary: 12 }, "older profiles: the bestiary bonus alone");
-  assert.deepEqual(S.readTalisman({ talisman: { loot: "12.5", bestiary: 20 }, bestiaryBonus: 20 }), { loot: 12.5, bestiary: 20 });
-  assert.deepEqual(S.readTalisman({ talisman: { loot: 5, bestiary: 20 }, bestiaryBonus: 25 }), { loot: 5, bestiary: 25 }, "an older build changed bestiaryBonus: it wins");
-  assert.deepEqual(S.readTalisman({ talisman: { loot: 5, bestiary: 20 } }), { loot: 5, bestiary: 20 });
-  assert.deepEqual(S.readTalisman({ talisman: { loot: 60, bestiary: -1 }, bestiaryBonus: "x" }), { loot: 0, bestiary: 0 }, "out of range");
+  const T = (o) => Object.assign({ loot: 0, bestiary: 0, damage: 0, leech: 0 }, o);
+  assert.deepEqual(S.readTalisman({}), T());
+  assert.deepEqual(S.readTalisman(undefined), T());
+  assert.deepEqual(S.readTalisman({ bestiaryBonus: 12 }), T({ bestiary: 12 }), "older profiles: the bestiary bonus alone");
+  assert.deepEqual(S.readTalisman({ talisman: { loot: "12.5", bestiary: 20 }, bestiaryBonus: 20 }), T({ loot: 12.5, bestiary: 20 }));
+  assert.deepEqual(S.readTalisman({ talisman: { loot: 5, bestiary: 20 }, bestiaryBonus: 25 }), T({ loot: 5, bestiary: 25 }), "an older build changed bestiaryBonus: it wins");
+  assert.deepEqual(S.readTalisman({ talisman: { loot: 5, bestiary: 20 } }), T({ loot: 5, bestiary: 20 }));
+  assert.deepEqual(S.readTalisman({ talisman: { loot: 60, bestiary: -1, damage: 51, leech: "x" }, bestiaryBonus: "x" }), T(), "out of range");
+  assert.deepEqual(S.readTalisman({ talisman: { loot: 5, bestiary: 20, damage: "10.25", leech: 7.5 } }), T({ loot: 5, bestiary: 20, damage: 10.25, leech: 7.5 }), "damage and life leech");
 });
 
 test("Silver and Gold: the character's odds and the logged offers", () => {

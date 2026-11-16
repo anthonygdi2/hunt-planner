@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { todayFactor, heldTask, spotValue, scaleSpots, byValue, spotScores, planOffers, planOptions, planChain, MAX_STEPS } from "../../src/core/plan.js";
+import { todayFactor, heldTask, spotValue, scaleSpots, byValue, spotScores, planOffers, planOptions, planChain, preyAdvice, MAX_STEPS } from "../../src/core/plan.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 import { readWeights } from "../../src/core/score.js";
 
@@ -154,4 +154,75 @@ test("options and the chain", () => {
   const none = planChain(po, { diff: "master", now: NOW, marks: {}, tokens: 0, hpd: 3 });
   assert.deepEqual(none.steps.map((s) => s.kind), ["claim", "go", "go", "seeSpots"]);
   assert.ok(MAX_STEPS >= 2);
+});
+
+test("a typed bestiary count raises a spot's charm as its creatures near the end", () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, (msg || "") + " " + a + " vs " + b);
+  // Assassin 300/h (Hard: 2,500 kills, 50 points), Scout 200/h (Medium: 1,000 kills, 25 points).
+  near(spotValue(SP, NUMS, { diff: "master" }, ctx).m.charm, 300 * 50 / 2500 + 200 * 25 / 1000);
+  const counted = Object.assign({}, ctx, { entries: { "cobra-assassin": { bestiaryKills: 2000 }, "cobra-scout": { bestiaryKills: 950 } } });
+  near(spotValue(SP, NUMS, { diff: "master" }, counted).m.charm, 300 * 50 / 500 + 25, "500 left at 300/h; the Scout's 50 left are done within the hour");
+  // A 2 h session finishes both: 75 points over the 2 hours. The Talisman's double bestiary speeds the held one only.
+  near(spotValue(SP, NUMS, { diff: "master", hours: 2 }, counted).m.charm, 75 / 2);
+  near(spotValue(SP, NUMS, { diff: "master", held: { slug: "cobra-assassin", kills: 300 } }, Object.assign({}, counted, { bestiaryBonus: 50, entries: { "cobra-assassin": { bestiaryKills: 1500 }, "cobra-scout": { bestiaryDone: true } } })).m.charm,
+    300 * 1.5 * 50 / 1000);
+});
+
+test("damage bonuses raise every rate of the spot: a damage Prey, and the Talisman while the bounty lasts", () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-6 * Math.max(1, Math.abs(b)), (msg || "") + " " + a + " vs " + b);
+  const nums = Object.assign({ lph: 4e5, tasks: [] }, NUMS), held = { slug: "cobra-assassin", kills: 300 };
+  const plain = spotValue(SP, nums, { diff: "master", held }, ctx);
+  assert.equal("killBonus" in plain, false);
+  // The assassin is 3/4 of the spot's exp; half the hunt is killing: 1 / (1 − 0.5 × 0.75 × 0.1 / 1.1).
+  const km = 1 / (1 - 0.5 * 0.75 * 0.1 / 1.1), tctx = Object.assign({}, ctx, { talismanDamage: 10 });
+  const v = spotValue(SP, nums, { diff: "master", held }, tctx);
+  near(v.killBonus, km - 1);
+  near(v.kph["cobra-assassin"], 300 * km);
+  near(v.parts.hunt, 2e6 * km);
+  near(v.parts.held, plain.parts.held * km, "the bounty is done sooner");
+  near(v.m.profit, 1e5 * km);
+  near(v.m.charm, plain.m.charm * km);
+  // Not without the bounty, not where its creature doesn't die, not at a respawn-limited spot, and not when the spot's
+  // own hunts on that bounty were logged before bonuses were recorded.
+  assert.equal(spotValue(SP, nums, { diff: "master" }, tctx).m.profit, 1e5);
+  assert.equal(spotValue(SP, nums, { diff: "master", held: { slug: "rat", kills: 100 } }, tctx).m.profit, 1e5);
+  assert.equal(spotValue(SP, nums, { diff: "master", held, killTime: 0 }, tctx).m.profit, 1e5);
+  assert.equal(spotValue(SP, Object.assign({}, nums, { tasks: ["cobra-assassin"] }), { diff: "master", held }, tctx).m.profit, 1e5);
+  // With hit points the share is of the hit points killed: assassin 300 × 1,000 against scout 200 × 6,000 is one fifth.
+  near(spotValue(SP, nums, { diff: "master", held }, Object.assign({}, tctx, { hpTable: { "cobra-assassin": 1000, "cobra-scout": 6000 } })).killBonus, 1 / (1 - 0.5 * 0.2 * 0.1 / 1.1) - 1);
+  // A damage Prey on the scout (1/4 of the spot) counts with or without a bounty, and is named under Today.
+  const today = { prey: [{ slug: "cobra-scout", kind: "damage", pct: 25 }, { slug: "rat", kind: "damage", pct: 25 }] };
+  const p = spotValue(SP, nums, { diff: "master", today }, ctx), kp = 1 / (1 - 0.5 * 0.25 * 0.25 / 1.25);
+  near(p.killBonus, kp - 1);
+  near(p.m.xp, 2e6 * kp);
+  assert.deepEqual(p.today, ["Cobra Scout prey +25% damage"]);
+  // Both on one creature add their percents.
+  const b = spotValue(SP, nums, { diff: "master", held, today: { prey: [{ slug: "cobra-assassin", kind: "damage", pct: 15 }] } }, tctx);
+  near(b.killBonus, 1 / (1 - 0.5 * 0.75 * 0.25 / 1.25) - 1);
+  // A session that finishes the bounty: the Talisman counts only for the share of the hunting time it lasts.
+  const s = spotValue(SP, nums, { diff: "master", held: { slug: "cobra-assassin", kills: 300 }, hours: 2 }, tctx), on = 300 / (300 * km * 2);
+  near(s.killBonus, (km - 1) * on);
+});
+
+test("which creature to put Prey on: the largest share of the spot, and what the biggest Prey of each kind adds", () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-6 * Math.max(1, Math.abs(b)), (msg || "") + " " + a + " vs " + b);
+  assert.equal(preyAdvice(null, ctx), null);
+  assert.equal(preyAdvice({ kph: {}, xph: 0 }, ctx), null);
+  // The assassin is 3/4 of the spot's exp. Exp 40%, loot 40% (needs the spot's loot/h), damage 25%.
+  const a = preyAdvice(Object.assign({ lph: 4e5 }, NUMS), ctx, null), km = 1 / (1 - 0.5 * 0.75 * 0.25 / 1.25);
+  assert.equal(a.slug, "cobra-assassin");
+  near(a.share, 0.75);
+  assert.deepEqual([a.xp.pct, a.loot.pct, a.damage.pct], [40, 40, 25]);
+  near(a.xp.xph, 2e6 * 0.75 * 0.4);
+  near(a.loot.pph, 4e5 * 0.75 * 0.4);
+  near(a.damage.kills, km - 1);
+  near(a.damage.xph, 2e6 * (km - 1));
+  near(a.damage.pph, 1e5 * (km - 1));
+  // The damage Prey goes by the creature's share of the hit points killed (one fifth here), the others by exp.
+  const h = preyAdvice(NUMS, Object.assign({}, ctx, { hpTable: { "cobra-assassin": 1000, "cobra-scout": 6000 } }), null);
+  near(h.share, 0.75);
+  near(h.damage.kills, 1 / (1 - 0.5 * 0.2 * 0.25 / 1.25) - 1);
+  // No loot/h: no loot line. A respawn-limited spot: no damage line.
+  const b = preyAdvice(NUMS, ctx, 0);
+  assert.deepEqual([b.loot, b.damage], [null, null]);
 });

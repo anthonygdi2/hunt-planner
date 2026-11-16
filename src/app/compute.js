@@ -5,6 +5,7 @@ import { readSources, readGoal, readHuntSources, readTalisman } from "../store/s
 import { topPool } from "../core/catalog.js";
 import { raidRate, spotRates, sessionSpot, xpField, deriveRates } from "../core/rates.js";
 import { splitHunts } from "../core/spots.js";
+import { norm, slugify } from "../core/text.js";
 import { pickReference, calibrate, referenceSpots, referenceUse } from "../core/reference.js";
 import { weeklyBonus } from "../core/weekly.js";
 import { weeklyState, openWeeklyTasks } from "./weekly.js";
@@ -18,7 +19,9 @@ export const ownHunts = (sessions, pid) => (pid ? sessions.filter((x) => !x.by |
 // state: {catalog (makeCatalog), reference (REFERENCE), profile (the active character's profile document, {} for
 // none), pid (its id), sessions (every logged hunt in the storage, shared by all characters, store readHunts),
 // userSpots (the spots made for them), entries (slug → entry), advanced (advanced mode: weekly tasks count),
-// difficulty ("all" or a task difficulty: the tier list's)}. now: ms.
+// difficulty ("all" or a task difficulty: the tier list's), planner {state {noAccess, respawnLimit}} (optional: the
+// spots the character can't go to, spot id → true, a creature's numbers never come from one; and the spots where
+// respawn is the limit, so damage bonuses count for nothing)}. now: ms.
 // Returns {hunts (splitHunts: the hunts that count for the character, and why the rest don't), huntCtx (huntCheck's
 // ctx for it), raidP, raidInfo, picks, calib, calibOther, xpBoost, spotKph, spotEco, refActive, refSpotSrc, weeklyNow,
 // derived (slug → pickSpot result, fromRef for reference picks), refShadow, metrics, scores (relative), tiers, ctx}.
@@ -37,8 +40,19 @@ export function compute(state, now) {
   const picks = pickReference(reference, { vocation, level: p.level, enabled: refOn, older: sources.older });
   const cal = calibrate(sessions, picks, catalog);
 
+  // The planner's per-spot switches, by the name a record carries: a reference or logged spot's id is its name as a
+  // slug, a spot the player made has its own id.
+  const plSt = (state.planner && state.planner.state) || {}, users = state.userSpots || {};
+  const flagged = (map) => {
+    const ids = map || {}, names = {};
+    Object.keys(ids).forEach((id) => { if (users[id] && users[id].name) names[norm(users[id].name)] = true; });
+    return (spot) => !!spot && !!(ids[slugify(spot)] || names[norm(spot)]);
+  };
+  // Where respawn is the limit, damage bonuses count for nothing: the share of a hunt spent killing is 0 there.
+  const respawn = flagged(plSt.respawnLimit), killTime = (spot) => (respawn(spot) ? 0 : null), huntKillTime = (x) => killTime(sessionSpot(x));
+
   // Spot rates: the character's logged spots, then the reference spots it hasn't logged.
-  const logged = spotRates(sessions, catalog, sessionSpot, xpField(p.xpMode), state.expTable), spotKph = {}, spotEco = {}, refSpotSrc = {};
+  const logged = spotRates(sessions, catalog, sessionSpot, xpField(p.xpMode), state.expTable, huntKillTime, state.hpTable), spotKph = {}, spotEco = {}, refSpotSrc = {};
   Object.keys(logged).forEach((s) => { spotKph[s] = logged[s].kph; spotEco[s] = { xph: logged[s].xph, pph: logged[s].pph, lph: logged[s].lph }; });
   const refActive = referenceSpots({ picks, calib: cal.calib, calibOther: cal.calibOther, sessions, loggedSpots: spotKph, vocation, otherOn,
     xpMode: p.xpMode, xpBoost: cal.xpBoost, catalog });
@@ -55,14 +69,18 @@ export function compute(state, now) {
   const weights = scoringWeights(readGoal(p)), chalRates = p.chalRates && typeof p.chalRates === "object" ? p.chalRates : {};
   const weeklyXph = weeklyNow.length ? (spot, hours, slug, kills) => weeklyBonus(weeklyNow, spot && spotKph[spot], hours, slug, kills) : null;
   const tal = readTalisman(p);
-  const ctx = (diff) => ({ diff, chalRates, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, raidP: raid.p, spotKph, spotEco, expTable: state.expTable, entries, catalog, weeklyXph });
+  const ctx = (diff) => ({ diff, chalRates, bestiaryBonus: tal.bestiary, talismanLoot: tal.loot, talismanDamage: tal.damage, killTime, hpTable: state.hpTable, raidP: raid.p, spotKph, spotEco, expTable: state.expTable, entries, catalog, weeklyXph });
   const diffFor = (c) => (difficulty !== "all" ? difficulty : topPool(c));
   const choose = (c, spots, pin) => { const d = diffFor(c); return pickSpot(spots, pin, { metricFor: (x) => metrics(c, x, ctx(d)), weights }); };
 
+  // Spots the character can't go to: no creature's numbers come from one.
+  const blocked = flagged(plSt.noAccess), canGo = (rec) => !blocked(rec.spot);
+
   // Each creature's numbers: its logged spots, else reference spots.
-  const rates = deriveRates(sessions, { catalog, xpMode: p.xpMode, expTable: state.expTable }), derived = {};
+  const rates = deriveRates(sessions, { catalog, xpMode: p.xpMode, expTable: state.expTable, killTime: huntKillTime, hpTable: state.hpTable }), derived = {};
+  Object.keys(rates).forEach((slug) => { rates[slug] = rates[slug].filter(canGo); if (!rates[slug].length) delete rates[slug]; });
   Object.keys(rates).forEach((slug) => { derived[slug] = choose(catalog.bySlug[slug], rates[slug], (entries[slug] || {}).pinSpot); });
-  const ref = referenceUse(refActive, derived, entries);
+  const ref = referenceUse(refActive.filter((a) => canGo(a.e)), derived, entries);
   Object.keys(ref.use).forEach((slug) => {
     derived[slug] = choose(catalog.bySlug[slug], ref.use[slug], (entries[slug] || {}).pinSpot);
     derived[slug].fromRef = true;

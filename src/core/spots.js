@@ -67,11 +67,13 @@ export function spotIndex({ reference, sessions, catalog, spotMeta, userSpots, s
 
 // The character's numbers for a whole spot: its own clean sessions there first, else the reference entry the tier list
 // would use (its vocation or "any", then another vocation's), calibrated the same way. Null without either.
-// ctx: {catalog, xpMode, refOn, otherOn, picks, calib, calibOther, vocation, xpBoost, expTable}.
+// ctx: {catalog, xpMode, refOn, otherOn, picks, calib, calibOther, vocation, xpBoost, expTable, killTime (the share of
+// a hunt here spent killing, for taking damage bonuses out of its hunts; null for the default), hpTable (slug → hit
+// points, for the same)}.
 // Returns {src, kph {slug}, xph, pph, lph (loot/h, null when unknown), tasks (own: the bounties its hunts were on),
 // profitStale?, hours, kills, entry}.
 export function spotNumbers(sp, ctx) {
-  const own = sp.sessions.length ? spotRates(sp.sessions, ctx.catalog, () => sp.id, xpField(ctx.xpMode), ctx.expTable)[sp.id] : null;
+  const own = sp.sessions.length ? spotRates(sp.sessions, ctx.catalog, () => sp.id, xpField(ctx.xpMode), ctx.expTable, () => ctx.killTime, ctx.hpTable)[sp.id] : null;
   if (own) return { src: "own", kph: own.kph, xph: own.xph, pph: own.pph, lph: own.lph, tasks: own.tasks, hours: own.hours, kills: own.kills, entry: null };
   if (!ctx.refOn) return null;
   const opts = { xpMode: ctx.xpMode, xpBoost: ctx.xpBoost, catalog: ctx.catalog }, k = norm(sp.name);

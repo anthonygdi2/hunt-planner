@@ -24,6 +24,7 @@ const FILES = {
   "creatures.json": { option: "creatures", inline: "line" },
   "reference.json": { option: "reference", inline: "list" },
   "creature-exp.json": { option: "creatureExp", inline: "line" },
+  "creature-hp.json": { option: "creatureHp", inline: "line" },
 };
 const DATA_CALL = /__BTL_DATA__\("([^"]+)"\)/g;
 // A line that holds only a stylesheet include, with its line ending: the file's text takes the whole line's place.

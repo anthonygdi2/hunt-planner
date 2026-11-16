@@ -36,7 +36,7 @@ test("first run: vocations, level, and Show my plan only once a level is typed",
 
 const STATE = {
   status: "ready", canWrite: true, local: true, notice: "", pid: "a", order: ["a", "b"], advanced: false, theme: "system", planner: { state: {} },
-  profiles: { a: { name: "Main EK", vocation: "Elite Knight", level: 615, talisman: { loot: 12.5, bestiary: 20 }, bestiaryBonus: 20, refOtherOff: true }, b: { vocation: "Royal Paladin", level: 420 } },
+  profiles: { a: { name: "Main EK", vocation: "Elite Knight", level: 615, talisman: { loot: 12.5, bestiary: 20, damage: 10.25 }, bestiaryBonus: 20, refOtherOff: true }, b: { vocation: "Royal Paladin", level: 420 } },
 };
 
 test("characters page: what it shows", () => {
@@ -45,7 +45,8 @@ test("characters page: what it shows", () => {
   assert.deepEqual([...document.querySelectorAll(".hp-pill")].map((b) => [b.textContent, b.getAttribute("aria-pressed")]), [["Main EK · 615", "true"], ["RP 420", "false"], ["+ Add", null]]);
   assert.equal($("#ch-name").value, "Main EK");
   assert.equal($("#ch-voc").value, "Elite Knight");
-  assert.deepEqual([$("#ch-loot").value, $("#ch-bonus").value], ["12.5", "20"], "the Talisman's loot and bestiary bonuses");
+  assert.deepEqual([$("#ch-loot").value, $("#ch-bonus").value, $("#ch-damage").value, $("#ch-leech").value], ["12.5", "20", "10.25", "0"], "the Talisman's four bonuses");
+  assert.match(document.body.textContent, /Damage counts as faster kills\. Life leech is kept with each hunt/);
   assert.match(document.body.textContent, /bonuses as the game shows them, 0 without one/);
   assert.equal($("#src-ref").getAttribute("aria-checked"), "true");
   assert.equal($("#src-other").getAttribute("aria-checked"), "false", "refOtherOff migrates to the switch");
@@ -74,12 +75,14 @@ test("characters page: each control calls its action", () => {
   $("#set-taken").value = "120"; $("#set-taken").dispatchEvent(new dom.window.Event("change"));
   $("#ch-loot").value = "15"; $("#ch-loot").dispatchEvent(new dom.window.Event("change"));
   $("#ch-bonus").value = "25"; $("#ch-bonus").dispatchEvent(new dom.window.Event("change"));
+  $("#ch-damage").value = "11"; $("#ch-damage").dispatchEvent(new dom.window.Event("change"));
+  $("#ch-leech").value = "3"; $("#ch-leech").dispatchEvent(new dom.window.Event("change"));
   $("#ch-delete").click();
   $("#bk-download").click();
   assert.deepEqual(s.calls, [
     ["switchCharacter", "b"], ["add"], ["setSources", { reference: true, otherVocation: true, older: true }],
     ["setSources", { reference: false, otherVocation: false, older: false }], ["setAdvanced", true], ["setTheme", "light"],
-    ["update", { name: "Knighty" }], ["update", { level: 616 }], ["setTakenMinutes", 120], ["talisman", { loot: "15" }], ["talisman", { bestiary: "25" }], ["arm", true], ["download"]]);
+    ["update", { name: "Knighty" }], ["update", { level: 616 }], ["setTakenMinutes", 120], ["talisman", { loot: "15" }], ["talisman", { bestiary: "25" }], ["talisman", { damage: "11" }], ["talisman", { leech: "3" }], ["arm", true], ["download"]]);
   // Armed: the same button deletes.
   $ = mount(characters.render(charactersPageView(STATE, null), { armed: true, status: "Backup saved." }, on));
   assert.equal($("#ch-delete").textContent, "Tap again to delete Main EK. Its logged hunts stay for your other characters.", "deleting keeps the hunts, and says so");
@@ -146,39 +149,49 @@ test("plan: Silver and Gold odds and Log this board (Advanced mode)", async () =
   const board = (offers) => ({ difficulty: "master", tokens: 4, mode: "offers", active: null, offers });
   const goal = { chip: { label: "Goal", value: "Exp", set: true } };
   const s = spy(), bounty = {};
-  ["logBoard", "odds", "useLoggedOdds", "useGuessOdds"].forEach((k) => { bounty[k] = s.fn(k); });
-  const guess = { odds: { silver: 10, gold: 2 }, typed: false };
+  ["logBoard", "odds", "followLog"].forEach((k) => { bounty[k] = s.fn(k); });
+  const guess = { odds: { silver: 10, gold: 2 }, typed: false, n: 0 };
   // Basic mode: none of it.
   let $ = mount(plan.render({ goal, bounty: bountyView(board([full, blank, blank]), catalog) }, { open: "bounty" }, { toggle() {}, bounty }));
   assert.equal($("#bounty-odds"), null);
   assert.equal($("#bounty-log"), null);
   // The guess, nothing logged, a board not filled in.
   let o = oddsView(guess, {}, false, board([full, blank, blank]));
-  assert.deepEqual([o.silver, o.gold, o.typed, o.canUse], ["10", "2", false, false]);
-  assert.equal(o.logged, "No boards logged yet. Your shares can be used once 10 offers are logged.");
+  assert.deepEqual([o.silver, o.gold, o.typed], ["10", "2", false]);
+  assert.equal(o.logged, "No boards logged yet.");
   $ = mount(plan.render({ goal, bounty: bountyView(board([full, blank, blank]), catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
   assert.equal($("#odds-line").textContent, "The plan uses a guess: Silver 10%, Gold 2% per offer. The real odds aren’t published.");
   assert.equal($("#odds-silver").value, "10");
   assert.equal($("#bounty-log").disabled, true);
-  assert.equal($("#odds-use"), null);
-  assert.equal($("#odds-guess"), null);
+  assert.equal($("#odds-follow"), null, "nothing typed: already following the log");
   $("#odds-silver").value = "12.5"; $("#odds-silver").dispatchEvent(new dom.window.Event("change"));
   $("#odds-gold").value = "3"; $("#odds-gold").dispatchEvent(new dom.window.Event("change"));
   assert.deepEqual(s.calls.splice(0), [["odds", { silver: "12.5" }], ["odds", { gold: "3" }]]);
   // Typed odds, twelve offers logged, a full board not logged yet.
   const log = { master: Array.from({ length: 12 }, (_, i) => ({ kind: i < 3 ? "silver" : i < 4 ? "gold" : "normal" })) };
   const filled = board([full, Object.assign({}, full, { slug: "gorerilla" }), full]);
-  o = oddsView({ odds: { silver: 12.5, gold: 3 }, typed: true }, log, false, filled);
+  o = oddsView({ odds: { silver: 12.5, gold: 3 }, typed: true, n: 0 }, log, false, filled);
   assert.equal(o.line, "The plan uses your odds: Silver 12.5%, Gold 3% per offer.");
-  assert.equal(o.logged, "12 offers logged: Silver 25%, Gold 8.3%.");
+  assert.equal(o.logged, "12 offers logged: Silver 25%, Gold 8.3%. Typed odds win over your log.");
   $ = mount(plan.render({ goal, bounty: bountyView(filled, catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
   assert.equal($("#bounty-log").disabled, false);
   assert.equal($("#bounty-log-note").textContent, "Picking an offer or rerolling here logs the board by itself. Use this if you won’t.");
-  $("#bounty-log").click(); $("#odds-use").click(); $("#odds-guess").click();
-  assert.deepEqual(s.calls.splice(0), [["logBoard"], ["useLoggedOdds"], ["useGuessOdds"]]);
-  // Logged already; the shares already in use: no Use button.
-  o = oddsView({ odds: { silver: 25, gold: 8.3 }, typed: true }, log, true, filled);
-  assert.deepEqual([o.canUse, o.board.canLog, o.board.text], [false, false, "This board is logged."]);
+  $("#bounty-log").click(); $("#odds-follow").click();
+  assert.deepEqual(s.calls.splice(0), [["logBoard"], ["followLog"]]);
+  // Nothing typed and boards logged: the plan follows the log (the blend the model hands over), and says so.
+  // Boards logged with their lists: the ×5 Preferred weight against them.
+  const tagged = { master: Array.from({ length: 10 }, (_, i) => ({ kind: "normal", pref: i < 3, unw: i === 9, nPool: 100, nPref: 5, nUnw: 5 })) };
+  assert.equal(oddsView(guess, log, true, filled).slots, null, "no offer logged with its lists");
+  o = oddsView(guess, tagged, true, filled);
+  assert.equal(o.slots, "Preferred creatures came up in 3 of 10 offers (30%). The ×5 model expects 21.7%; with no extra weight it would be 5.3%. Too few offers to tell them apart yet. " +
+    "An Unwanted creature was offered 1 time, so Unwanted doesn’t take a creature out of the pool.");
+  $ = mount(plan.render({ goal, bounty: bountyView(filled, catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
+  assert.equal($("#odds-slots").textContent, o.slots);
+  o = oddsView({ odds: { silver: 12.9, gold: 3.16 }, typed: false, n: 12 }, log, true, filled);
+  assert.equal(o.line, "The plan follows your log: Silver 12.9%, Gold 3.2% per offer. It starts from a guess and moves toward your logged boards as they add up.");
+  assert.deepEqual([o.logged, o.board.canLog, o.board.text], ["12 offers logged: Silver 25%, Gold 8.3%.", false, "This board is logged."]);
+  $ = mount(plan.render({ goal, bounty: bountyView(filled, catalog, null, null, o) }, { open: "bounty" }, { toggle() {}, bounty }));
+  assert.deepEqual([$("#odds-silver").value, $("#odds-gold").value, $("#odds-follow"), $("#odds-slots")], ["12.9", "3.2", null, null]);
   // An active bounty: odds, but no board to log.
   const active = { difficulty: "master", tokens: 4, mode: "active", offers: [blank, blank, blank], active: { slug: "cobra-assassin", kills: 450, killsLeft: 400, kind: "normal", exp: null } };
   o = oddsView(guess, {}, false, active);
@@ -451,8 +464,8 @@ test("log: the saved hunts, their vocation and level filters, and the editor", a
 
 // The loot bonuses editor's view (app/views.js boostsView) for a hunt that killed Rats and Cave Rats.
 const BOOSTS = (o) => Object.assign({ boosted: "", boostedOptions: [{ value: "", label: "None" }, { value: "rat", label: "Rat" }, { value: "cave-rat", label: "Cave Rat" }],
-  prey: [], pcts: [13, 16, 19, 22, 25, 28, 31, 34, 37, 40].map((x) => ({ value: x, label: "+" + x + "%" })), canAddPrey: true, nextPrey: "rat",
-  talisman: null, talismanOk: true, draft: {}, value: {} }, o || {});
+  prey: [], kinds: [{ value: "loot", label: "Loot" }, { value: "damage", label: "Damage" }], canAddPrey: true, nextPrey: "rat",
+  talisman: null, talismanOk: true, damage: null, damageOk: true, leech: null, leechOk: true, draft: {}, value: {} }, o || {});
 
 test("log: the loot bonuses on during a hunt, in the preview and the saved hunt's editor", async () => {
   const log = await import("../../src/ui/screens/log.js");
@@ -461,25 +474,31 @@ test("log: the loot bonuses on during a hunt, in the preview and the saved hunt'
   const creatures = [{ value: "", label: "None" }, { value: "rat", label: "Rat" }, { value: "cave-rat", label: "Cave Rat" }];
   const view = { text: "x", problem: "", read: "", preview: { hours: 1 }, where: "known", spotId: "a", spots: [{ value: "a", label: "A" }], parents: [], name: "", parentId: "", note: "",
     nameHint: "", exp: "5kk", profit: "300k", kph: [], raids: null, canSave: true, saved, duplicate: null,
-    boosts: BOOSTS({ boosted: "rat", prey: [{ i: 0, slug: "cave-rat", pct: 25, creatures }], talisman: "7.5" }) };
+    boosts: BOOSTS({ boosted: "rat", prey: [{ i: 0, slug: "cave-rat", pct: 25, kind: "loot", creatures, pcts: [13, 16, 19, 22, 25, 28, 31, 34, 37, 40].map((x) => ({ value: x, label: "+" + x + "%" })) }], talisman: "7.5", damage: "10", leech: "" }) };
   let $ = mount(log.render(view, { leaving: false }, on));
   assert.equal($("#log-boosts").getAttribute("role"), "group");
   assert.match($("#log-boosts").textContent, /On during this hunt/);
   assert.equal($("#log-boosted").value, "rat", "filled from today's boosts");
   assert.equal($("#log-prey-0").value, "cave-rat");
   assert.equal($("#log-prey-0-pct").value, "25");
+  assert.equal($("#log-prey-0-kind").value, "loot");
   assert.equal($("#log-talisman").value, "7.5");
+  assert.deepEqual([$("#log-damage").value, $("#log-leech").value], ["10", ""], "the Talisman's damage and life leech");
+  assert.match($("#log-boosts").textContent, /Life leech is only kept with the hunt/);
   $("#log-boosted").value = ""; $("#log-boosted").dispatchEvent(new dom.window.Event("change"));
   $("#log-prey-0-pct").value = "40"; $("#log-prey-0-pct").dispatchEvent(new dom.window.Event("change"));
   $("#log-prey-0").value = "rat"; $("#log-prey-0").dispatchEvent(new dom.window.Event("change"));
+  $("#log-prey-0-kind").value = "damage"; $("#log-prey-0-kind").dispatchEvent(new dom.window.Event("change"));
   $("#log-prey-0-remove").click();
   $("#log-prey-add").click();
   $("#log-talisman").value = "10"; $("#log-talisman").dispatchEvent(new dom.window.Event("change"));
-  assert.deepEqual(s.calls, [["boost", { boosted: "" }], ["boost", { prey: 0, pct: 40 }], ["boost", { prey: 0, slug: "rat" }], ["boost", { removePrey: 0 }],
-    ["boost", { addPrey: "rat" }], ["boost", { talisman: "10" }]]);
+  $("#log-leech").value = "4"; $("#log-leech").dispatchEvent(new dom.window.Event("change"));
+  assert.deepEqual(s.calls, [["boost", { boosted: "" }], ["boost", { prey: 0, pct: 40 }], ["boost", { prey: 0, slug: "rat" }], ["boost", { prey: 0, kind: "damage" }], ["boost", { removePrey: 0 }],
+    ["boost", { addPrey: "rat" }], ["boost", { talisman: "10" }], ["boost", { leech: "4" }]]);
   // Off the bounty there's no Talisman field; a percent that doesn't read says so, and Save waits.
   $ = mount(log.render(Object.assign({}, view, { boosts: BOOSTS({ canAddPrey: false }) }), { leaving: false }, on));
   assert.equal($("#log-talisman"), null);
+  assert.equal($("#log-damage"), null);
   assert.equal($("#log-prey-add"), null);
   $ = mount(log.render(Object.assign({}, view, { canSave: false, boosts: BOOSTS({ talisman: "80", talismanOk: false }) }), { leaving: false }, on));
   assert.equal($("#log-talisman").getAttribute("aria-invalid"), "true");
@@ -506,21 +525,32 @@ test("log view: the loot bonuses default from today's boosts and the Talisman, a
   const model = (o) => Object.assign({ now: end + 60000, spotIndex: () => ({ list: [], spots: {}, idOf: () => null }),
     bounty: () => ({ mode: "active", active: { slug: "rat" } }),
     today: () => ({ boosted: "rat", prey: [{ slug: "cave-rat", kind: "loot", pct: 25 }, { slug: "rat", kind: "xp", pct: 40 }, { slug: "cobra-scout", kind: "loot", pct: 40 }], event: 0 }) }, o || {});
-  const state = { pid: "a", profiles: { a: { vocation: "Elite Knight", level: 100, talisman: { loot: 7.5, bestiary: 0 } } }, hunts: [] };
+  const dmgToday = () => ({ boosted: null, prey: [{ slug: "rat", kind: "damage", pct: 15 }, { slug: "cave-rat", kind: "loot", pct: 25 }], event: 0 });
+  const state = { pid: "a", profiles: { a: { vocation: "Elite Knight", level: 100, talisman: { loot: 7.5, bestiary: 0, damage: 10.25, leech: 0 } } }, hunts: [] };
   const draft = { text, where: "new", name: "Rat Cave" };
   // Ended this server day: today's boosted creature and loot Preys on creatures killed in it; on the bounty, the Talisman.
   let v = logView(draft, model(), catalog, false, state);
   assert.equal(v.boosts.boosted, "rat");
   assert.deepEqual(v.boosts.prey.map((q) => [q.slug, q.pct]), [["cave-rat", 25]], "the exp Prey and a creature not killed are left out");
   assert.equal(v.boosts.talisman, "7.5");
-  assert.deepEqual(v.boosts.value, { boosted: "rat", prey: [{ slug: "cave-rat", pct: 25 }], talisman: 7.5 });
+  assert.deepEqual([v.boosts.damage, v.boosts.leech], ["10.25", ""], "the Talisman's damage and life leech, from the character");
+  assert.deepEqual(v.boosts.value, { boosted: "rat", prey: [{ slug: "cave-rat", pct: 25 }], talisman: 7.5, damage: 10.25 });
   assert.deepEqual(v.boosts.boostedOptions.map((o) => o.value), ["", "rat", "cave-rat"]);
   assert.equal(v.boosts.nextPrey, "rat");
   assert.equal(v.canSave, true);
+  // A damage Prey on a creature killed is filled in too, and stored apart from the loot Preys; changing a Prey's bonus
+  // keeps its size within that bonus's range.
+  v = logView(draft, model({ today: dmgToday }), catalog, false, state);
+  assert.deepEqual(v.boosts.prey.map((q) => [q.slug, q.kind, q.pct, q.pcts.length]), [["rat", "damage", 15, 10], ["cave-rat", "loot", 25, 10]]);
+  assert.deepEqual(v.boosts.prey[0].pcts.map((o) => o.value), [7, 9, 11, 13, 15, 17, 19, 21, 23, 25]);
+  assert.deepEqual([v.boosts.value.prey, v.boosts.value.preyDamage], [[{ slug: "cave-rat", pct: 25 }], [{ slug: "rat", pct: 15 }]]);
+  const swapped = boostsPatch(boostsPatch(v.boosts.draft, { prey: 1, kind: "damage" }), { prey: 0, kind: "loot" });
+  assert.deepEqual(swapped.prey.map((q) => [q.kind, q.pct]), [["loot", 15], ["damage", 25]]);
+  assert.deepEqual(boostsPatch(boostsPatch(v.boosts.draft, { prey: 1, pct: 40 }), { prey: 1, kind: "damage" }).prey[1], { slug: "cave-rat", pct: 25, kind: "damage" });
   // An older hunt: nothing from today's boosts; off the bounty: no Talisman.
   v = logView(draft, model({ now: end + 3 * 864e5, bounty: () => ({ mode: "offers", active: null }) }), catalog, false, state);
   assert.deepEqual(v.boosts.value, { boosted: null, prey: [], talisman: 0 });
-  assert.equal(v.boosts.talisman, null);
+  assert.deepEqual([v.boosts.talisman, v.boosts.damage, v.boosts.leech], [null, null, null]);
   // Changes go through boostsPatch; a Talisman percent that doesn't read holds Save.
   let d = boostsPatch(logView(draft, model(), catalog, false, state).boosts.draft, { boosted: "" });
   d = boostsPatch(d, { prey: 0, pct: 40 });
@@ -533,7 +563,11 @@ test("log view: the loot bonuses default from today's boosts and the Talisman, a
   assert.equal(v.boosts.value, null);
   assert.equal(v.canSave, false);
   v = logView(Object.assign({}, draft, { boosts: boostsPatch(boostsPatch(d, { talisman: "2,5" }), { removePrey: 0 }) }), model(), catalog, false, state);
-  assert.deepEqual(v.boosts.value, { boosted: null, prey: [{ slug: "rat", pct: 13 }], talisman: 2.5 });
+  assert.deepEqual(v.boosts.value, { boosted: null, prey: [{ slug: "rat", pct: 13 }], talisman: 2.5, damage: 10.25 });
+  v = logView(Object.assign({}, draft, { boosts: boostsPatch(boostsPatch(d, { talisman: "" }), { leech: "x" }) }), model(), catalog, false, state);
+  assert.deepEqual([v.boosts.leechOk, v.boosts.value, v.canSave], [false, null, false], "a life leech that doesn't read holds Save");
+  v = logView(Object.assign({}, draft, { boosts: boostsPatch(boostsPatch(boostsPatch(d, { talisman: "" }), { leech: "3" }), { damage: "" }) }), model(), catalog, false, state);
+  assert.deepEqual([v.boosts.value.talisman, v.boosts.value.leech, "damage" in v.boosts.value], [0, 3, false]);
   // A saved hunt: the boosted creature is badged; the editor of one logged on its bounty before bonuses were recorded shows
   // the Talisman of the character that logged it, and isn't changed until edited.
   const hunt = { id: "h1", spot: "Rat Cave", hours: 1, end: "2026-11-01T11:00:00", task: "rat", loot: 5e4, kills: [{ slug: "rat", name: "Rat", count: 100 }], by: { pid: "a" } };
@@ -543,6 +577,7 @@ test("log view: the loot bonuses default from today's boosts and the Talisman, a
   assert.match(r2.sub, /Rat boosted/);
   assert.doesNotMatch(r1.sub, /boosted/);
   assert.equal(r1.editor.boosts.talisman, "7.5");
+  assert.equal(r1.editor.boosts.damage, "10.25");
   assert.equal(r1.editor.boostsChanged, false);
   assert.equal(r1.editor.canSave, true);
 });
@@ -554,13 +589,14 @@ test("spots: search, sort, toggles, rows, more, and the badges legend", async ()
     toggles: [{ key: "allVocations", label: "All vocations", on: false }, { key: "anyLevel", label: "Any level", on: true }, { key: "hideTaken", label: "Hide taken", on: false }],
     count: "2 spots", more: 3, empty: "", legend: BADGE_LEGEND,
     rows: [{ id: "cobra-bastion", name: "Cobra Bastion", sub: null, score: "96", numbers: "7.8kk exp/h · 300k profit/h", none: null, creatures: "Cobra Assassin (your bounty)", badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: "Taken · clears in 25 min" },
-      { id: "my-lure", name: "Lure", sub: "Your variation of Cobra Bastion", score: null, numbers: null, none: "Not enough data for your vocation", creatures: "", badges: [], taken: null }] };
+      { id: "my-lure", name: "Lure", sub: "Your variation of Cobra Bastion", score: null, numbers: null, none: "Not enough data for your vocation", creatures: "", badges: [], taken: null, blocked: "Can’t go there" }] };
   const s = spy(), on = {};
   ["query", "sort", "toggle", "open", "logNew", "more"].forEach((k) => { on[k] = s.fn(k); });
   const $ = mount(spots.render(view, on));
   assert.equal(document.querySelectorAll(".hp-spot").length, 2);
   assert.match(document.querySelector(".hp-spot.taken").textContent, /Cobra Bastion96.*Taken · clears in 25 min/);
   assert.match(document.body.textContent, /Your variation of Cobra BastionNo score/);
+  assert.match(document.querySelectorAll(".hp-spot")[1].textContent, /Can’t go there/, "a spot the character can't go to is badged");
   assert.equal($("#spots-anyLevel").getAttribute("aria-pressed"), "true");
   assert.equal(document.querySelectorAll(".hp-legend li").length, 6);
   $("#spots-q").value = "cob"; $("#spots-q").dispatchEvent(new dom.window.Event("input"));
@@ -575,7 +611,8 @@ test("spots: search, sort, toggles, rows, more, and the badges legend", async ()
 test("spot page: sections, Mark taken, logs, variations, delete a hunt inline, advanced controls", async () => {
   const spot = await import("../../src/ui/screens/spot.js");
   const view = { id: "cobra-bastion", name: "Cobra Bastion", sub: null, parentId: null, scoreLine: "Score 96 for Main EK · Mostly exp, some profit", exp: "7.8kk", profit: "300k",
-    badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: null,
+    badges: [{ kind: "refAdj", text: "Reference, adjusted to you" }], taken: null, access: { who: "Main EK", blocked: false, travel: "12", timed: false, respawnLimit: false },
+    prey: "Cobra Assassin, about 75% of the exp here. Biggest Prey: +1.2kk exp/h (40% exp).",
     creatures: [{ slug: "cobra-assassin", name: "Cobra Assassin", perHour: "≈ 400/h", tag: "Your bounty", gold: true }, { slug: "cobra-scout", name: "Cobra Scout", perHour: "≈ 90/h", tag: "Weekly task", gold: false }],
     sources: { hunts: "None yet.", reference: { who: "Elite Knight, level 500+, from Kusnier’s video (Sep 2026)", url: "https://example.org/v", recorded: "As recorded: 9.1kk", adjusted: "Adjusted to you: 7.8kk",
       details: { key: "ref-cb", open: false, caption: "Recorded over 15 min.", amounts: [{ label: "Raw exp", total: "2.28kk", perHour: "9.1kk" }],
@@ -588,9 +625,31 @@ test("spot page: sections, Mark taken, logs, variations, delete a hunt inline, a
         kills: [{ name: "Cobra Assassin", count: "520", perHour: "520/h" }], counts: true, notes: null, url: null } }],
     emptySessions: "No sessions.", own: { name: "Cobra Bastion", armed: false, deleteText: "Deletes this spot." } };
   const s = spy(), on = {};
-  ["back", "taken", "free", "log", "vary", "open", "arm", "deleteSession", "details", "raid", "rename", "deleteSpot"].forEach((k) => { on[k] = s.fn(k); });
+  ["back", "taken", "free", "log", "vary", "open", "arm", "deleteSession", "details", "raid", "rename", "deleteSpot", "access", "travel", "respawnLimit"].forEach((k) => { on[k] = s.fn(k); });
   let $ = mount(spot.render(view, on));
+  // For this character: whether it can go there, and its travel minutes.
+  assert.match(document.body.textContent, /For Main EK/);
+  assert.deepEqual([$("#spot-access").getAttribute("role"), $("#spot-access").getAttribute("aria-checked"), $("#spot-travel").value], ["switch", "true", "12"]);
+  assert.equal($("#spot-blocked"), null);
+  assert.match(document.body.textContent, /Counts once you set a session length/);
+  assert.equal($("#spot-damage").getAttribute("aria-checked"), "true", "more damage means more kills, unless switched off");
+  $("#spot-access").click();
+  $("#spot-travel").value = "20"; $("#spot-travel").dispatchEvent(new dom.window.Event("change"));
+  $("#spot-damage").click();
+  assert.deepEqual(s.calls, [["access", false], ["travel", "20"], ["respawnLimit", true]]);
+  s.calls.length = 0;
+  $ = mount(spot.render(Object.assign({}, view, { access: { who: "Main EK", blocked: true, travel: "", timed: true, respawnLimit: true } }), on));
+  assert.equal($("#spot-access").getAttribute("aria-checked"), "false");
+  assert.equal($("#spot-damage").getAttribute("aria-checked"), "false");
+  assert.match(document.body.textContent, /Off: the Talisman’s damage and a damage Prey add nothing here/);
+  assert.equal($("#spot-blocked").textContent, "Can’t go there");
+  assert.match(document.body.textContent, /Off: this spot stays out of the plan.*Comes out of your session’s hunting time/);
+  $("#spot-access").click();
+  assert.deepEqual(s.calls, [["access", true]]);
+  s.calls.length = 0;
+  $ = mount(spot.render(view, on));
   assert.match(document.body.textContent, /Creatures here.*Cobra AssassinYour bounty≈ 400\/h/);
+  assert.equal($("#spot-prey").textContent, "Best for a Prey: Cobra Assassin, about 75% of the exp here. Biggest Prey: +1.2kk exp/h (40% exp).");
   assert.match(document.body.textContent, /Other sources not used here.*skipped: an Elite Knight hunt exists/);
   assert.doesNotMatch(document.body.textContent, /Doesn’t count/);
   mount(spot.render(Object.assign({}, view, { sessions: [Object.assign({}, view.sessions[0], { skipped: "Doesn’t count: logged as Elite Knight." })] }), on));
@@ -676,27 +735,46 @@ test("creature page: numbers and sources, lists and Avoid, bestiary, notes, adva
     source: "From your hunts at Cobra Bastion.", weekly: "", spots: [{ name: "Cobra Bastion", id: "cobra-bastion", kph: "400/h", exp: "7kk exp/h", profit: "300k profit/h", used: true,
       badge: { kind: "yours", text: "Yours" }, note: "Used." }], noSpots: "", preferred: false, unwanted: true, avoid: false, listsNote: "…",
     bestiary: "2,500 kills for 50 charm points.", bestiaryDone: false, wardenDone: true, rare: false, notes: "lure",
+    bestiaryKills: { value: "1500", hint: "1,000 kills left of 2,500. Updated 3 days ago." },
     advanced: { nums: [{ key: "kph", label: "Kills/h", value: "" }, { key: "xph", label: "Exp/h", value: "" }, { key: "pph", label: "Profit/h", value: "" }],
       pin: { value: "", options: [{ value: "", label: "Best for my goal (Cobra Bastion)" }, { value: "Cobra Bastion", label: "Cobra Bastion" }] }, minLevel: "", minLevelLabel: "Usable from level (Elite Knights)" },
     updated: "Last edited Oct 21" };
   const s = spy(), on = {};
-  ["back", "spot", "preferred", "unwanted", "avoid", "bestiary", "warden", "notesDraft", "notes", "nums", "pin", "minLevel"].forEach((k) => { on[k] = s.fn(k); });
+  ["back", "spot", "preferred", "unwanted", "avoid", "bestiary", "bestiaryKills", "warden", "notesDraft", "notes", "nums", "pin", "minLevel"].forEach((k) => { on[k] = s.fn(k); });
   let $ = mount(creature.render(view, on));
   assert.equal($("#cr-unw").getAttribute("aria-pressed"), "true");
   assert.equal($("#cr-warden").getAttribute("aria-checked"), "true");
   assert.equal($("#cr-notes").value, "lure");
+  assert.deepEqual([$("#cr-bkills").value, $("#cr-bkills-hint").textContent, $("#cr-bkills").getAttribute("aria-describedby")], ["1500", "1,000 kills left of 2,500. Updated 3 days ago.", "cr-bkills-hint"]);
   $("#cr-pref").click(); $("#cr-unw").click(); $("#cr-avoid").click(); $("#cr-bestiary").click(); $("#cr-warden").click();
+  $("#cr-bkills").value = "1600"; $("#cr-bkills").dispatchEvent(new dom.window.Event("change"));
   $("#cr-notes").value = "lure two"; $("#cr-notes").dispatchEvent(new dom.window.Event("input")); $("#cr-notes").dispatchEvent(new dom.window.Event("change"));
   $("#cr-num-kph").value = "450"; $("#cr-num-kph").dispatchEvent(new dom.window.Event("change"));
   $("#cr-pin").value = "Cobra Bastion"; $("#cr-pin").dispatchEvent(new dom.window.Event("change"));
   $("#cr-minlevel").value = "700"; $("#cr-minlevel").dispatchEvent(new dom.window.Event("change"));
   document.querySelector('a[href="#/spot/cobra-bastion"]').click();
   document.querySelector(".hp-back").click();
-  assert.deepEqual(s.calls, [["preferred", true], ["unwanted", false], ["avoid", true], ["bestiary", true], ["warden", false], ["notesDraft", "lure two"], ["notes", "lure two"],
+  assert.deepEqual(s.calls, [["preferred", true], ["unwanted", false], ["avoid", true], ["bestiary", true], ["warden", false], ["bestiaryKills", "1600"], ["notesDraft", "lure two"], ["notes", "lure two"],
     ["nums", "kph", "450"], ["pin", "Cobra Bastion"], ["minLevel", "700"], ["spot", "cobra-bastion"], ["back"]]);
   mount(creature.render(Object.assign({}, view, { advanced: null, rare: true }), on));
   assert.equal(document.querySelector("#cr-warden"), null, "rare creatures have no Echo Warden");
   assert.equal(document.querySelector("#cr-num-kph"), null);
   mount(creature.render(null, on));
   assert.match(document.body.textContent, /no creature by that name/);
+});
+
+test("plan: Today's boosts says which creature to put Prey on at the first spot", async () => {
+  const plan = await import("../../src/ui/screens/plan.js");
+  const { preyAdviceText } = await import("../../src/app/views.js");
+  const name = (s) => ({ "cobra-assassin": "Cobra Assassin" })[s] || s;
+  assert.equal(preyAdviceText(null, name), null);
+  const text = preyAdviceText({ slug: "cobra-assassin", share: 0.754, xp: { pct: 40, xph: 1.2e6 }, loot: { pct: 40, pph: 1.2e5 }, damage: { pct: 25, kills: 0.0452, xph: 9e4, pph: 4e3 } }, name);
+  assert.equal(text, "Cobra Assassin, about 75% of the exp here. Biggest Prey: +1.2kk exp/h (40% exp) · +120k profit/h (40% loot) · +4.5% kills (25% damage).");
+  assert.equal(preyAdviceText({ slug: "cobra-assassin", share: 1, xp: { pct: 40, xph: 4e5 }, loot: null, damage: null }, name), "Cobra Assassin, about 100% of the exp here. Biggest Prey: +400k exp/h (40% exp).");
+  const today = { chip: { set: false, value: "" }, boosted: "", prey: [], canAddPrey: true, event: 0, events: [{ value: 0, label: "No exp event" }], names: [], advice: { spot: "Cobra Bastion", text } };
+  const view = { goal: { chip: { label: "Goal", value: "Exp", set: true } }, today };
+  let $ = mount(plan.render(view, { open: "today" }, { toggle() {}, today: {} }));
+  assert.equal($("#prey-advice").textContent, "Prey at Cobra Bastion: " + text + " The game’s Prey list is random unless you use a wildcard.");
+  $ = mount(plan.render(Object.assign({}, view, { today: Object.assign({}, today, { advice: null }) }), { open: "today" }, { toggle() {}, today: {} }));
+  assert.equal($("#prey-advice"), null);
 });

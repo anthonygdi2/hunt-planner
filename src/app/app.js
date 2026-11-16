@@ -1,6 +1,7 @@
 // The running app: one state object fed by db subscriptions, the actions that change it (writing through the store and
 // updating the state at once), and the model of the active character derived from it. The UI subscribes, renders
 // view models from it and calls its actions; it keeps no game state of its own.
+import { bestiaryOf } from "../core/metrics.js";
 import { VOCATIONS, TASK, TOKEN_CAP, PREY, PREY_SLOTS, SLOTS, TALISMAN } from "../data/rules.js";
 import { occKey, markAge } from "../core/occupancy.js";
 import { serverDay, weekKey } from "../core/weekly.js";
@@ -9,7 +10,6 @@ import { NUM_FIELDS } from "../core/numbers.js";
 import { isChallengingMaster, learnChallenging } from "../core/rewards.js";
 import { makeCatalog } from "../core/catalog.js";
 import { PRESETS, readWeights } from "../core/score.js";
-import { loggedOdds, MIN_BOARD_OBS } from "../core/reroll.js";
 import { boardSlotTags } from "../core/slots.js";
 import { makeRepo } from "../store/repo.js";
 import { PREF } from "../store/prefs.js";
@@ -20,7 +20,7 @@ import { makeModel, makePlanCache } from "./model.js";
 import { pickLang } from "../core/i18n.js";
 import { setLang, translator, t } from "./lang.js";
 
-// data: {creatures, reference, expTable}; prefs: store/prefs.js; now() → ms.
+// data: {creatures, reference, expTable, hpTable}; prefs: store/prefs.js; now() → ms.
 // browserLang: the browser's language (navigator.language), for the first choice of language.
 export function createApp({ data, prefs, now, browserLang }) {
   const catalog = makeCatalog(data.creatures), known = (slug) => !!catalog.bySlug[slug];
@@ -144,10 +144,15 @@ export function createApp({ data, prefs, now, browserLang }) {
   }
   // A new spot's id: "my-" and its name as a slug, made unique.
   // The loot bonuses stored on a hunt (store/schema.js readBoosts): creatures the catalog knows, the Talisman only when
-  // the hunt was on its bounty (task). None given stores none on, so the hunt reads as base rates.
+  // the hunt was on its bounty (task), with its damage and life leech when it has them. None given stores none on, so
+  // the hunt reads as base rates.
   function huntBoosts(b, task) {
     const v = readBoosts(b || {});
-    return { boosted: known(v.boosted) ? v.boosted : null, prey: v.prey.filter((q) => known(q.slug)), talisman: task ? v.talisman : 0 };
+    const out = { boosted: known(v.boosted) ? v.boosted : null, prey: v.prey.filter((q) => known(q.slug)), talisman: task ? v.talisman : 0 };
+    if (task) ["damage", "leech"].forEach((k) => { if (v[k] > 0) out[k] = v[k]; });
+    const pd = (v.preyDamage || []).filter((q) => known(q.slug));
+    if (pd.length) out.preyDamage = pd;
+    return out;
   }
   function newSpotId(name) {
     const base = "my-" + (slugify(name) || "spot"), taken = model().spotIndex().spots;
@@ -305,7 +310,22 @@ export function createApp({ data, prefs, now, browserLang }) {
     setAvoid(slug, on) { const r = (state.entries[slug] || {}).rating; saveEntry(slug, { rating: on ? "X" : r === "X" ? null : r }); },
     setPreferred(slug, on) { setSlot(slug, "preferred", on); },
     setUnwanted(slug, on) { setSlot(slug, "unwanted", on); },
-    setBestiaryDone(slug, on) { saveEntry(slug, { bestiaryDone: !!on }); },
+    // Switching it back off drops a typed kill count that had reached the total.
+    setBestiaryDone(slug, on) {
+      const c = catalog.bySlug[slug], k = (state.entries[slug] || {}).bestiaryKills, full = !on && c && k >= bestiaryOf(c).kills;
+      saveEntry(slug, Object.assign({ bestiaryDone: !!on }, full ? { bestiaryKills: null, bestiaryKillsAt: null } : {}));
+    },
+    // The creature's bestiary kill count as the game shows it (typed; empty clears it). Reaching the class's total marks
+    // the bestiary finished; a lower count marks it unfinished. Nothing changes when it isn't a whole number.
+    setBestiaryKills(slug, text) {
+      const c = catalog.bySlug[slug], raw = String(text == null ? "" : text).trim().replace(/[.,\s]/g, "");
+      if (!c) return;
+      if (raw === "") { saveEntry(slug, { bestiaryKills: null, bestiaryKillsAt: null }); return; }
+      if (!/^\d{1,6}$/.test(raw)) return;
+      const total = bestiaryOf(c).kills, n = Math.min(total, Number(raw));
+      if (n === (state.entries[slug] || {}).bestiaryKills) return;
+      saveEntry(slug, { bestiaryKills: n, bestiaryKillsAt: iso(), bestiaryDone: n >= total });
+    },
     setWardenDone(slug, on) { saveEntry(slug, { wardenDone: !!on }); },
     setNotes(slug, text) { saveEntry(slug, { notes: String(text || "").trim().slice(0, 2000) }); },
     // nums: {kph?, xph?, pph?} as typed ("1.2kk", "" to clear). Returns false (and writes nothing) if one isn't a number.
@@ -382,10 +402,11 @@ export function createApp({ data, prefs, now, browserLang }) {
     confirmNoTokens() { saveBounty({ zeroChecked: serverDay(now()) }); },
     // Silver and Gold (Advanced mode). Log this board, for a board not picked or rerolled here (those log themselves).
     logBoard() { logOffers(-1); },
-    // The character's own odds in percent ({silver, gold}, either one typed; the other stays as the plan has it).
+    // The character's own odds in percent ({silver, gold}, either one typed; the other stays as the plan has it, to one
+    // decimal). They then win over the log until Follow my log.
     // Nothing changes when a value isn't a number or the two add up to more than 100.
     setOfferOdds(patch) {
-      const now0 = model().offerOdds(), next = Object.assign({}, now0.odds);
+      const now0 = model().offerOdds(), next = { silver: Math.round(now0.odds.silver * 10) / 10, gold: Math.round(now0.odds.gold * 10) / 10 };
       ["silver", "gold"].forEach((k) => {
         if (!(k in patch)) return;
         const raw = String(patch[k]).trim().replace("%", "").replace(",", "."), n = Number(raw);
@@ -393,15 +414,10 @@ export function createApp({ data, prefs, now, browserLang }) {
       });
       if (readOfferOdds(next) && (!now0.typed || next.silver !== now0.odds.silver || next.gold !== now0.odds.gold)) updateCharacter({ offerOdds: next });
     },
-    // The shares of the logged offers (once there are enough) become the character's odds.
-    useLoggedOdds() {
-      const L = loggedOdds(model().offerLog());
-      if (L.n >= MIN_BOARD_OBS) updateCharacter({ offerOdds: { silver: Math.round(L.silver * 10) / 10, gold: Math.round(L.gold * 10) / 10 } });
-    },
-    // Back to the guess (OFFER_ODDS).
-    useGuessOdds() { updateCharacter({ offerOdds: null }); },
-    // The Bounty Talisman's more-loot and double-bestiary chances as the game shows them, in percent ({loot} or
-    // {bestiary}, typed; empty is 0, no Talisman). Written as talisman {loot, bestiary} with bestiaryBonus kept in step,
+    // Typed odds cleared: the plan follows the log again (the guess blended with the logged offers).
+    followLoggedOdds() { updateCharacter({ offerOdds: null }); },
+    // The Bounty Talisman's bonuses as the game shows them, in percent ({loot}, {bestiary}, {damage} or {leech}, typed;
+    // empty is 0, no Talisman). Written as talisman {loot, bestiary, damage, leech} with bestiaryBonus kept in step,
     // so older builds still read the bestiary bonus. Nothing changes when a value isn't a number in range.
     setTalisman(patch) {
       const cur = readTalisman(profile() || {}), next = Object.assign({}, cur);
@@ -411,13 +427,32 @@ export function createApp({ data, prefs, now, browserLang }) {
         const raw = String(patch[k] == null ? "" : patch[k]).trim().replace("%", "").replace(",", "."), n = raw === "" ? 0 : Number(raw);
         if (n >= 0 && n <= TALISMAN[k].max) { next[k] = Math.round(n * 100) / 100; ok = true; }
       });
-      if (ok && (next.loot !== cur.loot || next.bestiary !== cur.bestiary)) updateCharacter({ talisman: next, bestiaryBonus: next.bestiary });
+      if (ok && Object.keys(TALISMAN).some((k) => next[k] !== cur[k])) updateCharacter({ talisman: next, bestiaryBonus: next.bestiary });
     },
     // Plan: Free and Taken marks (each counted once per 15 minutes toward how often the spot is free), Hunting now.
     markTaken(spotId) { mark(spotId, "taken"); },
     markFree(spotId) { mark(spotId, "free"); },
     startHunting(spotId) { mark(spotId, "free"); actions.savePlanner({ hunting: { spotId, at: iso() } }); },
     stopHunting() { actions.savePlanner({ hunting: null }); },
+    // A spot the character can't go to (no access quest, say): out of its plan and its creatures' numbers until allowed again.
+    setSpotAccess(spotId, canGo) {
+      const next = Object.assign({}, state.planner.state.noAccess);
+      if (canGo) delete next[spotId]; else next[spotId] = true;
+      actions.savePlanner({ noAccess: next });
+    },
+    // A spot where killing faster adds nothing for the character (respawn is the limit): damage bonuses count for nothing there.
+    setRespawnLimit(spotId, limited) {
+      const next = Object.assign({}, state.planner.state.respawnLimit);
+      if (limited) next[spotId] = true; else delete next[spotId];
+      actions.savePlanner({ respawnLimit: next });
+    },
+    // The character's own travel time to a spot in minutes (1 to 600; anything else clears it). It comes out of the
+    // hunting time when a session length is set.
+    setTravel(spotId, minutes) {
+      const next = Object.assign({}, state.planner.state.travel), m = Math.round(Number(String(minutes == null ? "" : minutes).trim()));
+      if (m >= 1 && m <= 600) next[spotId] = m; else delete next[spotId];
+      actions.savePlanner({ travel: next });
+    },
     // Time: a session length in hours, or null for no limit.
     setFixedHours(h) { actions.savePlanner({ fixedHours: Number(h) > 0 ? Number(h) : null }); },
     // Today's boosts: they count only on the server day they were set.
@@ -486,6 +521,7 @@ export function createApp({ data, prefs, now, browserLang }) {
       const body = { spot: name, spotId, task, start: preview.start || null, end: preview.end || iso().slice(0, 19), hours: Math.round(preview.hours * 10000) / 10000,
         rawXp: preview.rawXp != null ? preview.rawXp : null, xp: preview.xp != null ? preview.xp : null, loot: preview.loot != null ? preview.loot : null,
         supplies: preview.supplies != null ? preview.supplies : null, balance: preview.balance != null ? preview.balance : null,
+        damage: preview.damage != null ? preview.damage : null, healing: preview.healing != null ? preview.healing : null,
         kills: preview.kills.map((k) => (k.slug ? { slug: k.slug, name: k.name, count: k.count } : { name: k.name, count: k.count })), level: Number(p.level) || null, vocation: p.vocation || VOCATIONS[0],
         by: { pid, name: p.name ? String(p.name).trim().slice(0, 40) : null }, boosts: huntBoosts(boosts, task), createdAt: iso() };
       const raids = {};
@@ -571,7 +607,7 @@ export function createApp({ data, prefs, now, browserLang }) {
   // The active character's model (app/model.js), rebuilt after each change; its tiers are for Master tasks. modelFor
   // gives one whose tiers are for another difficulty (or "all"), for the Creatures screen.
   const modelState = (difficulty) => ({ t: translator(), catalog, reference: data.reference, profile: profile() || {}, pid: state.pid, sessions: state.hunts, entries: state.entries, advanced: state.advanced,
-    difficulty, creatures: state.creatures, planner: state.planner, spotMeta: {}, expTable: data.expTable, userSpots: state.userSpots });
+    difficulty, creatures: state.creatures, planner: state.planner, spotMeta: {}, expTable: data.expTable, hpTable: data.hpTable, userSpots: state.userSpots });
   function model() {
     if (!cachedModel) cachedModel = makeModel(modelState("master"), null, now(), { planCache });
     return cachedModel;
