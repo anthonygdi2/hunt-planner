@@ -156,6 +156,18 @@ test("options and the chain", () => {
   assert.ok(MAX_STEPS >= 2);
 });
 
+test("a typed bestiary count raises a spot's charm as its creatures near the end", () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, (msg || "") + " " + a + " vs " + b);
+  // Assassin 300/h (Hard: 2,500 kills, 50 points), Scout 200/h (Medium: 1,000 kills, 25 points).
+  near(spotValue(SP, NUMS, { diff: "master" }, ctx).m.charm, 300 * 50 / 2500 + 200 * 25 / 1000);
+  const counted = Object.assign({}, ctx, { entries: { "cobra-assassin": { bestiaryKills: 2000 }, "cobra-scout": { bestiaryKills: 950 } } });
+  near(spotValue(SP, NUMS, { diff: "master" }, counted).m.charm, 300 * 50 / 500 + 25, "500 left at 300/h; the Scout's 50 left are done within the hour");
+  // A 2 h session finishes both: 75 points over the 2 hours. The Talisman's double bestiary speeds the held one only.
+  near(spotValue(SP, NUMS, { diff: "master", hours: 2 }, counted).m.charm, 75 / 2);
+  near(spotValue(SP, NUMS, { diff: "master", held: { slug: "cobra-assassin", kills: 300 } }, Object.assign({}, counted, { bestiaryBonus: 50, entries: { "cobra-assassin": { bestiaryKills: 1500 }, "cobra-scout": { bestiaryDone: true } } })).m.charm,
+    300 * 1.5 * 50 / 1000);
+});
+
 test("damage bonuses raise every rate of the spot: a damage Prey, and the Talisman while the bounty lasts", () => {
   const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-6 * Math.max(1, Math.abs(b)), (msg || "") + " " + a + " vs " + b);
   const nums = Object.assign({ lph: 4e5, tasks: [] }, NUMS), held = { slug: "cobra-assassin", kills: 300 };

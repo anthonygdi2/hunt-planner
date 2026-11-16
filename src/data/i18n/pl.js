@@ -645,4 +645,10 @@ export default {
   "The plan follows your log: Silver {silver}%, Gold {gold}% per offer. It starts from a guess and moves toward your logged boards as they add up.": "Plan podąża za twoim logiem: Silver {silver}%, Gold {gold}% na ofertę. Zaczyna od szacunku i zbliża się do zapisanych tablic, gdy ich przybywa.",
   "Typed odds win over your log.": "Wpisane szanse mają pierwszeństwo przed logiem.",
   "Follow my log": "Podążaj za moim logiem",
+  "Optional: your kill count from the game’s Bestiary. Each kill left then counts for more as you near the end.": "Opcjonalnie: liczba killi z Bestiary w grze. Każdy brakujący kill liczy się wtedy bardziej, im bliżej końca.",
+  "All {total} kills done.": "Wszystkie {total} killi zrobione.",
+  "{left} kill left of {total}.": { one: "Został {left} kill z {total}.", few: "Zostały {left} kille z {total}.", many: "Zostało {left} killi z {total}.", other: "Zostało {left} killa z {total}." },
+  "Updated today.": "Zaktualizowano dzisiaj.",
+  "Updated {n} day ago.": { one: "Zaktualizowano {n} dzień temu.", few: "Zaktualizowano {n} dni temu.", many: "Zaktualizowano {n} dni temu.", other: "Zaktualizowano {n} dnia temu." },
+  "Bestiary kills so far": "Kille w bestiary do tej pory",
 };

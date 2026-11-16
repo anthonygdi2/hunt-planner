@@ -99,7 +99,8 @@ export const readTheme = (v) => (THEMES.indexOf(v) !== -1 ? v : "system");
 // ---------- entries: profiles/{pid}/entries/{slug} ----------
 export const RATINGS = ["S", "A", "B", "C", "D", "X"];
 const NUM_FIELDS = ["kph", "xph", "pph"];
-// {rating?, kph?, xph?, pph?, notes? (≤ 2000), bestiaryDone?, wardenDone?, updatedAt?, numsAt?, pinSpot?}
+// {rating?, kph?, xph?, pph?, notes? (≤ 2000), bestiaryDone?, bestiaryKills? (the kill count the game's Bestiary shows,
+// typed; since November 15, 2026), bestiaryKillsAt? (when it was typed), wardenDone?, updatedAt?, numsAt?, pinSpot?}
 export function readRecord(v) {
   const r = {};
   if (!v) return r;
@@ -107,6 +108,8 @@ export function readRecord(v) {
   NUM_FIELDS.forEach((k) => { if (typeof v[k] === "number" && isFinite(v[k])) r[k] = v[k]; });
   if (typeof v.notes === "string" && v.notes) r.notes = v.notes.slice(0, 2000);
   if (v.bestiaryDone === true) r.bestiaryDone = true;
+  if (typeof v.bestiaryKills === "number" && v.bestiaryKills >= 0 && v.bestiaryKills <= 100000) r.bestiaryKills = Math.floor(v.bestiaryKills);
+  if (r.bestiaryKills != null && typeof v.bestiaryKillsAt === "string") r.bestiaryKillsAt = v.bestiaryKillsAt;
   if (v.wardenDone === true) r.wardenDone = true;
   if (typeof v.updatedAt === "string") r.updatedAt = v.updatedAt;
   if (typeof v.numsAt === "string") r.numsAt = v.numsAt;

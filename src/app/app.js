@@ -1,6 +1,7 @@
 // The running app: one state object fed by db subscriptions, the actions that change it (writing through the store and
 // updating the state at once), and the model of the active character derived from it. The UI subscribes, renders
 // view models from it and calls its actions; it keeps no game state of its own.
+import { bestiaryOf } from "../core/metrics.js";
 import { VOCATIONS, TASK, TOKEN_CAP, PREY, PREY_SLOTS, SLOTS, TALISMAN } from "../data/rules.js";
 import { occKey, markAge } from "../core/occupancy.js";
 import { serverDay, weekKey } from "../core/weekly.js";
@@ -309,7 +310,22 @@ export function createApp({ data, prefs, now, browserLang }) {
     setAvoid(slug, on) { const r = (state.entries[slug] || {}).rating; saveEntry(slug, { rating: on ? "X" : r === "X" ? null : r }); },
     setPreferred(slug, on) { setSlot(slug, "preferred", on); },
     setUnwanted(slug, on) { setSlot(slug, "unwanted", on); },
-    setBestiaryDone(slug, on) { saveEntry(slug, { bestiaryDone: !!on }); },
+    // Switching it back off drops a typed kill count that had reached the total.
+    setBestiaryDone(slug, on) {
+      const c = catalog.bySlug[slug], k = (state.entries[slug] || {}).bestiaryKills, full = !on && c && k >= bestiaryOf(c).kills;
+      saveEntry(slug, Object.assign({ bestiaryDone: !!on }, full ? { bestiaryKills: null, bestiaryKillsAt: null } : {}));
+    },
+    // The creature's bestiary kill count as the game shows it (typed; empty clears it). Reaching the class's total marks
+    // the bestiary finished; a lower count marks it unfinished. Nothing changes when it isn't a whole number.
+    setBestiaryKills(slug, text) {
+      const c = catalog.bySlug[slug], raw = String(text == null ? "" : text).trim().replace(/[.,\s]/g, "");
+      if (!c) return;
+      if (raw === "") { saveEntry(slug, { bestiaryKills: null, bestiaryKillsAt: null }); return; }
+      if (!/^\d{1,6}$/.test(raw)) return;
+      const total = bestiaryOf(c).kills, n = Math.min(total, Number(raw));
+      if (n === (state.entries[slug] || {}).bestiaryKills) return;
+      saveEntry(slug, { bestiaryKills: n, bestiaryKillsAt: iso(), bestiaryDone: n >= total });
+    },
     setWardenDone(slug, on) { saveEntry(slug, { wardenDone: !!on }); },
     setNotes(slug, text) { saveEntry(slug, { notes: String(text || "").trim().slice(0, 2000) }); },
     // nums: {kph?, xph?, pph?} as typed ("1.2kk", "" to clear). Returns false (and writes nothing) if one isn't a number.

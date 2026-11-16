@@ -782,7 +782,8 @@ export function creatureView(state, model, catalog, slug, diff, ui, advanced) {
   // Its own task difficulty when the list shows all tasks, or when it isn't in that pool.
   const cdiff = diff !== "all" && creatureInPool(c, diff) ? diff : topPool(c), m = model.metricsFor(c, e, cdiff) || {};
   const idx = model.spotIndex(), dash = "–", tag = tags[c.slug];
-  const b = bestiaryOf(c);
+  const b = bestiaryOf(c), bk = typeof entry.bestiaryKills === "number" ? entry.bestiaryKills : null, bkAt = Date.parse(entry.bestiaryKillsAt || "");
+  const bkDays = bk != null && bkAt > 0 && model.now >= bkAt ? Math.floor((model.now - bkAt) / 864e5) : null;
   const bestiary = t("{kills} kills · {charm} charm points", { kills: b.kills.toLocaleString(locale()), charm: b.charmPoints }) +
     (c.r ? " · " + t("rare: no Echo Raids") : " · " + t("Echo Warden +{points}", { points: b.warden }));
 
@@ -824,6 +825,11 @@ export function creatureView(state, model, catalog, slug, diff, ui, advanced) {
     preferred: sl.preferred.indexOf(slug) !== -1, unwanted: sl.unwanted.indexOf(slug) !== -1, avoid: model.ratingOf(c) === "X",
     listsNote: t("Avoid keeps it out of your tiers and the plan."),
     bestiary, bestiaryDone: !!entry.bestiaryDone, wardenDone: !!entry.wardenDone, rare: !!c.r,
+    // The typed bestiary kill count: each kill left is then worth charm points ÷ kills left.
+    bestiaryKills: { value: bk != null ? String(bk) : "", hint: bk == null ? t("Optional: your kill count from the game’s Bestiary. Each kill left then counts for more as you near the end.")
+      : bk >= b.kills ? t("All {total} kills done.", { total: b.kills.toLocaleString(locale()) })
+      : t.n(b.kills - bk, "{left} kill left of {total}.", "{left} kills left of {total}.", { left: (b.kills - bk).toLocaleString(locale()), total: b.kills.toLocaleString(locale()) }) + (bkDays != null ? " " + (bkDays < 1 ? t("Updated today.")
+        : t.n(bkDays, "Updated {n} day ago.", "Updated {n} days ago.")) : "") },
     notes: ui.notes != null ? ui.notes : entry.notes || "",
     advanced: advanced ? {
       nums: NUM_FIELDS.map((k) => ({ key: k, label: k === "kph" ? t("Kills/h") : k === "xph" ? t("Exp/h") : t("Profit/h"), value: fmtField(k, entry[k]) })),

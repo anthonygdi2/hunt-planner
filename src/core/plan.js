@@ -2,7 +2,7 @@
 import { norm } from "./text.js";
 import { creatureInPool } from "./catalog.js";
 import { taskReward, kindMult } from "./rewards.js";
-import { bestiaryOf, expShares, lootMult, killMult } from "./metrics.js";
+import { bestiaryOf, bestiaryRate, expShares, lootMult, killMult } from "./metrics.js";
 import { GOAL_KEYS, weightedValue } from "./score.js";
 import { RHO, taskShape, rateThreshold } from "./reroll.js";
 import { markAge, markActive, occOdds, orderByOdds } from "./occupancy.js";
@@ -123,14 +123,15 @@ export function spotValue(sp, nums, opts, ctx) {
     v.parts.weekly += w.exp * f / H;
     v.weekly.push({ key: w.key, name: w.name, kph: k, kills: rate ? null : Math.min(w.rem, k * Hh), left: w.rem, exp: w.exp * f });
   });
-  // Charm as metrics counts it for every creature at a spot; the Talisman's double bestiary only for the held creature.
+  // Charm as metrics counts it for every creature at a spot (a typed bestiary count: each kill left is worth points ÷
+  // kills left, capped at finishing it in the hunting time); the Talisman's double bestiary only for the held creature.
   let charm = 0;
   const bonus = Number(ctx.bestiaryBonus) || 0, raidP = ctx.raidP;
   Object.keys(nums.kph).forEach((key) => {
     const o = ctx.catalog.bySlug[key];
     if (!o) return;
     const k = nums.kph[key], rec = ctx.entries[key] || {}, b = bestiaryOf(o);
-    if (!rec.bestiaryDone) charm += k * b.charmPoints / b.kills * (held && key === held.slug ? 1 + bonus / 100 : 1);
+    charm += bestiaryRate(o, rec, k * (held && key === held.slug ? 1 + bonus / 100 : 1), rate ? 1 : Hh);
     if (!rec.wardenDone && !o.r && raidP > 0) charm += k * raidP * (rec.bestiaryDone ? RAID.wardenShareDone : RAID.wardenShare) * b.warden;
   });
   v.m = { xp: v.parts.hunt + v.parts.today + v.parts.held + v.parts.weekly, profit: nums.pph != null ? nums.pph * Hh / H + v.lootBonus + v.talismanLoot : null,

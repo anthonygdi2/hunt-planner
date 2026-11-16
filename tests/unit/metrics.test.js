@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { metrics, bestiaryOf, expShares, lootMult, killMult } from "../../src/core/metrics.js";
+import { metrics, bestiaryOf, bestiaryRate, expShares, lootMult, killMult } from "../../src/core/metrics.js";
 import { makeCatalog } from "../../src/core/catalog.js";
 
 const catalog = makeCatalog([
@@ -130,4 +130,24 @@ test("damage bonuses: faster kills by the creature's share of the spot and the t
   assert.equal(metrics(cobra, Object.assign({ taskBonus: true }, rec), Object.assign({}, base, at, { talismanDamage: 10 })).profit, 2e5);
   // No spot rates: the record's own kill share stands in.
   near(metrics(cobra, { kph: 300, xph: 3e6, pph: 2e5, share: 1 }, Object.assign({}, base, { talismanDamage: 10 })).profit, 2e5 / (1 - 0.5 * 0.1 / 1.1));
+});
+
+test("a typed bestiary kill count: each kill left is worth charm points ÷ kills left, capped at finishing it", () => {
+  const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, (msg || "") + " " + a + " vs " + b);
+  // Cobra Assassin: Hard, 2,500 kills for 50 charm points.
+  near(bestiaryRate(cobra, {}, 300, 1), 300 * 50 / 2500, "no count: points ÷ the total");
+  near(bestiaryRate(cobra, { bestiaryKills: 0 }, 300, 1), 300 * 50 / 2500, "none done yet is the same");
+  near(bestiaryRate(cobra, { bestiaryKills: 1500 }, 300, 1), 300 * 50 / 1000, "1,000 left: each kill is worth more");
+  near(bestiaryRate(cobra, { bestiaryKills: 2400 }, 300, 1), 50, "100 left at 300/h: done within the hour, the whole 50 and no more");
+  near(bestiaryRate(cobra, { bestiaryKills: 2000 }, 300, 2), 50 / 2, "500 left, done in a 2 h session: 50 points over the 2 hours");
+  near(bestiaryRate(cobra, { bestiaryKills: 2000 }, 100, 2), 100 * 50 / 500, "not finished in the session: the plain rate per kill left");
+  assert.equal(bestiaryRate(cobra, { bestiaryKills: 2500 }, 300, 1), 0, "the total reached");
+  assert.equal(bestiaryRate(cobra, { bestiaryDone: true, bestiaryKills: 10 }, 300, 1), 0);
+  assert.equal(bestiaryRate(cobra, {}, 0, 1), 0);
+  // In the metrics: the creature's own bestiary (with the Talisman's double chance) and the others at its spot.
+  const rec = { kph: 300, xph: 3e6, pph: 2e5, spot: "Bastion", bestiaryKills: 1500 };
+  const at = { spotKph: { Bastion: { "cobra-assassin": 300, "cobra-scout": 100 } }, entries: { "cobra-scout": { bestiaryKills: 900 } } };
+  const m = metrics(cobra, rec, Object.assign({}, base, at, { bestiaryBonus: 20 }));
+  near(m.bestiaryCharm, 300 * 1.2 * 50 / 1000);
+  near(m.otherCharm, 25, "the Scout (Medium: 1,000 kills, 25 points) has 100 left at 100/h: all 25");
 });

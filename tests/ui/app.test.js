@@ -504,6 +504,22 @@ test("Creatures over the golden fixture: tiers, a creature page's writes, and th
   await until(() => store["profiles/ek"].slots.preferred.indexOf("cobra-assassin") !== -1 && store["profiles/ek"].slots.unwanted.indexOf("cobra-assassin") === -1, "Preferred again, off Unwanted");
   await p.click("#cr-avoid");
   await until(() => (store["profiles/ek/entries/cobra-assassin"] || {}).rating === "X", "Avoid");
+  // The bestiary kill count: typed, with kills left and when; reaching the total finishes the bestiary, and switching
+  // that back off drops the count.
+  assert.match(p.$("#cr-bkills-hint").textContent, /^Optional: your kill count/);
+  await p.type("#cr-bkills", "1,500");
+  await until(() => (store["profiles/ek/entries/cobra-assassin"] || {}).bestiaryKills === 1500, "the kill count");
+  assert.equal(typeof store["profiles/ek/entries/cobra-assassin"].bestiaryKillsAt, "string");
+  assert.equal(p.$("#cr-bkills-hint").textContent, "1,000 kills left of 2,500. Updated today.");
+  await p.type("#cr-bkills", "abc");
+  await wait(30);
+  assert.equal(store["profiles/ek/entries/cobra-assassin"].bestiaryKills, 1500, "not a number: nothing changes");
+  await p.type("#cr-bkills", "9999");
+  await until(() => store["profiles/ek/entries/cobra-assassin"].bestiaryDone === true, "the total reached: finished");
+  assert.equal(store["profiles/ek/entries/cobra-assassin"].bestiaryKills, 2500);
+  assert.equal(p.$("#cr-bestiary").getAttribute("aria-checked"), "true");
+  await p.click("#cr-bestiary");
+  await until(() => !("bestiaryKills" in store["profiles/ek/entries/cobra-assassin"]) && !store["profiles/ek/entries/cobra-assassin"].bestiaryDone, "unfinished again, the count dropped");
   await p.click("#cr-bestiary");
   await until(() => store["profiles/ek/entries/cobra-assassin"].bestiaryDone === true, "bestiary done");
   await p.type("#cr-notes", "Lure two boxes");

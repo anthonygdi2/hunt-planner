@@ -157,7 +157,7 @@ export function mount(root, app, host) {
       return creatureScreen.render(creatureView(s, M, app.catalog, slug, diff, U, s.advanced), {
         back: () => go("creatures"), spot: openSpot,
         preferred: (on) => a.setPreferred(slug, on), unwanted: (on) => a.setUnwanted(slug, on), avoid: (on) => a.setAvoid(slug, on),
-        bestiary: (on) => a.setBestiaryDone(slug, on), warden: (on) => a.setWardenDone(slug, on),
+        bestiary: (on) => a.setBestiaryDone(slug, on), bestiaryKills: (v) => a.setBestiaryKills(slug, v), warden: (on) => a.setWardenDone(slug, on),
         notesDraft: (t) => { U.notes = t; }, notes: (t) => { U.notes = null; a.setNotes(slug, t); },
         nums: (k, x) => { if (!a.setCreatureNumbers(slug, { [k]: x })) { s.notice = t("That isn’t a number. Type it like 450, 3.2kk or 800k."); draw(); } },
         pin: (spot) => a.pinSpot(slug, spot), minLevel: (t) => a.setMinLevel(slug, t),

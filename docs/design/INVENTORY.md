@@ -117,7 +117,7 @@ Reached from Hunting now, a spot page, a variation button, or Spots → "Log a c
 
 **Shows:** tiers S–D and Avoid for the chosen difficulty and goal mix; each creature as a chip, with bounty, Preferred, Unwanted and low-data markers. Table view: creature, tier, best spot, exp/h, profit/h, source.
 
-**You can:** switch Tiers / Table; search; open a creature panel (its spots, numbers and sources; mark Preferred or Unwanted, mirroring the in-game lists); edit the Preferred / Unwanted lists (the old slots planner, with odds). **[Decision]** The creature panel also keeps: Avoid, bestiary finished, Echo Warden done, notes, and in Advanced mode own numbers, pinned spot and "usable from level".
+**You can:** switch Tiers / Table; search; open a creature panel (its spots, numbers and sources; mark Preferred or Unwanted, mirroring the in-game lists); edit the Preferred / Unwanted lists (the old slots planner, with odds). **[Decision]** The creature panel also keeps: Avoid, bestiary finished, the bestiary kill count (optional, typed from the game), Echo Warden done, notes, and in Advanced mode own numbers, pinned spot and "usable from level".
 
 ## 8. Weekly
 

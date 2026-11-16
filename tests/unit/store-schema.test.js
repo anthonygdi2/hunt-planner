@@ -103,6 +103,13 @@ test("the loot bonuses on during a hunt", () => {
   assert.equal("boosts" in S.readHunt("h", { hours: 1, kills: [], boosts: 3 }), false);
 });
 
+test("an entry's typed bestiary kill count", () => {
+  assert.deepEqual(S.readRecord({ bestiaryKills: 1234.9, bestiaryKillsAt: "2026-11-15T10:00:00.000Z" }), { bestiaryKills: 1234, bestiaryKillsAt: "2026-11-15T10:00:00.000Z" });
+  assert.deepEqual(S.readRecord({ bestiaryKills: 0 }), { bestiaryKills: 0 });
+  assert.deepEqual(S.readRecord({ bestiaryKills: -1, bestiaryKillsAt: "x" }), {}, "a bad count, and no date without one");
+  assert.deepEqual(S.readRecord({ bestiaryKills: "12" }), {});
+});
+
 test("the Bounty Talisman: loot and bestiary chances, the bestiary kept in step with bestiaryBonus", () => {
   const T = (o) => Object.assign({ loot: 0, bestiary: 0, damage: 0, leech: 0 }, o);
   assert.deepEqual(S.readTalisman({}), T());

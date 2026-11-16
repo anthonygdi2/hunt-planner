@@ -725,23 +725,26 @@ test("creature page: numbers and sources, lists and Avoid, bestiary, notes, adva
     source: "From your hunts at Cobra Bastion.", weekly: "", spots: [{ name: "Cobra Bastion", id: "cobra-bastion", kph: "400/h", exp: "7kk exp/h", profit: "300k profit/h", used: true,
       badge: { kind: "yours", text: "Yours" }, note: "Used." }], noSpots: "", preferred: false, unwanted: true, avoid: false, listsNote: "…",
     bestiary: "2,500 kills for 50 charm points.", bestiaryDone: false, wardenDone: true, rare: false, notes: "lure",
+    bestiaryKills: { value: "1500", hint: "1,000 kills left of 2,500. Updated 3 days ago." },
     advanced: { nums: [{ key: "kph", label: "Kills/h", value: "" }, { key: "xph", label: "Exp/h", value: "" }, { key: "pph", label: "Profit/h", value: "" }],
       pin: { value: "", options: [{ value: "", label: "Best for my goal (Cobra Bastion)" }, { value: "Cobra Bastion", label: "Cobra Bastion" }] }, minLevel: "", minLevelLabel: "Usable from level (Elite Knights)" },
     updated: "Last edited Oct 21" };
   const s = spy(), on = {};
-  ["back", "spot", "preferred", "unwanted", "avoid", "bestiary", "warden", "notesDraft", "notes", "nums", "pin", "minLevel"].forEach((k) => { on[k] = s.fn(k); });
+  ["back", "spot", "preferred", "unwanted", "avoid", "bestiary", "bestiaryKills", "warden", "notesDraft", "notes", "nums", "pin", "minLevel"].forEach((k) => { on[k] = s.fn(k); });
   let $ = mount(creature.render(view, on));
   assert.equal($("#cr-unw").getAttribute("aria-pressed"), "true");
   assert.equal($("#cr-warden").getAttribute("aria-checked"), "true");
   assert.equal($("#cr-notes").value, "lure");
+  assert.deepEqual([$("#cr-bkills").value, $("#cr-bkills-hint").textContent, $("#cr-bkills").getAttribute("aria-describedby")], ["1500", "1,000 kills left of 2,500. Updated 3 days ago.", "cr-bkills-hint"]);
   $("#cr-pref").click(); $("#cr-unw").click(); $("#cr-avoid").click(); $("#cr-bestiary").click(); $("#cr-warden").click();
+  $("#cr-bkills").value = "1600"; $("#cr-bkills").dispatchEvent(new dom.window.Event("change"));
   $("#cr-notes").value = "lure two"; $("#cr-notes").dispatchEvent(new dom.window.Event("input")); $("#cr-notes").dispatchEvent(new dom.window.Event("change"));
   $("#cr-num-kph").value = "450"; $("#cr-num-kph").dispatchEvent(new dom.window.Event("change"));
   $("#cr-pin").value = "Cobra Bastion"; $("#cr-pin").dispatchEvent(new dom.window.Event("change"));
   $("#cr-minlevel").value = "700"; $("#cr-minlevel").dispatchEvent(new dom.window.Event("change"));
   document.querySelector('a[href="#/spot/cobra-bastion"]').click();
   document.querySelector(".hp-back").click();
-  assert.deepEqual(s.calls, [["preferred", true], ["unwanted", false], ["avoid", true], ["bestiary", true], ["warden", false], ["notesDraft", "lure two"], ["notes", "lure two"],
+  assert.deepEqual(s.calls, [["preferred", true], ["unwanted", false], ["avoid", true], ["bestiary", true], ["warden", false], ["bestiaryKills", "1600"], ["notesDraft", "lure two"], ["notes", "lure two"],
     ["nums", "kph", "450"], ["pin", "Cobra Bastion"], ["minLevel", "700"], ["spot", "cobra-bastion"], ["back"]]);
   mount(creature.render(Object.assign({}, view, { advanced: null, rare: true }), on));
   assert.equal(document.querySelector("#cr-warden"), null, "rare creatures have no Echo Warden");

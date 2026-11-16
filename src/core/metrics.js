@@ -21,6 +21,18 @@ export function expShares(kph, expTable) {
   return out;
 }
 
+// Charm points per hour from a creature's bestiary at kph kills/h (already raised by any double-bestiary chance), over
+// `hours` of hunting (1 for an hourly rate). rec: its entry {bestiaryDone, bestiaryKills}. The points come when the
+// bestiary is finished, so with the kill count typed each kill left is worth points ÷ kills left (as a weekly task's
+// kills are), capped at finishing it within those hours; without one, points ÷ the class's total. 0 when done.
+export function bestiaryRate(c, rec, kph, hours) {
+  const r = rec || {}, b = bestiaryOf(c);
+  if (r.bestiaryDone || !(kph > 0)) return 0;
+  if (typeof r.bestiaryKills !== "number") return kph * b.charmPoints / b.kills;
+  const left = b.kills - r.bestiaryKills, H = hours > 0 ? hours : 1;
+  return left > 0 ? b.charmPoints * Math.min(1, kph * H / left) / H : 0;
+}
+
 // What loot bonuses multiply a spot's loot by: each creature's share of the loot (shares: expShares, an estimate) × 2
 // when it's the boosted creature (rules.js BOOSTED_LOOT_MULT) × (1 + the sum of its loot chances / 100: loot Preys and
 // the Talisman add their chances, rules.js TALISMAN). boosted: a slug or null; chances: {slug: percent}. 1 when nothing
@@ -49,7 +61,8 @@ export function killMult(shares, bonuses, killTime) {
 // leads (higher once the bestiary is done).
 const wardenShare = (entry) => (entry.bestiaryDone ? RAID.wardenShareDone : RAID.wardenShare);
 
-// c: a catalog creature. rec: its working numbers {kph, xph, pph, spot} plus its entry's bestiaryDone and wardenDone.
+// c: a catalog creature. rec: its working numbers {kph, xph, pph, spot} plus its entry's bestiaryDone, bestiaryKills
+// (the typed kill count, when there is one: bestiaryRate) and wardenDone.
 // ctx:
 //   diff        the task difficulty
 //   kills       the task's kills (default: the middle of the range); mult: Silver/Gold multiplier (default 1)
@@ -62,7 +75,7 @@ const wardenShare = (entry) => (entry.bestiaryDone ? RAID.wardenShareDone : RAID
 //   spotEco     spot → {lph (loot/h, null when unknown)}, and expTable (slug → base exp), for that share
 //   raidP       Echo Raid chance per kill
 //   spotKph     spot → {slug: kills/h}, for what else dies at rec.spot
-//   entries     slug → entry {bestiaryDone, wardenDone}, for those other creatures
+//   entries     slug → entry {bestiaryDone, bestiaryKills, wardenDone}, for those other creatures
 //   talismanDamage  the Talisman's damage bonus in percent: the creature's kill rate at its spot, and the spot's exp
 //                  and profit with it, are raised by killMult (its share of that spot), unless its numbers come from
 //                  hunts logged on its bounty before bonuses were recorded (rec.taskBonus)
@@ -102,7 +115,7 @@ export function metrics(c, rec, ctx) {
   const b = bestiaryOf(c), bonus = Number(ctx.bestiaryBonus) || 0, raidP = ctx.raidP;
   const wardenOpen = !rec.wardenDone && !c.r && raidP > 0;
   if (kph != null) {
-    m.bestiaryCharm = rec.bestiaryDone ? 0 : kph * (b.charmPoints / b.kills) * (1 + bonus / 100);
+    m.bestiaryCharm = bestiaryRate(c, rec, kph * (1 + bonus / 100), 1);
     m.wardenCharm = wardenOpen ? kph * raidP * wardenShare(rec) * b.warden : 0;
     // Hunting a spot also progresses the bestiary (and Echo Warden chances) of everything else killed there. The
     // Talisman's double-bestiary chance only applies to the bounty creature itself.
@@ -112,7 +125,7 @@ export function metrics(c, rec, ctx) {
       const o = key !== c.slug && ctx.catalog.bySlug[key];
       if (!o) return;
       const ok = sk[key], orec = (ctx.entries && ctx.entries[key]) || {}, ob = bestiaryOf(o);
-      if (!orec.bestiaryDone) others += ok * ob.charmPoints / ob.kills;
+      others += bestiaryRate(o, orec, ok, 1);
       if (!orec.wardenDone && !o.r && raidP > 0) others += ok * raidP * wardenShare(orec) * ob.warden;
     });
     m.otherCharm = others;
